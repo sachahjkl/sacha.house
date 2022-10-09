@@ -20,8 +20,8 @@
 
 <style lang="postcss">
 	time {
-		@apply border-2 rounded-sm border-black  px-2 py-1
-         text-2xl shadow text-center inline-block drop-shadow-md
+		@apply border-2 rounded-sm border-zinc-900  px-2 py-1
+         text-2xl shadow text-center block drop-shadow-md my-auto
 		 cursor-pointer text-red-600 italic flex-grow-0 h-min select-none;
 		background-color: rgb(31, 0, 0);
 	}
