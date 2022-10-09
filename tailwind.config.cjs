@@ -1,3 +1,6 @@
+const daisyui = require('daisyui');
+const tailwindTypography = require('@tailwindcss/typography');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./src/routes/**/*.{svelte,js,ts}'],
@@ -5,5 +8,15 @@ module.exports = {
 		extend: {}
 	},
 
-	plugins: [require('daisyui')]
+	plugins: [tailwindTypography, daisyui],
+	daisyui: {
+		styled: true,
+		// themes: true,
+		// base: true,
+		// utils: true,
+		// logs: true,
+		// rtl: false,
+		// prefix: '',
+		darkTheme: 'business'
+	}
 };

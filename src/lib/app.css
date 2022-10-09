@@ -1,3 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Overpass&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+	font-family: 'Digital-7';
+	font-display: swap;
+	src: url('/fonts/digital-7/digital_7_mono.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Digital-7';
+	font-display: swap;
+	font-style: italic;
+	src: url('/fonts/digital-7/digital_7_mono_italic.ttf') format('truetype');
+}
+
+body {
+	font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
