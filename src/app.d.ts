@@ -7,5 +7,3 @@ declare namespace App {
 	// interface Error {}
 	// interface Platform {}
 }
-
-declare module 'daisyui';

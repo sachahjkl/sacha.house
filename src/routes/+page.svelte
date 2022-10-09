@@ -4,36 +4,40 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-
 	const { participants } = data;
+
+	import comrade from '$lib/assets/c-omrade.jpg';
 </script>
 
 <svelte:head>
 	<title>accueil / {SITE_TITLE}</title>
 </svelte:head>
-<div class="prose">
+
+<article class="prose">
 	<h1>
-		{SITE_TITLE}<span class="visites"><ClockDisplay value={`${participants.value} visites`} /></span
-		>
+		{SITE_TITLE}
+		<div class="visites hidden md:inline-block">
+			<ClockDisplay value={`${participants.value} visites`} />
+		</div>
 	</h1>
-	<hr />
-	<h2>Informations de contact / détails</h2>
+	<div class="divider" />
+	<h2 class="mt-2">Informations de contact / détails</h2>
 	<p>
 		<a href="/a-propos">à propos de moi</a>
 	</p>
 	<p>
 		<a href="mailto:{MOI.mail}">📧 M'envoyer un mail</a>
 	</p>
-	<hr />
-	<img class="illustration" src="/c-omrade.jpg" alt="comrade" />
-</div>
+	<div class="visites md:hidden inline-block">
+		<ClockDisplay value={`${participants.value} visites`} />
+	</div>
+	<div class="divider" />
+	<img class="illustration" src={comrade} alt="comrade" />
+</article>
 
 <style lang="postcss">
-	div {
+	.prose {
 		@apply mx-auto;
-	}
-	hr {
-		@apply my-3;
 	}
 	a {
 		@apply text-blue-500 visited:text-purple-500
@@ -41,11 +45,11 @@
 	}
 
 	.illustration {
-		@apply max-w-[80%] m-auto;
+		@apply max-w-[60%] m-auto;
 	}
 
 	h1 {
-		@apply flex justify-between flex-wrap items-center mb-2;
+		@apply flex justify-between flex-wrap content-center items-center mb-2;
 	}
 
 	.visites {
