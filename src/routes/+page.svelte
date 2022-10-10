@@ -4,7 +4,7 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const { participants } = data;
+	const { visites } = data;
 
 	import comrade from '$lib/assets/c-omrade.jpg';
 </script>
@@ -17,7 +17,7 @@
 	<h1>
 		{SITE_TITLE}
 		<div class="visites hidden md:inline-block">
-			<ClockDisplay value={`${participants.value} visites`} />
+			<ClockDisplay value={`${visites} visites`} />
 		</div>
 	</h1>
 	<div class="divider" />
@@ -29,7 +29,7 @@
 		<a href="mailto:{MOI.mail}">📧 M'envoyer un mail</a>
 	</p>
 	<div class="visites md:hidden inline-block">
-		<ClockDisplay value={`${participants.value} visites`} />
+		<ClockDisplay value={`${visites} visites`} />
 	</div>
 	<div class="divider" />
 	<img class="illustration" src={comrade} alt="comrade" />

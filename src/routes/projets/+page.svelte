@@ -2,24 +2,8 @@
 	import { MOI, SITE_TITLE } from '$lib/constants';
 	import gitlabSrc from '$lib/assets/gitlab.png';
 	import githubSrc from '$lib/assets/github.png';
-	import type { Data, Groups, ProjectMemberships } from '$lib/interfaces/Project';
 	import Project from '$lib/components/Project.svelte';
-
-	const getProjects = async () => {
-		const res = await fetch('/projets', {
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-		const data: Data = await res.json();
-		return data;
-	};
-
-	const gitlabMerge = (groups: Groups, projectMemberships: ProjectMemberships) => {
-		groups.nodes.map((node) => {
-			return node.projects.nodes;
-		});
-	};
+	import { getProjects } from '$lib/utils';
 
 	const projectsPromise = getProjects();
 </script>
@@ -60,31 +44,28 @@
 		{#await projectsPromise}
 			<button class="btn btn-ghost loading">Chargement des données...</button>
 		{:then data}
+			<!-- content here -->
 			<ul class="projects not-prose">
-				{#each data.gitlab.user.groups.nodes as group}
-					{#each group.projects.nodes.sort((a, b) => (b.description?.length ?? 0) - (a.description?.length ?? 0)) as { avatarUrl, description, name, url }}
-						<li>
-							<Project {description} name={`${name} (groupe ${group.name})`} {url} {avatarUrl} />
+				{#each data.gitlab as { avatarUrl, description, name, url, group, visibility }}
+					{#if visibility.toLowerCase().includes('public')}
+						<li class="project">
+							<Project
+								{description}
+								name={`${name} ${group ? `(groupe ${group?.name})` : ''}`}
+								{url}
+								{avatarUrl}
+							/>
 						</li>
-					{/each}
+					{/if}
 				{:else}
 					<li>Pas de projet !</li>
 				{/each}
-				{#each data.gitlab.user.projectMemberships.nodes.sort((a, b) => (b.project.description?.length ?? 0) - (a.project.description?.length ?? 0)) as { project }}
-					<li>
-						<Project
-							description={project.description}
-							name={project.name}
-							url={project.url}
-							avatarUrl={project.avatarUrl}
-						/>
-					</li>
-				{/each}
 			</ul>
+		{:catch _}
+			<button class="btn btn-ghost">💣 Erreur de chargement !</button>
 		{/await}
 		<!--  -->
 	</section>
-	<div class="divider" />
 	<section>
 		<h2>
 			<img class="title-logo" src={githubSrc} alt="GitHub Logo" /> GitHub /
@@ -94,14 +75,16 @@
 			<button class="btn btn-ghost loading">Chargement des données...</button>
 		{:then data}
 			<ul class="projects not-prose">
-				{#each data.github.user.projects.nodes.sort((a, b) => (b.description?.length ?? 0) - (a.description?.length ?? 0)) as { description, name, url }}
-					<li>
+				{#each data.github as { description, name, url }}
+					<li class="project">
 						<Project {description} {name} {url} />
 					</li>
-				{:else}²
+				{:else}
 					<li>Pas de projet !</li>
 				{/each}
 			</ul>
+		{:catch _}
+			<button class="btn btn-ghost">💣 Erreur de chargement !</button>
 		{/await}
 	</section>
 </article>
@@ -116,6 +99,8 @@
 	}
 
 	.projects {
-		@apply list-none max-h-[500px] overflow-y-scroll;
+		@apply list-none max-h-[500px] p-0 overflow-y-scroll border-y-2;
 	}
+	/* .project {
+	} */
 </style>

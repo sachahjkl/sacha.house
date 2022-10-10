@@ -23,67 +23,74 @@
 	onMount(() => {
 		themeChange(false);
 	});
+	let headerheight = 0; // in pixels;
 </script>
 
-<nav>
-	<ul class="inline-list">
-		<li class="title md:order-first ">
-			<img class="favicon" src="/favicon_shadow.png" alt="favicon" />
-			{MOI.prenom.substring(1)}
-			{capitalize(MOI.nom)}
-		</li>
-		<li class="dropdown md:hidden order-first ">
-			<label tabindex="0" for="navDropdown" class="btn border gap-2 btn-primary m-1">
-				<HamburgerIcon />
-				Menu
-			</label>
-			<ul
-				id="navDropdown"
-				tabindex="0"
-				class="dropdown-content border menu shadow bg-base-100 rounded-box w-52"
-			>
-				{#each navItems as item}
-					<li>
-						<a class:active={$page.url.pathname === item.slug} href={item.slug}>
-							{item.icon}
-							{item.title}
-						</a>
-					</li>
-				{/each}
-				<li class="select-none flex items-center">
-					<form class=" w-full">
-						🌚 <input
-							type="checkbox"
-							data-toggle-theme="light,dark"
-							data-act-class="ACTIVECLASS"
-							class="toggle toggle-sm"
-						/> 🌞
-					</form>
-				</li>
-			</ul>
-		</li>
-		{#each navItems as item}
-			<li class="item-inline">
-				<a class:active={$page.url.pathname === item.slug} href={item.slug}>
-					{item.icon}
-					{item.title}
+<header bind:clientHeight={headerheight}>
+	<nav>
+		<ul class="inline-list">
+			<li class="title md:order-first ">
+				<a href="/">
+					<img class="favicon" src="/favicon_shadow.png" alt="favicon" />
+					{MOI.prenom.substring(1)}
+					{capitalize(MOI.nom)}
 				</a>
 			</li>
-		{/each}
+			<li class="dropdown md:hidden order-first ">
+				<label tabindex="0" for="navDropdown" class="btn border gap-2 btn-primary m-1">
+					<HamburgerIcon />
+					Menu
+				</label>
+				<ul
+					id="navDropdown"
+					tabindex="0"
+					class="dropdown-content border menu shadow bg-base-100 rounded-box w-52"
+				>
+					{#each navItems as item}
+						<li>
+							<a class:active={$page.url.pathname === item.slug} href={item.slug}>
+								{item.icon}
+								{item.title}
+							</a>
+						</li>
+					{/each}
+					<li class="select-none flex items-center hover-bounce">
+						<form class=" w-full">
+							<span class="bounce">🌚</span>
+							<input
+								type="checkbox"
+								data-toggle-theme="light,dark"
+								data-act-class="ACTIVECLASS"
+								class="toggle toggle-sm"
+							/> <span class="bounce">🌞</span>
+						</form>
+					</li>
+				</ul>
+			</li>
+			{#each navItems as item}
+				<li class="item-inline">
+					<a class:active={$page.url.pathname === item.slug} href={item.slug}>
+						{item.icon}
+						{item.title}
+					</a>
+				</li>
+			{/each}
 
-		<li class="hidden md:flex items-center select-none">
-			🌚 <input
-				type="checkbox"
-				data-toggle-theme="light,dark"
-				data-act-class="ACTIVECLASS"
-				class="toggle toggle-sm mx-2"
-			/> 🌞
-		</li>
-	</ul>
-</nav>
+			<li class="hidden md:flex items-center select-none hover-bounce">
+				<span class="bounce">🌚</span>
+				<input
+					type="checkbox"
+					data-toggle-theme="light,dark"
+					data-act-class="ACTIVECLASS"
+					class="toggle toggle-sm mx-2"
+				/> <span class="bounce">🌞</span>
+			</li>
+		</ul>
+	</nav>
+</header>
 
 {#if init}
-	<div class="content" in:fly={{ y: -50 }}>
+	<div style="--headerHeight: {headerheight}px" class="content" in:fly={{ y: -50 }}>
 		<main>
 			<slot><!-- optional fallback --></slot>
 		</main>
@@ -102,8 +109,17 @@
 {/if}
 
 <style lang="postcss">
+	header {
+		@apply fixed top-0 bg-base-100  w-full z-10;
+	}
+
+	header + * {
+		@apply mt-[calc(var(--headerHeight)_+_1rem)];
+	}
+	nav {
+	}
 	main {
-		@apply max-w-5xl m-auto mt-4 p-4;
+		@apply max-w-5xl m-auto p-4;
 	}
 	.active {
 		@apply font-bold;
@@ -131,5 +147,21 @@
 
 	.title {
 		@apply font-bold mx-2 my-auto inline-block;
+	}
+
+	.hover-bounce:hover .bounce {
+		animation: bounce 1s infinite;
+	}
+
+	@keyframes bounce {
+		0%,
+		100% {
+			transform: none;
+			animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+		}
+		50% {
+			transform: translateY(-25%);
+			animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+		}
 	}
 </style>
