@@ -1,11 +1,9 @@
-import { derived, writable } from 'svelte/store';
 import { auth } from './auth';
 
 export interface NavItem {
 	icon: string;
 	title: string;
 	pathname: string;
-	// access: RouteAccess;
 }
 
 const defaultNavItems: NavItem[] = [
@@ -15,9 +13,5 @@ const defaultNavItems: NavItem[] = [
 	{ icon: '🔒', title: 'admin', pathname: '/admin' }
 ];
 
-export const getFilteredNavItems = (clientAddress = '') =>
+export const getAuthorizedNavItems = (clientAddress = '') =>
 	defaultNavItems.filter((item) => auth(item.pathname, { clientAddress }));
-
-export const filteredNavItems = writable(getFilteredNavItems());
-
-export const navItems = derived(filteredNavItems, (s) => s);

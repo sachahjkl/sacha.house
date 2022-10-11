@@ -47,7 +47,6 @@
 			<!-- content here -->
 			<ul class="projects not-prose">
 				{#each data.gitlab as { avatarUrl, description, name, url, group, visibility }}
-					{#if visibility.toLowerCase().includes('public')}
 						<li class="project">
 							<Project
 								{description}
@@ -56,7 +55,6 @@
 								{avatarUrl}
 							/>
 						</li>
-					{/if}
 				{:else}
 					<li>Pas de projet !</li>
 				{/each}
@@ -99,8 +97,10 @@
 	}
 
 	.projects {
-		@apply list-none max-h-[500px] p-0 overflow-y-scroll border-y-2;
+		@apply list-none max-h-[540px] p-0 overflow-y-scroll border-y-2
+		snap-y snap-mandatory;
 	}
-	/* .project {
-	} */
+	.project {
+		@apply snap-start;
+	}
 </style>

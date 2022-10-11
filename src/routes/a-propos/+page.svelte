@@ -13,7 +13,7 @@
 <article class="prose">
 	<h1 class="">à propos</h1>
 	<div class="avatar block mx-auto">
-		<div class="w-80 mx-auto rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+		<div class="pic">
 			<img class="me" src={picSrc} alt="Moi" />
 		</div>
 	</div>
@@ -36,16 +36,33 @@
 		<li>Mail : <CopyableValue value={MOI.mail} /></li>
 		<li>Adresse Ethereum : <CopyableValue value={MOI.ethAddress} /></li>
 		<li>
-			Adresse Monero <CopyableValue value={MOI.moneroAdress} />
+			Adresse Monero : <CopyableValue value={MOI.moneroAdress} />
+		</li>
+		<li>
+			Profil linkedinProfile : <a href={MOI.linkedin.toString()}>{MOI.linkedin.toString()}</a>
+		</li>
+		<li>
+			Profil GitHub : <a href={MOI.github.toString()}>{MOI.github.toString()}</a>
+		</li>
+		<li>
+			Profil GitLab : <a href={MOI.gitlab.toString()}>{MOI.gitlab.toString()}</a>
 		</li>
 	</ul>
 </article>
 
 <style lang="postcss">
+	.pic {
+		@apply w-80 mx-auto rounded-full ring-4 hover:ring-8
+		hover:ring-secondary hover:scale-105 active:ring-success active:scale-95
+		transition-all ring-primary ring-offset-base-100 ring-offset-2;
+	}
 	article {
 		@apply mx-auto;
 	}
 	.me {
 		@apply m-0;
+	}
+	a {
+		@apply hover:scale-105 transition-all;
 	}
 </style>

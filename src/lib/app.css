@@ -19,8 +19,8 @@
 
 :root {
 	--toastWidth: 30ch;
-	--toastBackground: hsla(var(--b1) / var(--tw-bg-opacity, 1));
-	--toastColor: hsla(var(--bc) / var(--tw-text-opacity, 1));
+	--toastBackground: hsla(var(--bc) / var(--tw-text-opacity, 1));
+	--toastColor: hsla(var(--b1) / var(--tw-bg-opacity, 1));
 	--toastBarBackground: hsl(var(--p));
 }
 

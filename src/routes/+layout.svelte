@@ -102,13 +102,14 @@
 				<p>Copyright © {year} - All right reserved</p>
 			</div>
 			<img
+				class="deploy-img"
 				src="https://api.netlify.com/api/v1/badges/{PUBLIC_NETLIFY_SITE_ID}/deploy-status"
 				alt="Deploy Status Badge"
 			/>
 		</footer>
 	</div>
 {/if}
-<SvelteToast options={{ duration: 200000 }} />
+<SvelteToast options={{ duration: 2000 }} />
 
 <style lang="postcss">
 	header {
@@ -153,6 +154,10 @@
 
 	.hover-bounce:hover .bounce {
 		animation: bounce 1s infinite;
+	}
+
+	.deploy-img {
+		@apply hover:scale-95 active:scale-90 transition-all;
 	}
 
 	@keyframes bounce {

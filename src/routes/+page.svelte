@@ -23,10 +23,10 @@
 	<div class="divider" />
 	<h2 class="mt-2">Informations de contact / détails</h2>
 	<p>
-		<a href="/a-propos">à propos de moi</a>
+		➜ <a href="/a-propos">à propos de moi</a>
 	</p>
 	<p>
-		<a href="mailto:{MOI.mail}">📧 M'envoyer un mail</a>
+		📧 <a href="mailto:{MOI.mail}">M'envoyer un mail</a>
 	</p>
 	<div class="visites md:hidden inline-block">
 		<ClockDisplay value={`${visites} visites`} />
@@ -45,7 +45,8 @@
 	}
 
 	.illustration {
-		@apply max-w-[60%] m-auto;
+		@apply max-w-[60%] m-auto hover:scale-95
+		active:scale-90 transition-all;
 	}
 
 	h1 {
