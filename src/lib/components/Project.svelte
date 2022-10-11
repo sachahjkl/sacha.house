@@ -33,7 +33,7 @@
 		@apply link hover:text-primary focus:text-primary-focus ;
 	}
 	div.card {
-		@apply bg-base-100 border shadow m-2 hover:scale-95 active:scale-105 transition-transform;
+		@apply bg-base-100 border shadow m-2 hover:scale-95 active:scale-[1.01] transition-transform;
 	}
 	.letter {
 		--color: lightred;

@@ -1,8 +1,10 @@
-import type { LayoutLoad } from './$types';
+import type { LayoutServerLoad } from './$types';
+import { navItems } from '$lib/nav';
+import { get } from 'svelte/store';
 import { countAPIConfig } from '$lib/constants';
 import type { Result } from 'countapi-js';
 
-export const load: LayoutLoad = async ({ fetch }) => {
+export const load: LayoutServerLoad = async ({ fetch }) => {
 	const { key, namespace } = countAPIConfig;
 	let visites = -1;
 	try {
@@ -14,6 +16,7 @@ export const load: LayoutLoad = async ({ fetch }) => {
 		console.log("erreur à l'incrémentation du compteur de visites.");
 	}
 	return {
+		navItems: get(navItems),
 		visites
 	};
 };

@@ -6,6 +6,7 @@ import preprocess from 'svelte-preprocess';
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
+
 	preprocess: preprocess({
 		postcss: true
 	}),
@@ -14,7 +15,10 @@ const config = {
 		adapter: adapter({
 			edge: true,
 			split: false
-		})
+		}),
+		version: {
+			name: Date.now().toString()
+		}
 	}
 };
 

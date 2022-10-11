@@ -17,6 +17,17 @@
 	src: url('/fonts/digital-7/digital_7_mono_italic.ttf') format('truetype');
 }
 
+:root {
+	--toastWidth: 30ch;
+	--toastBackground: hsla(var(--b1) / var(--tw-bg-opacity, 1));
+	--toastColor: hsla(var(--bc) / var(--tw-text-opacity, 1));
+	--toastBarBackground: hsl(var(--p));
+}
+
+._toastMsg {
+	@apply text-ellipsis overflow-hidden;
+}
+
 body {
 	font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

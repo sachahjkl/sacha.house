@@ -1,19 +1,20 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { themeChange } from 'theme-change';
 	import '$lib/app.css';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import { themeChange } from 'theme-change';
 	import { MOI } from '$lib/constants';
 	import { capitalize } from '$lib/utils';
 	import { PUBLIC_NETLIFY_SITE_ID, PUBLIC_USE_INTRO } from '$env/static/public';
 	import HamburgerIcon from '$lib/components/HamburgerIcon.svelte';
-	import { fly } from 'svelte/transition';
+	import { SvelteToast } from '@zerodevx/svelte-toast';
+	import type { LayoutData } from './$types';
 
-	const navItems = [
-		{ icon: '🏡', title: 'accueil', slug: '/' },
-		{ icon: '📁', title: 'projets', slug: '/projets' },
-		{ icon: '📜', title: 'à propos', slug: '/a-propos' }
-	];
+	export let data: LayoutData;
+	const { navItems } = data;
+
+	const year = new Date().getFullYear();
 
 	const useIntro: boolean = JSON.parse(PUBLIC_USE_INTRO);
 	let init = useIntro ? false : true;
@@ -48,7 +49,7 @@
 				>
 					{#each navItems as item}
 						<li>
-							<a class:active={$page.url.pathname === item.slug} href={item.slug}>
+							<a class:active={$page.url.pathname === item.pathname} href={item.pathname}>
 								{item.icon}
 								{item.title}
 							</a>
@@ -69,7 +70,7 @@
 			</li>
 			{#each navItems as item}
 				<li class="item-inline">
-					<a class:active={$page.url.pathname === item.slug} href={item.slug}>
+					<a class:active={$page.url.pathname === item.pathname} href={item.pathname}>
 						{item.icon}
 						{item.title}
 					</a>
@@ -98,7 +99,7 @@
 		<footer class="footer justify-between p-4 max-w-5xl m-auto mt-3">
 			<div class="items-center grid-flow-col">
 				<img class="favicon" src="/favicon_shadow.png" alt="Logo" />
-				<p>Copyright © 2022 - All right reserved</p>
+				<p>Copyright © {year} - All right reserved</p>
 			</div>
 			<img
 				src="https://api.netlify.com/api/v1/badges/{PUBLIC_NETLIFY_SITE_ID}/deploy-status"
@@ -107,6 +108,7 @@
 		</footer>
 	</div>
 {/if}
+<SvelteToast options={{ duration: 200000 }} />
 
 <style lang="postcss">
 	header {

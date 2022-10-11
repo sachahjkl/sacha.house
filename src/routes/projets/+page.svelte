@@ -12,7 +12,7 @@
 	<title>projets / {SITE_TITLE}</title>
 </svelte:head>
 <article class="prose">
-	<h1 class="">Projets</h1>
+	<h1 class="">projets</h1>
 	<p>Mes projets, plus ou moins aboutis. Dans la globalité, l'objectif de ces dépôts était :</p>
 	<ul>
 		<li>D'apprendre des nouvelles technologies.</li>
