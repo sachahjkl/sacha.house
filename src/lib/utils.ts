@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import type { ProjetsResponse } from 'src/routes/projets/+server';
+import type { ProjetsResponse } from 'src/routes/api/projets/+server';
 import { get } from 'svelte/store';
 import { projectData } from './store';
 
@@ -17,7 +17,7 @@ export const randomColor = () => {
 export const getProjects = async () => {
 	const dataCheck = get(projectData);
 	if (dataCheck) return dataCheck;
-	const res = await fetch('/projets', {
+	const res = await fetch('/api/projets', {
 		headers: {
 			'Content-Type': 'application/json'
 		}

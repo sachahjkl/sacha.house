@@ -35,16 +35,18 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		const GH = (await resGH.json()) as { data: { user: { projects: { nodes: Project[] } } } };
 		const GL = (await resGL.json()) as { data: { projects: { nodes: Project[] } } };
 
+		const removePrivate = (node: Project) => node.visibility.toLowerCase() !== 'private';
+
 		const response: ProjetsResponse = {
-			github: GH.data.user.projects.nodes,
-			gitlab: GL.data.projects.nodes
+			github: GH.data.user.projects.nodes.filter(removePrivate),
+			gitlab: GL.data.projects.nodes.filter(removePrivate)
 		};
 		return json(response, {
 			headers: {
-				'Cache-Control': 'max-age=604800'
+				'Cache-Control': 'max-age=3600'
 			}
 		});
 	} catch (err) {
-		throw error(500, 'Impossible de récupérer les données de projet.');
+		throw error(500, 'Impossible de récupérer les données des projets.');
 	}
 };
