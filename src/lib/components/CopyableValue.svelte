@@ -15,10 +15,16 @@
 
 <style lang="postcss">
 	code {
-		@apply inline-flex transition-all bg-base-content text-base-100 px-2 py-1 rounded m-1 hover:ring active:scale-105;
+		@apply inline-flex transition-all bg-base-200 text-base-content px-2 py-1 rounded m-1 hover:ring active:scale-105;
 	}
 	.value {
 		@apply inline-block  max-w-[30ch] overflow-x-scroll hover:underline;
+		-ms-overflow-style: none; /* for Internet Explorer, Edge */
+		scrollbar-width: none;
+	}
+
+	.value::-webkit-scrollbar {
+		@apply hidden;
 	}
 
 	.copy-icon {

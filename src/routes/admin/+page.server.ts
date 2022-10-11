@@ -10,12 +10,12 @@ export const load: PageServerLoad = async ({ fetch, getClientAddress }) => {
 			headers: {
 				Authorization: `Bearer ${SECRET_PROXYCURL_BEARER_TOKEN}`
 			},
-			mode: 'cors'
+			mode: 'no-cors'
 		});
 
 		({ credit_balance } = (await res.json()) as { credit_balance: number });
 	} catch (error) {
-		console.error("Echec de la récupération du crédit restant por l'api ProxyCURL");
+		console.error("Echec de la récupération du crédit restant por l'api ProxyCURL", error);
 	}
 	// const clientAddress = getClientAddress();
 	// if (!auth(url.pathname, { clientAddress })) throw redirect(302, '/');

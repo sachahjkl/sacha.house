@@ -1,5 +1,6 @@
 const daisyui = require('daisyui');
 const tailwindTypography = require('@tailwindcss/typography');
+const tailwindLineClamp = require('@tailwindcss/line-clamp');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
 		extend: {}
 	},
 
-	plugins: [tailwindTypography, daisyui],
+	plugins: [tailwindLineClamp, tailwindTypography, daisyui],
 	daisyui: {
 		styled: true,
 		// themes: true,

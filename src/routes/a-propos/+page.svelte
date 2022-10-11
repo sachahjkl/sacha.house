@@ -29,7 +29,14 @@
 		N’hésitez pas à <a href="mailto:{MOI.mail}">m’envoyer un mail</a> à propos de ce que vous pensez
 		de ce site ou tout autre sujet qui pourrait m’intéresser (travail, discussion, projet, ...).
 	</p>
+	<div class="divider" />
 	<h2>Détails professionels</h2>
+	<p>
+		Lorem ipsum dolor sit amet, consectetur adipisicing elit. Porro magni neque commodi fugit
+		tempore unde velit laudantium illum deserunt modi beatae iste amet soluta quam consectetur
+		obcaecati recusandae, reiciendis maxime!
+	</p>
+	<div class="divider" />
 	<h2>Contact</h2>
 	<p>Voici, en vrac, une liste d'information de contact me concernant :</p>
 	<ul>
