@@ -1,31 +1,36 @@
 import { env } from '$env/dynamic/private';
 
+const ADMIN_ALWAYS_OFF = false;
+const DEFAULT_IPS = ['127.0.0.1', '::1'];
+
 export enum Visibility {
 	public,
 	admin
 }
 
 export interface AccessRule {
-	pathname: string;
+	pathname: RegExp;
 	visibility: Visibility[];
 }
 
 const rules: AccessRule[] = [
 	{
-		pathname: '/admin',
+		pathname: /^\/(api\/)?admin\/?.*$/,
 		visibility: [Visibility.admin]
 	}
 ];
 
-const isAuthorizedIP = (ip = '255.255.255.255') =>
-	[...env.SECRET_ADMIN_IPS.split(',').map((item) => item.trim()), '127.0.0.1', '::1'].includes(ip);
+const isAuthorizedIP = (ip = '255.255.255.255') => {
+	const IPs = (JSON.parse(env.SECRET_ADMIN_IPS) as string[]).map((item) => item.trim());
+	return !ADMIN_ALWAYS_OFF && [...IPs, ...DEFAULT_IPS].includes(ip);
+};
 
 interface AuthParams {
 	clientAddress?: string;
 }
 
 export const auth = (pathname: string, params: AuthParams): boolean => {
-	const rule = rules.find((rule) => rule.pathname === pathname);
+	const rule = rules.find((rule) => pathname.match(rule.pathname));
 	let access = false;
 	if (!rule) {
 		access = true;
