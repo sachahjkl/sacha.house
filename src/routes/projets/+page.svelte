@@ -46,7 +46,7 @@
 		{:then data}
 			<!-- content here -->
 			<ul class="projects not-prose">
-				{#each data.gitlab as { avatarUrl, description, name, url, group, visibility }}
+				{#each data.gitlab as { avatarUrl, description, name, url, group }}
 						<li class="project">
 							<Project
 								{description}

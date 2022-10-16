@@ -18,7 +18,7 @@
 			</div>
 		{:else}
 			<div
-				style={(avatarUrl ?? '').trim() !== '' ? '' : `--color: hsl(${h}, ${s}%, ${l}%)`}
+				style={(avatarUrl ?? '').trim() !== '' ? '' : `--color: hsl(${h}, ${s*100}%, ${l*100}%)`}
 				class="letter-box"
 			>
 				<span class="letter">
