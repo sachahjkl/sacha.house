@@ -9,7 +9,6 @@ import { MOI } from '$lib/constants';
 import { HTTPMethod } from '$lib/interfaces/HTTP';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import serverFetch from 'node-fetch';
 
 export interface UpdateProfileData {
 	profile: unknown;
@@ -33,15 +32,12 @@ export const GET: RequestHandler = async ({ fetch }) => {
 	}
 };
 
-export const PATCH: RequestHandler = async ({ url, getClientAddress, fetch }) => {
-	if (!auth(url.pathname, { clientAddress: getClientAddress(), method: HTTPMethod.PATCH })) {
-		throw error(401, 'Pas autorisé à exécuter cette action.');
-	}
+const fetchProxyCurl = async () => {
 	const proxyCurlURL = new URL(`${PUBLIC_PROXYCURL_API_ENDPOINT}/proxycurl/api/v2/linkedin`);
 	proxyCurlURL.searchParams.append('url', MOI.linkedin.toString());
 	proxyCurlURL.searchParams.append('fallback_to_cache', 'on-error');
 
-	const res = await serverFetch(proxyCurlURL.toString(), {
+	const res = await fetch(proxyCurlURL.toString(), {
 		headers: {
 			Authorization: `Bearer ${SECRET_PROXYCURL_BEARER_TOKEN}`
 		}
@@ -52,7 +48,15 @@ export const PATCH: RequestHandler = async ({ url, getClientAddress, fetch }) =>
 			`Récupération du profil échouée. "${await res.text()}";  ${proxyCurlURL.toString()}`
 		);
 	const profile = await res.json();
+	return profile;
+};
 
+export const PATCH: RequestHandler = async ({ url, getClientAddress, fetch }) => {
+	if (!auth(url.pathname, { clientAddress: getClientAddress(), method: HTTPMethod.PATCH })) {
+		throw error(401, 'Pas autorisé à exécuter cette action.');
+	}
+
+	const profile = await fetchProxyCurl();
 	console.info('Profil LinkedIn récupéré :', JSON.stringify(profile));
 
 	const gist = {
