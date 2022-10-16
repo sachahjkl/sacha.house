@@ -7,7 +7,7 @@
 	$: characters = value.length;
 </script>
 
-<time on:click={clickCallback}>
+<time on:click={clickCallback} on:keypress={clickCallback}>
 	<span class="text" bind:this={text}>
 		<span class="char-grid">
 			{Array.from(Array(characters - 1))

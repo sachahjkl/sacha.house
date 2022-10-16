@@ -1,4 +1,3 @@
-import chroma from 'chroma-js';
 import type { ProjetsResponse } from 'src/routes/api/projets/+server';
 import { get } from 'svelte/store';
 import { projectData } from './store';
@@ -7,11 +6,11 @@ export function capitalize(s: string) {
 	return s[0].toUpperCase() + s.slice(1);
 }
 
-export const randomColor = () => {
+export const randomColorHSL = () => {
 	// 30 random hues with step of 12 degrees
 	const h = Math.floor((Math.random() * 360) / 12) * 12;
 
-	return chroma.hsl(h, 0.9, 0.6).hex();
+	return [h, 0.9, 0.6];
 };
 
 export const getProjects = async () => {
@@ -22,7 +21,7 @@ export const getProjects = async () => {
 			'Content-Type': 'application/json'
 		}
 	});
-	if (300 <= res.status && res.status < 200) throw new Error();
+	if (!res.ok) throw new Error('bourbier pas de projet khouya');
 	const data: ProjetsResponse = await res.json();
 	projectData.set(data);
 	return data;

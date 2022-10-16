@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { randomColor } from '$lib/utils';
+	import { randomColorHSL } from '$lib/utils';
 
 	export let description = 'N/A';
 	export let name = 'Projet';
 	export let url = 'https://github.com/torvalds/linux';
 	export let avatarUrl = '';
+	const [h, s, l] = randomColorHSL();
 </script>
 
 <a href={url}>
@@ -17,7 +18,7 @@
 			</div>
 		{:else}
 			<div
-				style={(avatarUrl ?? '').trim() !== '' ? '' : `--color: ${randomColor()}`}
+				style={(avatarUrl ?? '').trim() !== '' ? '' : `--color: hsl(${h}, ${s}%, ${l}%)`}
 				class="letter-box"
 			>
 				<span class="letter">

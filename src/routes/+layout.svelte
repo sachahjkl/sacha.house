@@ -38,10 +38,19 @@
 				</a>
 			</li>
 			<li class="dropdown md:hidden order-first ">
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+				<!--
+					INFO :  We use a <label tabindex="0"> instead of a <button>
+					because Safari has a bug that prevents the button from being focused.
+				-->
 				<label tabindex="0" for="navDropdown" class="btn border gap-2 btn-primary m-1">
 					<HamburgerIcon />
 					Menu
 				</label>
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+				<!--
+					 Using tabindex="0" is required so the dropdown can be focused.
+				-->
 				<ul
 					id="navDropdown"
 					tabindex="0"
