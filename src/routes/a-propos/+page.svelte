@@ -1,21 +1,13 @@
 <script lang="ts">
 	import { MOI, SITE_TITLE } from '$lib/constants';
-	import { capitalize } from '$lib/utils';
+	import { capitalize, getProfile } from '$lib/utils';
 
 	import picSrc from '$lib/assets/me.jpg';
 	import CopyableValue from '$lib/components/CopyableValue.svelte';
-	import { onMount } from 'svelte';
-	import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 	import Experience from '$lib/components/Experience.svelte';
 	import Education from '$lib/components/Education.svelte';
 
-	let profile: LinkedinProfile;
-	let loadingProfile = true;
-
-	onMount(async () => {
-		profile = await fetch('/api/linkedinProfile').then(async (res) => await res.json());
-		loadingProfile = false;
-	});
+	const profilePromise = getProfile();
 </script>
 
 <svelte:head>
@@ -43,15 +35,16 @@
 			de ce site ou tout autre sujet qui pourrait m’intéresser (travail, discussion, projet, ...).
 		</p>
 		<p>
-			Vous pouvez retrouver mon CV en cliquant <a href={MOI.curriculumVitae.toString()}>ici</a>.
+			Vous pouvez <b>retrouver mon CV</b> en cliquant
+			<a href={MOI.curriculumVitae.toString()}>ici</a>.
 		</p>
 	</section>
 	<div class="divider" />
 	<section>
 		<h2 id="détails-professionnels">Détails professionels</h2>
-		{#if loadingProfile}
+		{#await profilePromise}
 			<span class="animate-spin inline-block">⚙️</span> Chargement du profil...
-		{:else}
+		{:then profile}
 			<ul class="steps steps-vertical p-0">
 				{#each profile.experiences as experience}
 					<li data-content="●" class="step ">
@@ -61,24 +54,25 @@
 					</li>
 				{/each}
 			</ul>
-		{/if}
+		{/await}
 	</section>
 	<div class="divider" />
 	<section>
 		<h2 id="parcours-académique">Parcours académique</h2>
-		{#if loadingProfile}
+
+		{#await profilePromise}
 			<span class="animate-spin inline-block">⚙️</span> Chargement du profil...
-		{:else}
+		{:then profile}
 			<ul class="steps steps-vertical p-0">
 				{#each profile.education as edu}
-					<li data-content="●" class="step ">
+					<li data-content="●" class="step">
 						<div class="text-left place self-start">
 							<Education education={edu} />
 						</div>
 					</li>
 				{/each}
 			</ul>
-		{/if}
+		{/await}
 	</section>
 	<div class="divider" />
 	<section>
@@ -118,6 +112,7 @@
 	a {
 		@apply hover:scale-105 transition-all;
 	}
+
 	.step::after {
 		@apply self-start mt-8;
 	}
