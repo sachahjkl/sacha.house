@@ -1,15 +1,16 @@
-import { SECRET_GITHUB_BEARER_TOKEN, SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
 import {
 	PUBLIC_GITHUB_API_ENDPOINT,
 	PUBLIC_LINKEDIN_GIST_ID,
 	PUBLIC_PROXYCURL_API_ENDPOINT
 } from '$env/static/public';
-import { auth } from '$lib/auth';
-import { MOI } from '$lib/constants';
+import { SECRET_GITHUB_BEARER_TOKEN, SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
+import { error, json } from '@sveltejs/kit';
+
 import { HTTPMethod } from '$lib/interfaces/HTTP';
 import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
-import { json, error } from '@sveltejs/kit';
+import { MOI } from '$lib/constants';
 import type { RequestHandler } from './$types';
+import { auth } from '$lib/auth';
 
 export interface UpdateProfileData {
 	profile: LinkedinProfile;
@@ -26,7 +27,11 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		});
 		if (!res.ok) throw error(500, 'Récupération du gist échouée.');
 		const gist = (await res.json()) as { files: { 'linkedin_profile.json': { content: string } } };
-		return json(JSON.parse(gist.files['linkedin_profile.json'].content));
+		return json(JSON.parse(gist.files['linkedin_profile.json'].content), {
+			headers: {
+				'Cache-Control': 'max-age=3600'
+			}
+		});
 	} catch (err) {
 		console.error('Récupération du gist échouée.', err);
 		throw error(500, 'Erreur inattendue, récupération du gist échouée.');
