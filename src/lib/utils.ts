@@ -21,7 +21,7 @@ export const getProjects = async () => {
 			'Content-Type': 'application/json'
 		}
 	});
-	if (300 <= res.status && res.status < 200) throw new Error();
+	if (!res.ok) throw new Error('bourbier pas de projet khouya');
 	const data: ProjetsResponse = await res.json();
 	projectData.set(data);
 	return data;

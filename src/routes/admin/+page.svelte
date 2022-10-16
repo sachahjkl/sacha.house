@@ -1,39 +1,44 @@
 <script lang="ts">
 	import { PUBLIC_PROXYCURL_API_ENDPOINT } from '$env/static/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
-	import { countAPIConfig, MOI } from '$lib/constants';
+	import { countAPIConfig, MOI, SITE_TITLE } from '$lib/constants';
 	import { toast } from '@zerodevx/svelte-toast';
 	import type { Result } from 'countapi-js';
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
+	import type { UpdateProfileData } from '../api/linkedinProfile/+server';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const creditBalance = writable(-1);
-	const visites = writable(data.visites);
+	let creditBalance = -1;
+	let visites = data.visites;
 
-	let refreshingLinkedinStuff = true;
+	let profile = {};
+
+	let loadingProfile = true;
+	let loadingCredits = true;
 	let promiseCountApi = Promise.resolve();
 
 	const toastCredits = (credits: number) => `
 	<strong>👍 Profil mis à jour !</strong><br>
 	Il te reste ${credits} crédit(s)`;
 
-	const refreshCredit = async () => {
-		refreshingLinkedinStuff = true;
-		const res = await fetch('/api/admin/creditBalance');
-		$creditBalance = parseInt(await res.text());
-		refreshingLinkedinStuff = false;
-		return $creditBalance;
-	};
-
 	const updateProfile = async () => {
+		loadingProfile = true;
+		loadingCredits = true;
 		try {
-			// Ici, procéder à la MAJ du profil linkedin.
+			const res = await fetch('/api/linkedinProfile', { method: 'PATCH' });
+			if (!res.ok) throw new Error();
 
-			toast.push(toastCredits(await refreshCredit()));
+			const data: UpdateProfileData = await res.json();
+			creditBalance = creditBalance - 1;
+			profile = data.profile as {};
+
+			toast.push(toastCredits(creditBalance));
 		} catch (error) {
 			toast.push('Echec de la mise à jour du profil.');
+		} finally {
+			loadingProfile = false;
+			loadingCredits = false;
 		}
 	};
 
@@ -42,11 +47,22 @@
 		const promiseCountApi = await fetch(
 			`https://api.countapi.xyz/update/${namespace}/${key}?amount=${amount}`
 		);
-		$visites = ((await promiseCountApi.json()) as Result).value;
+		visites = ((await promiseCountApi.json()) as Result).value;
 	};
 
-	onMount(() => ($creditBalance === -1 ? refreshCredit() : null));
+	onMount(async () => {
+		creditBalance = parseInt(await fetch('/api/admin/creditBalance').then((res) => res.text()));
+		profile = await fetch('/api/linkedinProfile').then(
+			async (res) => (await res.json()) as Record<string, unknown>
+		);
+		loadingProfile = false;
+		loadingCredits = false;
+	});
 </script>
+
+<svelte:head>
+	<title>admin / {SITE_TITLE}</title>
+</svelte:head>
 
 <article class="prose">
 	<h1>admin</h1>
@@ -69,10 +85,10 @@
 			>.
 		</p>
 		<p>
-			{#if refreshingLinkedinStuff}
+			{#if loadingCredits}
 				<span class="animate-spin inline-block">⚙️</span> Chargement du crédit...
 			{:else}
-				Il reste <b>{$creditBalance} crédits</b> pour raffraichir ces données.
+				Il reste <b>{creditBalance} crédits</b> pour raffraichir ces données.
 			{/if}
 		</p>
 		<button
@@ -83,12 +99,12 @@
 			<div class="refresh-icon">⚙️</div>
 			Rafraichir le profil (coûte 1 crédit)
 		</button>
-		{#if refreshingLinkedinStuff}
+		{#if loadingProfile}
 			<p>
 				<span class="animate-spin inline-block">⚙️</span> Chargement des données...
 			</p>
 		{:else}
-			<PrismJs code={JSON.stringify(MOI.linkedinProfile, null, 1)} language="javascript" />
+			<PrismJs code={JSON.stringify(profile, null, 1)} language="javascript" />
 		{/if}
 	</section>
 	<section>
@@ -99,11 +115,11 @@
 				<span class="animate-spin inline-block">⚙️</span> Chargement des données...
 			</p>
 		{:then _}
-			<p>Nous avons reçu un total de <b> {$visites} visites</b>.</p>
-				<button class="btn gap-2" on:click={() => updateCounter(1)}>
-					<div class="action-icon text-xl">+</div>
-					Incrémenter</button
-				>
+			<p>Nous avons reçu un total de <b> {visites} visites</b>.</p>
+			<button class="btn gap-2" on:click={() => updateCounter(1)}>
+				<div class="action-icon text-xl">+</div>
+				Incrémenter</button
+			>
 		{/await}
 	</section>
 </article>

@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { HTTPMethod } from './interfaces/HTTP';
 
 const ADMIN_ALWAYS_OFF = false;
 const DEFAULT_IPS = ['127.0.0.1', '::1'];
@@ -10,6 +11,7 @@ export enum Visibility {
 
 export interface AccessRule {
 	pathname: RegExp;
+	methods?: HTTPMethod[];
 	visibility: Visibility[];
 }
 
@@ -17,6 +19,11 @@ const rules: AccessRule[] = [
 	{
 		pathname: /^\/(api\/)?admin\/?.*$/,
 		visibility: [Visibility.admin]
+	},
+	{
+		pathname: /^\/linkedinProfile\/?$/,
+		visibility: [Visibility.admin],
+		methods: [HTTPMethod.PATCH]
 	}
 ];
 
@@ -27,10 +34,27 @@ const isAuthorizedIP = (ip = '255.255.255.255') => {
 
 interface AuthParams {
 	clientAddress?: string;
+	method?: HTTPMethod;
 }
 
-export const auth = (pathname: string, params: AuthParams): boolean => {
-	const rule = rules.find((rule) => pathname.match(rule.pathname));
+const getRule = (pathname: string, params: AuthParams = { method: HTTPMethod.GET }) => {
+	const rule = rules.find((rule) => {
+		const pathnameCheck = pathname.match(rule.pathname);
+		// on compare les méthodes si une méthode est contrôlée par l'AccessRule,
+		// sinon OK
+		const methodCheck =
+			!rule.methods || !params.method || (params.method && rule.methods.includes(params.method));
+
+		return pathnameCheck && methodCheck;
+	});
+	return rule;
+};
+
+export const auth = (
+	pathname: string,
+	params: AuthParams = { method: HTTPMethod.GET }
+): boolean => {
+	const rule = getRule(pathname, params);
 	let access = false;
 	if (!rule) {
 		access = true;

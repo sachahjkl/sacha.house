@@ -15,7 +15,7 @@ export interface ProjetsResponse {
 
 export const GET: RequestHandler = async ({ fetch }) => {
 	try {
-		const promiseGH = fetch(PUBLIC_GITHUB_API_ENDPOINT, {
+		const promiseGH = fetch(`${PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
 			method: 'POST',
 			body: makeGqlBody(GET_PROJECTS_GITHUB, { username: MOI.username }),
 			headers: {
@@ -23,7 +23,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 				'Content-Type': 'application/json'
 			}
 		});
-		const promiseGL = fetch(PUBLIC_GITLAB_API_ENDPOINT, {
+		const promiseGL = fetch(`${PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
 			method: 'POST',
 			body: makeGqlBody(GET_PROJECTS_GITLAB, { username: MOI.username }),
 			headers: {

@@ -33,7 +33,7 @@
 	</section>
 	<div class="divider" />
 	<section>
-		<h2>Détails professionels</h2>
+		<h2 id="détails-professionnels"> Détails professionels </h2>
 		<p>
 			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Porro magni neque commodi fugit
 			tempore unde velit laudantium illum deserunt modi beatae iste amet soluta quam consectetur
@@ -78,4 +78,5 @@
 	a {
 		@apply hover:scale-105 transition-all;
 	}
+
 </style>
