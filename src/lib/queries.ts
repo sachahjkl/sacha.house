@@ -1,13 +1,4 @@
-function gql(strings: TemplateStringsArray) {
-	return strings.join(' ');
-}
-
-export function makeGqlBody(query: string, variables: Record<string, string>) {
-	return JSON.stringify({
-		query,
-		variables
-	});
-}
+import { gql } from 'graphql-request';
 
 export const GET_PROJECTS_GITLAB = gql`
 	query GET_PROJECTS_GITLAB {

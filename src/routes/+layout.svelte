@@ -122,7 +122,7 @@
 
 <style lang="postcss">
 	header {
-		@apply fixed top-0 bg-base-100  w-full z-10;
+		@apply fixed top-0 bg-base-100  w-full z-10 print:hidden;
 	}
 
 	header + * {
@@ -179,5 +179,9 @@
 			transform: translateY(-25%);
 			animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
 		}
+	}
+
+	footer {
+		@apply print:hidden
 	}
 </style>

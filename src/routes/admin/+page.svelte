@@ -2,6 +2,7 @@
 	import { PUBLIC_PROXYCURL_API_ENDPOINT } from '$env/static/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
 	import { countAPIConfig, MOI, SITE_TITLE } from '$lib/constants';
+	import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 	import { toast } from '@zerodevx/svelte-toast';
 	import type { Result } from 'countapi-js';
 	import { onMount } from 'svelte';
@@ -12,7 +13,7 @@
 	let creditBalance = -1;
 	let visites = data.visites;
 
-	let profile = {};
+	let profile: LinkedinProfile;
 
 	let loadingProfile = true;
 	let loadingCredits = true;
@@ -31,7 +32,7 @@
 
 			const data: UpdateProfileData = await res.json();
 			creditBalance = creditBalance - 1;
-			profile = data.profile as {};
+			profile = data.profile;
 
 			toast.push(toastCredits(creditBalance));
 		} catch (error) {
@@ -51,10 +52,8 @@
 	};
 
 	onMount(async () => {
-		creditBalance = parseInt(await fetch('/api/admin/creditBalance').then((res) => res.text()));
-		profile = await fetch('/api/linkedinProfile').then(
-			async (res) => (await res.json()) as Record<string, unknown>
-		);
+		creditBalance = Number(await fetch('/api/admin/creditBalance').then((res) => res.text()));
+		profile = await fetch('/api/linkedinProfile').then(async (res) => await res.json());
 		loadingProfile = false;
 		loadingCredits = false;
 	});
