@@ -12,7 +12,7 @@
 	import type { LayoutData } from './$types';
 
 	export let data: LayoutData;
-	const { navItems } = data;
+	const { navItems, commitHash } = data;
 
 	const year = new Date().getFullYear();
 
@@ -110,11 +110,19 @@
 				<img class="favicon" src="/favicon_shadow.png" alt="Logo" />
 				<p>Copyright © {year} - All right reserved</p>
 			</div>
-			<img
-				class="deploy-img"
-				src="https://api.netlify.com/api/v1/badges/{PUBLIC_NETLIFY_SITE_ID}/deploy-status"
-				alt="Deploy Status Badge"
-			/>
+			<div class="flex content-center">
+				<img
+					class="deploy-img"
+					src="https://api.netlify.com/api/v1/badges/{PUBLIC_NETLIFY_SITE_ID}/deploy-status"
+					alt="Deploy Status Badge"
+				/>
+				/
+				<a class="underline" href="https://gitlab.com/sachahjkl/sacha.house/-/commit/{commitHash}">
+					<small class="text-base-content text-opacity-60">
+						commit <b> {commitHash.substring(0, 8)}</b></small
+					>
+				</a>
+			</div>
 		</footer>
 	</div>
 {/if}
@@ -182,6 +190,6 @@
 	}
 
 	footer {
-		@apply print:hidden
+		@apply print:hidden;
 	}
 </style>
