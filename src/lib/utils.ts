@@ -1,6 +1,8 @@
-import type { ProjetsResponse } from 'src/routes/api/projets/+server';
+import { profile, projectData } from './store';
+
+import type { LinkedinProfile } from './interfaces/LinkedinProfile';
+import type { ProjetsResponse } from './interfaces/Project';
 import { get } from 'svelte/store';
-import { projectData } from './store';
 
 export function capitalize(s: string) {
 	return s[0].toUpperCase() + s.slice(1);
@@ -16,13 +18,18 @@ export const randomColorHSL = () => {
 export const getProjects = async () => {
 	const dataCheck = get(projectData);
 	if (dataCheck) return dataCheck;
-	const res = await fetch('/api/projets', {
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	});
+	const res = await fetch('/api/projets');
 	if (!res.ok) throw new Error('bourbier pas de projet khouya');
 	const data: ProjetsResponse = await res.json();
 	projectData.set(data);
+	return data;
+};
+export const getProfile = async () => {
+	const dataCheck = get(profile);
+	if (dataCheck) return dataCheck;
+	const res = await fetch('/api/linkedinProfile');
+	if (!res.ok) throw new Error('bourbier pas de profile khouya');
+	const data: LinkedinProfile = await res.json();
+	profile.set(data);
 	return data;
 };
