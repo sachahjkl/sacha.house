@@ -7,11 +7,12 @@ import {
 import { auth } from '$lib/auth';
 import { MOI } from '$lib/constants';
 import { HTTPMethod } from '$lib/interfaces/HTTP';
+import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export interface UpdateProfileData {
-	profile: unknown;
+	profile: LinkedinProfile;
 	remainingCredit: number;
 }
 
@@ -56,7 +57,7 @@ export const PATCH: RequestHandler = async ({ url, getClientAddress, fetch }) =>
 		throw error(401, 'Pas autorisé à exécuter cette action.');
 	}
 
-	const profile = await fetchProxyCurl();
+	const profile: LinkedinProfile = await fetchProxyCurl();
 	console.info('Profil LinkedIn récupéré :', JSON.stringify(profile));
 
 	const gist = {
@@ -82,7 +83,7 @@ export const PATCH: RequestHandler = async ({ url, getClientAddress, fetch }) =>
 
 	const data: UpdateProfileData = {
 		profile,
-		remainingCredit: parseInt(newCreditBalance)
+		remainingCredit: Number(newCreditBalance)
 	};
 	return json(data);
 };

@@ -1,45 +1,41 @@
+import { GET_PROJECTS_GITHUB, GET_PROJECTS_GITLAB } from '$lib/queries';
+import { PUBLIC_GITHUB_API_ENDPOINT, PUBLIC_GITLAB_API_ENDPOINT } from '$env/static/public';
+import type { Project, ProjetsResponse } from '$lib/interfaces/Project';
+import { SECRET_GITHUB_BEARER_TOKEN, SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
+import { error, json } from '@sveltejs/kit';
+
+import { GraphQLClient } from 'graphql-request';
+import { MOI } from '$lib/constants';
 import type { RequestHandler } from './$types';
 
-import { PUBLIC_GITHUB_API_ENDPOINT, PUBLIC_GITLAB_API_ENDPOINT } from '$env/static/public';
-import { MOI } from '$lib/constants';
-import { GET_PROJECTS_GITHUB, GET_PROJECTS_GITLAB } from '$lib/queries';
-import { SECRET_GITHUB_BEARER_TOKEN, SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
-import { makeGqlBody } from '$lib/queries';
-import { json, error } from '@sveltejs/kit';
-import type { Project } from '$lib/interfaces/Project';
-
-export interface ProjetsResponse {
-	github: Project[];
-	gitlab: Project[];
-}
+export type GHType = { user: { projects: { nodes: Project[] } } };
+export type GLType = { projects: { nodes: Project[] } };
 
 export const GET: RequestHandler = async ({ fetch }) => {
 	try {
-		const promiseGH = fetch(`${PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
-			method: 'POST',
-			body: makeGqlBody(GET_PROJECTS_GITHUB, { username: MOI.username }),
+		const clientGH = new GraphQLClient(`${PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
+			fetch,
 			headers: {
-				Authorization: `Bearer ${SECRET_GITHUB_BEARER_TOKEN}`,
-				'Content-Type': 'application/json'
+				Authorization: `Bearer ${SECRET_GITHUB_BEARER_TOKEN}`
 			}
 		});
-		const promiseGL = fetch(`${PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
-			method: 'POST',
-			body: makeGqlBody(GET_PROJECTS_GITLAB, { username: MOI.username }),
+		const clientGL = new GraphQLClient(`${PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
+			fetch,
 			headers: {
-				Authorization: `Bearer ${SECRET_GITLAB_BEARER_TOKEN}`,
-				'Content-Type': 'application/json'
+				Authorization: `Bearer ${SECRET_GITLAB_BEARER_TOKEN}`
 			}
 		});
-		const [resGH, resGL] = await Promise.all([promiseGH, promiseGL]);
-		const GH = (await resGH.json()) as { data: { user: { projects: { nodes: Project[] } } } };
-		const GL = (await resGL.json()) as { data: { projects: { nodes: Project[] } } };
+		const GH: GHType = await clientGH.request(GET_PROJECTS_GITHUB, { username: MOI.username });
+		const GL: GLType = await clientGL.request(GET_PROJECTS_GITLAB, { username: MOI.username });
+		console.log('Données de GitHub et GitLab reçues', { GH, GL });
+		const nodesGH = GH.user.projects.nodes;
+		const nodesGL = GL.projects.nodes;
 
 		const removePrivate = (node: Project) => node.visibility.toLowerCase() !== 'private';
 
 		const response: ProjetsResponse = {
-			github: GH.data.user.projects.nodes.filter(removePrivate),
-			gitlab: GL.data.projects.nodes.filter(removePrivate)
+			github: nodesGH.filter(removePrivate),
+			gitlab: nodesGL.filter(removePrivate)
 		};
 		return json(response, {
 			headers: {
@@ -47,6 +43,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			}
 		});
 	} catch (err) {
+		console.error('Problème à la récupération des projets', err);
 		throw error(500, 'Impossible de récupérer les données des projets.');
 	}
 };

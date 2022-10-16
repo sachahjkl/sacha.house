@@ -12,3 +12,8 @@ export interface Group {
 }
 
 type Visibility = 'public' | 'private' | 'PUBLIC' | 'PRIVATE';
+
+export interface ProjetsResponse {
+	github: Project[];
+	gitlab: Project[];
+}
