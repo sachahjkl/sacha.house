@@ -1,23 +1,13 @@
 <script lang="ts">
-	import { MOI, SITE_TITLE } from '$lib/constants';
+	import { MOI } from '$lib/constants';
 	import gitlabSrc from '$lib/assets/gitlab.png';
 	import githubSrc from '$lib/assets/github.png';
 	import Project from '$lib/components/Project.svelte';
-	import { getProjects, metaDescription, metaTitle } from '$lib/utils';
+	import { getProjects } from '$lib/utils';
 
 	const projectsPromise = getProjects();
-	const TITLE = `projets / ${SITE_TITLE}`;
-	const DESCRIPTION = 'Mes projets personnels';
 </script>
 
-<svelte:head>
-	<title>{TITLE}</title>
-	<meta name="og:title" content={TITLE} />
-	<meta name="twitter:title" content={TITLE} />
-	<meta name="og:description" content={DESCRIPTION} />
-	<meta name="twitter:description" content={DESCRIPTION} />
-	<meta name="description" content={DESCRIPTION} />
-</svelte:head>
 <article class="prose">
 	<h1 class="">projets</h1>
 	<p>Mes projets, plus ou moins aboutis. Dans la globalité, l'objectif de ces dépôts était :</p>

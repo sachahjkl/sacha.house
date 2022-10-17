@@ -6,22 +6,9 @@
 	const { post } = data;
 	const createdAt = new Date(Date.parse(post.createdAt));
 	const updatedAt = new Date(Date.parse(post.updatedAt));
-	const excerpt =
-		post.content.html.length > 180
-			? `${post.content.html.substring(0, 180)}...`
-			: post.content.html;
-
-	const TITLE = `${post.title} / ${SITE_TITLE}`;
-	const DESCRIPTION = excerpt;
 </script>
 
 <svelte:head>
-	<title>{TITLE}</title>
-	<meta name="og:title" content={TITLE} />
-	<meta name="twitter:title" content={TITLE} />
-	<meta name="og:description" content={DESCRIPTION} />
-	<meta name="twitter:description" content={DESCRIPTION} />
-	<meta name="description" content={DESCRIPTION} />
 	<meta property="og:article:published_time" content={createdAt.toISOString()} />
 	{updatedAt
 		? `<meta property="og:article:modified_time" content="${updatedAt.toISOString()}"/>`

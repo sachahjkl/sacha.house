@@ -5,13 +5,14 @@
 	import { fly } from 'svelte/transition';
 	import { themeChange } from 'theme-change';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/constants';
-	import { capitalize,  } from '$lib/utils';
+	import { capitalize } from '$lib/utils';
 	import { PUBLIC_NETLIFY_SITE_ID, PUBLIC_USE_INTRO } from '$env/static/public';
 	import HamburgerIcon from '$lib/components/HamburgerIcon.svelte';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
-	import type { LayoutData } from './$types';
+	import type { LayoutServerData } from './$types';
 
-	export let data: LayoutData;
+	export let data: LayoutServerData;
+
 	const { navItems, commitHash } = data;
 
 	const year = new Date().getFullYear();
@@ -26,18 +27,31 @@
 	});
 	let headerheight = 0; // in pixels;
 	const TITLE = SITE_TITLE;
-	const DESCRIPTION = `Le site web personnel de ${SITE_TITLE}`;
+	const DESCRIPTION = `Le site web personnel de ${PRETTY_PRENOM} ${PRETTY_NOM}`;
+	const IMAGE = '/favicon_shadow.png';
+	const AUTHOR = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
 </script>
 
 <svelte:head>
-	<title>{TITLE}</title>
-	<meta name="og:title" content={TITLE} />
-	<meta name="twitter:title" content={TITLE} />
-	<meta name="author" content={SITE_TITLE} />
-	<meta name="description" content={DESCRIPTION} />
-	<meta name="og:description" content={DESCRIPTION} />
-	<meta name="twitter:description" content={DESCRIPTION} />
-	<meta name="author" content="{PRETTY_PRENOM} {PRETTY_NOM}" />
+	<title>{$page.data.seo?.title || TITLE}</title>
+	<meta name="og:title" content={$page.data.seo?.title || TITLE} />
+	<meta name="twitter:title" content={$page.data.seo?.title || TITLE} />
+
+	<meta name="description" content={$page.data.seo?.description || DESCRIPTION} />
+	<meta name="og:description" content={$page.data.seo?.description || DESCRIPTION} />
+	<meta name="twitter:description" content={$page.data.seo?.description || DESCRIPTION} />
+
+	<meta name="twitter:image" content={$page.data.seo?.image || IMAGE} />
+	<meta property="og:image" content={$page.data.seo?.image || IMAGE} />
+
+	<meta
+		name="keywords"
+		content="Blog, Programmation, Programming, Portfolio, Personal, Personnel"
+	/>
+	<meta name="generator" content="SvelteKit" />
+	<meta property="og:locale" content="fr_FR" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="author" content={$page.data.seo?.author || AUTHOR} />
 </svelte:head>
 
 <header bind:clientHeight={headerheight}>
@@ -143,7 +157,7 @@
 
 <style lang="postcss">
 	header {
-		@apply fixed top-0 bg-base-100  w-full z-10 print:hidden;
+		@apply fixed top-0 bg-base-100 bg-opacity-50 backdrop-blur-sm w-full z-10 print:hidden;
 	}
 
 	header + * {

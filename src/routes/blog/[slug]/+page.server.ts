@@ -3,6 +3,7 @@ import { GraphQLClient } from 'graphql-request';
 import { PUBLIC_HYGRAPH_API_ENDPOINT } from '$env/static/public';
 import type { PageServerLoad } from './$types';
 import type { Post } from '$lib/interfaces/Post';
+import { SITE_TITLE } from '$lib/constants';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -20,7 +21,16 @@ export const load: PageServerLoad = async ({ params }) => {
 		console.error('Erreur à la récupération du post.');
 	}
 
+	const excerpt =
+		post.content.html.length > 180
+			? `${post.content.html.substring(0, 180)}...`
+			: post.content.html;
+
 	return {
-		post
+		post,
+		seo: {
+			title: `${post.title} / ${SITE_TITLE}`,
+			description: excerpt
+		}
 	};
 };
