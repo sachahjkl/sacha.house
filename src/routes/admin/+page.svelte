@@ -3,6 +3,7 @@
 	import PrismJs from '$lib/components/PrismJS.svelte';
 	import { countAPIConfig, MOI, SITE_TITLE } from '$lib/constants';
 	import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
+	import { metaDescription, metaTitle } from '$lib/utils';
 	import { toast } from '@zerodevx/svelte-toast';
 	import type { Result } from 'countapi-js';
 	import { onMount } from 'svelte';
@@ -57,10 +58,19 @@
 		loadingProfile = false;
 		loadingCredits = false;
 	});
+
+	const TITLE = `admin / ${SITE_TITLE}`;
+	const DESCRIPTION = "Panneau d'administration du site.";
 </script>
 
 <svelte:head>
-	<title>admin / {SITE_TITLE}</title>
+	<title>{TITLE}</title>
+	<meta name="og:title" content={TITLE} />
+	<meta name="twitter:title" content={TITLE} />
+	<meta name="og:description" content={DESCRIPTION} />
+	<meta name="twitter:description" content={DESCRIPTION} />
+	<meta name="description" content={DESCRIPTION} />
+	<meta name="robots" content="noindex nofollow" />
 </svelte:head>
 
 <article class="prose">
