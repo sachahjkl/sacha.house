@@ -5,5 +5,6 @@ export interface Post {
 	createdAt: string;
 	content: {
 		html: string;
+		text: string;
 	};
 }

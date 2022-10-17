@@ -72,6 +72,7 @@ export const GET_POST = gql`
 			createdAt
 			content {
 				html
+				text
 			}
 		}
 	}

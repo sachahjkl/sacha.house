@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/constants';
+	import { PRETTY_NOM, PRETTY_PRENOM } from '$lib/constants';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -9,6 +9,8 @@
 </script>
 
 <svelte:head>
+	<meta property="og:url" content={data.seo.url} />
+	<meta property="og:type" content="article" />
 	<meta property="og:article:published_time" content={createdAt.toISOString()} />
 	{updatedAt
 		? `<meta property="og:article:modified_time" content="${updatedAt.toISOString()}"/>`
