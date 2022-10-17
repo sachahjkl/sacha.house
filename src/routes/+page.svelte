@@ -7,14 +7,7 @@
 	const { visites } = data;
 
 	import comrade from '$lib/assets/c-omrade.jpg';
-	const TITLE = `accueil / ${SITE_TITLE}`;
 </script>
-
-<svelte:head>
-	<title>{TITLE}</title>
-	<meta name="og:title" content={TITLE} />
-	<meta name="twitter:title" content={TITLE} />
-</svelte:head>
 
 <article class="prose">
 	<h1>

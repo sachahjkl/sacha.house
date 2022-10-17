@@ -8,19 +8,7 @@
 	import Education from '$lib/components/Education.svelte';
 
 	const profilePromise = getProfile();
-	const TITLE = `à propos / ${SITE_TITLE}`;
-	const DESCRIPTION = `Présentation de ${PRETTY_PRENOM} ${PRETTY_NOM}. on peut y retrouver mes détails de contact, mon CV et une brève présentation de qui je suis.`;
 </script>
-
-<svelte:head>
-	<title>{TITLE}</title>
-	<meta name="og:title" content={TITLE} />
-	<meta name="twitter:title" content={TITLE} />
-	<meta name="og:description" content={DESCRIPTION} />
-	<meta name="twitter:description" content={DESCRIPTION} />
-	<meta name="description" content={DESCRIPTION} />
-	<meta property="og:image" content={picSrc} />
-</svelte:head>
 
 <article class="prose">
 	<h1 class="">à propos</h1>
