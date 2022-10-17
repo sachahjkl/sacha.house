@@ -4,8 +4,8 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { themeChange } from 'theme-change';
-	import { MOI } from '$lib/constants';
-	import { capitalize } from '$lib/utils';
+	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/constants';
+	import { capitalize,  } from '$lib/utils';
 	import { PUBLIC_NETLIFY_SITE_ID, PUBLIC_USE_INTRO } from '$env/static/public';
 	import HamburgerIcon from '$lib/components/HamburgerIcon.svelte';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
@@ -25,7 +25,20 @@
 		themeChange(false);
 	});
 	let headerheight = 0; // in pixels;
+	const TITLE = SITE_TITLE;
+	const DESCRIPTION = `Le site web personnel de ${SITE_TITLE}`;
 </script>
+
+<svelte:head>
+	<title>{TITLE}</title>
+	<meta name="og:title" content={TITLE} />
+	<meta name="twitter:title" content={TITLE} />
+	<meta name="author" content={SITE_TITLE} />
+	<meta name="description" content={DESCRIPTION} />
+	<meta name="og:description" content={DESCRIPTION} />
+	<meta name="twitter:description" content={DESCRIPTION} />
+	<meta name="author" content="{PRETTY_PRENOM} {PRETTY_NOM}" />
+</svelte:head>
 
 <header bind:clientHeight={headerheight}>
 	<nav>

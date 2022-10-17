@@ -3,13 +3,20 @@
 	import gitlabSrc from '$lib/assets/gitlab.png';
 	import githubSrc from '$lib/assets/github.png';
 	import Project from '$lib/components/Project.svelte';
-	import { getProjects } from '$lib/utils';
+	import { getProjects, metaDescription, metaTitle } from '$lib/utils';
 
 	const projectsPromise = getProjects();
+	const TITLE = `projets / ${SITE_TITLE}`;
+	const DESCRIPTION = 'Mes projets personnels';
 </script>
 
 <svelte:head>
-	<title>projets / {SITE_TITLE}</title>
+	<title>{TITLE}</title>
+	<meta name="og:title" content={TITLE} />
+	<meta name="twitter:title" content={TITLE} />
+	<meta name="og:description" content={DESCRIPTION} />
+	<meta name="twitter:description" content={DESCRIPTION} />
+	<meta name="description" content={DESCRIPTION} />
 </svelte:head>
 <article class="prose">
 	<h1 class="">projets</h1>
@@ -47,14 +54,14 @@
 			<!-- content here -->
 			<ul class="projects not-prose">
 				{#each data.gitlab as { avatarUrl, description, name, url, group }}
-						<li class="project">
-							<Project
-								{description}
-								name={`${name} ${group ? `(groupe ${group?.name})` : ''}`}
-								{url}
-								{avatarUrl}
-							/>
-						</li>
+					<li class="project">
+						<Project
+							{description}
+							name={`${name} ${group ? `(groupe ${group?.name})` : ''}`}
+							{url}
+							{avatarUrl}
+						/>
+					</li>
 				{:else}
 					<li>Pas de projet !</li>
 				{/each}

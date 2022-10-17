@@ -4,6 +4,8 @@ export const MOI = {
 	nom: 'froment',
 	prenom: 'sacha',
 	username: 'sachahjkl',
+	/** @type {import("./interfaces/Person").Config} */
+	gender: 'male',
 	dateNaissance: new Date('1999-05-25T00:00:00+02:00'),
 	placeOfLiving: 'Paris',
 	github: new URL('https://github.com/sachahjkl'),
@@ -23,7 +25,9 @@ export const MOI = {
 	}
 };
 
-export const SITE_TITLE = `${capitalize(MOI.prenom.toLowerCase())} ${MOI.nom.toUpperCase()} `;
+export const PRETTY_PRENOM = capitalize(MOI.prenom.toLowerCase());
+export const PRETTY_NOM = MOI.nom.toUpperCase();
+export const SITE_TITLE = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
 
 export const countAPIConfig = {
 	namespace: 'sacha.house',
