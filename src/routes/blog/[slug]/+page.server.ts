@@ -6,7 +6,7 @@ import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/constants';
 import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
 	let post: Post = {} as Post;
 	try {
 		const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT, {
@@ -22,15 +22,15 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const excerpt =
-		post.content.html.length > 180
-			? `${post.content.html.substring(0, 180)}...`
-			: post.content.html;
-
+		post.content.text.length > 180
+			? `${post.content.text.substring(0, 180)}...`
+			: post.content.text;
 	return {
 		post,
 		seo: {
 			title: `${post.title} / ${SITE_TITLE}`,
-			description: excerpt
+			description: excerpt,
+			url: url.toString()
 		}
 	};
 };
