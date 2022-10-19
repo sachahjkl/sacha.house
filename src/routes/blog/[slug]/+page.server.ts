@@ -4,7 +4,7 @@ import { PUBLIC_HYGRAPH_API_ENDPOINT } from '$env/static/public';
 import type { PageServerLoad } from './$types';
 import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/constants';
-import { redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	let post: Post = {} as Post;
@@ -13,18 +13,21 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			fetch
 		});
 		const data: { post: Post } = await clientGL.request(GET_POST, { slug: params.slug });
-		if (!data.post) {
-			throw redirect(302, '/blog');
-		}
+		console.log({ data });
+
 		post = data.post;
 	} catch (error) {
 		console.error('Erreur à la récupération du post.');
+	}
+	if (!post) {
+		throw error(404, 'Poste introuvable 😔.');
 	}
 
 	const excerpt =
 		post.content.text.length > 180
 			? `${post.content.text.substring(0, 180)}...`
 			: post.content.text;
+
 	return {
 		post,
 		seo: {
