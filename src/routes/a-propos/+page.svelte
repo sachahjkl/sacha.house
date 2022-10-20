@@ -35,6 +35,7 @@
 			<a href={MOI.curriculumVitae.toString()}>ici</a>.
 		</p>
 	</section>
+	<div class="divider" />
 	<section>
 		<h2 id="détails-professionnels">🖥️ Détails professionels</h2>
 		<hr class="mb-0" />
@@ -49,6 +50,7 @@
 			<Education education={edu} />
 		{/each}
 	</section>
+	<div class="divider" />
 	<section>
 		<h2>🖋️ Contact</h2>
 		<p>Voici, en vrac, une liste d'information de contact me concernant :</p>
@@ -78,7 +80,7 @@
 		transition-all ring-primary ring-offset-base-100 ring-offset-2;
 	}
 	article {
-		@apply mx-auto;
+		@apply mx-auto print:max-w-full;
 	}
 	.me {
 		@apply m-0;

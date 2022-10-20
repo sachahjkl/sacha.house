@@ -31,21 +31,3 @@
 body {
 	font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
-/* Titres à la markdown */
-
-/* h1,
-h2,
-h3 {
-	@apply before:text-base-content before:text-opacity-30 before:mr-1;
-}
-
-h1::before {
-	@apply content-["#"];
-}
-h2::before {
-	@apply content-["##"];
-}
-h3::before {
-	@apply content-["###"];
-} */

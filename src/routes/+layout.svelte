@@ -69,7 +69,7 @@
 
 <style lang="postcss">
 	.content {
-		@apply mt-[calc(var(--headerHeight)_+_1rem)];
+		@apply mt-[calc(var(--headerHeight)_+_1rem)] print:mt-0;
 	}
 	main {
 		@apply max-w-5xl m-auto p-4;
