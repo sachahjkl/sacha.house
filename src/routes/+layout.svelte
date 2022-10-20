@@ -49,7 +49,7 @@
 </svelte:head>
 
 <Header bind:headerheight activePagePathname={$page.url.pathname} navItems={data.navItems}>
-	<a slot="brand" href="/">
+	<a slot="brand" href="/" data-sveltekit-prefetch>
 		<img class="favicon" src="/favicon_shadow.png" alt="favicon" />
 		{MOI.prenom.substring(1)}
 		{capitalize(MOI.nom)}

@@ -9,7 +9,7 @@
 	export let data: PageData;
 </script>
 
-<article class="prose">
+<article class="prose" data-sveltekit-prefetch>
 	<h1>
 		{SITE_TITLE}
 		<div class="visites hidden md:inline-block">
