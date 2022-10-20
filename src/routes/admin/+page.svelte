@@ -4,9 +4,9 @@
 	import PrismJs from '$lib/components/PrismJS.svelte';
 
 	import { toast } from '@zerodevx/svelte-toast';
-	import type { PageData } from './$types';
+	import type { PageServerData } from './$types';
 
-	export let data: PageData;
+	export let data: PageServerData;
 
 	const toastCredits = (credits: number) => `
 	<strong>👍 Profil mis à jour !</strong><br>
