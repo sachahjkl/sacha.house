@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { MOI } from '$lib/constants';
+	import { MOI } from '$lib/me';
 	import gitlabSrc from '$lib/assets/gitlab.png';
 	import githubSrc from '$lib/assets/github.png';
 	import Project from '$lib/components/Project.svelte';
-	import { getProjects } from '$lib/utils';
+	import type { PageData } from './$types';
 
-	const projectsPromise = getProjects();
+	export let data: PageData;
 </script>
 
 <article class="prose">
@@ -38,49 +38,36 @@
 			<img class="title-logo" src={gitlabSrc} alt="GitLab Logo" /> GitLab /
 			<a href={MOI.gitlab.toString()}>@{MOI.gitlab.pathname.split('/').pop()}</a>
 		</h2>
-		{#await projectsPromise}
-			<button class="btn btn-ghost loading">Chargement des données...</button>
-		{:then data}
-			<!-- content here -->
-			<ul class="projects not-prose">
-				{#each data.gitlab as { avatarUrl, description, name, url, group }}
-					<li class="project">
-						<Project
-							{description}
-							name={`${name} ${group ? `(groupe ${group?.name})` : ''}`}
-							{url}
-							{avatarUrl}
-						/>
-					</li>
-				{:else}
-					<li>Pas de projet !</li>
-				{/each}
-			</ul>
-		{:catch _}
-			<button class="btn btn-ghost">💣 Erreur de chargement !</button>
-		{/await}
-		<!--  -->
+		<ul class="projects not-prose">
+			{#each data.projects.gitlab as { avatarUrl, description, descriptionHtml, name, url, group }}
+				<li class="project">
+					<Project
+						{description}
+						{descriptionHtml}
+						name={`${name} ${group ? `(groupe ${group?.name})` : ''}`}
+						{url}
+						{avatarUrl}
+					/>
+				</li>
+			{:else}
+				<li>Pas de projet !</li>
+			{/each}
+		</ul>
 	</section>
 	<section>
 		<h2>
 			<img class="title-logo" src={githubSrc} alt="GitHub Logo" /> GitHub /
 			<a href={MOI.github.toString()}>@{MOI.github.pathname.split('/').pop()}</a>
 		</h2>
-		{#await projectsPromise}
-			<button class="btn btn-ghost loading">Chargement des données...</button>
-		{:then data}
-			<ul class="projects not-prose">
-				{#each data.github as { description, name, url }}
-					<li class="project">
-						<Project {description} {name} {url} />
-					</li>
-				{:else}
-					<li>Pas de projet !</li>
-				{/each}
-			</ul>
-		{:catch _}
-			<button class="btn btn-ghost">💣 Erreur de chargement !</button>
-		{/await}
+		<ul class="projects not-prose">
+			{#each data.projects.github as { description, name, url }}
+				<li class="project">
+					<Project {description} {name} {url} />
+				</li>
+			{:else}
+				<li>Pas de projet !</li>
+			{/each}
+		</ul>
 	</section>
 </article>
 

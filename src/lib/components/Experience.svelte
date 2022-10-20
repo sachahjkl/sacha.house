@@ -4,37 +4,48 @@
 	export let experience: Experience;
 	const titre = experience.title;
 	const compétences: string[] = [];
-	const {description} = experience;
+	const { description } = experience;
 	const lieu = { name: experience.company, website: experience?.company_linkedin_profile_url };
-	const startDate = new Date(experience.starts_at.year, experience.starts_at.month - 1, experience.starts_at.day);
+	const startDate = new Date(
+		experience.starts_at.year,
+		experience.starts_at.month - 1,
+		experience.starts_at.day
+	);
 	const endDate = experience.ends_at
 		? new Date(experience.ends_at.year, experience.ends_at.month - 1, experience.ends_at.day)
 		: null;
 </script>
 
 <section>
-	<h3>
-		{titre}
-		<small class="ml-1 text-base-content text-opacity-70 not-prose"
+	<h3 class="mb-0 font-bold text-base-content text-opacity-50">
+		{#if lieu.website}
+			<a class="no-underline hover:underline font-bold" href={lieu.website}>{lieu.name} 🔗</a>
+		{:else}
+			{lieu.name}
+		{/if}
+		<!-- <small class="ml-1 text-base-content text-opacity-70 not-prose"
 			>à
-			{#if lieu.website}
-				<a class="underline" href={lieu.website}>{lieu.name}</a>
-			{:else}
-				{lieu.name}
-			{/if}
-		</small>
+
+		</small> -->
 	</h3>
+	<h4 class="italic font-normal">
+		{titre}
+	</h4>
 	<small class="text-base-content text-opacity-50">
-		{startDate.toLocaleDateString('fr-FR', {
-			year: 'numeric',
-			month: 'short'
-		})}
-		{#if endDate}
-			-
-			{endDate.toLocaleDateString('fr-FR', {
+		<time>
+			{startDate.toLocaleDateString('fr-FR', {
 				year: 'numeric',
 				month: 'short'
 			})}
+		</time>
+		{#if endDate}
+			-
+			<time>
+				{endDate.toLocaleDateString('fr-FR', {
+					year: 'numeric',
+					month: 'short'
+				})}
+			</time>
 		{/if}
 	</small>
 	<div>

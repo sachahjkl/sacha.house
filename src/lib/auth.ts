@@ -19,11 +19,6 @@ const rules: AccessRule[] = [
 	{
 		pathname: /^\/(api\/)?admin\/?.*$/,
 		visibility: [Visibility.admin]
-	},
-	{
-		pathname: /^\/linkedinProfile\/?$/,
-		visibility: [Visibility.admin],
-		methods: ['PATCH']
 	}
 ];
 

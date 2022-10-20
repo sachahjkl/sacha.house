@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/constants';
-	import { getProfile } from '$lib/utils';
+	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
 
 	import picSrc from '$lib/assets/me.jpg';
 	import CopyableValue from '$lib/components/CopyableValue.svelte';
 	import Experience from '$lib/components/Experience.svelte';
 	import Education from '$lib/components/Education.svelte';
+	import type { PageData } from './$types';
 
-	const profilePromise = getProfile();
+	export let data: PageData;
 </script>
 
 <article class="prose">
@@ -35,44 +35,22 @@
 			<a href={MOI.curriculumVitae.toString()}>ici</a>.
 		</p>
 	</section>
-	<div class="divider" />
 	<section>
-		<h2 id="détails-professionnels">Détails professionels</h2>
-		{#await profilePromise}
-			<span class="animate-spin inline-block">⚙️</span> Chargement du profil...
-		{:then profile}
-			<ul class="steps steps-vertical p-0">
-				{#each profile.experiences as experience}
-					<li data-content="●" class="step ">
-						<div class="text-left place self-start">
-							<Experience {experience} />
-						</div>
-					</li>
-				{/each}
-			</ul>
-		{/await}
+		<h2 id="détails-professionnels">🖥️ Détails professionels</h2>
+		<hr class="mb-0" />
+		{#each data.profile.experiences as experience, i}
+			<Experience {experience} />
+		{/each}
 	</section>
-	<div class="divider" />
 	<section>
-		<h2 id="parcours-académique">Parcours académique</h2>
-
-		{#await profilePromise}
-			<span class="animate-spin inline-block">⚙️</span> Chargement du profil...
-		{:then profile}
-			<ul class="steps steps-vertical p-0">
-				{#each profile.education as edu}
-					<li data-content="●" class="step">
-						<div class="text-left place self-start">
-							<Education education={edu} />
-						</div>
-					</li>
-				{/each}
-			</ul>
-		{/await}
+		<h2 id="parcours-académique">🏫 Parcours académique</h2>
+		<hr class="mb-0" />
+		{#each data.profile.education as edu, i}
+			<Education education={edu} />
+		{/each}
 	</section>
-	<div class="divider" />
 	<section>
-		<h2>Contact</h2>
+		<h2>🖋️ Contact</h2>
 		<p>Voici, en vrac, une liste d'information de contact me concernant :</p>
 		<ul>
 			<li>Mail : <CopyableValue value={MOI.mail} /></li>
@@ -107,13 +85,5 @@
 	}
 	a {
 		@apply hover:scale-105 transition-all;
-	}
-
-	.step::after {
-		@apply self-start mt-8;
-	}
-
-	.step::before {
-		@apply -translate-y-[85%];
 	}
 </style>

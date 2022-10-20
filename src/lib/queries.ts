@@ -12,7 +12,8 @@ export const GET_PROJECTS_GITLAB = gql`
 		name
 		url: webUrl
 		avatarUrl
-		description: descriptionHtml
+		description
+		descriptionHtml
 		visibility
 	}
 `;

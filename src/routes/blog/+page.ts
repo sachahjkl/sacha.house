@@ -7,26 +7,30 @@ import { SITE_TITLE } from '$lib/me';
 import { error } from '@sveltejs/kit';
 
 export const load: PageLoad = async ({ fetch }) => {
-	let posts: ListedPost[] = [];
-	fetch;
-	try {
-		const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT, {
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json'
+	const getPosts = async () => {
+		try {
+			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT, {
+				fetch,
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json'
+				}
+			});
+			const posts = await clientGL
+				.request(GET_POSTS)
+				.then((data: { posts: ListedPost[] }) => data.posts);
+			if (!posts.length) {
+				throw error(404, 'Postes introuvables !');
 			}
-		});
-		posts = await clientGL.request(GET_POSTS).then((data: { posts: ListedPost[] }) => data.posts);
-	} catch (err) {
-		console.error('Erreur à la récupération des posts.', { err });
-	}
-
-	if (!posts.length) {
-		throw error(404, 'Postes introuvables !');
-	}
+			return posts;
+		} catch (err) {
+			console.error('Erreur à la récupération des posts.', { err });
+		}
+		return [] as ListedPost[];
+	};
 
 	return {
-		posts,
+		posts: getPosts(),
 		seo: {
 			title: `blog / ${SITE_TITLE}`,
 			description:

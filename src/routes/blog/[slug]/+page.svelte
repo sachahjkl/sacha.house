@@ -3,7 +3,8 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const { post } = data;
+	let post: typeof data.post;
+	$: ({ post } = data);
 	const createdAt = new Date(Date.parse(post.createdAt));
 	const updatedAt = new Date(Date.parse(post.updatedAt));
 </script>

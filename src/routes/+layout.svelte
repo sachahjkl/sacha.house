@@ -14,12 +14,10 @@
 
 	export let data: LayoutServerData;
 
-	const { navItems, commitHash } = data;
-
 	const useIntro: boolean = JSON.parse(env.PUBLIC_USE_INTRO || 'true');
-	let init = !useIntro;
+	let doIntro = !useIntro;
 
-	onMount(() => (init = true));
+	onMount(() => (doIntro = true));
 	let headerheight = 56; // default average height in pixels;
 
 	const TITLE = SITE_TITLE;
@@ -50,7 +48,7 @@
 	<meta name="author" content={$page.data.seo?.author || AUTHOR} />
 </svelte:head>
 
-<Header bind:headerheight activePagePathname={$page.url.pathname} {navItems}>
+<Header bind:headerheight activePagePathname={$page.url.pathname} navItems={data.navItems}>
 	<a slot="brand" href="/">
 		<img class="favicon" src="/favicon_shadow.png" alt="favicon" />
 		{MOI.prenom.substring(1)}
@@ -58,13 +56,13 @@
 	</a>
 </Header>
 
-{#if init}
+{#if doIntro}
 	<div style="--headerHeight: {headerheight}px" class="content" in:fly={{ y: -50 }}>
 		<main>
 			<slot><!-- optional fallback --></slot>
 		</main>
 
-		<Footer {commitHash} netlifyID={PUBLIC_NETLIFY_SITE_ID} />
+		<Footer commitHash={data.commitHash} netlifyID={PUBLIC_NETLIFY_SITE_ID} />
 	</div>
 {/if}
 <SvelteToast options={{ duration: 2000 }} />
