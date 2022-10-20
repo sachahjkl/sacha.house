@@ -32,7 +32,7 @@ export const getCounter = async (fetch: typeof window.fetch) => {
 
 		return result.value;
 	} catch (error) {
-		console.error("Echec lors de l'incrémentation du compteur de visites.", { error });
+		console.error('Echec lors de la récupération du compteur de visites.', { error });
 		return -1;
 	}
 };
