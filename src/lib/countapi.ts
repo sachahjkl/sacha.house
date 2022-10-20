@@ -5,7 +5,7 @@ export const countAPIConfig = {
 	key: 'visites'
 };
 
-export const updateCounter = async (fetch: typeof window.fetch, amount = 1) => {
+export const updateCounter = async (amount = 1) => {
 	try {
 		const { key, namespace } = countAPIConfig;
 		const result: Result = await fetch(
@@ -21,7 +21,7 @@ export const updateCounter = async (fetch: typeof window.fetch, amount = 1) => {
 	}
 };
 
-export const getCounter = async (fetch: typeof window.fetch) => {
+export const getCounter = async () => {
 	try {
 		const { key, namespace } = countAPIConfig;
 		const result: Result = await fetch(`https://api.countapi.xyz/get/${namespace}/${key}`).then(

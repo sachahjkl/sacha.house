@@ -13,8 +13,10 @@ export const load: LayoutServerLoad = async ({ fetch, getClientAddress, cookies 
 	const navItems = getAuthorizedNavItems(clientAddress);
 
 	// on ne compte les visites qu'une fois par visiteur
+	// une fois qu'on a incrémenté le compteur,
+	// on valorise le cookie "visite" à "true"
 	if (!(JSON.parse(cookies.get('visite') || 'false') as boolean)) {
-		updateCounter(fetch);
+		updateCounter();
 		cookies.set('visite', JSON.stringify(true));
 		console.log('Cookie de visite défini');
 	}
