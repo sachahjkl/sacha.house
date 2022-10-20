@@ -13,7 +13,7 @@ export const MOI = {
 	linkedin: new URL('https://www.linkedin.com/in/sachafroment/'),
 	mail: 'sacha@sacha.house',
 	curriculumVitae: new URL(
-		'https://mega.nz/file/7oF2SBwR#LFdx6o9LnntuK4Z0LjHegn5a7PRiXgZ1SFw0R_qmNQk'
+		'https://mega.nz/file/bxUgHAKD#63H2N3PoF4s_FP8SK1l3W8qB1Day5fGta1qMqjsIg7c'
 	),
 	ethAddress: '0xDfB091f812ea27Ca58e8f556B252f245660cba87',
 	moneroAdress:
@@ -28,8 +28,3 @@ export const MOI = {
 export const PRETTY_PRENOM = capitalize(MOI.prenom.toLowerCase());
 export const PRETTY_NOM = MOI.nom.toUpperCase();
 export const SITE_TITLE = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
-
-export const countAPIConfig = {
-	namespace: 'sacha.house',
-	key: 'visites'
-};

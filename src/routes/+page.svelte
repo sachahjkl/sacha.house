@@ -1,19 +1,19 @@
 <script lang="ts">
 	import ClockDisplay from '$lib/components/ClockDisplay.svelte';
-	import { MOI, SITE_TITLE } from '$lib/constants';
+	import { MOI, SITE_TITLE } from '$lib/me';
+
+	import comrade from '$lib/assets/c-omrade.jpg';
+
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const { visites } = data;
-
-	import comrade from '$lib/assets/c-omrade.jpg';
 </script>
 
 <article class="prose">
 	<h1>
 		{SITE_TITLE}
 		<div class="visites hidden md:inline-block">
-			<ClockDisplay value={`${visites} visites`} />
+			<ClockDisplay value={`${data.visites} visites`} />
 		</div>
 	</h1>
 	<div class="divider" />
@@ -25,7 +25,7 @@
 		📧 <a href="mailto:{MOI.mail}">M'envoyer un mail</a>
 	</p>
 	<div class="visites md:hidden inline-block">
-		<ClockDisplay value={`${visites} visites`} />
+		<ClockDisplay value={`${data.visites} visites`} />
 	</div>
 	<div class="divider" />
 	<img class="illustration" src={comrade} alt="comrade" />

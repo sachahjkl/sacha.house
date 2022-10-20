@@ -12,7 +12,8 @@ export const GET_PROJECTS_GITLAB = gql`
 		name
 		url: webUrl
 		avatarUrl
-		description: descriptionHtml
+		description
+		descriptionHtml
 		visibility
 	}
 `;
@@ -55,10 +56,6 @@ export const GET_POSTS = gql`
 			slug
 			title
 			updatedAt
-			publishedAt
-			content {
-				html
-			}
 		}
 	}
 `;

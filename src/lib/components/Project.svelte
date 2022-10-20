@@ -2,13 +2,18 @@
 	import { randomColorHSL } from '$lib/utils';
 
 	export let description = 'N/A';
+	export let descriptionHtml = 'N/A';
 	export let name = 'Projet';
 	export let url = 'https://github.com/torvalds/linux';
 	export let avatarUrl = '';
 	const [h, s, l] = randomColorHSL();
 </script>
 
-<a href={url}>
+<a
+	href={url}
+	title="{name}
+{description}"
+>
 	<div class="h-32 card card-side bg-base-200">
 		{#if avatarUrl}
 			<div class="w-32 grid shrink-0 place-content-center">
@@ -18,7 +23,9 @@
 			</div>
 		{:else}
 			<div
-				style={(avatarUrl ?? '').trim() !== '' ? '' : `--color: hsl(${h}, ${s*100}%, ${l*100}%)`}
+				style={(avatarUrl ?? '').trim() !== ''
+					? ''
+					: `--color: hsl(${h}, ${s * 100}%, ${l * 100}%)`}
 				class="letter-box"
 			>
 				<span class="letter">
@@ -26,10 +33,10 @@
 				</span>
 			</div>
 		{/if}
-		<div class="card-body p-4 project-info">
+		<div class="card-body m-3 mr-6 p-0 project-info">
 			<h2 class="card-title">{name}</h2>
 			<div class="description">
-				{@html description || '😞 Pas de description ... '}
+				{@html descriptionHtml || '😞 Pas de description ... '}
 			</div>
 		</div>
 	</div>
@@ -44,6 +51,10 @@
 	}
 	div.card {
 		@apply shadow m-2 hover:scale-95 active:scale-[1.01] transition-transform;
+	}
+
+	.card-body {
+		@apply overflow-hidden;
 	}
 	.letter-box {
 		--color: lightred;

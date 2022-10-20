@@ -81,7 +81,7 @@
 
 <style lang="postcss">
 	header {
-		@apply fixed top-0 bg-base-100 bg-opacity-50 backdrop-blur-sm w-full z-10 print:hidden;
+		@apply fixed top-0 bg-base-100 bg-opacity-50 backdrop-blur-md w-full z-10 print:hidden;
 	}
 	nav {
 		@apply m-2 flex flex-wrap justify-between;

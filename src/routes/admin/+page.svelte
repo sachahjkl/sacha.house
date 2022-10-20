@@ -1,63 +1,27 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { PUBLIC_PROXYCURL_API_ENDPOINT } from '$env/static/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
-	import { countAPIConfig, MOI, SITE_TITLE } from '$lib/constants';
-	import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
-	import { metaDescription, metaTitle } from '$lib/utils';
+
 	import { toast } from '@zerodevx/svelte-toast';
-	import type { Result } from 'countapi-js';
-	import { onMount } from 'svelte';
-	import type { UpdateProfileData } from '../api/linkedinProfile/+server';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	let creditBalance = -1;
-	let visites = data.visites;
-
-	let profile: LinkedinProfile;
-
-	let loadingProfile = true;
-	let loadingCredits = true;
-	let promiseCountApi = Promise.resolve();
 
 	const toastCredits = (credits: number) => `
 	<strong>👍 Profil mis à jour !</strong><br>
 	Il te reste ${credits} crédit(s)`;
 
-	const updateProfile = async () => {
-		loadingProfile = true;
-		loadingCredits = true;
-		try {
-			const res = await fetch('/api/linkedinProfile', { method: 'PATCH' });
-			if (!res.ok) throw new Error();
+	const toastError = (message: string) => `
+	<strong>💣 Une erreur a eu lieu</strong><br>
+	${message}`;
 
-			const data: UpdateProfileData = await res.json();
-			creditBalance = creditBalance - 1;
-			profile = data.profile;
+	let profileLoading = false;
+	let visitesLoading = false;
 
-			toast.push(toastCredits(creditBalance));
-		} catch (error) {
-			toast.push('Echec de la mise à jour du profil.');
-		} finally {
-			loadingProfile = false;
-			loadingCredits = false;
-		}
-	};
-
-	const updateCounter = async (amount: number) => {
-		const { key, namespace } = countAPIConfig;
-		const promiseCountApi = await fetch(
-			`https://api.countapi.xyz/update/${namespace}/${key}?amount=${amount}`
-		);
-		visites = ((await promiseCountApi.json()) as Result).value;
-	};
-
-	onMount(async () => {
-		creditBalance = Number(await fetch('/api/admin/creditBalance').then((res) => res.text()));
-		profile = await fetch('/api/linkedinProfile').then(async (res) => await res.json());
-		loadingProfile = false;
-		loadingCredits = false;
-	});
+	let profileStringifiedPretty = JSON.stringify(data.profile, null, 1);
+	let code: string;
+	$: code = profileLoading ? 'Chargement des données du profil...' : profileStringifiedPretty;
 </script>
 
 <svelte:head>
@@ -68,7 +32,7 @@
 	<h1>admin</h1>
 
 	<section>
-		<h2>Adresse IP</h2>
+		<h2>🕵️ Adresse IP</h2>
 
 		<p>
 			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code
@@ -78,49 +42,71 @@
 	</section>
 	<div class="divider" />
 	<section>
-		<h2>Données du profil LinkedIn</h2>
+		<h2>👔 Données du profil LinkedIn</h2>
 		<p>
 			Les données pour le profil LinkedIn proviennent de l'API <a
 				href={PUBLIC_PROXYCURL_API_ENDPOINT}>{PUBLIC_PROXYCURL_API_ENDPOINT}</a
 			>.
 		</p>
-		<p>
-			{#if loadingCredits}
-				<span class="animate-spin inline-block">⚙️</span> Chargement du crédit...
-			{:else}
-				Il reste <b>{creditBalance} crédits</b> pour raffraichir ces données.
-			{/if}
-		</p>
-		<button
-			class="refresh-linkedin btn btn-sm gap-2"
-			on:keypress={updateProfile}
-			on:click={updateProfile}
-		>
-			<div class="refresh-icon">⚙️</div>
-			Rafraichir le profil (coûte 1 crédit)
-		</button>
-		{#if loadingProfile}
-			<p>
-				<span class="animate-spin inline-block">⚙️</span> Chargement des données...
-			</p>
+		{#if profileLoading}
+			<span class="animate-spin inline-block">⚙️</span> Chargement des données de crédits...
 		{:else}
-			<PrismJs code={JSON.stringify(profile, null, 1)} language="javascript" />
+			<p>
+				Il reste <b>{data.creditBalance} crédits</b> pour raffraichir ces données.
+			</p>
 		{/if}
+		<form
+			method="POST"
+			action="?/updateLinkedinProfile"
+			use:enhance={() => {
+				profileLoading = true;
+
+				return async ({ result, update }) => {
+					await update();
+					profileLoading = false;
+					if (result.type === 'success') {
+						toast.push(toastCredits(result.data?.creditBalance));
+						data.creditBalance = result.data?.creditBalance;
+					}
+					if (result.type === 'error') {
+						toast.push(toastError(result.error?.message));
+					}
+				};
+			}}
+		>
+			<button type="submit" class="refresh-linkedin btn btn-sm gap-2">
+				<div class="refresh-icon">⚙️</div>
+				Rafraichir le profil (coûte 1 crédit)
+			</button>
+		</form>
+
+		<PrismJs {code} language="javascript" />
 	</section>
 	<section>
-		<h2>Nombre de visites</h2>
-
-		{#await promiseCountApi}
-			<p>
-				<span class="animate-spin inline-block">⚙️</span> Chargement des données...
-			</p>
-		{:then _}
-			<p>Nous avons reçu un total de <b> {visites} visites</b>.</p>
-			<button class="btn gap-2" on:click={() => updateCounter(1)}>
+		<h2>#️⃣ Nombre de visites</h2>
+		<p>
+			{#if visitesLoading}
+				<span class="animate-spin inline-block">⚙️</span> Chargement des visites...
+			{:else}
+				Nous avons reçu un total de <b> {data.visites} visites</b>.
+			{/if}
+		</p>
+		<form
+			method="POST"
+			action="?/incrementCounter"
+			use:enhance={() => {
+				visitesLoading = true;
+				return async ({ update }) => {
+					await update();
+					visitesLoading = false;
+				};
+			}}
+		>
+			<button type="submit" class="btn gap-2">
 				<div class="action-icon text-xl">+</div>
-				Incrémenter</button
-			>
-		{/await}
+				Incrémenter
+			</button>
+		</form>
 	</section>
 </article>
 

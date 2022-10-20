@@ -2,12 +2,14 @@
 	import Prism from 'prismjs';
 	import { onMount } from 'svelte';
 
-    const themeURL = "/prism-okaidia.css"
-    // const themeURL = "/prism-vsc-dark-plus.css"
+	const themeURL = '/prism-okaidia.css';
+	// const themeURL = "/prism-vsc-dark-plus.css"
 
 	export let language = '';
 	export let code = '';
 	let formattedCode = code;
+
+	$: formattedCode = Prism.highlight(code, Prism.languages[language], language);
 
 	onMount(async () => {
 		formattedCode = Prism.highlight(code, Prism.languages[language], language);
@@ -15,10 +17,7 @@
 </script>
 
 <svelte:head>
-	<link
-		rel="stylesheet"
-		href={themeURL}
-	/>
+	<link rel="stylesheet" href={themeURL} />
 </svelte:head>
 
 <pre class="language-{language}"><code class="language-{language}">{@html formattedCode}</code

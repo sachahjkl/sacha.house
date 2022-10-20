@@ -3,6 +3,7 @@ export interface Project {
 	url: string;
 	avatarUrl?: string;
 	description?: string;
+	descriptionHtml?: string;
 	visibility: Visibility;
 	group?: Group;
 }

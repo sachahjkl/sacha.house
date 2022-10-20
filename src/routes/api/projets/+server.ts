@@ -5,7 +5,7 @@ import { SECRET_GITHUB_BEARER_TOKEN, SECRET_GITLAB_BEARER_TOKEN } from '$env/sta
 import { error, json } from '@sveltejs/kit';
 
 import { GraphQLClient } from 'graphql-request';
-import { MOI } from '$lib/constants';
+import { MOI } from '$lib/me';
 import type { RequestHandler } from './$types';
 
 export type GHType = { user: { projects: { nodes: Project[] } } };
