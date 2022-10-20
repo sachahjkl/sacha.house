@@ -24,19 +24,15 @@ export const load: PageLoad = async ({ params, url }) => {
 	};
 	const post = getPost();
 
-	const promise = post.then((post) => ({
-		excerpt:
-			post.content.text.length > 180
-				? `${post.content.text.substring(0, 180)}...`
-				: post.content.text,
-		title: `${post.title} / ${SITE_TITLE}`
-	}));
-
 	return {
 		post,
 		seo: {
-			title: await promise.then((val) => val.title),
-			description: await promise.then((val) => val.excerpt),
+			title: await post.then((post) => `${post.title} / ${SITE_TITLE}`),
+			description: await post.then((post) =>
+				post.content.text.length > 180
+					? `${post.content.text.substring(0, 180)}...`
+					: post.content.text
+			),
 			url: url.toString()
 		}
 	};

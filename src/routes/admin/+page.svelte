@@ -4,9 +4,9 @@
 	import PrismJs from '$lib/components/PrismJS.svelte';
 
 	import { toast } from '@zerodevx/svelte-toast';
-	import type { PageServerData } from './$types';
+	import type { PageData } from './$types';
 
-	export let data: PageServerData;
+	export let data: PageData;
 
 	const toastCredits = (credits: number) => `
 	<strong>👍 Profil mis à jour !</strong><br>
@@ -68,8 +68,8 @@
 						toast.push(toastCredits(result.data?.creditBalance));
 						data.creditBalance = result.data?.creditBalance;
 					}
-					if (result.type === 'error') {
-						toast.push(toastError(result.error?.message));
+					if (result.type === 'invalid') {
+						toast.push(toastError(result.data?.message));
 					}
 				};
 			}}

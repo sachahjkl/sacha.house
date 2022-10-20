@@ -6,20 +6,20 @@ import {
 	PUBLIC_PROXYCURL_API_ENDPOINT
 } from '$env/static/public';
 import { SECRET_GITHUB_BEARER_TOKEN, SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
-import { error, invalid } from '@sveltejs/kit';
 
 import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
+import { invalid } from '@sveltejs/kit';
 import { updateCounter } from '$lib/countapi';
 
 export const load: PageServerLoad = async ({ getClientAddress, fetch }) => {
 	const creditBalance: Promise<number> = fetch('/api/creditBalance')
-		.then(async (res) => res.text())
+		.then((res) => res.text())
 		.then((str) => Number(str));
 
 	const profile: Promise<LinkedinProfile> = fetch('/api/linkedinProfile').then((res) => res.json());
 	const visites = fetch('/api/visites')
 		.then((val) => val.text())
-		.then((val) => Number(val));
+		.then((str) => Number(str));
 
 	return {
 		creditBalance,
@@ -79,11 +79,13 @@ export const actions: Actions = {
 				creditBalance
 			};
 		} catch (error) {
-			console.error('Erreur à la maj du profile linkedin', { error });
-			return invalid(500, {
-				error: true,
-				message: `Erreur innatendue - ${error}`
-			});
+			if (error instanceof Error) {
+				console.error('Erreur à la maj du profile linkedin', { error });
+				return invalid(500, {
+					error: true,
+					message: `Erreur innatendue - ${error.message}`
+				});
+			}
 		}
 	},
 
@@ -112,6 +114,6 @@ const fetchProxyCurl = async () => {
 			Authorization: `Bearer ${SECRET_PROXYCURL_BEARER_TOKEN}`
 		}
 	});
-	if (!res.ok) throw error(500, `Récupération du profil échouée."}`);
+	if (!res.ok) throw new Error(`Récupération du profil échouée.`);
 	return (await res.json()) as LinkedinProfile;
 };
