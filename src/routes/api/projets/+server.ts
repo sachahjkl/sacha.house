@@ -11,16 +11,14 @@ import type { RequestHandler } from './$types';
 export type GHType = { user: { projects: { nodes: Project[] } } };
 export type GLType = { projects: { nodes: Project[] } };
 
-export const GET: RequestHandler = async ({ fetch }) => {
+export const GET: RequestHandler = async () => {
 	try {
 		const clientGH = new GraphQLClient(`${PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
-			fetch,
 			headers: {
 				Authorization: `Bearer ${SECRET_GITHUB_BEARER_TOKEN}`
 			}
 		});
 		const clientGL = new GraphQLClient(`${PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
-			fetch,
 			headers: {
 				Authorization: `Bearer ${SECRET_GITLAB_BEARER_TOKEN}`
 			}

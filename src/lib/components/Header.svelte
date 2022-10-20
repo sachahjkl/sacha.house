@@ -12,7 +12,7 @@
 </script>
 
 <header bind:clientHeight={headerheight}>
-	<nav>
+	<nav data-sveltekit-prefetch>
 		<ul class="inline-list">
 			<li class="title md:order-first ">
 				<slot name="brand">Brand</slot>

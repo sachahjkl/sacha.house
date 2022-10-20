@@ -13,9 +13,9 @@
 	<meta property="og:url" content={data.seo.url} />
 	<meta property="og:type" content="article" />
 	<meta property="og:article:published_time" content={createdAt.toISOString()} />
-	{updatedAt
-		? `<meta property="og:article:modified_time" content="${updatedAt.toISOString()}"/>`
-		: ''}
+	{#if updatedAt}
+		<meta property="og:article:modified_time" content={updatedAt.toISOString()} />
+	{/if}
 	<meta property="og:article:author" content="{PRETTY_PRENOM} {PRETTY_NOM}" />
 </svelte:head>
 

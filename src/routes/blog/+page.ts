@@ -6,16 +6,10 @@ import type { PageLoad } from './$types';
 import { SITE_TITLE } from '$lib/me';
 import { error } from '@sveltejs/kit';
 
-export const load: PageLoad = async ({ fetch }) => {
+export const load: PageLoad = async () => {
 	const getPosts = async () => {
 		try {
-			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT, {
-				fetch,
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/json'
-				}
-			});
+			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT);
 			const posts = await clientGL
 				.request(GET_POSTS)
 				.then((data: { posts: ListedPost[] }) => data.posts);

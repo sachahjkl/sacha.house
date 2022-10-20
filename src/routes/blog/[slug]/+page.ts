@@ -6,12 +6,10 @@ import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
 import { error } from '@sveltejs/kit';
 
-export const load: PageLoad = async ({ params, url, fetch }) => {
+export const load: PageLoad = async ({ params, url }) => {
 	const getPost = async () => {
 		try {
-			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT, {
-				fetch
-			});
+			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT);
 			const data: { post: Post } = await clientGL.request(GET_POST, { slug: params.slug });
 			const post = data.post;
 
@@ -26,15 +24,19 @@ export const load: PageLoad = async ({ params, url, fetch }) => {
 	};
 	const post = getPost();
 
-	const excerpt = post.then((post) =>
-		post.content.text.length > 180 ? `${post.content.text.substring(0, 180)}...` : post.content.text
-	);
+	const promise = post.then((post) => ({
+		excerpt:
+			post.content.text.length > 180
+				? `${post.content.text.substring(0, 180)}...`
+				: post.content.text,
+		title: `${post.title} / ${SITE_TITLE}`
+	}));
 
 	return {
 		post,
 		seo: {
-			title: post.then((post) => `${post.title} / ${SITE_TITLE}`),
-			description: excerpt,
+			title: await promise.then((val) => val.title),
+			description: await promise.then((val) => val.excerpt),
 			url: url.toString()
 		}
 	};

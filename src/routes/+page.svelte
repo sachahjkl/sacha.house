@@ -18,7 +18,7 @@
 	</h1>
 	<div class="divider" />
 	<h2 class="mt-2">Informations de contact / détails</h2>
-	<p>
+	<p data-sveltekit-prefetch>
 		➜ <a href="/a-propos">à propos de moi</a>
 	</p>
 	<p>
