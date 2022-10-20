@@ -34,7 +34,8 @@ export const load: PageServerLoad = async ({ getClientAddress, fetch }) => {
 };
 
 export const actions: Actions = {
-	updateLinkedinProfile: async ({ fetch }) => {
+	updateLinkedinProfile: async (event) => {
+		const localFetch = event.fetch;
 		try {
 			const newProfile = await fetchProxyCurl();
 			console.info('Profil LinkedIn récupéré');
@@ -67,7 +68,7 @@ export const actions: Actions = {
 				});
 			}
 
-			const creditBalance = await fetch('/api/creditBalance')
+			const creditBalance = await localFetch('/api/creditBalance')
 				.then((res) => res.text())
 				.then((val) => Number(val));
 
@@ -86,9 +87,9 @@ export const actions: Actions = {
 		}
 	},
 
-	incrementCounter: async ({ fetch }) => {
+	incrementCounter: async () => {
 		try {
-			await updateCounter(fetch);
+			await updateCounter();
 			return {
 				success: true
 			};

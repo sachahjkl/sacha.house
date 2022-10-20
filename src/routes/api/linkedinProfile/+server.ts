@@ -10,7 +10,7 @@ export interface UpdateProfileData {
 	remainingCredit: number;
 }
 
-export const GET: RequestHandler = async ({ fetch }) => {
+export const GET: RequestHandler = async () => {
 	try {
 		const res = await fetch(`${PUBLIC_GITHUB_API_ENDPOINT}/gists/${PUBLIC_LINKEDIN_GIST_ID}`, {
 			headers: {

@@ -1,9 +1,5 @@
-// import adapter from '@sveltejs/adapter-auto';
-
 import adapter from '@sveltejs/adapter-netlify';
 import preprocess from 'svelte-preprocess';
-
-// import adapter from '@sveltejs/adapter-node';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -16,13 +12,8 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			edge: false,
 			split: true
-		}),
-		// adapter: adapter({ precompress: true }),
-		version: {
-			name: Date.now().toString()
-		}
+		})
 	}
 };
 
