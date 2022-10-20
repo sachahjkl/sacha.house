@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PRETTY_NOM, PRETTY_PRENOM } from '$lib/constants';
+	import { PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
 	import type { PageData } from './$types';
 
 	export let data: PageData;

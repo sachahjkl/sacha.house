@@ -1,5 +1,5 @@
 import type { PageLoad } from './$types';
-import { SITE_TITLE } from '$lib/constants';
+import { SITE_TITLE } from '$lib/me';
 
 export const load: PageLoad = async () => {
 	return {

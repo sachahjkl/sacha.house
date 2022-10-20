@@ -55,10 +55,6 @@ export const GET_POSTS = gql`
 			slug
 			title
 			updatedAt
-			publishedAt
-			content {
-				html
-			}
 		}
 	}
 `;

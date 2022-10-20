@@ -1,12 +1,13 @@
 <script lang="ts">
 	import ClockDisplay from '$lib/components/ClockDisplay.svelte';
-	import { MOI, SITE_TITLE } from '$lib/constants';
+	import { MOI, SITE_TITLE } from '$lib/me';
+
+	import comrade from '$lib/assets/c-omrade.jpg';
+
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	const { visites } = data;
-
-	import comrade from '$lib/assets/c-omrade.jpg';
 </script>
 
 <article class="prose">

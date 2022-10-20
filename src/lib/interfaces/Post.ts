@@ -8,3 +8,9 @@ export interface Post {
 		text: string;
 	};
 }
+
+export interface ListedPost {
+	slug: string;
+	title: string;
+	updatedAt: string;
+}

@@ -1,4 +1,4 @@
-import { PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/constants';
+import { PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
 
 import type { PageLoad } from './$types';
 import picSrc from '$lib/assets/me.jpg';

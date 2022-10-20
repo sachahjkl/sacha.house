@@ -28,8 +28,3 @@ export const MOI = {
 export const PRETTY_PRENOM = capitalize(MOI.prenom.toLowerCase());
 export const PRETTY_NOM = MOI.nom.toUpperCase();
 export const SITE_TITLE = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
-
-export const countAPIConfig = {
-	namespace: 'sacha.house',
-	key: 'visites'
-};

@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
-	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/constants';
+	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
 	import { capitalize } from '$lib/utils';
 	import { PUBLIC_NETLIFY_SITE_ID } from '$env/static/public';
 	import { env } from '$env/dynamic/public';
