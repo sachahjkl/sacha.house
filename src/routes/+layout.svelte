@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '$lib/app.css';
-	import { page } from '$app/stores';
+	import { page, navigating } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
@@ -11,19 +11,31 @@
 	import type { LayoutServerData } from './$types';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import nProgress from 'nprogress';
 
 	export let data: LayoutServerData;
 
 	const useIntro: boolean = JSON.parse(env.PUBLIC_USE_INTRO || 'true');
 	let doIntro = !useIntro;
 
-	onMount(() => (doIntro = true));
+	onMount(() => {
+		nProgress.configure({ easing: 'ease', speed: 500 });
+		doIntro = true;
+	});
 	let headerheight = 56; // default average height in pixels;
 
 	const TITLE = SITE_TITLE;
 	const DESCRIPTION = `Le site web personnel de ${PRETTY_PRENOM} ${PRETTY_NOM}`;
 	const IMAGE = '/favicon_shadow.png';
 	const AUTHOR = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
+
+	$: {
+		if ($navigating) {
+			nProgress.start();
+		} else {
+			nProgress.done();
+		}
+	}
 </script>
 
 <svelte:head>
