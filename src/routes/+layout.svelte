@@ -65,8 +65,8 @@
 <Header activePagePathname={$page.url.pathname} navItems={data.navItems}>
 	<a slot="brand" href="/" data-sveltekit-prefetch>
 		<picture>
-			<source src={faviconAvif} type="image/avif" />
-			<source src={faviconWebp} type="image/webp" />
+			<source srcset={faviconAvif} type="image/avif" />
+			<source srcset={faviconWebp} type="image/webp" />
 			<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="favicon" />
 		</picture>
 		{MOI.prenom.substring(1)}
@@ -82,8 +82,8 @@
 <Footer commitHash={data.commitHash} netlifyID={PUBLIC_NETLIFY_SITE_ID}>
 	<a slot="brand" href="/" data-sveltekit-prefetch>
 		<picture>
-			<source src={faviconAvif} type="image/avif" />
-			<source src={faviconWebp} type="image/webp" />
+			<source srcset={faviconAvif} type="image/avif" />
+			<source srcset={faviconWebp} type="image/webp" />
 			<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="favicon" />
 		</picture>
 	</a>
