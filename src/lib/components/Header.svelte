@@ -6,12 +6,10 @@
 
 	export let navItems: NavItem[] = [];
 	export let activePagePathname = '';
-	export let headerheight: number;
-    onMount(() =>
-		themeChange(false))
+	onMount(() => themeChange(false));
 </script>
 
-<header bind:clientHeight={headerheight}>
+<header>
 	<nav data-sveltekit-prefetch>
 		<ul class="inline-list">
 			<li class="title md:order-first ">
@@ -45,12 +43,15 @@
 						</li>
 					{/each}
 					<li class="select-none flex items-center hover-bounce">
-						<form class=" w-full">
+						<form class="w-full">
+							<label class="sr-only" for="theme-toggle-dropdown">Choix du thème</label>
 							<span class="bounce">🌚</span>
 							<input
 								type="checkbox"
 								data-toggle-theme="light,dark"
 								data-act-class="ACTIVECLASS"
+								name="theme-toggle-dropdown"
+								id="theme-toggle-dropdown"
 								class="toggle toggle-sm"
 							/> <span class="bounce">🌞</span>
 						</form>
@@ -67,11 +68,14 @@
 			{/each}
 
 			<li class="hidden md:flex items-center select-none hover-bounce">
+				<label class="sr-only" for="theme-toggle-mobile">Choix du thème</label>
 				<span class="bounce">🌚</span>
 				<input
 					type="checkbox"
 					data-toggle-theme="light,dark"
 					data-act-class="ACTIVECLASS"
+					name="theme-toggle"
+					id="theme-toggle"
 					class="toggle toggle-sm mx-2"
 				/> <span class="bounce">🌞</span>
 			</li>
@@ -81,10 +85,10 @@
 
 <style lang="postcss">
 	header {
-		@apply fixed top-0 bg-base-100 bg-opacity-50 backdrop-blur-md w-full z-10 print:hidden;
+		@apply sticky p-2 top-0 bg-base-100 bg-opacity-50 backdrop-blur-md w-full z-10 print:hidden;
 	}
 	nav {
-		@apply m-2 flex flex-wrap justify-between;
+		@apply flex flex-wrap justify-between;
 	}
 
 	.active {

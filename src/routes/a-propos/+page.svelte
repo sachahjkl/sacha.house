@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
-
-	import picSrc from '$lib/assets/me.jpg';
 	import CopyableValue from '$lib/components/CopyableValue.svelte';
 	import Experience from '$lib/components/Experience.svelte';
 	import Education from '$lib/components/Education.svelte';
 	import type { PageData } from './$types';
+	import Avatar from '$lib/components/Avatar.svelte';
 
 	export let data: PageData;
 </script>
@@ -14,9 +13,7 @@
 	<h1 class="">à propos</h1>
 	<section>
 		<div class="avatar block mx-auto">
-			<div class="pic">
-				<img class="me" src={picSrc} alt="Moi" />
-			</div>
+			<Avatar />
 		</div>
 
 		<p>
@@ -74,16 +71,8 @@
 </article>
 
 <style lang="postcss">
-	.pic {
-		@apply w-80 mx-auto rounded-full ring-4 hover:ring-8
-		hover:ring-secondary hover:scale-105 active:ring-success active:scale-95
-		transition-all ring-primary ring-offset-base-100 ring-offset-2;
-	}
 	article {
 		@apply mx-auto print:max-w-full;
-	}
-	.me {
-		@apply m-0;
 	}
 	a {
 		@apply hover:scale-105 transition-all;

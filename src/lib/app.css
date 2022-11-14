@@ -1,14 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Overpass&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: "Inter-fallback";
+    size-adjust: 107.00%;
+    ascent-override: 91%;
+    src: local("Arial");
+}
 
 @font-face {
 	font-family: 'Digital-7';
 	font-display: swap;
 	src: url('/fonts/digital-7/digital_7_mono.ttf') format('truetype');
 }
+
 
 @font-face {
 	font-family: 'Digital-7';
@@ -26,10 +32,6 @@
 
 ._toastMsg {
 	@apply text-ellipsis overflow-hidden;
-}
-
-body {
-	font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Make clicks pass-through */

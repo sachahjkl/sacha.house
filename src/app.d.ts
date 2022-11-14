@@ -7,3 +7,9 @@ declare namespace App {
 	// interface Error {}
 	// interface Platform {}
 }
+
+// Workaround for imagetools imports - https://github.com/microsoft/TypeScript/issues/38638#issuecomment-1088247956
+declare module '*&imagetools' {
+	const out;
+	export default out;
+}
