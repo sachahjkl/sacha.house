@@ -11,6 +11,9 @@
 	import type { LayoutServerData } from './$types';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import faviconAvif from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
+	import faviconWebp from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
+	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
 	import nProgress from 'nprogress';
 
 	export let data: LayoutServerData;
@@ -61,7 +64,11 @@
 
 <Header activePagePathname={$page.url.pathname} navItems={data.navItems}>
 	<a slot="brand" href="/" data-sveltekit-prefetch>
-		<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="favicon" />
+		<picture>
+			<source src={faviconAvif} type="image/avif" />
+			<source src={faviconWebp} type="image/webp" />
+			<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="favicon" />
+		</picture>
 		{MOI.prenom.substring(1)}
 		{capitalize(MOI.nom)}
 	</a>
@@ -72,7 +79,15 @@
 	<slot><!-- optional fallback --></slot>
 </main>
 
-<Footer commitHash={data.commitHash} netlifyID={PUBLIC_NETLIFY_SITE_ID} />
+<Footer commitHash={data.commitHash} netlifyID={PUBLIC_NETLIFY_SITE_ID}>
+	<a slot="brand" href="/" data-sveltekit-prefetch>
+		<picture>
+			<source src={faviconAvif} type="image/avif" />
+			<source src={faviconWebp} type="image/webp" />
+			<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="favicon" />
+		</picture>
+	</a>
+</Footer>
 <!-- {/if} -->
 <SvelteToast options={{ duration: 2000 }} />
 
