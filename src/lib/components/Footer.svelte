@@ -6,12 +6,14 @@
 
 <footer class="footer justify-between p-4 max-w-5xl m-auto mt-3">
 	<div class="items-center grid-flow-col">
-		<img class="favicon" src="/favicon_shadow.png" alt="Logo" />
+		<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="Logo" />
 		<p>Copyright © {year} - All right reserved</p>
 	</div>
 	<div class="flex content-center">
 		<img
 			class="deploy-img"
+			width="135"
+			height="20"
 			src="https://api.netlify.com/api/v1/badges/{netlifyID}/deploy-status"
 			alt="Deploy Status Badge"
 		/>

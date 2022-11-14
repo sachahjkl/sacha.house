@@ -1,8 +1,7 @@
 <script lang="ts">
 	import ClockDisplay from '$lib/components/ClockDisplay.svelte';
+	import Illustration from '$lib/components/Illustration.svelte';
 	import { MOI, SITE_TITLE } from '$lib/me';
-
-	import comrade from '$lib/assets/c-omrade.jpg';
 
 	import type { PageData } from './$types';
 
@@ -28,7 +27,7 @@
 		<ClockDisplay value={`${data.visites} visites`} />
 	</div>
 	<div class="divider" />
-	<img class="illustration" src={comrade} alt="comrade" />
+	<Illustration />
 </article>
 
 <style lang="postcss">
@@ -38,11 +37,6 @@
 	a {
 		@apply text-blue-500 visited:text-purple-500
          hover:text-blue-600 active:text-blue-700;
-	}
-
-	.illustration {
-		@apply max-w-[60%] m-auto hover:scale-95
-		active:scale-90 transition-all;
 	}
 
 	h1 {
