@@ -68,7 +68,7 @@
 			{/each}
 
 			<li class="hidden md:flex items-center select-none hover-bounce">
-				<label class="sr-only" for="theme-toggle-mobile">Choix du thème</label>
+				<label class="sr-only" for="theme-toggle">Choix du thème</label>
 				<span class="bounce">🌚</span>
 				<input
 					type="checkbox"
