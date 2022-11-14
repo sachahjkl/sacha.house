@@ -6,7 +6,7 @@
 
 <footer class="footer justify-between p-4 max-w-5xl m-auto mt-3">
 	<div class="items-center grid-flow-col">
-		<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="Logo" />
+		<slot name="brand">Mon site</slot>
 		<p>Copyright © {year} - All right reserved</p>
 	</div>
 	<div class="flex content-center">
