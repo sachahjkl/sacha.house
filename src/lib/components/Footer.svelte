@@ -34,8 +34,4 @@
 	.deploy-img {
 		@apply hover:scale-95 active:scale-90 transition-all;
 	}
-
-	img.favicon {
-		@apply inline-block align-text-top h-[1em];
-	}
 </style>
