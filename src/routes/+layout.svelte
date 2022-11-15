@@ -18,7 +18,6 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 
 	export let data: LayoutServerData;
-	let ReloadPrompt: ConstructorOfATypedSvelteComponent;
 
 	// const useIntro: boolean = JSON.parse(env.PUBLIC_USE_INTRO || 'true');
 	// let doIntro = !useIntro;
@@ -46,9 +45,6 @@
 				}
 			});
 		}
-	});
-	onMount(async () => {
-		pwaInfo && (ReloadPrompt = (await import('$lib/components/ReloadPrompt.svelte')).default);
 	});
 
 	$: webManifest = pwaInfo ? pwaInfo.webManifest.linkTag : '';

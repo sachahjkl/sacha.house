@@ -9,7 +9,6 @@ const config: UserConfig = {
 		sveltekit(),
 		SvelteKitPWA({
 			srcDir: './src',
-			mode: 'development',
 			registerType: 'autoUpdate',
 			strategies: 'generateSW',
 			scope: '/',
@@ -93,11 +92,6 @@ const config: UserConfig = {
 						}
 					}
 				]
-			},
-			devOptions: {
-				enabled: true,
-				type: 'module',
-				navigateFallback: '/'
 			}
 		})
 	]
