@@ -15,8 +15,10 @@
 	import faviconWebp from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
 	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
 	import nProgress from 'nprogress';
+	import { pwaInfo } from 'virtual:pwa-info';
 
 	export let data: LayoutServerData;
+	let ReloadPrompt: ConstructorOfATypedSvelteComponent;
 
 	// const useIntro: boolean = JSON.parse(env.PUBLIC_USE_INTRO || 'true');
 	// let doIntro = !useIntro;
@@ -25,6 +27,31 @@
 		nProgress.configure({ easing: 'ease', speed: 500 });
 		// doIntro = true;
 	});
+
+	onMount(async () => {
+		if (pwaInfo) {
+			const { registerSW } = await import('virtual:pwa-register');
+			registerSW({
+				immediate: true,
+				onRegistered(r) {
+					// uncomment following code if you want check for updates
+					// r && setInterval(() => {
+					//    console.log('Checking for sw update')
+					//    r.update()
+					// }, 20000 /* 20s for testing purposes */)
+					console.log(`SW Registered: ${r}`);
+				},
+				onRegisterError(error) {
+					console.log('SW registration error', error);
+				}
+			});
+		}
+	});
+	onMount(async () => {
+		pwaInfo && (ReloadPrompt = (await import('$lib/components/ReloadPrompt.svelte')).default);
+	});
+
+	$: webManifest = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 
 	const TITLE = SITE_TITLE;
 	const DESCRIPTION = `Le site web personnel de ${PRETTY_PRENOM} ${PRETTY_NOM}`;
@@ -42,6 +69,9 @@
 
 <svelte:head>
 	<title>{$page.data.seo?.title || TITLE}</title>
+
+	{@html webManifest}
+
 	<meta name="og:title" content={$page.data.seo?.title || TITLE} />
 	<meta name="twitter:title" content={$page.data.seo?.title || TITLE} />
 
@@ -84,12 +114,13 @@
 		<picture>
 			<source srcset={faviconAvif} type="image/avif" />
 			<source srcset={faviconWebp} type="image/webp" />
-			<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="favicon" />
+			<img class="favicon" src={faviconFallback} height="1em" width="1em" alt="favicon" />
 		</picture>
 	</a>
 </Footer>
 <!-- {/if} -->
 <SvelteToast options={{ duration: 2000 }} />
+
 
 <style lang="postcss">
 	main {

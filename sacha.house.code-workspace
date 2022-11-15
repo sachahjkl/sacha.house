@@ -16,7 +16,8 @@
 			"**/.svelte-kit": true,
 			"**/$houdini": true,
 			"**/.netlify": true,
-			"**/build": true
+			"**/build": true,
+			"**/dev-dist": true,
 		}
 	}
 }
