@@ -8,7 +8,7 @@ module.exports = {
 	content: ['./src/routes/**/*.{svelte,js,ts}', './src/lib/**/*.{svelte,js,ts}'],
 	theme: {
 		fontFamily: {
-			sans: ['Inter', 'Inter-fallback', ...defaultTheme.fontFamily.sans]
+			sans: ['Inter', 'Inter-fallback', 'Noto Color Emoji', ...defaultTheme.fontFamily.sans]
 		},
 		container: {
 			center: true
