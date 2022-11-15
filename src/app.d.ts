@@ -1,6 +1,11 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 // and what to do when importing types
+
+/// <reference types="vite-plugin-pwa/client" />
+/// <reference types="vite-plugin-pwa/info" />
+/// <reference types="@vite-pwa/sveltekit" />
+
 declare namespace App {
 	// interface Locals {}
 	// interface PageData {}
