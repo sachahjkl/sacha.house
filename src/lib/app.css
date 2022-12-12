@@ -4,8 +4,8 @@
 
 @font-face {
     font-family: "Inter-fallback";
-    size-adjust: 107.00%;
-    ascent-override: 91%;
+    size-adjust: normal;
+    ascent-override: normal;
     src: local("Arial");
 }
 

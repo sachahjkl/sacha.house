@@ -17,13 +17,13 @@ module.exports = {
 
 	plugins: [tailwindLineClamp, tailwindTypography, daisyui],
 	daisyui: {
-		styled: true,
+		styled: true
 		// themes: true,
 		// base: true,
 		// utils: true,
 		// logs: true,
 		// rtl: false,
 		// prefix: '',
-		darkTheme: 'dark'
+		// darkTheme: 'dark'
 	}
 };
