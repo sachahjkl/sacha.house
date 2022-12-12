@@ -15,7 +15,6 @@
 	import faviconWebp from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
 	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
 	import nProgress from 'nprogress';
-	import { pwaInfo } from 'virtual:pwa-info';
 
 	export let data: LayoutServerData;
 
@@ -26,28 +25,6 @@
 		nProgress.configure({ easing: 'ease', speed: 500 });
 		// doIntro = true;
 	});
-
-	onMount(async () => {
-		if (pwaInfo) {
-			const { registerSW } = await import('virtual:pwa-register');
-			registerSW({
-				immediate: true,
-				onRegistered(r) {
-					// uncomment following code if you want check for updates
-					// r && setInterval(() => {
-					//    console.log('Checking for sw update')
-					//    r.update()
-					// }, 20000 /* 20s for testing purposes */)
-					console.log(`SW Registered: ${r}`);
-				},
-				onRegisterError(error) {
-					console.log('SW registration error', error);
-				}
-			});
-		}
-	});
-
-	$: webManifest = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 
 	const TITLE = SITE_TITLE;
 	const DESCRIPTION = `Le site web personnel de ${PRETTY_PRENOM} ${PRETTY_NOM}`;
@@ -65,8 +42,6 @@
 
 <svelte:head>
 	<title>{$page.data.seo?.title || TITLE}</title>
-
-	{@html webManifest}
 
 	<meta name="og:title" content={$page.data.seo?.title || TITLE} />
 	<meta name="twitter:title" content={$page.data.seo?.title || TITLE} />
