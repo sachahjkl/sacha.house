@@ -8,7 +8,7 @@ import {
 import { SECRET_GITHUB_BEARER_TOKEN, SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
 
 import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
-import { invalid } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { updateCounter } from '$lib/countapi';
 
 export const load: PageServerLoad = async ({ getClientAddress, fetch }) => {
@@ -62,7 +62,7 @@ export const actions: Actions = {
 
 			if (!gistRes.ok) {
 				console.error('Mise à jour du gist échouee. erreur : ', gistRes.status);
-				return invalid(500, {
+				return fail(500, {
 					error: true,
 					message: 'Mise à jour du gist échouée.'
 				});
@@ -81,7 +81,7 @@ export const actions: Actions = {
 		} catch (error) {
 			if (error instanceof Error) {
 				console.error('Erreur à la maj du profile linkedin', { error });
-				return invalid(500, {
+				return fail(500, {
 					error: true,
 					message: `Erreur innatendue - ${error.message}`
 				});
@@ -96,7 +96,7 @@ export const actions: Actions = {
 				success: true
 			};
 		} catch (err) {
-			return invalid(500, {
+			return fail(500, {
 				error: true,
 				message: err
 			});
