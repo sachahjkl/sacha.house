@@ -8,7 +8,7 @@
 	<h1>blog</h1>
 
 	<h2>📰 Liste des articles</h2>
-	<ul data-sveltekit-prefetch>
+	<ul data-sveltekit-preload-data>
 		{#each data.posts as post}
 			<li>
 				<a href="/blog/{post.slug}">{post.title}</a>
