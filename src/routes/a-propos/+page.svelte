@@ -36,14 +36,14 @@
 	<section>
 		<h2 id="détails-professionnels">🖥️ Détails professionels</h2>
 		<hr class="mb-0" />
-		{#each data.profile.experiences as experience, i}
+		{#each data.profile.experiences as experience, i (i)}
 			<Experience {experience} />
 		{/each}
 	</section>
 	<section>
 		<h2 id="parcours-académique">🏫 Parcours académique</h2>
 		<hr class="mb-0" />
-		{#each data.profile.education as edu, i}
+		{#each data.profile.education as edu, i (i)}
 			<Education education={edu} />
 		{/each}
 	</section>

@@ -68,7 +68,7 @@
 						toast.push(toastCredits(result.data?.creditBalance));
 						data.creditBalance = result.data?.creditBalance;
 					}
-					if (result.type === 'invalid') {
+					if (result.type === 'failure') {
 						toast.push(toastError(result.data?.message));
 					}
 				};

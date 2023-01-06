@@ -1,13 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 
 	export let imgSrc = '/me.jpg';
 
-	let show = false;
-	onMount(() => {
-		show = true;
-	});
 </script>
 
 <div in:fade class="avatarTitle">
