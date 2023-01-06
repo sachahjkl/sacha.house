@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 	// import { fly } from 'svelte/transition';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
-	import { capitalize } from '$lib/utils';
+	import { addSnow, capitalize, isChristmas } from '$lib/utils';
 	import { PUBLIC_NETLIFY_SITE_ID } from '$env/static/public';
 	// import { env } from '$env/dynamic/public';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
@@ -23,6 +23,10 @@
 
 	onMount(() => {
 		nProgress.configure({ easing: 'ease', speed: 500 });
+		if (isChristmas()) {
+			addSnow(document);
+		}
+
 		// doIntro = true;
 	});
 
@@ -64,7 +68,7 @@
 </svelte:head>
 
 <Header activePagePathname={$page.url.pathname} navItems={data.navItems}>
-	<a slot="brand" href="/" data-sveltekit-prefetch>
+	<a slot="brand" href="/" data-sveltekit-preload-data>
 		<picture>
 			<source srcset={faviconAvif} type="image/avif" />
 			<source srcset={faviconWebp} type="image/webp" />
@@ -81,7 +85,7 @@
 </main>
 
 <Footer commitHash={data.commitHash} netlifyID={PUBLIC_NETLIFY_SITE_ID}>
-	<a slot="brand" href="/" data-sveltekit-prefetch>
+	<a slot="brand" href="/" data-sveltekit-preload-data>
 		<picture>
 			<source srcset={faviconAvif} type="image/avif" />
 			<source srcset={faviconWebp} type="image/webp" />
@@ -91,7 +95,6 @@
 </Footer>
 <!-- {/if} -->
 <SvelteToast options={{ duration: 2000 }} />
-
 
 <style lang="postcss">
 	main {

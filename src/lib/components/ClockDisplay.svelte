@@ -2,13 +2,13 @@
 	export let value = '';
 	export let clickCallback = () => {};
 
-	let text: HTMLSpanElement;
+	// let text: HTMLSpanElement;
 	let characters: number = 20;
 	$: characters = value.length;
 </script>
 
 <time on:click={clickCallback} on:keypress={clickCallback}>
-	<span class="text" bind:this={text}>
+	<span class="text" >
 		<span class="char-grid">
 			{Array.from(Array(characters - 1))
 				.map(() => '8')

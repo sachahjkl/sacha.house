@@ -10,7 +10,7 @@
 </script>
 
 <header>
-	<nav data-sveltekit-prefetch>
+	<nav data-sveltekit-preload-data>
 		<ul class="inline-list">
 			<li class="title md:order-first ">
 				<slot name="brand">Brand</slot>
