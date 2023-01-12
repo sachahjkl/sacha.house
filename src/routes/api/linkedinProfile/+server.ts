@@ -10,7 +10,7 @@ export interface UpdateProfileData {
 	remainingCredit: number;
 }
 
-export const GET: RequestHandler = async () => {
+export const GET = (async () => {
 	try {
 		const res = await fetch(`${PUBLIC_GITHUB_API_ENDPOINT}/gists/${PUBLIC_LINKEDIN_GIST_ID}`, {
 			headers: {
@@ -29,4 +29,4 @@ export const GET: RequestHandler = async () => {
 		console.error('Récupération du gist échouée.', err);
 		throw error(500, 'Erreur inattendue, récupération du gist échouée.');
 	}
-};
+}) satisfies RequestHandler;

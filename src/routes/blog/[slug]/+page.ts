@@ -6,7 +6,7 @@ import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
 import { error } from '@sveltejs/kit';
 
-export const load: PageLoad = async ({ params, url }) => {
+export const load = (async ({ params, url }) => {
 	const getPost = async () => {
 		try {
 			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT);
@@ -36,4 +36,4 @@ export const load: PageLoad = async ({ params, url }) => {
 			url: url.toString()
 		}
 	};
-};
+}) satisfies PageLoad;

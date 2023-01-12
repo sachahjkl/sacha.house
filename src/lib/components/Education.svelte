@@ -21,9 +21,8 @@
 	</h3>
 	<h4 class="italic font-normal">
 		{#if lieu.website}
-			<a
-				class="no-underline hover:underline text-base-content text-opacity-70"
-				href={lieu.website}>{lieu.name} 🔗</a
+			<a class="no-underline hover:underline text-base-content text-opacity-70" href={lieu.website}
+				>{lieu.name} 🔗</a
 			>
 		{:else}
 			{lieu.name}

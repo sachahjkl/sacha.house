@@ -2,7 +2,6 @@
 	import { fade, fly } from 'svelte/transition';
 
 	export let imgSrc = '/me.jpg';
-
 </script>
 
 <div in:fade class="avatarTitle">

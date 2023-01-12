@@ -6,7 +6,7 @@ import type { PageLoad } from './$types';
 import { SITE_TITLE } from '$lib/me';
 import { error } from '@sveltejs/kit';
 
-export const load: PageLoad = async () => {
+export const load = (async () => {
 	const getPosts = async () => {
 		try {
 			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT);
@@ -31,4 +31,4 @@ export const load: PageLoad = async () => {
 				"Mon blog dans lequel je posterai (rarement) des sujets portant souvent sur l'informatique."
 		}
 	};
-};
+}) satisfies PageLoad;
