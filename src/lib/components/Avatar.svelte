@@ -8,7 +8,7 @@
 	<picture>
 		<source srcset={avif} type="image/avif" />
 		<source srcset={webp} type="image/webp" />
-		<img class="me" src={fallback} height="800" width="800" alt="Moi"/>
+		<img class="me" src={fallback} height="800" width="800" alt="Moi" />
 	</picture>
 </div>
 

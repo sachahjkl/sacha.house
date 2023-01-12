@@ -1,7 +1,7 @@
 import type { PageLoad } from './$types';
 import { SITE_TITLE } from '$lib/me';
 
-export const load: PageLoad = async ({ fetch }) => {
+export const load = (async ({ fetch }) => {
 	const visites = fetch('/api/visites')
 		.then((val) => val.text())
 		.then((val) => Number(val));
@@ -11,4 +11,4 @@ export const load: PageLoad = async ({ fetch }) => {
 			title: `accueil / ${SITE_TITLE}`
 		}
 	};
-};
+}) satisfies PageLoad;

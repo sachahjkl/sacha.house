@@ -11,7 +11,7 @@ import type { RequestHandler } from './$types';
 export type GHType = { user: { projects: { nodes: Project[] } } };
 export type GLType = { projects: { nodes: Project[] } };
 
-export const GET: RequestHandler = async () => {
+export const GET = (async () => {
 	try {
 		const clientGH = new GraphQLClient(`${PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
 			headers: {
@@ -44,4 +44,4 @@ export const GET: RequestHandler = async () => {
 		console.error('Problème à la récupération des projets', err);
 		throw error(500, 'Impossible de récupérer les données des projets.');
 	}
-};
+}) satisfies RequestHandler;

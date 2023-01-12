@@ -1,14 +1,14 @@
 <script lang="ts">
 	export let value = '';
-	export let clickCallback = () => {};
+	export let clickCallback = () => undefined;
 
 	// let text: HTMLSpanElement;
-	let characters: number = 20;
+	let characters = 20;
 	$: characters = value.length;
 </script>
 
 <time on:click={clickCallback} on:keypress={clickCallback}>
-	<span class="text" >
+	<span class="text">
 		<span class="char-grid">
 			{Array.from(Array(characters - 1))
 				.map(() => '8')

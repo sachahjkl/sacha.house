@@ -18,6 +18,6 @@
 			"**/.netlify": true,
 			"**/build": true,
 			"**/dev-dist": true,
-		}
+		},
 	}
 }

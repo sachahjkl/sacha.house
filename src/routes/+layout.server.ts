@@ -8,7 +8,7 @@ import { SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
 import { getAuthorizedNavItems } from '$lib/nav';
 import { updateCounter } from '$lib/countapi';
 
-export const load: LayoutServerLoad = async ({ fetch, getClientAddress, cookies }) => {
+export const load = (async ({ fetch, getClientAddress, cookies }) => {
 	const clientAddress = getClientAddress();
 	const navItems = getAuthorizedNavItems(clientAddress);
 
@@ -43,4 +43,4 @@ export const load: LayoutServerLoad = async ({ fetch, getClientAddress, cookies 
 		navItems,
 		commitHash: commitHash()
 	};
-};
+}) satisfies LayoutServerLoad;

@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 @font-face {
-    font-family: "Inter-fallback";
-    size-adjust: normal;
-    ascent-override: normal;
-    src: local("Arial");
+	font-family: 'Inter-fallback';
+	size-adjust: normal;
+	ascent-override: normal;
+	src: local('Arial');
 }
 
 @font-face {
@@ -14,7 +14,6 @@
 	font-display: swap;
 	src: url('/fonts/digital-7/digital_7_mono.ttf') format('truetype');
 }
-
 
 @font-face {
 	font-family: 'Digital-7';

@@ -4,7 +4,7 @@ import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import type { PageLoad } from './$types';
 import picSrc from '$lib/assets/me.jpg';
 
-export const load: PageLoad = async ({ fetch }) => {
+export const load = (async ({ fetch }) => {
 	const profile: Promise<LinkedinProfile> = fetch('/api/linkedinProfile').then((res) => res.json());
 	return {
 		profile,
@@ -14,4 +14,4 @@ export const load: PageLoad = async ({ fetch }) => {
 			image: picSrc
 		}
 	};
-};
+}) satisfies PageLoad;

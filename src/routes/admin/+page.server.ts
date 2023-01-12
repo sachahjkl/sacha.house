@@ -11,7 +11,7 @@ import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import { fail } from '@sveltejs/kit';
 import { updateCounter } from '$lib/countapi';
 
-export const load: PageServerLoad = async ({ getClientAddress, fetch }) => {
+export const load = (async ({ getClientAddress, fetch }) => {
 	const creditBalance: Promise<number> = fetch('/api/creditBalance')
 		.then((res) => res.text())
 		.then((str) => Number(str));
@@ -31,9 +31,9 @@ export const load: PageServerLoad = async ({ getClientAddress, fetch }) => {
 			description: "Panneau d'administration du site."
 		}
 	};
-};
+}) satisfies PageServerLoad;
 
-export const actions: Actions = {
+export const actions = {
 	updateLinkedinProfile: async (event) => {
 		const localFetch = event.fetch;
 		try {
@@ -102,7 +102,7 @@ export const actions: Actions = {
 			});
 		}
 	}
-};
+} satisfies Actions;
 
 const fetchProxyCurl = async () => {
 	const proxyCurlURL = new URL(`${PUBLIC_PROXYCURL_API_ENDPOINT}/proxycurl/api/v2/linkedin`);
