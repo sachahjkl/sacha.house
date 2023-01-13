@@ -8,9 +8,9 @@ export const countAPIConfig = {
 export const updateCounter = async (amount = 1) => {
 	try {
 		const { key, namespace } = countAPIConfig;
-		const result: Result = await fetch(
+		const result = await fetch(
 			`https://api.countapi.xyz/update/${namespace}/${key}?amount=${amount}`
-		).then((data) => data.json());
+		).then<Result>((data) => data.json());
 
 		console.info('Compteur de visites incrémenté !', result.value);
 

@@ -3,7 +3,9 @@ import type { ProjetsResponse } from '$lib/interfaces/Project';
 import { SITE_TITLE } from '$lib/me';
 
 export const load = (async ({ fetch }) => {
-	const projects: Promise<ProjetsResponse> = fetch('/api/projets').then((res) => res.json());
+	const projects = fetch('/api/projets')
+		.then<ProjetsResponse>((res) => res.json())
+		.catch<ProjetsResponse>(() => ({ github: [], gitlab: [] }));
 	return {
 		projects,
 		seo: {

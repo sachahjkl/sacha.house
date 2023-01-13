@@ -5,7 +5,7 @@ import type { PageLoad } from './$types';
 import picSrc from '$lib/assets/me.jpg';
 
 export const load = (async ({ fetch }) => {
-	const profile: Promise<LinkedinProfile> = fetch('/api/linkedinProfile').then((res) => res.json());
+	const profile = fetch('/api/linkedinProfile').then<LinkedinProfile>((res) => res.json());
 	return {
 		profile,
 		seo: {
