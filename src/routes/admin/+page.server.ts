@@ -12,14 +12,16 @@ import { fail } from '@sveltejs/kit';
 import { updateCounter } from '$lib/countapi';
 
 export const load = (async ({ getClientAddress, fetch }) => {
-	const creditBalance: Promise<number> = fetch('/api/creditBalance')
+	const creditBalance = fetch('/api/creditBalance')
 		.then((res) => res.text())
-		.then((str) => Number(str));
+		.then((str) => Number(str))
+		.catch(() => 0);
 
-	const profile: Promise<LinkedinProfile> = fetch('/api/linkedinProfile').then((res) => res.json());
+	const profile = fetch('/api/linkedinProfile').then<LinkedinProfile>((res) => res.json());
 	const visites = fetch('/api/visites')
 		.then((val) => val.text())
-		.then((str) => Number(str));
+		.then((str) => Number(str))
+		.catch(() => 0);
 
 	return {
 		creditBalance,
