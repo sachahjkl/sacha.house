@@ -1,10 +1,9 @@
 <script lang="ts">
-	import ClockDisplay from '$lib/components/ClockDisplay.svelte';
 	import Illustration from '$lib/components/Illustration.svelte';
 	import { MOI, SITE_TITLE } from '$lib/me';
 
 	
-	export let data;
+	// export let data;
 </script>
 
 <article class="prose">
@@ -22,9 +21,9 @@
 	<p>
 		📧 <a href="mailto:{MOI.mail}">M'envoyer un mail</a>
 	</p>
-	<div class="visites md:hidden inline-block">
+	<!-- <div class="visites md:hidden inline-block">
 		<ClockDisplay value={`${data.visites} visites`} />
-	</div>
+	</div> -->
 	<div class="divider" />
 	<Illustration />
 </article>
@@ -42,7 +41,7 @@
 		@apply flex justify-between flex-wrap content-center items-center mb-2;
 	}
 
-	.visites {
+	/* .visites {
 		@apply hover:scale-110 active:scale-125 transition;
-	}
+	} */
 </style>

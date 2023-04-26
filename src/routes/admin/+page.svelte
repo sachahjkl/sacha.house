@@ -129,8 +129,8 @@
 		}
 	}
 
-	button:hover .action-icon {
+	/* button:hover .action-icon {
 		@apply transition-all;
 		animation: bounce 1s infinite;
-	}
+	} */
 </style>
