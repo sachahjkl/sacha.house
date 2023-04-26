@@ -17,7 +17,8 @@
 			"**/$houdini": true,
 			"**/.netlify": true,
 			"**/build": true,
-			"**/dev-dist": true,
+			"**/dev-dist": true
 		},
+		"typescript.tsdk": "node_modules\\typescript\\lib"
 	}
 }

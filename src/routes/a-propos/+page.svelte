@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
-	import CopyableValue from '$lib/components/CopyableValue.svelte';
-	import Experience from '$lib/components/Experience.svelte';
-	import Education from '$lib/components/Education.svelte';
-	import type { PageData } from './$types';
 	import Avatar from '$lib/components/Avatar.svelte';
+	import CopyableValue from '$lib/components/CopyableValue.svelte';
+	import Education from '$lib/components/Education.svelte';
+	import Experience from '$lib/components/Experience.svelte';
+	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
 
-	export let data: PageData;
+	export let data;
 </script>
 
 <article class="prose">
@@ -36,16 +35,24 @@
 	<section>
 		<h2 id="détails-professionnels">🖥️ Détails professionels</h2>
 		<hr class="mb-0" />
-		{#each data.profile.experiences as experience, i (i)}
-			<Experience {experience} />
-		{/each}
+		{#await data.streaming.profile}
+			<p>Loading ...</p>
+		{:then profile}
+			{#each profile.experiences as experience, i (i)}
+				<Experience {experience} />
+			{/each}
+		{/await}
 	</section>
 	<section>
 		<h2 id="parcours-académique">🏫 Parcours académique</h2>
 		<hr class="mb-0" />
-		{#each data.profile.education as edu, i (i)}
-			<Education education={edu} />
-		{/each}
+		{#await data.streaming.profile}
+			<p>Loading ...</p>
+		{:then profile}
+			{#each profile.education as edu, i (i)}
+				<Education education={edu} />
+			{/each}
+		{/await}
 	</section>
 	<div class="divider" />
 	<section>

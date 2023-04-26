@@ -1,12 +1,11 @@
 import { PUBLIC_GITLAB_API_ENDPOINT, PUBLIC_GIT_REPO_ID } from '$env/static/public';
 
+import { SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
+import { updateCounter } from '$lib/countapi';
+import type { LatestCommit } from '$lib/interfaces/LatestCommit';
+import { getAuthorizedNavItems } from '$lib/nav';
 import { GET_LATEST_COMMIT } from '$lib/queries';
 import { GraphQLClient } from 'graphql-request';
-import type { LatestCommit } from '$lib/interfaces/LatestCommit';
-import type { LayoutServerLoad } from './$types';
-import { SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
-import { getAuthorizedNavItems } from '$lib/nav';
-import { updateCounter } from '$lib/countapi';
 
 export const load = (async ({ fetch, getClientAddress, cookies }) => {
 	const clientAddress = getClientAddress();
@@ -43,4 +42,4 @@ export const load = (async ({ fetch, getClientAddress, cookies }) => {
 		navItems,
 		commitHash: commitHash()
 	};
-}) satisfies LayoutServerLoad;
+});

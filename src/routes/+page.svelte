@@ -3,17 +3,16 @@
 	import Illustration from '$lib/components/Illustration.svelte';
 	import { MOI, SITE_TITLE } from '$lib/me';
 
-	import type { PageData } from './$types';
-
-	export let data: PageData;
+	
+	export let data;
 </script>
 
 <article class="prose">
 	<h1>
 		{SITE_TITLE}
-		<div class="visites hidden md:inline-block">
+		<!-- <div class="visites hidden md:inline-block">
 			<ClockDisplay value={`${data.visites} visites`} />
-		</div>
+		</div> -->
 	</h1>
 	<div class="divider" />
 	<h2 class="mt-2">Informations de contact / détails</h2>

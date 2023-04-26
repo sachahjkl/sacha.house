@@ -4,9 +4,8 @@
 	import PrismJs from '$lib/components/PrismJS.svelte';
 
 	import { toast } from '@zerodevx/svelte-toast';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
 
 	const toastCredits = (credits: number) => `
 	<strong>👍 Profil mis à jour !</strong><br>
@@ -82,7 +81,7 @@
 
 		<PrismJs {code} language="javascript" />
 	</section>
-	<section>
+	<!-- <section>
 		<h2>#️⃣ Nombre de visites</h2>
 		<p>
 			{#if visitesLoading}
@@ -107,7 +106,7 @@
 				Incrémenter
 			</button>
 		</form>
-	</section>
+	</section> -->
 </article>
 
 <style lang="postcss">

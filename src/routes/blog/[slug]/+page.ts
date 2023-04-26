@@ -1,12 +1,11 @@
-import { GET_POST } from '$lib/queries';
-import { GraphQLClient } from 'graphql-request';
 import { PUBLIC_HYGRAPH_API_ENDPOINT } from '$env/static/public';
-import type { PageLoad } from './$types';
 import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
+import { GET_POST } from '$lib/queries';
 import { error } from '@sveltejs/kit';
+import { GraphQLClient } from 'graphql-request';
 
-export const load = (async ({ params, url }) => {
+export const load = async ({ params, url }) => {
 	const getPost = async () => {
 		try {
 			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT);
@@ -36,4 +35,4 @@ export const load = (async ({ params, url }) => {
 			url: url.toString()
 		}
 	};
-}) satisfies PageLoad;
+};

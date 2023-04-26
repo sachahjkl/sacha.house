@@ -1,17 +1,16 @@
-import { GET_PROJECTS_GITHUB, GET_PROJECTS_GITLAB } from '$lib/queries';
+import { SECRET_GITHUB_BEARER_TOKEN, SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
 import { PUBLIC_GITHUB_API_ENDPOINT, PUBLIC_GITLAB_API_ENDPOINT } from '$env/static/public';
 import type { Project, ProjetsResponse } from '$lib/interfaces/Project';
-import { SECRET_GITHUB_BEARER_TOKEN, SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
+import { GET_PROJECTS_GITHUB, GET_PROJECTS_GITLAB } from '$lib/queries';
 import { error, json } from '@sveltejs/kit';
 
-import { GraphQLClient } from 'graphql-request';
 import { MOI } from '$lib/me';
-import type { RequestHandler } from './$types';
+import { GraphQLClient } from 'graphql-request';
 
 export type GHType = { user: { projects: { nodes: Project[] } } };
 export type GLType = { projects: { nodes: Project[] } };
 
-export const GET = (async () => {
+export const GET = async () => {
 	try {
 		const clientGH = new GraphQLClient(`${PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
 			headers: {
@@ -44,4 +43,4 @@ export const GET = (async () => {
 		console.error('Problème à la récupération des projets', err);
 		throw error(500, 'Impossible de récupérer les données des projets.');
 	}
-}) satisfies RequestHandler;
+};

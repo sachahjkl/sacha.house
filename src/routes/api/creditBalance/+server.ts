@@ -1,9 +1,8 @@
-import { PUBLIC_PROXYCURL_API_ENDPOINT } from '$env/static/public';
-import type { RequestHandler } from './$types';
 import { SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
+import { PUBLIC_PROXYCURL_API_ENDPOINT } from '$env/static/public';
 import { error } from '@sveltejs/kit';
 
-export const GET = (async () => {
+export const GET = async () => {
 	try {
 		const res = await fetch(`${PUBLIC_PROXYCURL_API_ENDPOINT}/proxycurl/api/credit-balance`, {
 			headers: {
@@ -17,4 +16,4 @@ export const GET = (async () => {
 	} catch (err) {
 		throw error(500, "Echec de la récupération du crédit restant pour l'api ProxyCURL");
 	}
-}) satisfies RequestHandler;
+};

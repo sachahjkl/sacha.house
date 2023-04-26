@@ -1,39 +1,38 @@
-import type { Actions, PageServerLoad } from './$types';
-import { MOI, SITE_TITLE } from '$lib/me';
+import { SECRET_GITHUB_BEARER_TOKEN, SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
 import {
 	PUBLIC_GITHUB_API_ENDPOINT,
 	PUBLIC_LINKEDIN_GIST_ID,
 	PUBLIC_PROXYCURL_API_ENDPOINT
 } from '$env/static/public';
-import { SECRET_GITHUB_BEARER_TOKEN, SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
+import { MOI, SITE_TITLE } from '$lib/me';
 
+import { updateCounter } from '$lib/countapi';
 import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import { fail } from '@sveltejs/kit';
-import { updateCounter } from '$lib/countapi';
 
-export const load = (async ({ getClientAddress, fetch }) => {
+export const load = async ({ getClientAddress, fetch }) => {
 	const creditBalance = fetch('/api/creditBalance')
 		.then((res) => res.text())
 		.then((str) => Number(str))
 		.catch(() => 0);
 
 	const profile = fetch('/api/linkedinProfile').then<LinkedinProfile>((res) => res.json());
-	const visites = fetch('/api/visites')
-		.then((val) => val.text())
-		.then((str) => Number(str))
-		.catch(() => 0);
+	// const visites = fetch('/api/visites')
+	// 	.then((val) => val.text())
+	// 	.then((str) => Number(str))
+	// 	.catch(() => 0);
 
 	return {
 		creditBalance,
 		profile,
-		visites,
+		// visites,
 		ip: getClientAddress(),
 		seo: {
 			title: `admin / ${SITE_TITLE}`,
 			description: "Panneau d'administration du site."
 		}
 	};
-}) satisfies PageServerLoad;
+};
 
 export const actions = {
 	updateLinkedinProfile: async (event) => {
@@ -104,7 +103,7 @@ export const actions = {
 			});
 		}
 	}
-} satisfies Actions;
+};
 
 const fetchProxyCurl = async () => {
 	const proxyCurlURL = new URL(`${PUBLIC_PROXYCURL_API_ENDPOINT}/proxycurl/api/v2/linkedin`);

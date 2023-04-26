@@ -1,18 +1,17 @@
-import { GET_POSTS } from '$lib/queries';
-import { GraphQLClient } from 'graphql-request';
-import type { ListedPost } from '$lib/interfaces/Post';
 import { PUBLIC_HYGRAPH_API_ENDPOINT } from '$env/static/public';
-import type { PageLoad } from './$types';
+import type { ListedPost } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
+import { GET_POSTS } from '$lib/queries';
 import { error } from '@sveltejs/kit';
+import { GraphQLClient } from 'graphql-request';
 
-export const load = (async () => {
+export const load = async () => {
 	const getPosts = async () => {
 		try {
 			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT);
 			const posts = await clientGL
 				.request(GET_POSTS)
-				.then((data: { posts: ListedPost[] }) => data.posts);
+				.then((data) => (data as { posts: ListedPost[] }).posts);
 			if (!posts.length) {
 				throw error(404, 'Postes introuvables !');
 			}
@@ -24,11 +23,13 @@ export const load = (async () => {
 	};
 
 	return {
-		posts: getPosts(),
+		streaming: {
+			posts: getPosts()
+		},
 		seo: {
 			title: `blog / ${SITE_TITLE}`,
 			description:
 				"Mon blog dans lequel je posterai (rarement) des sujets portant souvent sur l'informatique."
 		}
 	};
-}) satisfies PageLoad;
+};

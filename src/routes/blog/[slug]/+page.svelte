@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
 	let post: typeof data.post = data.post;
 	$: post = data.post;
 	const createdAt = new Date(Date.parse(post.createdAt));

@@ -1,16 +1,15 @@
 import { PUBLIC_GITHUB_API_ENDPOINT, PUBLIC_LINKEDIN_GIST_ID } from '$env/static/public';
 import { error, json } from '@sveltejs/kit';
 
-import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
-import type { RequestHandler } from './$types';
 import { SECRET_GITHUB_BEARER_TOKEN } from '$env/static/private';
+import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 
 export interface UpdateProfileData {
 	profile: LinkedinProfile;
 	remainingCredit: number;
 }
 
-export const GET = (async () => {
+export const GET = async () => {
 	try {
 		const res = await fetch(`${PUBLIC_GITHUB_API_ENDPOINT}/gists/${PUBLIC_LINKEDIN_GIST_ID}`, {
 			headers: {
@@ -29,4 +28,4 @@ export const GET = (async () => {
 		console.error('Récupération du gist échouée.', err);
 		throw error(500, 'Erreur inattendue, récupération du gist échouée.');
 	}
-}) satisfies RequestHandler;
+};

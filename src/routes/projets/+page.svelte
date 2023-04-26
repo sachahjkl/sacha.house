@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { MOI } from '$lib/me';
-	import gitlabSrc from '$lib/assets/gitlab.png';
 	import githubSrc from '$lib/assets/github.png';
+	import gitlabSrc from '$lib/assets/gitlab.png';
 	import Project from '$lib/components/Project.svelte';
-	import type { PageData } from './$types';
+	import { MOI } from '$lib/me';
 
-	export let data: PageData;
+	export let data;
 </script>
 
 <article class="prose">
@@ -38,36 +37,45 @@
 			<img class="title-logo" src={gitlabSrc} alt="GitLab Logo" /> GitLab /
 			<a href={MOI.gitlab.toString()}>@{MOI.gitlab.pathname.split('/').pop()}</a>
 		</h2>
-		<ul class="projects not-prose">
-			{#each data.projects.gitlab as { avatarUrl, description, descriptionHtml, name, url, group }}
-				<li class="project">
-					<Project
-						{description}
-						{descriptionHtml}
-						name={`${name} ${group ? `(groupe ${group?.name})` : ''}`}
-						{url}
-						{avatarUrl}
-					/>
-				</li>
-			{:else}
-				<li>Pas de projet !</li>
-			{/each}
-		</ul>
+		{#await data.streaming.projects}
+			<p>Loading ...</p>
+		{:then projects}
+			<ul class="projects not-prose">
+				{#each projects.gitlab as { avatarUrl, description, descriptionHtml, name, url, group }}
+					<li class="project">
+						<Project
+							{description}
+							{descriptionHtml}
+							name={`${name} ${group ? `(groupe ${group?.name})` : ''}`}
+							{url}
+							{avatarUrl}
+						/>
+					</li>
+				{:else}
+					<li>Pas de projet !</li>
+				{/each}
+			</ul>
+		{/await}
 	</section>
 	<section>
 		<h2>
 			<img class="title-logo" src={githubSrc} alt="GitHub Logo" /> GitHub /
 			<a href={MOI.github.toString()}>@{MOI.github.pathname.split('/').pop()}</a>
 		</h2>
-		<ul class="projects not-prose">
-			{#each data.projects.github as { description, name, url }}
-				<li class="project">
-					<Project {description} {name} {url} />
-				</li>
-			{:else}
-				<li>Pas de projet !</li>
-			{/each}
-		</ul>
+		{#await data.streaming.projects}
+			<p>Loading ...</p>
+		{:then projects}
+			<ul class="projects not-prose">
+				{#each projects.github as { description, name, url }}
+					<li class="project">
+						<Project {description} {name} {url} />
+					</li>
+				{:else}
+					<li>Pas de projet !</li>
+				{/each}
+			</ul>
+			<!-- promise was fulfilled -->
+		{/await}
 	</section>
 </article>
 
