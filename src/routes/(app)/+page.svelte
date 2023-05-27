@@ -32,7 +32,7 @@
 		@apply mx-auto;
 	}
 	a {
-		@apply text-blue-500 visited:text-purple-500
+		@apply text-blue-500 visited:text-purple-500	
          hover:text-blue-600 active:text-blue-700;
 	}
 
