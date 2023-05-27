@@ -16,7 +16,6 @@
 	${message}`;
 
 	let profileLoading = false;
-	let visitesLoading = false;
 
 	let profileStringifiedPretty = JSON.stringify(data.profile, null, 1);
 	let code: string;

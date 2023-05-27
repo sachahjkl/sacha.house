@@ -7,7 +7,7 @@ import { getAuthorizedNavItems } from '$lib/nav';
 import { GET_LATEST_COMMIT } from '$lib/queries';
 import { GraphQLClient } from 'graphql-request';
 
-export const load = (async ({ fetch, getClientAddress, cookies }) => {
+export const load = async ({ fetch, getClientAddress, cookies }) => {
 	const clientAddress = getClientAddress();
 	const navItems = getAuthorizedNavItems(clientAddress);
 
@@ -42,4 +42,4 @@ export const load = (async ({ fetch, getClientAddress, cookies }) => {
 		navItems,
 		commitHash: commitHash()
 	};
-});
+};

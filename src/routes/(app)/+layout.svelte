@@ -1,20 +1,22 @@
 <script lang="ts">
+	import { navigating, page } from '$app/stores';
 	import '$lib/app.css';
-	import { page, navigating } from '$app/stores';
 	import { onMount } from 'svelte';
 	// import { fly } from 'svelte/transition';
+	import { PUBLIC_NETLIFY_SITE_ID } from '$env/static/public';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
 	import { addSnow, capitalize, isChristmas } from '$lib/utils';
-	import { PUBLIC_NETLIFY_SITE_ID } from '$env/static/public';
 	// import { env } from '$env/dynamic/public';
-	import { SvelteToast } from '@zerodevx/svelte-toast';
-	import type { LayoutServerData } from './$types';
-	import Header from '$lib/components/Header.svelte';
-	import Footer from '$lib/components/Footer.svelte';
-	import faviconAvif from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
-	import faviconWebp from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
 	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
+	import {
+		default as faviconAvif,
+		default as faviconWebp
+	} from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
+	import Footer from '$lib/components/Footer.svelte';
+	import Header from '$lib/components/Header.svelte';
+	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import nProgress from 'nprogress';
+	import type { LayoutServerData } from './$types';
 
 	export let data: LayoutServerData;
 
@@ -26,6 +28,11 @@
 		if (isChristmas()) {
 			addSnow(document);
 		}
+
+		return () => {
+			nProgress.done();
+			nProgress.remove();
+		};
 
 		// doIntro = true;
 	});

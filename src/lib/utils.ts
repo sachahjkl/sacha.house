@@ -85,3 +85,13 @@ export const addSnow = (document: Document) => {
 		document.body.appendChild(embedimSnow);
 	}
 };
+
+export const statusCodeToText = (status: number) => {
+	switch (status) {
+		case 418:
+			return "I'm a teapot";
+
+		default:
+			return 'Unknown';
+	}
+};

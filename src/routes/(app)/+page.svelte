@@ -2,13 +2,12 @@
 	import Illustration from '$lib/components/Illustration.svelte';
 	import { MOI, SITE_TITLE } from '$lib/me';
 
-	
 	// export let data;
 </script>
 
 <article class="prose">
 	<h1>
-		{SITE_TITLE}
+		{SITE_TITLE} <small><a class="no-underline drop-shadow-md" href="/teapot">🍵</a></small>
 		<!-- <div class="visites hidden md:inline-block">
 			<ClockDisplay value={`${data.visites} visites`} />
 		</div> -->

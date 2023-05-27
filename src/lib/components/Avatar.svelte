@@ -1,7 +1,7 @@
 <script lang="ts">
+	import fallback from '$lib/assets/me.jpg';
 	import avif from '$lib/assets/me.jpg?w=200;400;800&avif&srcset&quality=85&imagetools';
 	import webp from '$lib/assets/me.jpg?w=200;400;800&webp&srcset&quality=85&imagetools';
-	import fallback from '$lib/assets/me.jpg';
 </script>
 
 <div class="pic">

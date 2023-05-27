@@ -12,10 +12,10 @@
 <header>
 	<nav data-sveltekit-preload-data>
 		<ul class="inline-list">
-			<li class="title md:order-first ">
+			<li class="title md:order-first">
 				<slot name="brand">Brand</slot>
 			</li>
-			<li class="dropdown md:hidden order-first ">
+			<li class="dropdown md:hidden order-first">
 				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 				<!--
 					INFO :  We use a <label tabindex="0"> instead of a <button>
