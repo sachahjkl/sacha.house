@@ -1,10 +1,9 @@
-const daisyui = require('daisyui');
-const tailwindTypography = require('@tailwindcss/typography');
-const tailwindLineClamp = require('@tailwindcss/line-clamp');
-const defaultTheme = require('tailwindcss/defaultTheme');
+import daisyui from 'daisyui';
+import defaultTheme from 'tailwindcss/defaultTheme';
+import tailwindTypography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
 	content: ['./src/routes/**/*.{svelte,js,ts}', './src/lib/**/*.{svelte,js,ts}'],
 	theme: {
 		fontFamily: {
