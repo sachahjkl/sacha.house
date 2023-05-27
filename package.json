@@ -17,7 +17,6 @@
 		"@sveltejs/adapter-netlify": "^1.0.5",
 		"@sveltejs/adapter-node": "^1.2.3",
 		"@sveltejs/kit": "^1.15.9",
-		"@tailwindcss/line-clamp": "^0.4.4",
 		"@tailwindcss/typography": "^0.5.9",
 		"@types/chroma-js": "^2.4.0",
 		"@types/nprogress": "^0.2.0",

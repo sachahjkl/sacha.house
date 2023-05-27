@@ -15,7 +15,7 @@ module.exports = {
 		}
 	},
 
-	plugins: [tailwindLineClamp, tailwindTypography, daisyui],
+	plugins: [tailwindTypography, daisyui],
 	daisyui: {
 		styled: true
 		// themes: true,
