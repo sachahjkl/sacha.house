@@ -1,9 +1,7 @@
-import type { UserConfig } from 'vite';
-import { imagetools } from 'vite-imagetools';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+import { imagetools } from 'vite-imagetools';
 
-const config: UserConfig = {
+export default defineConfig({
 	plugins: [imagetools(), sveltekit()]
-};
-
-export default config;
+});
