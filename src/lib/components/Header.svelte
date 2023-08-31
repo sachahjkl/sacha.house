@@ -48,10 +48,10 @@
 							<span class="bounce">🌚</span>
 							<input
 								type="checkbox"
-								data-toggle-theme="dark,light"
+								data-toggle-theme="light,dark"
 								data-act-class="ACTIVECLASS"
 								name="theme-toggle-dropdown"
-								id="theme-toggle-dropdown"
+								id="theme-toggle-dropdown"	
 								class="toggle toggle-sm"
 							/> <span class="bounce">🌞</span>
 						</form>

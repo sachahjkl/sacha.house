@@ -2,16 +2,16 @@
 	import { navigating, page } from '$app/stores';
 	import '$lib/app.css';
 	import { onMount } from 'svelte';
-	// import { fly } from 'svelte/transition';
+// import { fly } from 'svelte/transition';
 	import { PUBLIC_NETLIFY_SITE_ID } from '$env/static/public';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
 	import { addSnow, capitalize, isChristmas } from '$lib/utils';
-	// import { env } from '$env/dynamic/public';
+// import { env } from '$env/dynamic/public';
 	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
 	import {
 		default as faviconAvif,
 		default as faviconWebp
-	} from '$lib/assets/favicon_shadow.png?w=16;400;800&avif&srcset&imagetools';
+	} from '$lib/assets/favicon_shadow.png?w=16;400;800&format=avif&as=srcset&imagetools';
 	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import { SvelteToast } from '@zerodevx/svelte-toast';

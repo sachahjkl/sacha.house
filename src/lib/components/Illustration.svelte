@@ -1,6 +1,6 @@
 <script lang="ts">
-	import avif from '$lib/assets/c-omrade.jpg?w=500;900;1000&avif&srcset&quality=85&imagetools';
-	import webp from '$lib/assets/c-omrade.jpg?w=500;900;1000&webp&srcset&quality=85&imagetools';
+	import avif from '$lib/assets/c-omrade.jpg?w=500;900;1000&format=avif&as=srcset&quality=85&imagetools';
+	import webp from '$lib/assets/c-omrade.jpg?w=500;900;1000&format=webp&as=srcset&quality=85&imagetools';
 	import fallback from '$lib/assets/c-omrade.jpg?w=700&quality=85&imagetools';
 </script>
 
