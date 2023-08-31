@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { init_game_state } from '$lib/pong';
+	import { DEFAULTS, init_game_state } from '$lib/pong';
 	import { onMount } from 'svelte';
 
 	export let width = 500;
@@ -12,10 +12,22 @@
 	let canvas: HTMLCanvasElement;
 
 	onMount(() => {
-		const [gameState, error] = init_game_state();
+		const [gameState, error] = init_game_state(
+			DEFAULTS.distanceFromBorder,
+			DEFAULTS.dimensions,
+			DEFAULTS.screen
+		);
 		if (error != null) {
 			console.error(error);
 			return;
+		}
+
+        // scale down the render for mobile
+		const widthRatio = window.innerWidth / gameState.screen.width;
+		const heightRatio = window.innerHeight / gameState.screen.width;
+		const minRatio = Math.min(widthRatio, heightRatio);
+		if (minRatio < 1) {
+			canvas.style.transform = `scale(${Math.floor(minRatio * 10) / 10})`;
 		}
 
 		// at this point, we know that gameState can't be null
@@ -63,7 +75,9 @@
 				ctx.fillStyle = 'white';
 				ctx.fillText(framerate, 10, 10);
 
-				console.table([{ 'time (ms)': time, 'Framerate (img/s)': framerate, delta: delta }]);
+                // annoying and slow, only for debug
+                // TODO(sacha): maybe assign a specific flag for logging (different from debug)
+				// console.table([{ 'time (ms)': time, 'Framerate (img/s)': framerate, delta: delta }]);
 			}
 
 			// Draw silly garbage for fun
@@ -104,7 +118,7 @@
 					gameState.dimensions.ball
 				);
 			}
-            // next frame
+			// next frame
 			requestAnimationFrame(loop);
 		};
 

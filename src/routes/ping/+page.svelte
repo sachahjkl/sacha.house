@@ -13,11 +13,11 @@
 	<div class="flex justify-center">
 		<Pong {play} {garbageMode} {debug} />
 	</div>
-	<div>
+	<!-- <div>
 		<label for="hardmode">
 			Hardmode (WIP) : <input type="checkbox" name="hardmode" id="hardmode" /></label
 		>
-	</div>
+	</div> -->
 	<div>
 		<label for="play">
 			Play : <input type="checkbox" name="play" id="play" bind:checked={play} /></label
