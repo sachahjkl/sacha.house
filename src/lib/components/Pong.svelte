@@ -1,36 +1,83 @@
 <script lang="ts">
-	import { DEFAULTS, init_game_state } from '$lib/pong';
+	import { DEFAULTS, init_game_state, scale, type GameState, type InputState } from '$lib/pong';
 	import { onMount } from 'svelte';
 
-	export let width = 500;
-	export let height = 500;
+	export let width = 500; // reference width /!\ DO NOT MUTATE
+	export let height = 500; // reference height /!\ DO NOT MUTATE
 	export let play: boolean = true;
 	export let garbageMode: boolean = true;
 	export let debug: boolean = false;
+	export let currentScale = 1;
+	export let input : InputState;
+
+	export let error: Error | null = null;
+
+	let cause: [boolean, string][];
+
+	$: cause = error?.cause as [boolean, string][];
+
+	// let scaledHeight: number = height;
+	// let scaledWidth: number = width;
+
+	// $: scaledHeight = height * scale;
+	// $: scaledWidth = width * scale;
+	$: {
+		if (gameState) {
+			gameState.screen = { height, width };
+		}
+	}
+
+	let gameState: GameState | null;
+
 	// export let wantedFramerate = 60;
+
+	$: currentScale = 1;
 
 	let canvas: HTMLCanvasElement;
 
+	const rescaleCanvas = () => {
+		// no bigger than the current width/height
+		let minRatio =
+			Math.min(
+				window?.innerWidth / width, // width ratio
+				window?.innerHeight / height // height ratio,
+			) - 0.05;
+		if (minRatio < 1) {
+			minRatio -= 0.05;
+		}
+
+		currentScale = Math.min(1, Math.max(0.2, minRatio));
+	};
+
+
+
 	onMount(() => {
-		const [gameState, error] = init_game_state(
-			DEFAULTS.distanceFromBorder,
-			DEFAULTS.dimensions,
-			DEFAULTS.screen
+		// We configure our settings
+		const mySettings = DEFAULTS;
+
+		mySettings.screen.height = height;
+		mySettings.screen.width = width;
+
+		// init game state with our settings (might return a validation error)
+		const [state, stateError] = init_game_state(
+			mySettings.distanceFromBorder,
+			mySettings.dimensions,
+			mySettings.screen
 		);
-		if (error != null) {
-			console.error(error);
+
+		// check for error
+		if (stateError != null) {
+			error = stateError;
+			console.error(stateError);
 			return;
 		}
 
-        // scale down the render for mobile
-		const widthRatio = window.innerWidth / gameState.screen.width;
-		const heightRatio = window.innerHeight / gameState.screen.width;
-		const minRatio = Math.min(widthRatio, heightRatio);
-		if (minRatio < 1) {
-			canvas.style.transform = `scale(${Math.floor(minRatio * 10) / 10})`;
-		}
-
 		// at this point, we know that gameState can't be null
+		gameState = state;
+
+		rescaleCanvas();
+
+		window.addEventListener('resize', rescaleCanvas);
 
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
@@ -44,17 +91,28 @@
 		const MAX_COLOR = parseInt('FFFFFF', 16);
 		const one_second_in_ms = 1000;
 
+		// the current frame
+		let frameHandle: number;
+
 		/**
 		 *
 		 * @param time current time (in ms)
 		 */
 		const loop: FrameRequestCallback = (time) => {
+			const scaledGameState = scale(state, currentScale);
+
+			const scaledWidth = scaledGameState.screen.width,
+				scaledHeight = scaledGameState.screen.height;
+
 			// Draw background
-			ctx.fillStyle = 'black';
-			ctx.fillRect(0, 0, width, height);
+			if(play){
+
+				ctx.fillStyle = 'black';
+				ctx.fillRect(0, 0, scaledWidth, scaledHeight);
+			}
 
 			// Print debug info
-			if (debug) {
+			if (play && debug) {
 				// Compute & display framerate
 
 				let framerate = '0 fps';
@@ -75,56 +133,84 @@
 				ctx.fillStyle = 'white';
 				ctx.fillText(framerate, 10, 10);
 
-                // annoying and slow, only for debug
-                // TODO(sacha): maybe assign a specific flag for logging (different from debug)
+				// annoying and slow, only for debug
+				// TODO(sacha): maybe assign a specific flag for logging (different from debug)
 				// console.table([{ 'time (ms)': time, 'Framerate (img/s)': framerate, delta: delta }]);
 			}
 
 			// Draw silly garbage for fun
 			if (garbageMode) {
+				const blockSize = 50 * currentScale;
 				// draw some bs to make shit lag
 				for (let index = 0; index < count; index++) {
 					ctx.fillStyle = `#${Math.round(Math.random() * MAX_COLOR).toString(16)}`;
 					ctx.fillRect(
-						Math.random() * (height - 150) + 50,
-						Math.random() * (width - 150) + 50,
-						50,
-						50
+						Math.random() * (scaledWidth - scaledWidth * 0.2 - blockSize) + scaledWidth * 0.1,
+						Math.random() * (scaledHeight - scaledHeight * 0.2 - blockSize) + scaledHeight * 0.1,
+						blockSize,
+						blockSize
 					);
 				}
 			}
 
 			if (play) {
+				// update game state
+				scaledGameState.tick(time, input);
+
+				// set color of elements displayed (for now every element except background is white)
 				ctx.fillStyle = 'white';
+
 				// draw left paddle
 				ctx.fillRect(
-					gameState.leftPaddle.x,
-					gameState.leftPaddle.y,
-					gameState.dimensions.paddle.width,
-					gameState.dimensions.paddle.height
+					scaledGameState.distanceFromBorder,
+					scaledGameState.leftPaddle.y,
+					scaledGameState.dimensions.paddle.width,
+					scaledGameState.dimensions.paddle.height
 				);
 				// draw right paddle
 				ctx.fillRect(
-					gameState.rightPaddle.x,
-					gameState.rightPaddle.y,
-					gameState.dimensions.paddle.width,
-					gameState.dimensions.paddle.height
+					scaledGameState.screen.width -
+						scaledGameState.distanceFromBorder -
+						scaledGameState.dimensions.paddle.width,
+					scaledGameState.rightPaddle.y,
+					scaledGameState.dimensions.paddle.width,
+					scaledGameState.dimensions.paddle.height
 				);
 				// draw ball
 				ctx.fillRect(
-					gameState.ball.x,
-					gameState.ball.y,
-					gameState.dimensions.ball,
-					gameState.dimensions.ball
+					scaledGameState.ball.x,
+					scaledGameState.ball.y,
+					scaledGameState.dimensions.ball,
+					scaledGameState.dimensions.ball
 				);
 			}
 			// next frame
-			requestAnimationFrame(loop);
+			frameHandle = requestAnimationFrame(loop);
 		};
 
 		// start loop
 		loop(0);
+
+		// cleanup on unMount
+		return () => {
+			cancelAnimationFrame(frameHandle);
+			window.removeEventListener('resize', rescaleCanvas);
+		};
 	});
 </script>
 
-<canvas class="block border rounded shadow" bind:this={canvas} {width} {height} />
+{#if cause}
+	<p>Validation failed :</p>
+	<ul>
+		{#each cause as check}
+			<li><input type="checkbox" checked={check[0]} readonly /> {check[1]}</li>
+		{/each}
+	</ul>
+{:else}
+	<canvas
+		class="block border rounded shadow"
+		bind:this={canvas}
+		width={width * currentScale}
+		height={height * currentScale}
+	/>
+{/if}
