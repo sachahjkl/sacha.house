@@ -1,3 +1,9 @@
+export const one_second_in_ms = 1000;
+
+export function clamp(value: number, min: number, max: number) {
+	return Math.min(Math.max(value, min), max);
+}
+
 export function capitalize(s: string) {
 	return s[0].toUpperCase() + s.slice(1);
 }

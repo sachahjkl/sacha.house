@@ -1,75 +1,151 @@
 <script lang="ts">
 	import '$lib/app.css';
 	import Pong from '$lib/components/Pong.svelte';
-	import { DEFAULT_INPUT_STATE, KEYS } from '$lib/pong';
+	import { DEFAULTS, DEFAULT_INPUT_STATE } from '$lib/pong';
 	import { onMount } from 'svelte';
+	import { slide } from 'svelte/transition';
+	import { themeChange } from 'theme-change';
 
-	let play = true;
+	let playing = true;
 	let garbageMode = false;
-	let debug = false;
+	let debug = true;
 	let error: Error | null = null;
+	let reset = false;
 
-	let height: number;
-	let width: number;
+	let height: number = DEFAULTS.screen.height;
+	let width: number = DEFAULTS.screen.width;
 
-	let input = DEFAULT_INPUT_STATE;
+	let currentScale: number;
 
-	const handleInputDown = (e: KeyboardEvent) => {
-		// console.log(e.key)
+	let input = { ...DEFAULT_INPUT_STATE };
 
-		switch (e.key) {
+	const KEYS = {
+		player1: {
+			UP: 'z',
+			DOWN: 's',
+			LEFT: 'q',
+			RIGHT: 'd'
+		},
+		player2: {
+			UP: 'ArrowUp',
+			DOWN: 'ArrowDown',
+			LEFT: 'ArrowLeft',
+			RIGHT: 'ArrowRight'
+		},
+		START: ' ', // spacebar - start game
+		PAUSE: 'p', // p - pause
+		RESET: 'r' // r - reset
+	};
+	const PAUSE_TIMEOUT_MS = 250;
+	const RESET_TIMEOUT_MS = 250;
+	let pauseTimeout: number = 0;
+	let resetTimeout: number = 0;
+
+	const updateInput = (currentKey: string, state = false) => {
+		switch (currentKey) {
 			case KEYS.player1.UP:
-				input.player1.UP = true;
+				input.player1.UP = state;
 				break;
 			case KEYS.player1.DOWN:
-				input.player1.DOWN = true;
+				input.player1.DOWN = state;
 				break;
 			case KEYS.player2.UP:
-				input.player2.UP = true;
+				input.player2.UP = state;
 				break;
 			case KEYS.player2.DOWN:
-				input.player2.DOWN = true;
+				input.player2.DOWN = state;
+				break;
+			case KEYS.START:
+				input.START = state;
+				break;
+			case KEYS.PAUSE:
+				if (pauseTimeout) return;
+				pauseTimeout = setTimeout(() => (pauseTimeout = 0), PAUSE_TIMEOUT_MS);
+				playing = !playing;
+				break;
+			case KEYS.RESET:
+				if (resetTimeout) return;
+				resetTimeout = setTimeout(() => {
+					resetTimeout = 0;
+					reset = false;
+				}, RESET_TIMEOUT_MS);
+				reset = true;
 				break;
 			default:
-				break;
+				return false;
+		}
+		console.info(input, input.player1, input.player1.UP);
+		return true;
+	};
+
+	const handleInputDown = (e: KeyboardEvent) => {
+		if (updateInput(e.key, true)) {
+			e.preventDefault();
 		}
 	};
 	const handleInputUp = (e: KeyboardEvent) => {
-		// console.log(e.key)
-
-		switch (e.key) {
-			case KEYS.player1.UP:
-				input.player1.UP = false;
-				break;
-			case KEYS.player1.DOWN:
-				input.player1.DOWN = false;
-				break;
-			case KEYS.player2.UP:
-				input.player2.UP = false;
-				break;
-			case KEYS.player2.DOWN:
-				input.player2.DOWN = false;
-				break;
-			default:
-				break;
+		if (updateInput(e.key, false)) {
+			e.preventDefault();
 		}
 	};
 
 	onMount(() => {
-		window.addEventListener('keydown', handleInputDown);
-		window.addEventListener('keyup', handleInputUp);
+		themeChange(false);
+		window.addEventListener('keydown', handleInputDown, false);
+		window.addEventListener('keyup', handleInputUp, false);
+		// window.addEventListener('keydown', handlePause, false);
 		return () => {
-			window.removeEventListener('keydown', handleInputDown);
-			window.removeEventListener('keydown', handleInputUp);
+			window.removeEventListener('keydown', handleInputDown, false);
+			window.removeEventListener('keyup', handleInputUp, false);
+			// window.addEventListener('keydown', handlePause);
 		};
 	});
 </script>
 
+<svelte:head>
+	<title>Ping 👉 Pong</title>
+</svelte:head>
+
 <main class="prose">
+	<p>
+		<a class="text-base-content opacity-60" href="/" title="Home"
+			><span class="rotate-180 inline-block">➜</span> 🏡 Retour à l'accueil</a
+		>
+	</p>
 	<h1>Pong :</h1>
 
+	<div class="mb-6">
+		<button
+			class="btn btn-sm btn-primary"
+			title="Click to pause the game (or click on the game itself)"
+			on:click={() => (playing = !playing)}
+		>
+			{playing ? '⏸ Pause' : '▶ Play '}
+		</button>
+		<button class="btn btn-sm btn-error" title="Reset the game">🔄 Reset</button>
+	</div>
 	<div class="flex place-content-center">
-		<Pong bind:error bind:input {play} bind:height bind:width {garbageMode} {debug} />
+		<div class="ctnr relative transition bg-black shadow-xl border-yellow-500 border-4">
+			<Pong
+				bind:error
+				bind:input
+				bind:playing
+				bind:height
+				bind:width
+				bind:currentScale
+				{reset}
+				{garbageMode}
+				{debug}
+			/>
+
+			{#if !playing}
+				<span
+					transition:slide
+					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full font-bold text-3xl text-white z-10 p-2 text-shadow-xl shadow-red-500/50"
+					>PAUSED</span
+				>
+			{/if}
+		</div>
 	</div>
 	<!-- <div>
 		<label for="hardmode">
@@ -77,54 +153,97 @@
 			>
 		</div> -->
 	{#if !error}
-		<div id="settings">
-			<h2>Settings</h2>
+		<div class="flex justify-items-stretch flex-wrap">
+			<div id="settings" class="flex-grow flex-shrink basis-[400px]">
+				<h2>Settings</h2>
 
-			<div class="flex gap-2 flex-col">
-				<label for="play">
-					Play : <input type="checkbox" name="play" id="play" bind:checked={play} />
-				</label>
+				<div class="flex gap-2 flex-col">
+					<label for="height">
+						Height:
+						<input
+							type="range"
+							min="250"
+							max="1000"
+							step="50"
+							id="height"
+							name="height"
+							bind:value={height}
+						/>
+						({height})
+					</label>
 
-				<label for="height">
-					Height:
-					<input
-						type="range"
-						min="250"
-						max="1000"
-						step="50"
-						id="height"
-						name="height"
-						bind:value={height}
-					/>
-					({height})
-				</label>
+					<label for="width">
+						Width:
+						<input
+							type="range"
+							min="250"
+							max="1000"
+							step="50"
+							id="width"
+							name="width"
+							bind:value={width}
+						/>
+						({width})
+					</label>
 
-				<label for="width">
-					Width:
-					<input
-						type="range"
-						min="250"
-						max="1000"
-						step="50"
-						id="width"
-						name="width"
-						bind:value={width}
-					/>
-					({width})
-				</label>
+					<label for="garbageMode">
+						Garbage Mode: <input
+							type="checkbox"
+							name="garbageMode"
+							id="garbageMode"
+							bind:checked={garbageMode}
+						/></label
+					>
 
-				<label for="garbageMode">
-					Garbage Mode: <input
-						type="checkbox"
-						name="garbageMode"
-						id="garbageMode"
-						bind:checked={garbageMode}
-					/></label
-				>
+					<label for="debug">
+						Debug info: <input
+							type="checkbox"
+							name="debug"
+							id="debug"
+							bind:checked={debug}
+						/></label
+					>
+					<label for="scale">
+						Scale: <input
+							class="px-2"
+							type="text"
+							name="scale"
+							id="scale"
+							readonly
+							bind:value={currentScale}
+						/></label
+					>
+				</div>
+			</div>
+			<div id="instructions" class="flex-grow flex-shrink basis-[400px]">
+				<h2>Instructions</h2>
+				<div class="flex flex-wrap gap-4">
+					<section class="basis-52 p-4 shadow-sm rounded bg-base-200">
+						<h3>Général</h3>
 
-				<label for="debug">
-					Debug info: <input type="checkbox" name="debug" id="debug" bind:checked={debug} /></label
-				>
+						<ul class="list-none p-0">
+							<li>Start : <kbd class="kbd kdb-sm">{KEYS.START.replace(' ', '␣')}</kbd></li>
+							<li>Pause : <kbd class="kbd kdb-sm">{KEYS.PAUSE}</kbd></li>
+							<li>Reset : <kbd class="kbd kdb-sm">{KEYS.RESET}</kbd></li>
+						</ul>
+					</section>
+					<section class="basis-52 p-4 shadow-sm rounded bg-base-200">
+						<h3>Joueur 1</h3>
+						<ul class="list-none p-0">
+							<li>
+								HAUT : <kbd class="kbd kbd-sm">{KEYS.player1.UP}</kbd>
+							</li>
+							<li>BAS : <kbd class="kbd kbd-sm">{KEYS.player1.DOWN}</kbd></li>
+						</ul>
+					</section>
+					<section class="basis-52 p-4 shadow-sm rounded bg-base-200">
+						<h3>Joueur 2</h3>
+						<ul class="list-none p-0">
+							<li>HAUT : <kbd class="kbd kbd-sm">{KEYS.player2.UP}</kbd></li>
+							<li>BAS : <kbd class="kbd kbd-sm">{KEYS.player2.DOWN}</kbd></li>
+						</ul>
+					</section>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -133,5 +252,9 @@
 <style lang="postcss">
 	main {
 		@apply max-w-5xl m-auto mt-6 p-4;
+	}
+
+	#instructions h3 {
+		@apply mt-0;
 	}
 </style>

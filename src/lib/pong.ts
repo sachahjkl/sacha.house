@@ -1,3 +1,5 @@
+import { clamp } from './utils';
+
 export const DEFAULTS = {
 	dimensions: {
 		paddle: {
@@ -9,7 +11,11 @@ export const DEFAULTS = {
 	distanceFromBorder: 20,
 	screen: {
 		height: 500,
-		width: 500
+		width: 950
+	},
+	speeds: {
+		paddle: 300, // pixels per second
+		ball: 300 // pixels per second
 	}
 };
 
@@ -21,22 +27,9 @@ export const DEFAULT_INPUT_STATE: InputState = {
 	player2: {
 		UP: false,
 		DOWN: false
-	}
-};
-
-export const KEYS = {
-	player1: {
-		UP: 'z',
-		DOWN: 's',
-		LEFT: 'q',
-		RIGHT: 'd'
 	},
-	player2: {
-		UP: 'ArrowUp',
-		DOWN: 'ArrowDown',
-		LEFT: 'ArrowLeft',
-		RIGHT: 'ArrowRight'
-	}
+	START: false,
+	PAUSE: false
 };
 
 export interface InputState {
@@ -52,16 +45,27 @@ export interface InputState {
 		// LEFT: boolean,
 		// RIGHT: boolean
 	};
+	START: boolean;
+	PAUSE: boolean;
 }
 
 export interface Paddle {
 	y: number;
+	speed: number;
 	score: number;
+	height: number;
+	width: number;
 }
 
 export interface Ball {
 	x: number;
 	y: number;
+	height: number;
+	width: number;
+	speed: {
+		vx: number;
+		vy: number;
+	};
 }
 
 export interface Screen {
@@ -80,9 +84,10 @@ export interface PaddleDimensions {
 }
 
 export interface GameState {
+	started: boolean;
+	playing: boolean;
 	distanceFromBorder: number;
 	screen: Screen;
-	dimensions: Dimensions;
 	leftPaddle: Paddle;
 	rightPaddle: Paddle;
 	ball: Ball;
@@ -93,16 +98,17 @@ const constraints: (state: GameState) => Array<[boolean, string]> = (state) => [
 	[state.screen.height > 100, 'screen needs to be at least 100px high'],
 	[state.screen.width > 100, 'screen needs to be at least 100px wide'],
 	[
-		state.dimensions.paddle.height < state.screen.height / 2,
-		'paddles need to take less than 1/2 of the screen height'
-	],
-	[
-		state.dimensions.paddle.width < state.screen.height / 5,
+		state.leftPaddle.width < state.screen.width / 5 &&
+			state.rightPaddle.width < state.screen.width / 5,
 		'paddles need to take less than 1/5 of the screen height'
 	],
 	[
-		state.dimensions.ball < state.screen.width / 2 &&
-			state.dimensions.ball < state.screen.height / 2,
+		state.leftPaddle.height < state.screen.height / 2 &&
+			state.rightPaddle.height < state.screen.height / 2,
+		'paddles need to take less than 1/2 of the screen height'
+	],
+	[
+		state.ball.width < state.screen.width / 2 && state.ball.height < state.screen.height / 2,
 		'ball needs to be at most 1/3 the screen size'
 	],
 	[
@@ -131,30 +137,95 @@ export function init_game_state(
 		ball: number;
 		paddle: PaddleDimensions;
 	} = DEFAULTS.dimensions,
-	screen: Screen = DEFAULTS.screen
+	screen: Screen = DEFAULTS.screen,
+	speeds = DEFAULTS.speeds
 ): [GameState, null] | [null, Error] {
 	const state: GameState = {
+		started: false,
+		playing: false,
 		distanceFromBorder,
-		dimensions,
 		screen,
 		ball: {
-			x: (screen.width - dimensions.ball) / 2,
-			y: (screen.height - dimensions.ball) / 2
+			speed: {
+				vx: speeds.ball,
+				vy: speeds.ball
+			},
+			x: dimensions.paddle.width + distanceFromBorder * 2,
+			y: (screen.height - dimensions.ball) / 2,
+			height: dimensions.ball,
+			width: dimensions.ball
 		},
 		leftPaddle: {
-			// x: distanceFromBorder,
+			width: dimensions.paddle.width,
+			height: dimensions.paddle.height,
+			speed: speeds.paddle,
 			y: (screen.height - dimensions.paddle.height) / 2, // start the paddle in middle of the screen (height-wise)
 			score: 0
 		},
 		rightPaddle: {
-			// x: screen.width - distanceFromBorder - dimensions.paddle.width, // needs to be >0
+			width: dimensions.paddle.width,
+			height: dimensions.paddle.height,
+			speed: speeds.paddle,
 			y: (screen.height - dimensions.paddle.height) / 2, // start the paddle in middle of the screen (height-wise)
 			score: 0
 		},
 		tick(delta, input) {
-			console.log(input.player1.UP);
-			delta + 1;
-			return;
+			// don't run tick if playing is off (paused)
+			// console.log('tick', this);
+			if (!this.playing) {
+				return;
+			}
+
+			const oldLeftPaddle = { ...this.leftPaddle };
+			// const oldrightPaddle = { ...this.rightPaddle };
+
+			// Start game if not started yet
+			if (!this.started && input.START) {
+				this.started = true;
+			}
+
+			// player 1 / left paddle
+
+			if (input.player1.UP) {
+				this.leftPaddle.y -= this.leftPaddle.speed * delta;
+			}
+
+			if (input.player1.DOWN) {
+				this.leftPaddle.y += this.leftPaddle.speed * delta;
+			}
+
+			// clamp
+			this.leftPaddle.y = clamp(this.leftPaddle.y, 0, this.screen.height - this.leftPaddle.height);
+
+			// player 2 / right paddle
+
+			if (input.player2.UP) {
+				this.rightPaddle.y -= this.rightPaddle.speed * delta;
+			}
+
+			if (input.player2.DOWN) {
+				this.rightPaddle.y += this.rightPaddle.speed * delta;
+			}
+
+			// clamp
+			this.rightPaddle.y = clamp(
+				this.rightPaddle.y,
+				0,
+				this.screen.height - this.rightPaddle.height
+			);
+
+			// ball
+			if (input.player1.UP && !this.started && oldLeftPaddle.y != this.leftPaddle.y) {
+				this.ball.y -= this.leftPaddle.speed * delta;
+			}
+
+			if (input.player1.DOWN && !this.started && oldLeftPaddle.y != this.leftPaddle.y) {
+				this.ball.y += this.leftPaddle.speed * delta;
+			}
+
+			// clamp
+			this.ball.x = clamp(this.ball.x, 0, this.screen.height - this.ball.height);
+			this.ball.y = clamp(this.ball.y, 0, this.screen.width - this.ball.width);
 		}
 	};
 
@@ -178,24 +249,31 @@ export function init_game_state(
 
 export function scale(state: GameState, scale: number): GameState {
 	return {
+		started: state.started,
+		playing: state.playing,
 		distanceFromBorder: state.distanceFromBorder * scale,
 		ball: {
 			x: state.ball.x * scale,
-			y: state.ball.y * scale
-		},
-		dimensions: {
-			ball: state.dimensions.ball * scale,
-			paddle: {
-				height: state.dimensions.paddle.height * scale,
-				width: state.dimensions.paddle.width * scale
+			y: state.ball.y * scale,
+			height: state.ball.height * scale,
+			width: state.ball.width * scale,
+			speed: {
+				vx: state.ball.speed.vx * scale,
+				vy: state.ball.speed.vy * scale
 			}
 		},
 		leftPaddle: {
 			...state.leftPaddle,
+			width: state.leftPaddle.width * scale,
+			height: state.leftPaddle.height * scale,
+			speed: state.leftPaddle.speed * scale,
 			y: state.leftPaddle.y * scale
 		},
 		rightPaddle: {
 			...state.rightPaddle,
+			width: state.rightPaddle.width * scale,
+			height: state.rightPaddle.height * scale,
+			speed: state.rightPaddle.speed * scale,
 			y: state.rightPaddle.y * scale
 		},
 		screen: {

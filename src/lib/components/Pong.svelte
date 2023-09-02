@@ -1,41 +1,62 @@
 <script lang="ts">
 	import { DEFAULTS, init_game_state, scale, type GameState, type InputState } from '$lib/pong';
+	import { one_second_in_ms as ONE_SECOND_IN_MS } from '$lib/utils';
 	import { onMount } from 'svelte';
 
+	// Game display state
+	export let input: InputState;
 	export let width = 500; // reference width /!\ DO NOT MUTATE
 	export let height = 500; // reference height /!\ DO NOT MUTATE
-	export let play: boolean = true;
-	export let garbageMode: boolean = true;
-	export let debug: boolean = false;
 	export let currentScale = 1;
-	export let input : InputState;
 
+	// Flags
+	export let debug: boolean = false;
+	export let playing: boolean = false;
+	export let garbageMode: boolean = true;
+	export let reset: boolean = false;
+
+	// Error
 	export let error: Error | null = null;
-
 	let cause: [boolean, string][];
-
 	$: cause = error?.cause as [boolean, string][];
 
-	// let scaledHeight: number = height;
-	// let scaledWidth: number = width;
+	let gameState: GameState;
 
-	// $: scaledHeight = height * scale;
-	// $: scaledWidth = width * scale;
+	// Update screen game state when height/width changes from outside (from props)
 	$: {
 		if (gameState) {
 			gameState.screen = { height, width };
+			gameState.playing = playing;
 		}
 	}
 
-	let gameState: GameState | null;
+	$: console.log('Playing changed !', playing);
+
+	$: {
+		console.info('reset', reset);
+		if (reset) {
+			const state = initGameState();
+
+			if (!state) {
+				console.error('failed to init state');
+			} else {
+				// at this point, we know that state can't be null
+
+				gameState = state;
+
+				state.playing = playing;
+			}
+		}
+	}
 
 	// export let wantedFramerate = 60;
 
-	$: currentScale = 1;
+	$: computeScale(width, height);
 
 	let canvas: HTMLCanvasElement;
 
-	const rescaleCanvas = () => {
+	const computeScale = (width: number, height: number) => {
+		if (typeof window === 'undefined') return;
 		// no bigger than the current width/height
 		let minRatio =
 			Math.min(
@@ -49,11 +70,9 @@
 		currentScale = Math.min(1, Math.max(0.2, minRatio));
 	};
 
-
-
-	onMount(() => {
+	function initGameState() {
 		// We configure our settings
-		const mySettings = DEFAULTS;
+		const mySettings = { ...DEFAULTS };
 
 		mySettings.screen.height = height;
 		mySettings.screen.width = width;
@@ -62,7 +81,8 @@
 		const [state, stateError] = init_game_state(
 			mySettings.distanceFromBorder,
 			mySettings.dimensions,
-			mySettings.screen
+			mySettings.screen,
+			mySettings.speeds
 		);
 
 		// check for error
@@ -71,13 +91,26 @@
 			console.error(stateError);
 			return;
 		}
+		return state;
+	}
 
-		// at this point, we know that gameState can't be null
+	onMount(() => {
+		// We configure our state
+		const state = initGameState();
+
+		if (!state) {
+			console.error('failed to init state');
+			return;
+		}
+
+		// at this point, we know that state can't be null
 		gameState = state;
 
-		rescaleCanvas();
+		computeScale(width, height);
 
-		window.addEventListener('resize', rescaleCanvas);
+		// setup scale recompute on window resize
+		const dynamicRescale = () => computeScale(width, height);
+		window.addEventListener('resize', dynamicRescale);
 
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
@@ -86,10 +119,11 @@
 		// for framerate calculations
 		let lastTime = 0;
 
-		let count = 5000;
+		// number of boxes to create
+		let boxCount = 500;
 
+		// highest color possible
 		const MAX_COLOR = parseInt('FFFFFF', 16);
-		const one_second_in_ms = 1000;
 
 		// the current frame
 		let frameHandle: number;
@@ -99,50 +133,31 @@
 		 * @param time current time (in ms)
 		 */
 		const loop: FrameRequestCallback = (time) => {
+			// update game state (Only when playing (ie. not paused))
+
+			// delta (in ms)
+			const delta = time - lastTime;
+
+			// tick once
+			gameState.tick(delta / ONE_SECOND_IN_MS, input);
+
+			// then scale
 			const scaledGameState = scale(state, currentScale);
 
 			const scaledWidth = scaledGameState.screen.width,
 				scaledHeight = scaledGameState.screen.height;
 
 			// Draw background
-			if(play){
-
+			if (playing) {
 				ctx.fillStyle = 'black';
 				ctx.fillRect(0, 0, scaledWidth, scaledHeight);
 			}
 
-			// Print debug info
-			if (play && debug) {
-				// Compute & display framerate
-
-				let framerate = '0 fps';
-				const delta = time - lastTime;
-
-				if (lastTime == 0 || time == 0) {
-					framerate = 'N/A';
-				} else {
-					// display framerate with 1 decimal place
-					framerate = `${(one_second_in_ms / delta).toFixed(1)} fps`;
-				}
-
-				// update last time since frame was drawn
-				lastTime = time;
-
-				// draw framerate
-				ctx.font = 'serif 24px';
-				ctx.fillStyle = 'white';
-				ctx.fillText(framerate, 10, 10);
-
-				// annoying and slow, only for debug
-				// TODO(sacha): maybe assign a specific flag for logging (different from debug)
-				// console.table([{ 'time (ms)': time, 'Framerate (img/s)': framerate, delta: delta }]);
-			}
-
 			// Draw silly garbage for fun
-			if (garbageMode) {
+			if (playing && garbageMode) {
 				const blockSize = 50 * currentScale;
-				// draw some bs to make shit lag
-				for (let index = 0; index < count; index++) {
+				// Draw some bs to make shit lag
+				for (let index = 0; index < boxCount; index++) {
 					ctx.fillStyle = `#${Math.round(Math.random() * MAX_COLOR).toString(16)}`;
 					ctx.fillRect(
 						Math.random() * (scaledWidth - scaledWidth * 0.2 - blockSize) + scaledWidth * 0.1,
@@ -153,37 +168,87 @@
 				}
 			}
 
-			if (play) {
-				// update game state
-				scaledGameState.tick(time, input);
+			// Set color of elements displayed (for now every element except background is white)
+			ctx.fillStyle = 'white';
 
-				// set color of elements displayed (for now every element except background is white)
-				ctx.fillStyle = 'white';
+			// Draw left paddle
+			ctx.fillRect(
+				scaledGameState.distanceFromBorder,
+				scaledGameState.leftPaddle.y,
+				scaledGameState.leftPaddle.width,
+				scaledGameState.leftPaddle.height
+			);
+			// Draw right paddle
+			ctx.fillRect(
+				scaledGameState.screen.width -
+					scaledGameState.distanceFromBorder -
+					scaledGameState.rightPaddle.width,
+				scaledGameState.rightPaddle.y,
+				scaledGameState.rightPaddle.width,
+				scaledGameState.rightPaddle.height
+			);
+			// Draw ball
+			ctx.fillRect(
+				scaledGameState.ball.x,
+				scaledGameState.ball.y,
+				scaledGameState.ball.width,
+				scaledGameState.ball.height
+			);
 
-				// draw left paddle
+			// Print debug info (overlay)
+			if (debug) {
+				// Compute & display framerate
+
+				let framerate = '0 fps';
+
+				if (lastTime == 0 || time == 0) {
+					framerate = 'N/A';
+				} else {
+					// display framerate with 1 decimal place
+					framerate = `${(ONE_SECOND_IN_MS / delta).toFixed(1)} fps`;
+				}
+
+				// update last time since frame was drawn
+				lastTime = time;
+
+				// global display settings
+				const fontSize = 18;
+				const margin = 10;
+				const scaledFontSize = fontSize * currentScale;
+				const scaledMargin = margin * currentScale;
+				ctx.font = `${scaledFontSize}px monospace `;
+
+				// draw framerate
+				ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
 				ctx.fillRect(
-					scaledGameState.distanceFromBorder,
-					scaledGameState.leftPaddle.y,
-					scaledGameState.dimensions.paddle.width,
-					scaledGameState.dimensions.paddle.height
+					scaledMargin - 2,
+					scaledMargin,
+					scaledFontSize * 5 + 2,
+					scaledFontSize + 2 * 2
 				);
-				// draw right paddle
+
+				ctx.fillStyle = 'black';
+				ctx.fillText(framerate, scaledMargin, scaledFontSize + scaledMargin);
+
+				ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
 				ctx.fillRect(
-					scaledGameState.screen.width -
-						scaledGameState.distanceFromBorder -
-						scaledGameState.dimensions.paddle.width,
-					scaledGameState.rightPaddle.y,
-					scaledGameState.dimensions.paddle.width,
-					scaledGameState.dimensions.paddle.height
+					scaledMargin - 2,
+					scaledGameState.screen.height - scaledFontSize - scaledMargin,
+					scaledFontSize * 7 + 2,
+					scaledFontSize + 2 * 2
 				);
-				// draw ball
-				ctx.fillRect(
-					scaledGameState.ball.x,
-					scaledGameState.ball.y,
-					scaledGameState.dimensions.ball,
-					scaledGameState.dimensions.ball
+
+				ctx.fillStyle = 'black';
+				ctx.fillText(
+					`scale=${currentScale.toFixed(2)}`,
+					scaledMargin,
+					scaledGameState.screen.height - scaledMargin
 				);
+
+				// TODO(sacha): maybe assign a specific flag for logging (different from debug)
+				// console.table([{ 'time (ms)': time, 'Framerate (img/s)': framerate, delta: delta }]);
 			}
+
 			// next frame
 			frameHandle = requestAnimationFrame(loop);
 		};
@@ -194,7 +259,7 @@
 		// cleanup on unMount
 		return () => {
 			cancelAnimationFrame(frameHandle);
-			window.removeEventListener('resize', rescaleCanvas);
+			window.removeEventListener('resize', dynamicRescale);
 		};
 	});
 </script>
@@ -208,9 +273,11 @@
 	</ul>
 {:else}
 	<canvas
-		class="block border rounded shadow"
 		bind:this={canvas}
 		width={width * currentScale}
 		height={height * currentScale}
+		on:click={() => {
+			playing = !playing;
+		}}
 	/>
 {/if}
