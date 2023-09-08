@@ -2,6 +2,7 @@
 	import '$lib/app.css';
 	import Pong from '$lib/components/Pong.svelte';
 	import { DEFAULTS, DEFAULT_INPUT_STATE } from '$lib/pong';
+	import { throttle } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { themeChange } from 'theme-change';
@@ -64,12 +65,10 @@
 				playing = !playing;
 				break;
 			case KEYS.RESET:
-				if (resetTimeout) return;
-				resetTimeout = setTimeout(() => {
-					resetTimeout = 0;
-					reset = false;
+				throttle(() => {
+					reset = true;
+					setTimeout(() => (reset = false), 10);
 				}, RESET_TIMEOUT_MS);
-				reset = true;
 				break;
 			default:
 				return false;
@@ -122,7 +121,13 @@
 		>
 			{playing ? '⏸ Pause' : '▶ Play '}
 		</button>
-		<button class="btn btn-sm btn-error" title="Reset the game">🔄 Reset</button>
+		<button
+			class="btn btn-sm btn-error"
+			title="Reset the game"
+			on:click={throttle(function () {
+				console.log('test');
+			}, 1000)}>🔄 Reset</button
+		>
 	</div>
 	<div class="flex place-content-center">
 		<div class="ctnr relative transition bg-black shadow-xl border-yellow-500 border-4">

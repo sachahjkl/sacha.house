@@ -8,6 +8,39 @@ export function capitalize(s: string) {
 	return s[0].toUpperCase() + s.slice(1);
 }
 
+export function throttle(callback: (...args: unknown[]) => unknown, delay: number) {
+	let last: number;
+	let timer: number;
+	return function (this: unknown, ...localArgs: unknown[]) {
+		const context: unknown = this as unknown;
+		const now = +new Date();
+		const args = localArgs;
+		if (last && now < last + delay) {
+			// le délai n'est pas écoulé on reset le timer
+			clearTimeout(timer);
+			timer = setTimeout(function () {
+				last = now;
+				callback.apply(context, args);
+			}, delay);
+		} else {
+			last = now;
+			callback.apply(context, args);
+		}
+	};
+}
+
+export function debounce(callback: (...args: unknown[]) => unknown, delay: number) {
+	let timer: number;
+	return function (this: unknown, ...localArgs: unknown[]) {
+		const args = localArgs;
+		const context: unknown = this as unknown;
+		clearTimeout(timer);
+		timer = setTimeout(function () {
+			callback.apply(context, args);
+		}, delay);
+	};
+}
+
 export const randomColorHSL = () => {
 	// 30 random hues with step of 12 degrees
 	const h = Math.floor((Math.random() * 360) / 12) * 12;
