@@ -7,7 +7,7 @@ export const MOI = {
 	/** @type {import("./interfaces/Person").Config} */
 	gender: 'male',
 	dateNaissance: new Date('1999-05-25T00:00:00+02:00'),
-	placeOfLiving: 'Paris',
+	placeOfLiving: 'Lyon',
 	github: new URL('https://github.com/sachahjkl'),
 	gitlab: new URL('https://gitlab.com/sachahjkl'),
 	linkedin: new URL('https://www.linkedin.com/in/sachafroment/'),
