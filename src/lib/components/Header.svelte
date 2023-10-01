@@ -21,7 +21,8 @@
 					INFO :  We use a <label tabindex="0"> instead of a <button>
 					because Safari has a bug that prevents the button from being focused.
 				-->
-				<label tabindex="0" for="navDropdown" class="btn border gap-2 btn-primary m-1">
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<label tabindex="0"  class="btn border gap-2 btn-primary m-1">
 					<HamburgerIcon />
 					Menu
 				</label>
@@ -30,7 +31,6 @@
 					 Using tabindex="0" is required so the dropdown can be focused.
 				-->
 				<ul
-					id="navDropdown"
 					tabindex="0"
 					class="dropdown-content border menu shadow bg-base-100 rounded-box w-52"
 				>
