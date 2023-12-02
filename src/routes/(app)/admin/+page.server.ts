@@ -1,11 +1,7 @@
-import { SECRET_GITHUB_BEARER_TOKEN, SECRET_PROXYCURL_BEARER_TOKEN } from '$env/static/private';
-import {
-	PUBLIC_GITHUB_API_ENDPOINT,
-	PUBLIC_LINKEDIN_GIST_ID,
-	PUBLIC_PROXYCURL_API_ENDPOINT
-} from '$env/static/public';
 import { MOI, SITE_TITLE } from '$lib/me';
 
+import { env as envPriv } from '$env/dynamic/private';
+import { env as envPub } from '$env/dynamic/public';
 import { updateCounter } from '$lib/countapi';
 import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import { fail } from '@sveltejs/kit';
@@ -50,13 +46,13 @@ export const actions = {
 			};
 
 			const gistRes = await fetch(
-				`${PUBLIC_GITHUB_API_ENDPOINT}/gists/${PUBLIC_LINKEDIN_GIST_ID}`,
+				`${envPub.PUBLIC_GITHUB_API_ENDPOINT}/gists/${envPub.PUBLIC_LINKEDIN_GIST_ID}`,
 				{
 					method: 'PATCH',
 					body: JSON.stringify(gist),
 					headers: {
 						Accept: 'application/vnd.github+json',
-						Authorization: `Bearer ${SECRET_GITHUB_BEARER_TOKEN}`
+						Authorization: `Bearer ${envPriv.GITHUB_BEARER_TOKEN}`
 					}
 				}
 			);
@@ -106,13 +102,13 @@ export const actions = {
 };
 
 const fetchProxyCurl = async () => {
-	const proxyCurlURL = new URL(`${PUBLIC_PROXYCURL_API_ENDPOINT}/proxycurl/api/v2/linkedin`);
+	const proxyCurlURL = new URL(`${envPub.PUBLIC_PROXYCURL_API_ENDPOINT}/proxycurl/api/v2/linkedin`);
 	proxyCurlURL.searchParams.append('url', MOI.linkedin.toString());
 	proxyCurlURL.searchParams.append('fallback_to_cache', 'on-error');
 
 	const res = await fetch(proxyCurlURL.toString(), {
 		headers: {
-			Authorization: `Bearer ${SECRET_PROXYCURL_BEARER_TOKEN}`
+			Authorization: `Bearer ${envPriv.PROXYCURL_BEARER_TOKEN}`
 		}
 	});
 	if (!res.ok) throw new Error(`Récupération du profil échouée.`);

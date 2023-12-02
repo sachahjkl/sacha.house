@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { navigating, page } from '$app/stores';
-	import { PUBLIC_NETLIFY_SITE_ID } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import '$lib/app.css';
 	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
 	import {
@@ -85,7 +85,7 @@
 	<slot><!-- optional fallback --></slot>
 </main>
 
-<Footer commitHash={data.commitHash} netlifyID={PUBLIC_NETLIFY_SITE_ID}>
+<Footer commitHash={data.commitHash} netlifyID={env.PUBLIC_NETLIFY_SITE_ID}>
 	<a slot="brand" href="/" data-sveltekit-preload-data>
 		<picture>
 			<source srcset={faviconAvif} type="image/avif" />

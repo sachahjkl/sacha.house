@@ -1,4 +1,4 @@
-import { PUBLIC_HYGRAPH_API_ENDPOINT } from '$env/static/public';
+import { PUBLIC_HYGRAPH_API_ENDPOINT } from '$env/dynamic/public';
 import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
 import { GET_POST } from '$lib/queries';

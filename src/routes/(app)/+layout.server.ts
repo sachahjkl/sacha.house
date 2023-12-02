@@ -1,6 +1,5 @@
-import { PUBLIC_GITLAB_API_ENDPOINT, PUBLIC_GIT_REPO_ID } from '$env/static/public';
-
-import { SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
+import { env as envPriv } from '$env/dynamic/private';
+import { env as envPub } from '$env/dynamic/public';
 import { updateCounter } from '$lib/countapi';
 import type { LatestCommit } from '$lib/interfaces/LatestCommit';
 import { getAuthorizedNavItems } from '$lib/nav';
@@ -22,14 +21,14 @@ export const load = async ({ fetch, getClientAddress, cookies }) => {
 
 	const commitHash = async () => {
 		try {
-			const clientGL = new GraphQLClient(`${PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
+			const clientGL = new GraphQLClient(`${envPub.PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
 				fetch,
 				headers: {
-					Authorization: `Bearer ${SECRET_GITLAB_BEARER_TOKEN}`
+					Authorization: `Bearer ${envPriv.GITLAB_BEARER_TOKEN}`
 				}
 			});
 			const GL: LatestCommit = await clientGL.request(GET_LATEST_COMMIT, {
-				repoID: PUBLIC_GIT_REPO_ID
+				repoID: envPub.PUBLIC_GIT_REPO_ID
 			});
 			return `${GL.project.repository.paginatedTree.nodes.at(0)?.lastCommit.sha}`;
 		} catch (error) {

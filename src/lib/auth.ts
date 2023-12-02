@@ -23,7 +23,7 @@ const rules: AccessRule[] = [
 ];
 
 const isAuthorizedIP = (ip = '255.255.255.255') => {
-	const IPs = (JSON.parse(env.SECRET_ADMIN_IPS) as string[]).map((item) => item.trim());
+	const IPs = (JSON.parse(env.ADMIN_IPS) as string[]).map((item) => item.trim());
 	return !ADMIN_ALWAYS_OFF && [...IPs, ...DEFAULT_IPS].includes(ip);
 };
 

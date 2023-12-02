@@ -1,9 +1,9 @@
-import { SECRET_GITHUB_BEARER_TOKEN, SECRET_GITLAB_BEARER_TOKEN } from '$env/static/private';
-import { PUBLIC_GITHUB_API_ENDPOINT, PUBLIC_GITLAB_API_ENDPOINT } from '$env/static/public';
 import type { Project, ProjetsResponse } from '$lib/interfaces/Project';
 import { GET_PROJECTS_GITHUB, GET_PROJECTS_GITLAB } from '$lib/queries';
 import { error, json } from '@sveltejs/kit';
 
+import { env as envPriv } from '$env/dynamic/private';
+import { env as envPub } from '$env/dynamic/public';
 import { MOI } from '$lib/me';
 import { GraphQLClient } from 'graphql-request';
 
@@ -12,14 +12,14 @@ export type GLType = { projects: { nodes: Project[] } };
 
 export const GET = async () => {
 	try {
-		const clientGH = new GraphQLClient(`${PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
+		const clientGH = new GraphQLClient(`${envPub.PUBLIC_GITHUB_API_ENDPOINT}/graphql`, {
 			headers: {
-				Authorization: `Bearer ${SECRET_GITHUB_BEARER_TOKEN}`
+				Authorization: `Bearer ${envPriv.GITHUB_BEARER_TOKEN}`
 			}
 		});
-		const clientGL = new GraphQLClient(`${PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
+		const clientGL = new GraphQLClient(`${envPub.PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
 			headers: {
-				Authorization: `Bearer ${SECRET_GITLAB_BEARER_TOKEN}`
+				Authorization: `Bearer ${envPriv.GITLAB_BEARER_TOKEN}`
 			}
 		});
 		const GH: GHType = await clientGH.request(GET_PROJECTS_GITHUB, { username: MOI.username });

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { PUBLIC_PROXYCURL_API_ENDPOINT } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
 
 	import { toast } from '@zerodevx/svelte-toast';
@@ -43,7 +43,7 @@
 		<h2>👔 Données du profil LinkedIn</h2>
 		<p>
 			Les données pour le profil LinkedIn proviennent de l'API <a
-				href={PUBLIC_PROXYCURL_API_ENDPOINT}>{PUBLIC_PROXYCURL_API_ENDPOINT}</a
+				href={env.PUBLIC_PROXYCURL_API_ENDPOINT}>{env.PUBLIC_PROXYCURL_API_ENDPOINT}</a
 			>.
 		</p>
 		{#if profileLoading}
@@ -63,11 +63,12 @@
 					await update();
 					profileLoading = false;
 					if (result.type === 'success') {
-						toast.push(toastCredits(result.data?.creditBalance));
-						data.creditBalance = result.data?.creditBalance;
+						const balance = Number(result.data?.creditBalance);
+						toast.push(toastCredits(balance));
+						data.creditBalance = balance;
 					}
 					if (result.type === 'failure') {
-						toast.push(toastError(result.data?.message));
+						toast.push(toastError(`${result.data?.message}`));
 					}
 				};
 			}}
