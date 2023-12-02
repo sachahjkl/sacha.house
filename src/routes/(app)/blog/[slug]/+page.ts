@@ -1,4 +1,4 @@
-import { PUBLIC_HYGRAPH_API_ENDPOINT } from '$env/dynamic/public';
+import { env } from '$env/dynamic/public';
 import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
 import { GET_POST } from '$lib/queries';
@@ -8,7 +8,7 @@ import { GraphQLClient } from 'graphql-request';
 export const load = async ({ params, url }) => {
 	const getPost = async () => {
 		try {
-			const clientGL = new GraphQLClient(PUBLIC_HYGRAPH_API_ENDPOINT);
+			const clientGL = new GraphQLClient(env.PUBLIC_HYGRAPH_API_ENDPOINT);
 			const data: { post: Post } = await clientGL.request(GET_POST, { slug: params.slug });
 			const post = data.post;
 

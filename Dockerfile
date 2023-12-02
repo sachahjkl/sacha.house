@@ -3,11 +3,14 @@ FROM node:lts-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
+# Secret env - undefined by default
 ENV GITHUB_BEARER_TOKEN ""
 ENV GITLAB_BEARER_TOKEN ""
 ENV PROXYCURL_BEARER_TOKEN ""
 # JSON array
 ENV ADMIN_IPS '[]'
+
+# Public env - default values
 ENV PUBLIC_NETLIFY_SITE_ID "0afd9771-2b63-4228-9750-56921d8247a6"
 ENV PUBLIC_GITLAB_API_ENDPOINT "https://gitlab.com/api/graphql"
 ENV PUBLIC_GITHUB_API_ENDPOINT "https://api.github.com/graphql"
