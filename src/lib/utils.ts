@@ -49,10 +49,16 @@ export const randomColorHSL = () => {
 };
 
 export const isChristmas = (givenDate: Date = new Date()) => {
-	const isMidDecember = givenDate.getMonth() === 11 && givenDate.getDay() >= 10;
-	const isStartJanuary = givenDate.getMonth() === 0 && givenDate.getDate() <= 5;
+	const today = givenDate || new Date();
+	// from November 25th
+	const endNovember = new Date(today.getFullYear(), 10, 25);
+	// to January 5th
+	const startJanuary = new Date(today.getFullYear() + 1, 0, 5);
 
-	return isMidDecember || isStartJanuary;
+	const christmasCheck = endNovember <= today && today <= startJanuary;
+	console.log('is Christmas: ', christmasCheck, 'start: ', endNovember, 'end: ', startJanuary);
+
+	return christmasCheck;
 };
 
 function embRand(a: number, b: number) {
