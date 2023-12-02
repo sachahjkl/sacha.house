@@ -1,12 +1,7 @@
 <script lang="ts">
 	import { navigating, page } from '$app/stores';
-	import '$lib/app.css';
-	import { onMount } from 'svelte';
-// import { fly } from 'svelte/transition';
 	import { PUBLIC_NETLIFY_SITE_ID } from '$env/static/public';
-	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
-	import { addSnow, capitalize, isChristmas } from '$lib/utils';
-// import { env } from '$env/dynamic/public';
+	import '$lib/app.css';
 	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
 	import {
 		default as faviconAvif,
@@ -14,14 +9,14 @@
 	} from '$lib/assets/favicon_shadow.png?w=16;400;800&format=avif&as=srcset&imagetools';
 	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
+	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
+	import { addSnow, capitalize, isChristmas } from '$lib/utils';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import nProgress from 'nprogress';
+	import { onMount } from 'svelte';
 	import type { LayoutServerData } from './$types';
 
 	export let data: LayoutServerData;
-
-	// const useIntro: boolean = JSON.parse(env.PUBLIC_USE_INTRO || 'true');
-	// let doIntro = !useIntro;
 
 	onMount(() => {
 		nProgress.configure({ easing: 'ease', speed: 500 });
@@ -86,7 +81,6 @@
 	</a>
 </Header>
 
-<!-- {#if doIntro} -->
 <main>
 	<slot><!-- optional fallback --></slot>
 </main>
@@ -100,7 +94,6 @@
 		</picture>
 	</a>
 </Footer>
-<!-- {/if} -->
 <SvelteToast options={{ duration: 2000 }} />
 
 <style lang="postcss">
