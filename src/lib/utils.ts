@@ -72,53 +72,26 @@ export const addSnow = (document: Document) => {
 		let embCSS =
 			'.embedim-snow{position: absolute;width: 20px;height: 20px;background: white;border-radius: 50%;margin-top:-10px; border: 2px solid rgba(0,0,0,0.3); filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));}';
 		let embHTML = '';
-		for (let i = 1; i < 200; i++) {
+		for (let n = 1; n < 200; n++) {
+			const i = n + 1;
+
 			embHTML += '<i class="embedim-snow"></i>';
 			const rndX = embRand(0, 1000000) * 0.0001,
 				rndO = embRand(-100000, 100000) * 0.0001,
 				rndT = (embRand(3, 8) * 10).toFixed(2),
 				rndS = (embRand(0, 10000) * 0.0001).toFixed(2);
-			embCSS +=
-				'.embedim-snow:nth-child(' +
-				i +
-				'){' +
-				'opacity:' +
-				(embRand(1, 10000) * 0.0001).toFixed(2) +
-				';' +
-				'transform:translate(' +
-				rndX.toFixed(2) +
-				'vw,-10px) scale(' +
-				rndS +
-				');' +
-				'animation:fall-' +
-				i +
-				' ' +
-				embRand(10, 30) +
-				's -' +
-				embRand(0, 30) +
-				's linear infinite' +
-				'}' +
-				'@keyframes fall-' +
-				i +
-				'{' +
-				rndT +
-				'%{' +
-				'transform:translate(' +
-				(rndX + rndO).toFixed(2) +
-				'vw,' +
-				rndT +
-				'vh) scale(' +
-				rndS +
-				')' +
-				'}' +
-				'to{' +
-				'transform:translate(' +
-				(rndX + rndO / 2).toFixed(2) +
-				'vw, 105vh) scale(' +
-				rndS +
-				')' +
-				'}' +
-				'}';
+			embCSS += `.embedim-snow:nth-child(${i}){opacity:${(embRand(1, 10000) * 0.0001).toFixed(
+				2
+			)};transform:translate(${rndX.toFixed(
+				2
+			)}vw,-10px) scale(${rndS});animation:fall-${i} ${embRand(10, 30)}s -${embRand(
+				0,
+				30
+			)}s linear infinite}@keyframes fall-${i}{${rndT}%{transform:translate(${(rndX + rndO).toFixed(
+				2
+			)}vw,${rndT}vh) scale(${rndS})}to{transform:translate(${(rndX + rndO / 2).toFixed(
+				2
+			)}vw, 105vh) scale(${rndS})}}`;
 		}
 		embedimSnow = document.createElement('div');
 		embedimSnow.id = 'embedim--snow';
