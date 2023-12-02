@@ -70,7 +70,7 @@ export const addSnow = (document: Document) => {
 	let embedimSnow = document.getElementById('embedim--snow');
 	if (!embedimSnow) {
 		let embCSS =
-			'.embedim-snow{position: absolute;width: 10px;height: 10px;background: white;border-radius: 50%;margin-top:-10px}';
+			'.embedim-snow{position: absolute;width: 20px;height: 20px;background: white;border-radius: 50%;margin-top:-10px; border: 2px solid rgba(0,0,0,0.3); filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));}';
 		let embHTML = '';
 		for (let i = 1; i < 200; i++) {
 			embHTML += '<i class="embedim-snow"></i>';
