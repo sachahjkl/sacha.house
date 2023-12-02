@@ -36,4 +36,4 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/build /app/build
 
 EXPOSE 3000
-CMD [ "pnpm", "start" ]
+CMD [ "node", "build"]
