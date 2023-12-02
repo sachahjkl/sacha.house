@@ -1,5 +1,5 @@
-import type { HTTPMethod } from './interfaces/HTTP';
 import { env } from '$env/dynamic/private';
+import type { HTTPMethod } from './interfaces/HTTP';
 
 const ADMIN_ALWAYS_OFF = false;
 const DEFAULT_IPS = ['127.0.0.1', '::1'];
