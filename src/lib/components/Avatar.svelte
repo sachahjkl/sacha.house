@@ -18,7 +18,7 @@
 		hover:ring-secondary hover:scale-105 active:ring-success active:scale-95
 		transition-all ring-primary ring-offset-base-100 ring-offset-2;
 	}
-	.me {
+	.me, picture {
 		@apply m-0;
 	}
 </style>
