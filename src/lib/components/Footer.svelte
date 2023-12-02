@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { env } from "$env/dynamic/public";
+
 	export let commitHash = 'inconnu';
-	export let netlifyID = '';
 	const year = new Date().getFullYear();
 </script>
 
@@ -14,7 +15,7 @@
 			class="deploy-img"
 			width="135"
 			height="20"
-			src="https://api.netlify.com/api/v1/badges/{netlifyID}/deploy-status"
+			src="https://gitlab.com/{env.PUBLIC_GIT_REPO_ID}/badges/master/pipeline.svg"
 			alt="Deploy Status Badge"
 		/>
 		/
