@@ -1,10 +1,10 @@
-import { env as envPriv } from '$env/dynamic/private';
-import { env as envPub } from '$env/dynamic/public';
-import { updateCounter } from '$lib/countapi';
-import type { LatestCommit } from '$lib/interfaces/LatestCommit';
-import { getAuthorizedNavItems } from '$lib/nav';
 import { GET_LATEST_COMMIT } from '$lib/queries';
 import { GraphQLClient } from 'graphql-request';
+import type { LatestCommit } from '$lib/interfaces/LatestCommit';
+import { env as envPriv } from '$env/dynamic/private';
+import { env as envPub } from '$env/dynamic/public';
+import { getAuthorizedNavItems } from '$lib/nav';
+import { updateCounter } from '$lib/countapi';
 
 export const load = async ({ fetch, getClientAddress, cookies }) => {
 	const clientAddress = getClientAddress();
@@ -15,7 +15,7 @@ export const load = async ({ fetch, getClientAddress, cookies }) => {
 	// on valorise le cookie "visite" à "true"
 	if (!(JSON.parse(cookies.get('visite') || 'false') as boolean)) {
 		updateCounter();
-		cookies.set('visite', JSON.stringify(true));
+		cookies.set('visite', JSON.stringify(true), { path: '/' });
 		console.log('Cookie de visite défini');
 	}
 
@@ -39,6 +39,6 @@ export const load = async ({ fetch, getClientAddress, cookies }) => {
 
 	return {
 		navItems,
-		commitHash: commitHash()
+		commitHash: await commitHash()
 	};
 };

@@ -1,27 +1,22 @@
 import { MOI, SITE_TITLE } from '$lib/me';
 
+import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import { env as envPriv } from '$env/dynamic/private';
 import { env as envPub } from '$env/dynamic/public';
-import { updateCounter } from '$lib/countapi';
-import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import { fail } from '@sveltejs/kit';
+import { updateCounter } from '$lib/countapi';
 
 export const load = async ({ getClientAddress, fetch }) => {
-	const creditBalance = fetch('/api/creditBalance')
+	const creditBalance = await fetch('/api/creditBalance')
 		.then((res) => res.text())
 		.then((str) => Number(str))
 		.catch(() => 0);
 
-	const profile = fetch('/api/linkedinProfile').then<LinkedinProfile>((res) => res.json());
-	// const visites = fetch('/api/visites')
-	// 	.then((val) => val.text())
-	// 	.then((str) => Number(str))
-	// 	.catch(() => 0);
+	const profile = await fetch('/api/linkedinProfile').then<LinkedinProfile>((res) => res.json());
 
 	return {
 		creditBalance,
 		profile,
-		// visites,
 		ip: getClientAddress(),
 		seo: {
 			title: `admin / ${SITE_TITLE}`,

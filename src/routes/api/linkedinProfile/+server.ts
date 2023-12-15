@@ -20,7 +20,7 @@ export const GET = async () => {
 				}
 			}
 		);
-		if (!res.ok) throw error(500, 'Récupération du gist échouée.');
+		if (!res.ok) error(500, 'Récupération du gist échouée.');
 		const gist = (await res.json()) as { files: { 'linkedin_profile.json': { content: string } } };
 		return json(JSON.parse(gist.files['linkedin_profile.json'].content), {
 			headers: {
@@ -29,6 +29,6 @@ export const GET = async () => {
 		});
 	} catch (err) {
 		console.error('Récupération du gist échouée.', err);
-		throw error(500, 'Erreur inattendue, récupération du gist échouée.');
+		error(500, 'Erreur inattendue, récupération du gist échouée.');
 	}
 };

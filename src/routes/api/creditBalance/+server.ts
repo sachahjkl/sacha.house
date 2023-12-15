@@ -17,6 +17,6 @@ export const GET = async () => {
 			.then((value: { credit_balance: number }) => value.credit_balance);
 		return new Response(credit_balance.toString());
 	} catch (err) {
-		throw error(500, "Echec de la récupération du crédit restant pour l'api ProxyCURL");
+		error(500, "Echec de la récupération du crédit restant pour l'api ProxyCURL");
 	}
 };

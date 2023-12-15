@@ -14,10 +14,10 @@ export async function load({ url }) {
 			break;
 		case 'coffee':
 		case 'café':
-			throw error(418, {
-				message:
-					'Did you really think a teapot could brew you coffee ??\nare you some kind of lunatic or something ?'
-			});
+			error(418, {
+            				message:
+            					'Did you really think a teapot could brew you coffee ??\nare you some kind of lunatic or something ?'
+            			});
 		default:
 			brewMessage = { text: `What kind of a drink is "${drink}" ???`, emoji: '🤮' };
 	}

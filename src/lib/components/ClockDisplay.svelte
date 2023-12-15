@@ -7,6 +7,7 @@
 	$: characters = value.length;
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <time on:click={clickCallback} on:keypress={clickCallback}>
 	<span class="text">
 		<span class="char-grid">

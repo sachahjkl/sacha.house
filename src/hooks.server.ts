@@ -9,9 +9,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 			method: event.request.method as HTTPMethod
 		})
 	) {
-		throw error(401, {
-			message: 'Pas autorisé à exécuter cette action.'
-		});
+		error(401, {
+        			message: 'Pas autorisé à exécuter cette action.'
+        		});
 		return new Response(null, {
 			status: 401,
 			headers: {

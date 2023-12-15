@@ -41,6 +41,6 @@ export const GET = async () => {
 		});
 	} catch (err) {
 		console.error('Problème à la récupération des projets', err);
-		throw error(500, 'Impossible de récupérer les données des projets.');
+		error(500, 'Impossible de récupérer les données des projets.');
 	}
 };

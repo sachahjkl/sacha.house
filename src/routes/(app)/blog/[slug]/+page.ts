@@ -1,9 +1,9 @@
-import { env } from '$env/dynamic/public';
+import { GET_POST } from '$lib/queries';
+import { GraphQLClient } from 'graphql-request';
 import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
-import { GET_POST } from '$lib/queries';
+import { env } from '$env/dynamic/public';
 import { error } from '@sveltejs/kit';
-import { GraphQLClient } from 'graphql-request';
 
 export const load = async ({ params, url }) => {
 	const getPost = async () => {
@@ -13,18 +13,18 @@ export const load = async ({ params, url }) => {
 			const post = data.post;
 
 			if (!post) {
-				throw error(404, 'Poste introuvable 😔.');
+				error(404, 'Poste introuvable 😔.');
 			}
 			return post;
 		} catch (err) {
 			console.error('Erreur à la récupération du post.', { err });
-			throw error(500, 'Erreur à la récupération du poste 😔.');
+			error(500, 'Erreur à la récupération du poste 😔.');
 		}
 	};
 	const post = getPost();
 
 	return {
-		post,
+		post: await post,
 		seo: {
 			title: await post.then((post) => `${post.title} / ${SITE_TITLE}`),
 			description: await post.then((post) =>

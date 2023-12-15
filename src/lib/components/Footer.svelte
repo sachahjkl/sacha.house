@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { env } from "$env/dynamic/public";
+	import { env } from '$env/dynamic/public';
 
 	export let commitHash = 'inconnu';
 	const year = new Date().getFullYear();

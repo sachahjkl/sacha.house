@@ -13,7 +13,7 @@ export const load = async () => {
 				.request(GET_POSTS)
 				.then((data) => (data as { posts: ListedPost[] }).posts);
 			if (!posts.length) {
-				throw error(404, 'Postes introuvables !');
+				error(404, 'Postes introuvables !');
 			}
 			return posts;
 		} catch (err) {
