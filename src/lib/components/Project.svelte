@@ -14,11 +14,11 @@
 	title="{name}
 {description}"
 >
-	<div class="h-32 card card-side bg-base-200">
+	<div class="h-32 card card-side bg-base-200 rounded z-10 overflow-hidden">
 		{#if avatarUrl}
 			<div class="w-32 grid shrink-0 place-content-center">
 				<figure>
-					<img loading="lazy" class="rounded m-3 drop-shadow" src={avatarUrl} alt="avatar" />
+					<img loading="lazy" class="m-3 drop-shadow" src={avatarUrl} alt="avatar" />
 				</figure>
 			</div>
 		{:else}
@@ -50,7 +50,7 @@
 		@apply line-clamp-2;
 	}
 	div.card {
-		@apply shadow m-2 hover:scale-95 active:scale-[1.01] transition-transform;
+		@apply shadow m-2 hover:scale-95 active:scale-90 transition-transform;
 	}
 
 	.card-body {
@@ -58,11 +58,11 @@
 	}
 	.letter-box {
 		--color: lightred;
-		@apply bg-[color:var(--color)] w-32 grid shrink-0 place-content-center shadow border-r-2 border-r-base-300;
+		@apply bg-[color:var(--color)] w-32 grid shrink-0 place-content-center;
 	}
 
 	.letter {
 		@apply w-12 h-12 flex place-items-center place-content-center text-3xl
-		rounded bg-base-100 text-base-content shadow-sm bg-opacity-50;
+		rounded bg-neutral-900 text-neutral-100 shadow-sm bg-opacity-50;
 	}
 </style>

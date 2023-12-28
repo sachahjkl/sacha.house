@@ -41,11 +41,16 @@ export function debounce(callback: (...args: unknown[]) => unknown, delay: numbe
 	};
 }
 
+let latestHue = 0;
 export const randomColorHSL = () => {
 	// 30 random hues with step of 12 degrees
-	const h = Math.floor((Math.random() * 360) / 12) * 12;
+	let tmp = latestHue;
+	while (tmp == latestHue) {
+		tmp = (360 / 12) * Math.round(Math.random() * 12);
+	}
+	latestHue = tmp;
 
-	return [h, 0.9, 0.6];
+	return [latestHue, 10, 0.6];
 };
 
 export const isChristmas = (givenDate: Date = new Date()) => {
