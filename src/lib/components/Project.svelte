@@ -14,7 +14,7 @@
 	title="{name}
 {description}"
 >
-	<div class="h-32 card card-side bg-base-200 rounded z-10 overflow-hidden">
+	<div class="h-32 card card-side bg-base-200 rounded overflow-hidden">
 		{#if avatarUrl}
 			<div class="w-32 grid shrink-0 place-content-center">
 				<figure>
