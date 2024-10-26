@@ -57,7 +57,7 @@
 
 <Header activePagePathname={$page.url.pathname} navItems={data.navItems} />
 
-<main class="p-3 max-w-5xl m-auto pb-16">
+<main class="m-auto max-w-5xl p-3 pb-16">
 	{#if children}{@render children()}{:else}<!-- optional fallback -->{/if}
 </main>
 
@@ -73,6 +73,6 @@
 
 <style lang="postcss">
 	img.favicon {
-		@apply inline-block align-text-top h-[1em] w-[1em];
+		@apply inline-block h-[1em] w-[1em] align-text-top;
 	}
 </style>

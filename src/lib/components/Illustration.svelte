@@ -12,6 +12,6 @@
 
 <style lang="postcss">
 	.illustration {
-		@apply max-w-md w-full m-auto;
+		@apply m-auto w-full max-w-md;
 	}
 </style>

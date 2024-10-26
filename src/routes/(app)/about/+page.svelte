@@ -16,7 +16,7 @@
 <article class="prose max-w-full">
 	<h1 class="h1">about</h1>
 	<section>
-		<div class="avatar block mx-auto">
+		<div class="avatar mx-auto block">
 			<Avatar />
 		</div>
 
@@ -87,6 +87,6 @@
 		@apply mx-auto print:max-w-full;
 	}
 	a {
-		@apply hover:scale-105 transition-all;
+		@apply transition-all hover:scale-105;
 	}
 </style>

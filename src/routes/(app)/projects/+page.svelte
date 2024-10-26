@@ -18,7 +18,7 @@
 		A collection of my work, including both completed and ongoing projects. These repositories were
 		created to:
 	</p>
-	<ul class="list-[square] list-inside ms-4">
+	<ul class="ms-4 list-inside list-[square]">
 		<li>Explore new technologies</li>
 		<li>Practice project management, design, and software architecture</li>
 		<li>
@@ -86,12 +86,11 @@
 	}
 
 	img.title-logo {
-		@apply w-[1.2em] inline-block align-middle m-0 mr-2;
+		@apply m-0 mr-2 inline-block w-[1.2em] align-middle;
 	}
 
 	.projects {
-		@apply list-none max-h-[540px] p-0 overflow-y-scroll border-y-2 border-textColor
-		snap-y snap-mandatory flex flex-col gap-4 mx-4;
+		@apply mx-4 flex max-h-[540px] snap-y snap-mandatory list-none flex-col gap-4 overflow-y-scroll border-y-2 border-textColor p-0;
 		scrollbar-width: thin;
 	}
 	.project {

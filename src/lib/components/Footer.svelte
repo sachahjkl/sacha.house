@@ -13,7 +13,7 @@
 </script>
 
 <footer
-	class="bg-textColor gap-2 text-sm text-bgColor flex flex-wrap items-center justify-between px-2 py-1 font-bold fixed bottom-0 w-full"
+	class="fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 bg-textColor px-2 py-1 text-sm font-bold text-bgColor"
 >
 	<div>
 		<p>(C) {year} sacha.house</p>

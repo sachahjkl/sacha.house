@@ -106,29 +106,29 @@
 <main>
 	<p>
 		<a class=" opacity-60" href="/" title="Home"
-			><span class="rotate-180 inline-block">➜</span> 🏡 go back home</a
+			><span class="inline-block rotate-180">➜</span> 🏡 go back home</a
 		>
 	</p>
-	<h1 class="text-3xl font-bold mb-[1em]">Pong :</h1>
+	<h1 class="mb-[1em] text-3xl font-bold">Pong :</h1>
 
 	<div class="mb-[1em] flex gap-[1em]">
 		<button
-			class="bg-textColor text-bgColor px-2"
+			class="bg-textColor px-2 text-bgColor"
 			title="Click to pause the game (or click on the game itself)"
 			onclick={() => (playing = !playing)}
 		>
 			{playing ? '⏸ Pause' : '▶ Play '}
 		</button>
 		<button
-			class="bg-textColor text-bgColor px-2"
+			class="bg-textColor px-2 text-bgColor"
 			title="Reset the game"
 			onclick={throttle(function () {
 				console.log('test');
 			}, 1000)}>🔄 Reset</button
 		>
 	</div>
-	<div class="flex place-content-center mb-4">
-		<div class="ctnr relative transition bg-black shadow-xl border-yellow-500 border-4">
+	<div class="mb-4 flex place-content-center">
+		<div class="ctnr relative border-4 border-yellow-500 bg-black shadow-xl transition">
 			<Pong
 				bind:error
 				bind:input
@@ -144,7 +144,7 @@
 			{#if !playing}
 				<span
 					transition:slide
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full font-bold text-3xl text-white z-10 p-2 text-shadow-xl shadow-red-500/50"
+					class="text-shadow-xl absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-full p-2 text-3xl font-bold text-white shadow-red-500/50"
 					>PAUSED</span
 				>
 			{/if}
@@ -156,11 +156,11 @@
 			>
 		</div> -->
 	{#if !error}
-		<div class="flex justify-items-stretch flex-wrap">
-			<div id="settings" class="flex-grow flex-shrink basis-[400px]">
-				<h2 class="text-2xl font-bold mb-2">Settings</h2>
+		<div class="flex flex-wrap justify-items-stretch">
+			<div id="settings" class="flex-shrink flex-grow basis-[400px]">
+				<h2 class="mb-2 text-2xl font-bold">Settings</h2>
 
-				<div class="flex gap-2 flex-col">
+				<div class="flex flex-col gap-2">
 					<label for="height">
 						Height:
 						<input
@@ -208,7 +208,7 @@
 					>
 					<label for="scale">
 						Scale: <input
-							class="px-2 text-textColor bg-bgColor border-2 border-textColor"
+							class="border-2 border-textColor bg-bgColor px-2 text-textColor"
 							type="text"
 							name="scale"
 							id="scale"
@@ -218,10 +218,10 @@
 					>
 				</div>
 			</div>
-			<div id="instructions" class="flex-grow flex-shrink basis-[400px]">
+			<div id="instructions" class="flex-shrink flex-grow basis-[400px]">
 				<h2>Instructions</h2>
 				<div class="flex flex-wrap gap-4">
-					<section class="basis-52 p-4 shadow-sm rounded">
+					<section class="basis-52 rounded p-4 shadow-sm">
 						<h3>Général</h3>
 
 						<ul class="list-none p-0">
@@ -230,7 +230,7 @@
 							<li>Reset : <kbd class="kbd kdb-sm">{KEYS.RESET}</kbd></li>
 						</ul>
 					</section>
-					<section class="basis-52 p-4 shadow-sm rounded">
+					<section class="basis-52 rounded p-4 shadow-sm">
 						<h3>Joueur 1</h3>
 						<ul class="list-none p-0">
 							<li>
@@ -239,7 +239,7 @@
 							<li>BAS : <kbd class="kbd kbd-sm">{KEYS.player1.DOWN}</kbd></li>
 						</ul>
 					</section>
-					<section class="basis-52 p-4 shadow-sm rounded">
+					<section class="basis-52 rounded p-4 shadow-sm">
 						<h3>Joueur 2</h3>
 						<ul class="list-none p-0">
 							<li>HAUT : <kbd class="kbd kbd-sm">{KEYS.player2.UP}</kbd></li>
@@ -254,7 +254,7 @@
 
 <style lang="postcss">
 	main {
-		@apply max-w-5xl m-auto mt-6 p-4;
+		@apply m-auto mt-6 max-w-5xl p-4;
 	}
 	#instructions h3 {
 		@apply mt-0;

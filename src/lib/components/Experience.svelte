@@ -23,7 +23,7 @@
 <section>
 	<h3 class="mb-0 font-bold text-opacity-50">
 		{#if lieu.website}
-			<a class="no-underline hover:underline font-bold" href={lieu.website}>{lieu.name} 🔗</a>
+			<a class="font-bold no-underline hover:underline" href={lieu.website}>{lieu.name} 🔗</a>
 		{:else}
 			{lieu.name}
 		{/if}
@@ -32,7 +32,7 @@
 
 		</small> -->
 	</h3>
-	<h4 class="italic font-normal">
+	<h4 class="font-normal italic">
 		{titre}
 	</h4>
 	<small class=" text-opacity-50">

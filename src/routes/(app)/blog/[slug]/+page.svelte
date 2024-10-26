@@ -27,11 +27,11 @@
 
 <p>
 	<a href="/blog" class="opacity-60"
-		><span class="rotate-180 inline-block">➜</span> Go back to the articles list</a
+		><span class="inline-block rotate-180">➜</span> Go back to the articles list</a
 	>
 </p>
 <h1 class="h1">{post.title}</h1>
-<small class="text-textColor text-opacity-50 text-sm"
+<small class="text-sm text-textColor text-opacity-50"
 	>created on {createdAt.toLocaleDateString()} at {createdAt.toLocaleTimeString()} - last modified on
 	{updatedAt.toLocaleDateString()} at {updatedAt.toLocaleTimeString()}</small
 >

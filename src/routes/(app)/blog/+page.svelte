@@ -11,11 +11,11 @@
 <article>
 	<h1 class="h1">blog</h1>
 
-	<h2 class="font-bold mb-2">📰 Available articles</h2>
+	<h2 class="mb-2 font-bold">📰 Available articles</h2>
 	{#await data.streaming.posts}
 		<p>Loading ...</p>
 	{:then posts}
-		<ul data-sveltekit-preload-data class="list-[square] list-inside ms-4">
+		<ul data-sveltekit-preload-data class="ms-4 list-inside list-[square]">
 			{#each posts as post}
 				<li>
 					<a href="/blog/{post.slug}">{post.title}</a>
@@ -43,6 +43,6 @@
 	}
 
 	.time {
-		@apply text-opacity-50 text-sm;
+		@apply text-sm text-opacity-50;
 	}
 </style>

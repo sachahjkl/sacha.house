@@ -27,16 +27,14 @@
 
 <style lang="postcss">
 	time {
-		@apply border-2 rounded-sm border-zinc-900  px-2 py-1
-         text-2xl shadow text-center block drop-shadow-md my-auto
-		 cursor-pointer text-red-600 italic flex-grow-0 h-min select-none;
+		@apply my-auto block h-min flex-grow-0 cursor-pointer select-none rounded-sm border-2 border-zinc-900 px-2 py-1 text-center text-2xl italic text-red-600 shadow drop-shadow-md;
 		background-color: rgb(31, 0, 0);
 	}
 
 	.text {
 		--color: rgb(230, 67, 67);
 		text-shadow: 0 0 5px var(--color);
-		@apply inline-block w-auto mx-auto relative rounded;
+		@apply relative mx-auto inline-block w-auto rounded;
 		font-family: 'Digital-7', 'monospace';
 		transition-property: text-shadow, color;
 		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -44,7 +42,7 @@
 	}
 
 	.char-grid {
-		@apply opacity-25 absolute left-0;
+		@apply absolute left-0 opacity-25;
 	}
 
 	time:hover .text {

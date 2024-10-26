@@ -10,36 +10,36 @@
 	let { navItems = [], activePagePathname = '', openNav = $bindable(false) }: Props = $props();
 </script>
 
-<header class="p-3 sticky top-0 z-10 bg-bgColor">
+<header class="sticky top-0 z-10 bg-bgColor p-3">
 	<nav data-sveltekit-preload-data>
-		<fieldset class="border-2 p-2 px-4 border-textColor">
-			<legend class="px-2 ml-3">Navigation</legend>
-			<ul class="gap-3 flex-wrap whitespace-nowrap hidden sm:flex">
+		<fieldset class="border-2 border-textColor p-2 px-4">
+			<legend class="ml-3 px-2">Navigation</legend>
+			<ul class="hidden flex-wrap gap-3 whitespace-nowrap sm:flex">
 				{#each navItems as item, i}
-					<li class="sm:flex-none flex-[100%]">
+					<li class="flex-[100%] sm:flex-none">
 						<a class:active={activePagePathname === item.pathname} href={item.pathname}>
 							{item.icon}
 							{item.title}
 						</a>
 					</li>
 					{#if i != navItems.length - 1}
-						<li class="border-r-2 border-textColor hidden sm:inline-block"></li>
+						<li class="hidden border-r-2 border-textColor sm:inline-block"></li>
 					{/if}
 				{/each}
 			</ul>
 
-			<details class="sm:hidden block" bind:open={openNav}>
+			<details class="block sm:hidden" bind:open={openNav}>
 				<summary class="mb-1">{openNav ? 'open' : 'closed'}</summary>
-				<ul class="flex gap-3 flex-wrap whitespace-nowrap">
+				<ul class="flex flex-wrap gap-3 whitespace-nowrap">
 					{#each navItems as item, i}
-						<li class="sm:flex-none flex-[100%]">
+						<li class="flex-[100%] sm:flex-none">
 							<a class:active={activePagePathname === item.pathname} href={item.pathname}>
 								{item.icon}
 								{item.title}
 							</a>
 						</li>
 						{#if i != navItems.length - 1}
-							<li class="border-r-2 border-textColor hidden sm:inline-block"></li>
+							<li class="hidden border-r-2 border-textColor sm:inline-block"></li>
 						{/if}
 					{/each}
 				</ul>

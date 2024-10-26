@@ -39,10 +39,10 @@
 {description}"
 >
 	<div
-		class="h-32 card card-side flex overflow-hidden bg-bgColor text-textColor border-4 hover:border-textColor border-bgColor"
+		class="card card-side flex h-32 overflow-hidden border-4 border-bgColor bg-bgColor text-textColor hover:border-textColor"
 	>
 		{#if avatarUrl}
-			<div class="w-32 grid shrink-0 place-content-center">
+			<div class="grid w-32 shrink-0 place-content-center">
 				<figure>
 					<img loading="lazy" src={avatarUrl} alt="avatar" />
 				</figure>
@@ -59,8 +59,8 @@
 				</span>
 			</div>
 		{/if}
-		<div class="overflow-hidden w-full text-textColor p-0">
-			<h2 class="ps-2 font-bold bg-textColor text-bgColor">{name}</h2>
+		<div class="w-full overflow-hidden p-0 text-textColor">
+			<h2 class="bg-textColor ps-2 font-bold text-bgColor">{name}</h2>
 			<div bind:this={descriptionEl} class="description ps-2">
 				{@html descriptionHtml || '😞 Pas de description ... '}
 			</div>
@@ -75,11 +75,10 @@
 
 	.letter-box {
 		--color: lightred;
-		@apply bg-[color:var(--color)] w-32 grid shrink-0 place-content-center;
+		@apply grid w-32 shrink-0 place-content-center bg-[color:var(--color)];
 	}
 
 	.letter {
-		@apply w-12 h-12 flex place-items-center place-content-center text-3xl
-		rounded bg-neutral-900 text-neutral-100 shadow-sm bg-opacity-50;
+		@apply flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900 bg-opacity-50 text-3xl text-neutral-100 shadow-sm;
 	}
 </style>

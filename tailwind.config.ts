@@ -1,9 +1,9 @@
-import tailwindTypography from '@tailwindcss/typography';
+import typography from '@tailwindcss/typography';
+import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
-/** @type {import('tailwindcss').Config} */
 export default {
-	content: ['./src/routes/**/*.{svelte,js,ts}', './src/lib/**/*.{svelte,js,ts}'],
+	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
 		fontFamily: {
 			sans: ['monospace', ...defaultTheme.fontFamily.mono, 'Noto Color Emoji'],
@@ -66,5 +66,5 @@ export default {
 			})
 		}
 	},
-	plugins: [tailwindTypography]
-};
+	plugins: [typography]
+} as Config;

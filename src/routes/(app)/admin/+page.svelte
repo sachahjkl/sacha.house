@@ -37,7 +37,7 @@
 		<h2>🕵️ Adresse IP</h2>
 
 		<p>
-			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code class=" p-1 px-2 rounded"
+			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code class=" rounded p-1 px-2"
 				>{data.ip}</code
 			>
 		</p>
@@ -51,7 +51,7 @@
 			>.
 		</p>
 		{#if profileLoading}
-			<span class="animate-spin inline-block">⚙️</span> Chargement des données de crédits...
+			<span class="inline-block animate-spin">⚙️</span> Chargement des données de crédits...
 		{:else}
 			<p>
 				Il reste <b>{data.creditBalance} crédits</b> pour raffraichir ces données.
@@ -79,7 +79,7 @@
 		>
 			<button
 				type="submit"
-				class="refresh-linkedin flex gap-2 bg-textColor text-bgColor font-bold px-2"
+				class="refresh-linkedin flex gap-2 bg-textColor px-2 font-bold text-bgColor"
 			>
 				<div class="refresh-icon">⚙️</div>
 				<span class="hover:underline"> Rafraichir le profil (coûte 1 crédit) </span>

@@ -11,7 +11,7 @@
 
 <div in:fade class="avatarTitle">
 	<div in:fly={{ x: -50 }} class="avatar">
-		<div class="w-[2em] rounded-full ring ring-primary ring-offset-2">
+		<div class="ring-primary w-[2em] rounded-full ring ring-offset-2">
 			<img src={imgSrc} alt="title" />
 		</div>
 	</div>
@@ -26,7 +26,7 @@
 	}
 
 	.avatar {
-		@apply mx-2 hover:scale-95 active:scale-105 transition-transform;
+		@apply mx-2 transition-transform hover:scale-95 active:scale-105;
 	}
 
 	img {

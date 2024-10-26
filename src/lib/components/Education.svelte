@@ -23,9 +23,9 @@
 	<h3 class="mb-0 font-bold">
 		{titre}
 	</h3>
-	<h4 class="italic font-normal">
+	<h4 class="font-normal italic">
 		{#if lieu.website}
-			<a class="no-underline hover:underline text-opacity-70" href={lieu.website}>{lieu.name} 🔗</a>
+			<a class="text-opacity-70 no-underline hover:underline" href={lieu.website}>{lieu.name} 🔗</a>
 		{:else}
 			{lieu.name}
 		{/if}

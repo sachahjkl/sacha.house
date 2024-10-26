@@ -27,10 +27,10 @@
 
 <style lang="postcss">
 	pre {
-		@apply whitespace-pre-wrap  max-h-[400px] overflow-y-auto shadow;
+		@apply max-h-[400px] overflow-y-auto whitespace-pre-wrap shadow;
 	}
 
 	pre * {
-		@apply break-all whitespace-pre-wrap;
+		@apply whitespace-pre-wrap break-all;
 	}
 </style>
