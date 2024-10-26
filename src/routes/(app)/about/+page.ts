@@ -10,7 +10,7 @@ export const load = async ({ fetch }) => {
 			profile
 		},
 		seo: {
-			title: `à propos / ${SITE_TITLE}`,
+			title: `about / ${SITE_TITLE}`,
 			description: `Présentation de ${PRETTY_PRENOM} ${PRETTY_NOM}. on peut y retrouver mes détails de contact, mon CV et une brève présentation de qui je suis.`,
 			image: picSrc
 		}

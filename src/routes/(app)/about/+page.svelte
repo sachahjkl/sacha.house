@@ -9,7 +9,7 @@
 </script>
 
 <article class="prose max-w-full">
-	<h1 class="h1">à propos</h1>
+	<h1 class="h1">about</h1>
 	<section>
 		<div class="avatar block mx-auto">
 			<Avatar />

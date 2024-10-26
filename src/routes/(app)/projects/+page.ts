@@ -10,7 +10,7 @@ export const load = async ({ fetch }) => {
 			projects
 		},
 		seo: {
-			title: `projets / ${SITE_TITLE}`,
+			title: `projects / ${SITE_TITLE}`,
 			description: 'Mes projets personnels'
 		}
 	};

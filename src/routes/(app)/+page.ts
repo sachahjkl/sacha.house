@@ -7,7 +7,7 @@ export const load = async () => {
 	return {
 		// visites,
 		seo: {
-			title: `accueil / ${SITE_TITLE}`
+			title: `home / ${SITE_TITLE}`
 		}
 	};
 };
