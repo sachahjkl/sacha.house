@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { run } from 'svelte/legacy';
 
-	import { DEFAULTS, init_game_state, scale, type GameState, type InputState } from '$lib/pong';
+	import { DEFAULT_INPUT_STATE, DEFAULTS, init_game_state, scale, type GameState, type InputState } from '$lib/pong';
 	import { one_second_in_ms as ONE_SECOND_IN_MS } from '$lib/utils';
 	import { onMount } from 'svelte';
 
@@ -23,9 +23,9 @@
 	}
 
 	let {
-		input,
-		width = 500,
-		height = 500,
+		input = $bindable(DEFAULT_INPUT_STATE),
+		width = $bindable(500),
+		height = $bindable(500),
 		currentScale = $bindable(1),
 		debug = false,
 		playing = $bindable(false),
@@ -35,13 +35,13 @@
 	}: Props = $props();
 	let cause: [boolean, string][] = $derived(error?.cause as [boolean, string][]);
 
-	let gameState: GameState = $state();
+	let gameState: GameState = $state() as GameState;
 
 
 
 
 
-	let canvas: HTMLCanvasElement = $state();
+	let canvas: HTMLCanvasElement = $state() as HTMLCanvasElement;
 
 	const computeScale = (width: number, height: number) => {
 		if (typeof window === 'undefined') return;

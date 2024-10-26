@@ -19,7 +19,7 @@
 	}: Props = $props();
 	const [h, s, l] = randomColorHSL();
 
-	let descriptionEl: HTMLElement = $state();
+	let descriptionEl: HTMLElement = $state() as HTMLElement;
 
 	onMount(() => {
 		const onResize = debounce(() => {

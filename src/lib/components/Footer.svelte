@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
 	import ExternalLinkIcon from '$lib/icons/ExternalLinkIcon.svelte';
+	import type { Snippet } from 'svelte';
 
-	interface Props {
+	interface FooterProps {
 		commitHash?: string;
+		children?: Snippet;
 	}
 
-	let { commitHash = 'unknown' }: Props = $props();
+	let { commitHash = 'unknown' }: FooterProps = $props();
 	const year = new Date().getFullYear();
 </script>
 

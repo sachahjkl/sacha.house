@@ -16,7 +16,7 @@
 	let height: number = $state(DEFAULTS.screen.height);
 	let width: number = $state(DEFAULTS.screen.width);
 
-	let currentScale: number = $state();
+	let currentScale: number = $state(1);
 
 	let input = $state({ ...DEFAULT_INPUT_STATE });
 
@@ -105,7 +105,7 @@
 	<title>Ping 👉 Pong</title>
 </svelte:head>
 
-<main >
+<main>
 	<p>
 		<a class=" opacity-60" href="/" title="Home"
 			><span class="rotate-180 inline-block">➜</span> 🏡 Retour à l'accueil</a

@@ -8,5 +8,5 @@ export const updateCounter = async (..._: unknown[]) => {
 };
 
 export const getCounter = async () => {
-	return;
+	return 0;
 };

@@ -10,12 +10,12 @@
 	import Header from '$lib/components/Header.svelte';
 	import { PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
 	import { addSnow, isChristmas } from '$lib/utils';
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import type { LayoutServerData } from './$types';
 
 	interface Props {
 		data: LayoutServerData;
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
 	let { data, children }: Props = $props();

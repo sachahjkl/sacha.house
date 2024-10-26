@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
+	import type { PageData } from './$types';
 
 	interface Props {
-		data: any;
+		data: PageData;
 	}
 
 	let { data }: Props = $props();
-	let post: typeof data.post = $state(data.post);
-	run(() => {
+	let post = $state(data.post);
+	$effect(() => {
 		post = data.post;
+		
 	});
-	const createdAt = new Date(Date.parse(post.createdAt));
-	const updatedAt = new Date(Date.parse(post.updatedAt));
+	const createdAt = $derived(new Date(Date.parse(post.createdAt)));
+	const updatedAt = $derived(new Date(Date.parse(post.updatedAt)));
 </script>
 
 <svelte:head>
