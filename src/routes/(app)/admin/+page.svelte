@@ -2,9 +2,10 @@
 	import { enhance } from '$app/forms';
 	import { env } from '$env/dynamic/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
+	import type { PageData } from '../$types';
 
 	interface Props {
-		data: any;
+		data: PageData;
 	}
 
 	let { data = $bindable() }: Props = $props();
@@ -20,8 +21,9 @@
 	let profileLoading = $state(false);
 
 	let profileStringifiedPretty = JSON.stringify(data.profile, null, 1);
-	let code: string = $derived(profileLoading ? 'Chargement des données du profil...' : profileStringifiedPretty);
-	
+	let code: string = $derived(
+		profileLoading ? 'Chargement des données du profil...' : profileStringifiedPretty
+	);
 </script>
 
 <svelte:head>

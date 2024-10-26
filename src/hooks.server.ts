@@ -10,8 +10,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		})
 	) {
 		error(401, {
-        			message: 'Pas autorisé à exécuter cette action.'
-        		});
+			message: 'Pas autorisé à exécuter cette action.'
+		});
 		return new Response(null, {
 			status: 401,
 			headers: {

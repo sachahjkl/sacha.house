@@ -1,6 +1,8 @@
 <script lang="ts">
+	import type { PageData } from '../$types';
+
 	interface Props {
-		data: any;
+		data: PageData;
 	}
 
 	let { data }: Props = $props();

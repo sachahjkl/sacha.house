@@ -3,26 +3,26 @@
 	import gitlabSrc from '$lib/assets/gitlab.png';
 	import Project from '$lib/components/Project.svelte';
 	import { MOI } from '$lib/me';
+	import type { PageData } from '../$types';
 
 	interface Props {
-		data: any;
+		data: PageData;
 	}
 
 	let { data }: Props = $props();
 </script>
 
-<article >
+<article>
 	<h1 class="h1">projects</h1>
-	<p>A collection of my work, including both completed and ongoing projects. These repositories were created to:</p>
+	<p>
+		A collection of my work, including both completed and ongoing projects. These repositories were
+		created to:
+	</p>
 	<ul class="list-[square] list-inside ms-4">
 		<li>Explore new technologies</li>
+		<li>Practice project management, design, and software architecture</li>
 		<li>
-			Practice project management, design, and software architecture
-		</li>
-		<li>
-			Collaborate on personal projects (<a href={MOI.links.hayekfr.toString()}>
-				website example
-			</a>
+			Collaborate on personal projects (<a href={MOI.links.hayekfr.toString()}> website example </a>
 			and its <a href={MOI.links.hayekfrRepo.toString()}>repository</a>, task automation, etc.)
 		</li>
 		<li>Organize academic work</li>

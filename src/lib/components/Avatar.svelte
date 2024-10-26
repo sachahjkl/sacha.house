@@ -13,7 +13,8 @@
 </div>
 
 <style lang="postcss">
-	.me, picture {
+	.me,
+	picture {
 		@apply m-0;
 	}
 </style>

@@ -38,7 +38,9 @@
 	title="{name}
 {description}"
 >
-	<div class="h-32 card card-side flex overflow-hidden bg-bgColor text-textColor border-4 hover:border-textColor border-bgColor">
+	<div
+		class="h-32 card card-side flex overflow-hidden bg-bgColor text-textColor border-4 hover:border-textColor border-bgColor"
+	>
 		{#if avatarUrl}
 			<div class="w-32 grid shrink-0 place-content-center">
 				<figure>

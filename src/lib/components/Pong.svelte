@@ -1,6 +1,12 @@
 <script lang="ts">
-	
-	import { DEFAULT_INPUT_STATE, DEFAULTS, init_game_state, scale, type GameState, type InputState } from '$lib/pong';
+	import {
+		DEFAULT_INPUT_STATE,
+		DEFAULTS,
+		init_game_state,
+		scale,
+		type GameState,
+		type InputState
+	} from '$lib/pong';
 	import { one_second_in_ms as ONE_SECOND_IN_MS } from '$lib/utils';
 	import { onMount } from 'svelte';
 
@@ -35,10 +41,6 @@
 	let cause: [boolean, string][] = $derived(error?.cause as [boolean, string][]);
 
 	let gameState: GameState = $state() as GameState;
-
-
-
-
 
 	let canvas: HTMLCanvasElement = $state() as HTMLCanvasElement;
 
@@ -249,7 +251,7 @@
 			window.removeEventListener('resize', dynamicRescale);
 		};
 	});
-	
+
 	$effect(() => {
 		console.info('reset', reset);
 		if (reset) {

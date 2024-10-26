@@ -1,8 +1,7 @@
 <script lang="ts">
-	
 	interface Props {
 		value?: string;
-		clickCallback?: any;
+		clickCallback?: () => void;
 	}
 
 	let { value = '', clickCallback = () => undefined }: Props = $props();

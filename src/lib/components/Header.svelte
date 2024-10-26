@@ -29,7 +29,7 @@
 			</ul>
 
 			<details class="sm:hidden block" bind:open={openNav}>
-				<summary class="mb-1" >{openNav ? 'open' : 'closed'}</summary>
+				<summary class="mb-1">{openNav ? 'open' : 'closed'}</summary>
 				<ul class="flex gap-3 flex-wrap whitespace-nowrap">
 					{#each navItems as item, i}
 						<li class="sm:flex-none flex-[100%]">

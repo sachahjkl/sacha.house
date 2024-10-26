@@ -21,7 +21,7 @@
 </script>
 
 <section>
-	<h3 class="mb-0 font-bold  text-opacity-50">
+	<h3 class="mb-0 font-bold text-opacity-50">
 		{#if lieu.website}
 			<a class="no-underline hover:underline font-bold" href={lieu.website}>{lieu.name} 🔗</a>
 		{:else}

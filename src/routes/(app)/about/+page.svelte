@@ -4,9 +4,10 @@
 	import Education from '$lib/components/Education.svelte';
 	import Experience from '$lib/components/Experience.svelte';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
+	import type { PageData } from '../$types';
 
 	interface Props {
-		data: any;
+		data: PageData;
 	}
 
 	let { data }: Props = $props();
@@ -27,8 +28,8 @@
 		<p>I'm a software engineer. I strive to produce simple, high-quality work.</p>
 
 		<p>
-			Feel free to <a href="mailto:{MOI.mail}">send me an email</a> about what you think
-			of this site or any other topic that might interest me (work, discussion, project, ...).
+			Feel free to <a href="mailto:{MOI.mail}">send me an email</a> about what you think of this site
+			or any other topic that might interest me (work, discussion, project, ...).
 		</p>
 		<p>
 			You can <b>find my resume</b> by clicking

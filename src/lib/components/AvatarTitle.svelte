@@ -15,7 +15,9 @@
 			<img src={imgSrc} alt="title" />
 		</div>
 	</div>
-	<span in:fly={{ x: 50 }} class="title">{#if children}{@render children()}{:else}My Title{/if}</span>
+	<span in:fly={{ x: 50 }} class="title"
+		>{#if children}{@render children()}{:else}My Title{/if}</span
+	>
 </div>
 
 <style lang="postcss">

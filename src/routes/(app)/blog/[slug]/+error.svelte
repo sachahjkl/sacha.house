@@ -6,7 +6,7 @@
 	<p>
 		<a href="/blog" class=" opacity-60">
 			<span class="rotate-180 inline-block">➜</span> Go back to the articles list
-			</a>
+		</a>
 	</p>
 	<h1>{$page.status}</h1>
 	<p>{$page.error?.message}</p>

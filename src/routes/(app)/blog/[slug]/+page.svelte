@@ -10,7 +10,6 @@
 	let post = $state(data.post);
 	$effect(() => {
 		post = data.post;
-		
 	});
 	const createdAt = $derived(new Date(Date.parse(post.createdAt)));
 	const updatedAt = $derived(new Date(Date.parse(post.updatedAt)));
