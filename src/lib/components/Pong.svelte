@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
+	
 	import { DEFAULT_INPUT_STATE, DEFAULTS, init_game_state, scale, type GameState, type InputState } from '$lib/pong';
 	import { one_second_in_ms as ONE_SECOND_IN_MS } from '$lib/utils';
 	import { onMount } from 'svelte';
@@ -251,7 +250,7 @@
 		};
 	});
 	
-	run(() => {
+	$effect(() => {
 		console.info('reset', reset);
 		if (reset) {
 			const state = initGameState();
@@ -268,18 +267,18 @@
 		}
 	});
 	// Update screen game state when height/width changes from outside (from props)
-	run(() => {
+	$effect(() => {
 		if (gameState) {
 			gameState.screen = { height, width };
 			gameState.playing = playing;
 		}
 	});
-	run(() => {
+	$effect(() => {
 		console.log('Playing changed !', playing);
 	});
 	// export let wantedFramerate = 60;
 
-	run(() => {
+	$effect(() => {
 		computeScale(width, height);
 	});
 </script>

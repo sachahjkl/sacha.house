@@ -5,7 +5,6 @@
 	import { throttle } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
-	import { themeChange } from 'theme-change';
 
 	let playing = $state(true);
 	let garbageMode = $state(false);
@@ -89,7 +88,6 @@
 	};
 
 	onMount(() => {
-		themeChange(false);
 		window.addEventListener('keydown', handleInputDown, false);
 		window.addEventListener('keyup', handleInputUp, false);
 		// window.addEventListener('keydown', handlePause, false);
@@ -108,7 +106,7 @@
 <main>
 	<p>
 		<a class=" opacity-60" href="/" title="Home"
-			><span class="rotate-180 inline-block">➜</span> 🏡 Retour à l'accueil</a
+			><span class="rotate-180 inline-block">➜</span> 🏡 go back home</a
 		>
 	</p>
 	<h1 class="text-3xl font-bold mb-[1em]">Pong :</h1>
@@ -210,7 +208,7 @@
 					>
 					<label for="scale">
 						Scale: <input
-							class="px-2"
+							class="px-2 text-textColor bg-bgColor border-2 border-textColor"
 							type="text"
 							name="scale"
 							id="scale"

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
+	
 	interface Props {
 		value?: string;
 		clickCallback?: any;
@@ -10,7 +9,7 @@
 
 	// let text: HTMLSpanElement;
 	let characters = $state(20);
-	run(() => {
+	$effect(() => {
 		characters = value.length;
 	});
 </script>

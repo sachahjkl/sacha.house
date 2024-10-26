@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import Prism from 'prismjs';
 	import { onMount } from 'svelte';
 
@@ -11,7 +9,7 @@
 	let { language = '', code = '' } = $props();
 	let formattedCode = $state(code);
 
-	run(() => {
+	$effect(() => {
 		formattedCode = Prism.highlight(code, Prism.languages[language], language);
 	});
 
