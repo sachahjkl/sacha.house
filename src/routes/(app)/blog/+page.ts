@@ -23,9 +23,7 @@ export const load = async () => {
 	};
 
 	return {
-		streaming: {
-			posts: getPosts()
-		},
+		posts: getPosts(),
 		seo: {
 			title: `blog / ${SITE_TITLE}`,
 			description:

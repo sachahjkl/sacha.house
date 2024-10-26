@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageData } from '../$types';
+	import type { PageData } from './$types';
 
 	interface Props {
 		data: PageData;
@@ -12,7 +12,7 @@
 	<h1 class="h1">blog</h1>
 
 	<h2 class="mb-2 font-bold">📰 Available articles</h2>
-	{#await data.streaming.posts}
+	{#await data.posts}
 		<p>Loading ...</p>
 	{:then posts}
 		<ul data-sveltekit-preload-data class="ms-4 list-inside list-[square]">

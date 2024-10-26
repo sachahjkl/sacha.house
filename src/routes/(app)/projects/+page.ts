@@ -6,9 +6,7 @@ export const load = async ({ fetch }) => {
 		.then<ProjetsResponse>((res) => res.json())
 		.catch<ProjetsResponse>(() => ({ github: [], gitlab: [] }));
 	return {
-		streaming: {
-			projects
-		},
+		projects: projects,
 		seo: {
 			title: `projects / ${SITE_TITLE}`,
 			description: 'Mes projets personnels'

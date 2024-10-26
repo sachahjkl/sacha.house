@@ -2,10 +2,10 @@
 	import { enhance } from '$app/forms';
 	import { env } from '$env/dynamic/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
-	import type { PageData } from '../$types';
+	import type { PageServerData } from './$types';
 
 	interface Props {
-		data: PageData;
+		data: PageServerData;
 	}
 
 	let { data = $bindable() }: Props = $props();

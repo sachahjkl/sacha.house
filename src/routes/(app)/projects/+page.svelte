@@ -3,7 +3,7 @@
 	import gitlabSrc from '$lib/assets/gitlab.png';
 	import Project from '$lib/components/Project.svelte';
 	import { MOI } from '$lib/me';
-	import type { PageData } from '../$types';
+	import type { PageData } from './$types';
 
 	interface Props {
 		data: PageData;
@@ -39,7 +39,7 @@
 			<img class="title-logo" width="15" src={gitlabSrc} alt="GitLab Logo" /> GitLab /
 			<a href={MOI.gitlab.toString()}>@{MOI.gitlab.pathname.split('/').pop()}</a>
 		</h2>
-		{#await data.streaming.projects}
+		{#await data.projects}
 			<p>Loading projects...</p>
 		{:then projects}
 			<ul class="projects">
@@ -64,7 +64,7 @@
 			<img class="title-logo" src={githubSrc} alt="GitHub Logo" /> GitHub /
 			<a href={MOI.github.toString()}>@{MOI.github.pathname.split('/').pop()}</a>
 		</h2>
-		{#await data.streaming.projects}
+		{#await data.projects}
 			<p>Loading projects...</p>
 		{:then projects}
 			<ul class="projects">

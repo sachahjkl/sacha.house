@@ -4,7 +4,7 @@
 	import Education from '$lib/components/Education.svelte';
 	import Experience from '$lib/components/Experience.svelte';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
-	import type { PageData } from '../$types';
+	import type { PageData } from './$types';
 
 	interface Props {
 		data: PageData;
@@ -40,7 +40,7 @@
 	<section>
 		<h2 id="professional-details">🖥️ Professional Details</h2>
 		<hr class="mb-0" />
-		{#await data.streaming.profile}
+		{#await data.profile}
 			<p>Loading ...</p>
 		{:then profile}
 			{#each profile.experiences as experience, i (i)}
@@ -51,7 +51,7 @@
 	<section>
 		<h2 id="academic-background">🏫 Academic Background</h2>
 		<hr class="mb-0" />
-		{#await data.streaming.profile}
+		{#await data.profile}
 			<p>Loading ...</p>
 		{:then profile}
 			{#each profile.education as edu, i (i)}

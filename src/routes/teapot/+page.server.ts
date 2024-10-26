@@ -23,9 +23,7 @@ export async function load({ url }) {
 	}
 	return {
 		brewMessage,
-		streaming: {
-			brewTypes: drinks
-		},
+		brewTypes: drinks,
 		spewage: (Math.random() + 1).toString(36).substring(7)
 	};
 }
