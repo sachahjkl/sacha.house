@@ -6,27 +6,25 @@
 	// export let data;
 </script>
 
-<article class="prose">
+<article>
+	<h1 class="text-3xl font-bold">Welcome to my website</h1>
 
-	
-	<TitleArt/>
-
-	<h1>Welcome to my website</h1>
+	<TitleArt />
 
 	<div class="divider" />
-	<h2 class="mt-2">Informations de contact / détails</h2>
-	<p data-sveltekit-preload-data>
-		➜ <a href="/a-propos">à propos de moi</a>
-	</p>
-	<p>
-		📧 <a href="mailto:{MOI.mail}">M'envoyer un mail</a>
-	</p>
-	<!-- <div class="visites md:hidden inline-block">
-		<ClockDisplay value={`${data.visites} visites`} />
-	</div> -->
-	<div class="divider" />
+	<h2 class="mt-2 font-bold">Quick links</h2>
+
+	<ul class="ms-8">
+		<li><a href="/about">➜ about me</a></li>
+		<li><a href="mailto:{MOI.mail}">📧 shoot me an email (will reply asap)</a></li>
+	</ul>
+
+	<div class="divider mt-4" />
 	<Illustration />
 </article>
 
 <style lang="postcss">
+	a:hover {
+		@apply underline;
+	}
 </style>

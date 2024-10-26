@@ -1,9 +1,9 @@
-import { GET_POST } from '$lib/queries';
-import { GraphQLClient } from 'graphql-request';
+import { env } from '$env/dynamic/public';
 import type { Post } from '$lib/interfaces/Post';
 import { SITE_TITLE } from '$lib/me';
-import { env } from '$env/dynamic/public';
+import { GET_POST } from '$lib/queries';
 import { error } from '@sveltejs/kit';
+import { GraphQLClient } from 'graphql-request';
 
 export const load = async ({ params, url }) => {
 	const getPost = async () => {

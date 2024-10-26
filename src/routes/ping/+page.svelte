@@ -111,25 +111,25 @@
 			><span class="rotate-180 inline-block">➜</span> 🏡 Retour à l'accueil</a
 		>
 	</p>
-	<h1>Pong :</h1>
+	<h1 class="text-3xl font-bold mb-[1em]">Pong :</h1>
 
-	<div class="mb-6">
+	<div class="mb-[1em] flex gap-[1em]">
 		<button
-			class="btn btn-sm btn-primary"
+			class="bg-textColor text-bgColor px-2"
 			title="Click to pause the game (or click on the game itself)"
 			on:click={() => (playing = !playing)}
 		>
 			{playing ? '⏸ Pause' : '▶ Play '}
 		</button>
 		<button
-			class="btn btn-sm btn-error"
+			class="bg-textColor text-bgColor px-2"
 			title="Reset the game"
 			on:click={throttle(function () {
 				console.log('test');
 			}, 1000)}>🔄 Reset</button
 		>
 	</div>
-	<div class="flex place-content-center">
+	<div class="flex place-content-center mb-4">
 		<div class="ctnr relative transition bg-black shadow-xl border-yellow-500 border-4">
 			<Pong
 				bind:error
@@ -160,7 +160,7 @@
 	{#if !error}
 		<div class="flex justify-items-stretch flex-wrap">
 			<div id="settings" class="flex-grow flex-shrink basis-[400px]">
-				<h2>Settings</h2>
+				<h2 class="text-2xl font-bold mb-2">Settings</h2>
 
 				<div class="flex gap-2 flex-col">
 					<label for="height">
@@ -258,7 +258,6 @@
 	main {
 		@apply max-w-5xl m-auto mt-6 p-4;
 	}
-
 	#instructions h3 {
 		@apply mt-0;
 	}

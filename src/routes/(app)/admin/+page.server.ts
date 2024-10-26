@@ -1,10 +1,10 @@
 import { MOI, SITE_TITLE } from '$lib/me';
 
-import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
 import { env as envPriv } from '$env/dynamic/private';
 import { env as envPub } from '$env/dynamic/public';
+import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
+import { updateCounter } from '$lib/server/countapi';
 import { fail } from '@sveltejs/kit';
-import { updateCounter } from '$lib/countapi';
 
 export const load = async ({ getClientAddress, fetch }) => {
 	const creditBalance = await fetch('/api/creditBalance')

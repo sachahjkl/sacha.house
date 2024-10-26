@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { navigating, page } from '$app/stores';
+	import { page } from '$app/stores';
 	import '$lib/app.css';
 	import faviconFallback from '$lib/assets/favicon_shadow.png?w=16&imagetools';
 	import {
@@ -10,24 +10,16 @@
 	import Header from '$lib/components/Header.svelte';
 	import { PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
 	import { addSnow, isChristmas } from '$lib/utils';
-	import nProgress from 'nprogress';
 	import { onMount } from 'svelte';
 	import type { LayoutServerData } from './$types';
 
 	export let data: LayoutServerData;
 
 	onMount(() => {
-		nProgress.configure({ easing: 'ease', speed: 500 });
 		if (isChristmas()) {
 			addSnow(document);
 		}
 
-		return () => {
-			nProgress.done();
-			nProgress.remove();
-		};
-
-		// doIntro = true;
 	});
 
 	const TITLE = SITE_TITLE;
@@ -35,13 +27,6 @@
 	const IMAGE = '/favicon_shadow.png';
 	const AUTHOR = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
 
-	$: {
-		if ($navigating) {
-			nProgress.start();
-		} else {
-			nProgress.done();
-		}
-	}
 </script>
 
 <svelte:head>
@@ -69,12 +54,12 @@
 
 <Header activePagePathname={$page.url.pathname} navItems={data.navItems} />
 
-<main>
+<main class="p-3 max-w-5xl m-auto pb-16">
 	<slot><!-- optional fallback --></slot>
 </main>
 
 <Footer commitHash={data.commitHash}>
-	<a slot="brand" href="/" data-sveltekit-preload-data>
+	<a href="/" data-sveltekit-preload-data>
 		<picture>
 			<source srcset={faviconAvif} type="image/avif" />
 			<source srcset={faviconWebp} type="image/webp" />
@@ -84,9 +69,6 @@
 </Footer>
 
 <style lang="postcss">
-	main {
-		@apply max-w-5xl m-auto mt-6 p-4;
-	}
 
 	img.favicon {
 		@apply inline-block align-text-top h-[1em] w-[1em];

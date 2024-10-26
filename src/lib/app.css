@@ -2,11 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-	width: 100%;
-}
 body {
-	@apply bg-bgColor text-textColor ;
+	@apply bg-bgColor text-textColor;
 }
 
 :root {
@@ -18,19 +15,4 @@ body {
 
 ._toastMsg {
 	@apply text-ellipsis overflow-hidden;
-}
-
-
-#nprogress .spinner-icon {
-	width: 18px;
-	height: 18px;
-	box-sizing: border-box;
-
-	border: solid 2px transparent;
-	border-top-color: hsl(var(--p));
-	border-left-color: hsl(var(--p));
-	border-radius: 50%;
-
-	-webkit-animation: nprogress-spinner 400ms linear infinite;
-	animation: nprogress-spinner 400ms linear infinite;
 }

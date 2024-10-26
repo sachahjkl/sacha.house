@@ -1,4 +1,4 @@
-import { getCounter } from '$lib/countapi';
+import { getCounter } from '$lib/server/countapi';
 
 export const GET = async () => {
 	const visites = await getCounter();

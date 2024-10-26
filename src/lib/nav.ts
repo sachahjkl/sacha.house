@@ -7,10 +7,10 @@ export interface NavItem {
 }
 
 const defaultNavItems: NavItem[] = [
-	{ icon: '🏡', title: 'accueil', pathname: '/' },
-	{ icon: '📁', title: 'projets', pathname: '/projets' },
+	{ icon: '🏡', title: 'home', pathname: '/' },
+	{ icon: '📁', title: 'projects', pathname: '/projects' },
 	{ icon: '📰', title: 'blog', pathname: '/blog' },
-	{ icon: '📜', title: 'à propos', pathname: '/a-propos' },
+	{ icon: '📜', title: 'about', pathname: '/about' },
 	{ icon: '🔒', title: 'admin', pathname: '/admin' }
 ];
 

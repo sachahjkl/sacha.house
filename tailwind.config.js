@@ -15,6 +15,7 @@ export default {
 		extend: {
 			colors: {
 				bgColor: '#000000',
+				bgOffColor: '#999999',
 				textColor: '#DDDDDD'
 			}
 		},

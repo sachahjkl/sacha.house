@@ -11,6 +11,7 @@ export const MOI = {
 	github: new URL('https://github.com/sachahjkl'),
 	gitlab: new URL('https://gitlab.com/sachahjkl'),
 	linkedin: new URL('https://www.linkedin.com/in/sachafroment/'),
+	homepage: new URL('https://sacha.house'),
 	mail: 'sacha@sacha.house',
 	curriculumVitae: new URL(
 		'https://mega.nz/file/bxUgHAKD#63H2N3PoF4s_FP8SK1l3W8qB1Day5fGta1qMqjsIg7c'

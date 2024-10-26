@@ -1,10 +1,10 @@
-import { GET_LATEST_COMMIT } from '$lib/queries';
-import { GraphQLClient } from 'graphql-request';
-import type { LatestCommit } from '$lib/interfaces/LatestCommit';
 import { env as envPriv } from '$env/dynamic/private';
 import { env as envPub } from '$env/dynamic/public';
+import type { LatestCommit } from '$lib/interfaces/LatestCommit';
 import { getAuthorizedNavItems } from '$lib/nav';
-import { updateCounter } from '$lib/countapi';
+import { GET_LATEST_COMMIT } from '$lib/queries';
+import { updateCounter } from '$lib/server/countapi';
+import { GraphQLClient } from 'graphql-request';
 
 export const load = async ({ fetch, getClientAddress, cookies }) => {
 	const clientAddress = getClientAddress();
