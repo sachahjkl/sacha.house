@@ -32,7 +32,7 @@ export const load = async ({ fetch, getClientAddress, cookies }) => {
 			});
 			return `${GL.project.repository.paginatedTree.nodes.at(0)?.lastCommit.sha}`;
 		} catch (error) {
-			console.error('Erreur à la récupération du hash de version du dépôt.');
+			console.error('Erreur à la récupération du hash de version du dépôt.', error);
 		}
 		return 'inconnu';
 	};

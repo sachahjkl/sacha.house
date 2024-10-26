@@ -39,7 +39,7 @@
 	const PAUSE_TIMEOUT_MS = 250;
 	const RESET_TIMEOUT_MS = 250;
 	let pauseTimeout: number = 0;
-	let resetTimeout: number = 0;
+	// let resetTimeout: number = 0;
 
 	const updateInput = (currentKey: string, state = false) => {
 		switch (currentKey) {

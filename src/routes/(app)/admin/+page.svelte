@@ -10,14 +10,6 @@
 
 	let { data = $bindable() }: Props = $props();
 
-	const toastCredits = (credits: number) => `
-	<strong>👍 Profil mis à jour !</strong><br>
-	Il te reste ${credits} crédit(s)`;
-
-	const toastError = (message: string) => `
-	<strong>💣 Une erreur a eu lieu</strong><br>
-	${message}`;
-
 	let profileLoading = $state(false);
 
 	let profileStringifiedPretty = JSON.stringify(data.profile, null, 1);
