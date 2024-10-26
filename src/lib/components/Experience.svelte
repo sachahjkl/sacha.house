@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { Experience } from '$lib/interfaces/LinkedinProfile';
 
-	export let experience: Experience;
+	interface Props {
+		experience: Experience;
+	}
+
+	let { experience }: Props = $props();
 	const titre = experience.title;
 	const compétences: string[] = [];
 	const { description } = experience;

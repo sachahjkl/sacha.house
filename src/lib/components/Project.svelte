@@ -2,14 +2,24 @@
 	import { debounce, randomColorHSL } from '$lib/utils';
 	import { onMount } from 'svelte';
 
-	export let description = 'N/A';
-	export let descriptionHtml = 'N/A';
-	export let name = 'Projet';
-	export let url = 'https://github.com/torvalds/linux';
-	export let avatarUrl = '';
+	interface Props {
+		description?: string;
+		descriptionHtml?: string;
+		name?: string;
+		url?: string;
+		avatarUrl?: string;
+	}
+
+	let {
+		description = 'N/A',
+		descriptionHtml = 'N/A',
+		name = 'Projet',
+		url = 'https://github.com/torvalds/linux',
+		avatarUrl = ''
+	}: Props = $props();
 	const [h, s, l] = randomColorHSL();
 
-	let descriptionEl: HTMLElement;
+	let descriptionEl: HTMLElement = $state();
 
 	onMount(() => {
 		const onResize = debounce(() => {

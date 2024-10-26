@@ -1,9 +1,17 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
 
-	export let data;
-	let post: typeof data.post = data.post;
-	$: post = data.post;
+	interface Props {
+		data: any;
+	}
+
+	let { data }: Props = $props();
+	let post: typeof data.post = $state(data.post);
+	run(() => {
+		post = data.post;
+	});
 	const createdAt = new Date(Date.parse(post.createdAt));
 	const updatedAt = new Date(Date.parse(post.updatedAt));
 </script>

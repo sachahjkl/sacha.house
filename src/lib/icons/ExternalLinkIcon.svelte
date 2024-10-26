@@ -1,5 +1,6 @@
 <script>
-	export let height = '15px';
+	/** @type {{height?: string}} */
+	let { height = '15px' } = $props();
 </script>
 
 <svg

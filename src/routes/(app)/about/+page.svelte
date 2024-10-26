@@ -5,7 +5,11 @@
 	import Experience from '$lib/components/Experience.svelte';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
 
-	export let data;
+	interface Props {
+		data: any;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <article class="prose max-w-full">
@@ -31,7 +35,7 @@
 			<a href={MOI.curriculumVitae.toString()}>here</a>.
 		</p>
 	</section>
-	<div class="divider" />
+	<div class="divider"></div>
 	<section>
 		<h2 id="professional-details">🖥️ Professional Details</h2>
 		<hr class="mb-0" />
@@ -54,7 +58,7 @@
 			{/each}
 		{/await}
 	</section>
-	<div class="divider" />
+	<div class="divider"></div>
 	<section>
 		<h2>🖋️ Contact</h2>
 		<p>Here's a list of my contact information:</p>

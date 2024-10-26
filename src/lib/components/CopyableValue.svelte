@@ -4,7 +4,11 @@
 
 	const toastMessage = (content: string) => `pasted "${content}"`;
 
-	export let value = '';
+	interface Props {
+		value?: string;
+	}
+
+	let { value = '' }: Props = $props();
 	const id = toId(value);
 </script>
 

@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
 
-	export let imgSrc = '/me.jpg';
+	interface Props {
+		imgSrc?: string;
+		children?: import('svelte').Snippet;
+	}
+
+	let { imgSrc = '/me.jpg', children }: Props = $props();
 </script>
 
 <div in:fade class="avatarTitle">
@@ -10,7 +15,7 @@
 			<img src={imgSrc} alt="title" />
 		</div>
 	</div>
-	<span in:fly={{ x: 50 }} class="title"><slot>My Title</slot></span>
+	<span in:fly={{ x: 50 }} class="title">{#if children}{@render children()}{:else}My Title{/if}</span>
 </div>
 
 <style lang="postcss">

@@ -13,20 +13,23 @@
 	import { onMount } from 'svelte';
 	import type { LayoutServerData } from './$types';
 
-	export let data: LayoutServerData;
+	interface Props {
+		data: LayoutServerData;
+		children?: import('svelte').Snippet;
+	}
+
+	let { data, children }: Props = $props();
 
 	onMount(() => {
 		if (isChristmas()) {
 			addSnow(document);
 		}
-
 	});
 
 	const TITLE = SITE_TITLE;
 	const DESCRIPTION = `Le site web personnel de ${PRETTY_PRENOM} ${PRETTY_NOM}`;
 	const IMAGE = '/favicon_shadow.png';
 	const AUTHOR = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
-
 </script>
 
 <svelte:head>
@@ -55,7 +58,7 @@
 <Header activePagePathname={$page.url.pathname} navItems={data.navItems} />
 
 <main class="p-3 max-w-5xl m-auto pb-16">
-	<slot><!-- optional fallback --></slot>
+	{#if children}{@render children()}{:else}<!-- optional fallback -->{/if}
 </main>
 
 <Footer commitHash={data.commitHash}>
@@ -69,7 +72,6 @@
 </Footer>
 
 <style lang="postcss">
-
 	img.favicon {
 		@apply inline-block align-text-top h-[1em] w-[1em];
 	}

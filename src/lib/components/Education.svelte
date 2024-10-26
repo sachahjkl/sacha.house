@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { Education } from '$lib/interfaces/LinkedinProfile';
 
-	export let education: Education;
+	interface Props {
+		education: Education;
+	}
+
+	let { education }: Props = $props();
 	const titre = `${education.degree_name} en ${education.field_of_study}`;
 	const lieu = { name: education.school, website: education?.school_linkedin_profile_url };
 	const startDate = new Date(

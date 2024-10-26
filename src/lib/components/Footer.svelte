@@ -2,7 +2,11 @@
 	import { env } from '$env/dynamic/public';
 	import ExternalLinkIcon from '$lib/icons/ExternalLinkIcon.svelte';
 
-	export let commitHash = 'unknown';
+	interface Props {
+		commitHash?: string;
+	}
+
+	let { commitHash = 'unknown' }: Props = $props();
 	const year = new Date().getFullYear();
 </script>
 

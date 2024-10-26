@@ -1,15 +1,19 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import Prism from 'prismjs';
 	import { onMount } from 'svelte';
 
 	const themeURL = '/prism-okaidia.css';
 	// const themeURL = "/prism-vsc-dark-plus.css"
 
-	export let language = '';
-	export let code = '';
-	let formattedCode = code;
+	/** @type {{language?: string, code?: string}} */
+	let { language = '', code = '' } = $props();
+	let formattedCode = $state(code);
 
-	$: formattedCode = Prism.highlight(code, Prism.languages[language], language);
+	run(() => {
+		formattedCode = Prism.highlight(code, Prism.languages[language], language);
+	});
 
 	onMount(async () => {
 		formattedCode = Prism.highlight(code, Prism.languages[language], language);

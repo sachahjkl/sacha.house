@@ -3,7 +3,11 @@
 	import { env } from '$env/dynamic/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
 
-	export let data;
+	interface Props {
+		data: any;
+	}
+
+	let { data = $bindable() }: Props = $props();
 
 	const toastCredits = (credits: number) => `
 	<strong>👍 Profil mis à jour !</strong><br>
@@ -13,11 +17,11 @@
 	<strong>💣 Une erreur a eu lieu</strong><br>
 	${message}`;
 
-	let profileLoading = false;
+	let profileLoading = $state(false);
 
 	let profileStringifiedPretty = JSON.stringify(data.profile, null, 1);
-	let code: string;
-	$: code = profileLoading ? 'Chargement des données du profil...' : profileStringifiedPretty;
+	let code: string = $derived(profileLoading ? 'Chargement des données du profil...' : profileStringifiedPretty);
+	
 </script>
 
 <svelte:head>
@@ -36,7 +40,7 @@
 			>
 		</p>
 	</section>
-	<div class="divider" />
+	<div class="divider"></div>
 	<section>
 		<h2>👔 Données du profil LinkedIn</h2>
 		<p>

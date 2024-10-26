@@ -4,7 +4,11 @@
 	import Project from '$lib/components/Project.svelte';
 	import { MOI } from '$lib/me';
 
-	export let data;
+	interface Props {
+		data: any;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <article >
@@ -29,7 +33,7 @@
 	<p>
 		Most of my work is hosted on <b>GitLab</b>, with some minor projects on <b>GitHub</b>.
 	</p>
-	<div class="divider" />
+	<div class="divider"></div>
 	<section>
 		<h2 class="h2">
 			<img class="title-logo" width="15" src={gitlabSrc} alt="GitLab Logo" /> GitLab /
@@ -87,7 +91,7 @@
 
 	.projects {
 		@apply list-none max-h-[540px] p-0 overflow-y-scroll border-y-2 border-textColor
-		snap-y snap-mandatory flex flex-col gap-4;
+		snap-y snap-mandatory flex flex-col gap-4 mx-4;
 		scrollbar-width: thin;
 	}
 	.project {

@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { NavItem } from '$lib/nav';
 
-	export let navItems: NavItem[] = [];
-	export let activePagePathname = '';
-	export let openNav = false;
+	interface Props {
+		navItems?: NavItem[];
+		activePagePathname?: string;
+		openNav?: boolean;
+	}
+
+	let { navItems = [], activePagePathname = '', openNav = $bindable(false) }: Props = $props();
 </script>
 
 <header class="p-3 sticky top-0 z-10 bg-bgColor">
@@ -19,7 +23,7 @@
 						</a>
 					</li>
 					{#if i != navItems.length - 1}
-						<li class="border-r-2 border-textColor hidden sm:inline-block" />
+						<li class="border-r-2 border-textColor hidden sm:inline-block"></li>
 					{/if}
 				{/each}
 			</ul>
@@ -35,7 +39,7 @@
 							</a>
 						</li>
 						{#if i != navItems.length - 1}
-							<li class="border-r-2 border-textColor hidden sm:inline-block" />
+							<li class="border-r-2 border-textColor hidden sm:inline-block"></li>
 						{/if}
 					{/each}
 				</ul>

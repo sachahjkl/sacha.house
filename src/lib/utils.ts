@@ -75,7 +75,7 @@ export const addSnow = (document: Document) => {
 	let embedimSnow = document.getElementById('embedim--snow');
 	if (!embedimSnow) {
 		let embCSS =
-			'.embedim-snow{position: absolute;width: 20px;height: 20px;background: white;border-radius: 50%;margin-top:-10px; border: 2px solid rgba(0,0,0,0.3); filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));}';
+			'.embedim-snow{user-select: none;position: absolute;width: 20px;height: 20px;background: white;border-radius: 50%;margin-top:-10px; border: 2px solid rgba(0,0,0,0.3); filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));}';
 		let embHTML = '';
 		for (let n = 1; n < 200; n++) {
 			const i = n + 1;

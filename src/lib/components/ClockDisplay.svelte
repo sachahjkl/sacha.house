@@ -1,14 +1,22 @@
 <script lang="ts">
-	export let value = '';
-	export let clickCallback = () => undefined;
+	import { run } from 'svelte/legacy';
+
+	interface Props {
+		value?: string;
+		clickCallback?: any;
+	}
+
+	let { value = '', clickCallback = () => undefined }: Props = $props();
 
 	// let text: HTMLSpanElement;
-	let characters = 20;
-	$: characters = value.length;
+	let characters = $state(20);
+	run(() => {
+		characters = value.length;
+	});
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<time on:click={clickCallback} on:keypress={clickCallback}>
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<time onclick={clickCallback} onkeypress={clickCallback}>
 	<span class="text">
 		<span class="char-grid">
 			{Array.from(Array(characters - 1))

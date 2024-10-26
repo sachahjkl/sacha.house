@@ -7,18 +7,18 @@
 	import { slide } from 'svelte/transition';
 	import { themeChange } from 'theme-change';
 
-	let playing = true;
-	let garbageMode = false;
-	let debug = true;
-	let error: Error | null = null;
-	let reset = false;
+	let playing = $state(true);
+	let garbageMode = $state(false);
+	let debug = $state(true);
+	let error: Error | null = $state(null);
+	let reset = $state(false);
 
-	let height: number = DEFAULTS.screen.height;
-	let width: number = DEFAULTS.screen.width;
+	let height: number = $state(DEFAULTS.screen.height);
+	let width: number = $state(DEFAULTS.screen.width);
 
-	let currentScale: number;
+	let currentScale: number = $state();
 
-	let input = { ...DEFAULT_INPUT_STATE };
+	let input = $state({ ...DEFAULT_INPUT_STATE });
 
 	const KEYS = {
 		player1: {
@@ -117,14 +117,14 @@
 		<button
 			class="bg-textColor text-bgColor px-2"
 			title="Click to pause the game (or click on the game itself)"
-			on:click={() => (playing = !playing)}
+			onclick={() => (playing = !playing)}
 		>
 			{playing ? '⏸ Pause' : '▶ Play '}
 		</button>
 		<button
 			class="bg-textColor text-bgColor px-2"
 			title="Reset the game"
-			on:click={throttle(function () {
+			onclick={throttle(function () {
 				console.log('test');
 			}, 1000)}>🔄 Reset</button
 		>

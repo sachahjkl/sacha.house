@@ -11,7 +11,7 @@
 
 	<TitleArt />
 
-	<div class="divider" />
+	<div class="divider"></div>
 	<h2 class="h2">Quick links</h2>
 
 	<ul class="ms-8">
@@ -20,7 +20,7 @@
 		<li><a href="/teapot">🍵 teapot</a></li>
 	</ul>
 
-	<div class="divider mt-4" />
+	<div class="divider mt-4"></div>
 	<Illustration />
 </article>
 

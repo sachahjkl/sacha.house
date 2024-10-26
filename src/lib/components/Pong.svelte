@@ -1,59 +1,47 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { DEFAULTS, init_game_state, scale, type GameState, type InputState } from '$lib/pong';
 	import { one_second_in_ms as ONE_SECOND_IN_MS } from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	// Game display state
-	export let input: InputState;
-	export let width = 500; // reference width /!\ DO NOT MUTATE
-	export let height = 500; // reference height /!\ DO NOT MUTATE
-	export let currentScale = 1;
 
 	// Flags
-	export let debug: boolean = false;
-	export let playing: boolean = false;
-	export let garbageMode: boolean = true;
-	export let reset: boolean = false;
 
 	// Error
-	export let error: Error | null = null;
-	let cause: [boolean, string][];
-	$: cause = error?.cause as [boolean, string][];
-
-	let gameState: GameState;
-
-	// Update screen game state when height/width changes from outside (from props)
-	$: {
-		if (gameState) {
-			gameState.screen = { height, width };
-			gameState.playing = playing;
-		}
+	interface Props {
+		input: InputState;
+		width?: number;
+		height?: number;
+		currentScale?: number;
+		debug?: boolean;
+		playing?: boolean;
+		garbageMode?: boolean;
+		reset?: boolean;
+		error?: Error | null;
 	}
 
-	$: console.log('Playing changed !', playing);
+	let {
+		input,
+		width = 500,
+		height = 500,
+		currentScale = $bindable(1),
+		debug = false,
+		playing = $bindable(false),
+		garbageMode = true,
+		reset = false,
+		error = $bindable(null)
+	}: Props = $props();
+	let cause: [boolean, string][] = $derived(error?.cause as [boolean, string][]);
 
-	$: {
-		console.info('reset', reset);
-		if (reset) {
-			const state = initGameState();
+	let gameState: GameState = $state();
 
-			if (!state) {
-				console.error('failed to init state');
-			} else {
-				// at this point, we know that state can't be null
 
-				gameState = state;
 
-				state.playing = playing;
-			}
-		}
-	}
 
-	// export let wantedFramerate = 60;
 
-	$: computeScale(width, height);
-
-	let canvas: HTMLCanvasElement;
+	let canvas: HTMLCanvasElement = $state();
 
 	const computeScale = (width: number, height: number) => {
 		if (typeof window === 'undefined') return;
@@ -262,6 +250,38 @@
 			window.removeEventListener('resize', dynamicRescale);
 		};
 	});
+	
+	run(() => {
+		console.info('reset', reset);
+		if (reset) {
+			const state = initGameState();
+
+			if (!state) {
+				console.error('failed to init state');
+			} else {
+				// at this point, we know that state can't be null
+
+				gameState = state;
+
+				state.playing = playing;
+			}
+		}
+	});
+	// Update screen game state when height/width changes from outside (from props)
+	run(() => {
+		if (gameState) {
+			gameState.screen = { height, width };
+			gameState.playing = playing;
+		}
+	});
+	run(() => {
+		console.log('Playing changed !', playing);
+	});
+	// export let wantedFramerate = 60;
+
+	run(() => {
+		computeScale(width, height);
+	});
 </script>
 
 {#if cause}
@@ -276,8 +296,8 @@
 		bind:this={canvas}
 		width={width * currentScale}
 		height={height * currentScale}
-		on:click={() => {
+		onclick={() => {
 			playing = !playing;
 		}}
-	/>
+	></canvas>
 {/if}
