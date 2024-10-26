@@ -2,7 +2,7 @@
 	import '$lib/app.css';
 </script>
 
-<main class="prose">
+<main >
 	<slot />
 </main>
 

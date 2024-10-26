@@ -8,8 +8,8 @@
 	export let data;
 </script>
 
-<article class="prose">
-	<h1 class="">à propos</h1>
+<article class="prose max-w-full">
+	<h1 class="h1">à propos</h1>
 	<section>
 		<div class="avatar block mx-auto">
 			<Avatar />

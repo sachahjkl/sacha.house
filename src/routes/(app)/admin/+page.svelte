@@ -26,7 +26,7 @@
 	<meta name="robots" content="noindex nofollow" />
 </svelte:head>
 
-<article class="prose">
+<article>
 	<h1>admin</h1>
 
 	<section>

@@ -2,14 +2,14 @@
 	export let data;
 </script>
 
-<article class="prose">
-	<h1>blog</h1>
+<article >
+	<h1 class="h1">blog</h1>
 
-	<h2>📰 Liste des articles</h2>
+	<h2 class="font-bold mb-2">📰 Available articles</h2>
 	{#await data.streaming.posts}
 		<p>Loading ...</p>
 	{:then posts}
-		<ul data-sveltekit-preload-data>
+		<ul data-sveltekit-preload-data class="list-[square] list-inside ms-4">
 			{#each posts as post}
 				<li>
 					<a href="/blog/{post.slug}">{post.title}</a>
@@ -30,6 +30,10 @@
 <style lang="postcss">
 	article {
 		@apply mx-auto;
+	}
+
+	a {
+		@apply hover:underline;
 	}
 
 	.time {

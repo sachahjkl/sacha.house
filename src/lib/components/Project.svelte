@@ -28,11 +28,11 @@
 	title="{name}
 {description}"
 >
-	<div class="h-32 card card-side rounded overflow-hidden">
+	<div class="h-32 card card-side flex gap-4 overflow-hidden bg-bgColor text-textColor border-2 hover:border-textColor border-bgColor">
 		{#if avatarUrl}
-			<div class="w-32 grid shrink-0 place-content-center">
+			<div class="w-32 grid shrink-0 place-content-center p-4">
 				<figure>
-					<img loading="lazy" class="m-3 drop-shadow" src={avatarUrl} alt="avatar" />
+					<img loading="lazy" src={avatarUrl} alt="avatar" />
 				</figure>
 			</div>
 		{:else}
@@ -47,8 +47,8 @@
 				</span>
 			</div>
 		{/if}
-		<div class="card-body m-3 mr-6 p-0 project-info">
-			<h2 class="card-title">{name}</h2>
+		<div class="overflow-hidden w-full text-textColor m-3 mr-6 p-0">
+			<h2 class="ps-2 font-bold bg-textColor text-bgColor">{name}</h2>
 			<div bind:this={descriptionEl} class="description">
 				{@html descriptionHtml || '😞 Pas de description ... '}
 			</div>
@@ -57,19 +57,10 @@
 </a>
 
 <style lang="postcss">
-	:global(.card a) {
-		@apply focus:scale-105;
-	}
 	.description {
 		@apply line-clamp-2;
 	}
-	div.card {
-		@apply shadow m-2 hover:scale-95 active:scale-90 transition-transform;
-	}
 
-	.card-body {
-		@apply overflow-hidden;
-	}
 	.letter-box {
 		--color: lightred;
 		@apply bg-[color:var(--color)] w-32 grid shrink-0 place-content-center;

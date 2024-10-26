@@ -18,22 +18,26 @@
 	<meta property="og:article:author" content="{PRETTY_PRENOM} {PRETTY_NOM}" />
 </svelte:head>
 
-<article class="prose">
-	<p>
-		<a href="/blog" class=" opacity-60"
-			><span class="rotate-180 inline-block">➜</span> Retour à la liste des articles</a
-		>
-	</p>
-	<h1>{post.title}</h1>
-	<small
-		>créé le {createdAt.toLocaleDateString()} à {createdAt.toLocaleTimeString()} - dernière modification
-		le {updatedAt.toLocaleDateString()} à {updatedAt.toLocaleTimeString()}</small
+<p>
+	<a href="/blog" class="opacity-60"
+		><span class="rotate-180 inline-block">➜</span> Go back to the articles list</a
 	>
+</p>
+<h1 class="h1">{post.title}</h1>
+<small class="text-textColor text-opacity-50 text-sm"
+	>created on {createdAt.toLocaleDateString()} at {createdAt.toLocaleTimeString()} - last modified on
+	{updatedAt.toLocaleDateString()} at {updatedAt.toLocaleTimeString()}</small
+>
+<article class="prose mt-4">
 	{@html post.content.html}
 </article>
 
 <style lang="postcss">
 	article {
 		@apply mx-auto;
+	}
+
+	a {
+		@apply underline;
 	}
 </style>

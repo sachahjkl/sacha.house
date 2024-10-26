@@ -105,7 +105,7 @@
 	<title>Ping 👉 Pong</title>
 </svelte:head>
 
-<main class="prose">
+<main >
 	<p>
 		<a class=" opacity-60" href="/" title="Home"
 			><span class="rotate-180 inline-block">➜</span> 🏡 Retour à l'accueil</a

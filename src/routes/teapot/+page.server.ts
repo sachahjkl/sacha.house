@@ -14,10 +14,10 @@ export async function load({ url }) {
 			break;
 		case 'coffee':
 		case 'café':
-			error(418, {
-            				message:
-            					'Did you really think a teapot could brew you coffee ??\nare you some kind of lunatic or something ?'
-            			});
+			return error(418, {
+				message:
+					'Did you really think a teapot could brew you coffee ??\nare you some kind of lunatic or something ?'
+			});
 		default:
 			brewMessage = { text: `What kind of a drink is "${drink}" ???`, emoji: '🤮' };
 	}
@@ -25,6 +25,7 @@ export async function load({ url }) {
 		brewMessage,
 		streaming: {
 			brewTypes: drinks
-		}
+		},
+		spewage: (Math.random() + 1).toString(36).substring(7)
 	};
 }
