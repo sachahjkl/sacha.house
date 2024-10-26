@@ -4,7 +4,7 @@
 
 <article class="prose mx-auto">
 	<p>
-		<a href="/blog" class="text-base-content opacity-60">
+		<a href="/blog" class=" opacity-60">
 			<span class="rotate-180 inline-block">➜</span> Retour à la liste des articles
 		</a>
 	</p>

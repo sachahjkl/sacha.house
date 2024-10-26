@@ -5,12 +5,11 @@
 	const year = new Date().getFullYear();
 </script>
 
-<footer class="footer justify-between p-4 max-w-5xl m-auto mt-3">
-	<div class="items-center grid-flow-col">
-		<slot name="brand">Mon site</slot>
-		<p>Copyright © {year} - All right reserved</p>
+<footer class="bg-textColor text-bgColor flex items-center justify-between px-2 py-1 font-bold"> 
+	<div class="">
+		<p>(C) 2024</p>
 	</div>
-	<div class="flex content-center">
+	<div class="flex flex-wrap items-center gap-3">
 		<img
 			class="deploy-img"
 			width="135"
@@ -19,20 +18,11 @@
 			alt="Deploy Status Badge"
 		/>
 		/
-		<a class="underline" href="https://gitlab.com/sachahjkl/sacha.house/-/commit/{commitHash}">
-			<small class="text-base-content text-opacity-60">
+		<a  href="https://gitlab.com/sachahjkl/sacha.house/-/commit/{commitHash}"> 
+			<small class=" text-opacity-60">
 				commit <b> {commitHash.substring(0, 8)}</b></small
 			>
 		</a>
 	</div>
 </footer>
 
-<style lang="postcss">
-	footer {
-		@apply print:hidden;
-	}
-
-	.deploy-img {
-		@apply hover:scale-95 active:scale-90 transition-all;
-	}
-</style>

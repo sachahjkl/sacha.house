@@ -21,14 +21,14 @@
 	</h3>
 	<h4 class="italic font-normal">
 		{#if lieu.website}
-			<a class="no-underline hover:underline text-base-content text-opacity-70" href={lieu.website}
+			<a class="no-underline hover:underline text-opacity-70" href={lieu.website}
 				>{lieu.name} 🔗</a
 			>
 		{:else}
 			{lieu.name}
 		{/if}
 	</h4>
-	<small class="text-base-content text-opacity-50">
+	<small class="text-opacity-50">
 		<time>
 			{startDate.toLocaleDateString('fr-FR', {
 				year: 'numeric',

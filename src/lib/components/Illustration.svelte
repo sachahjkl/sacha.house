@@ -12,7 +12,6 @@
 
 <style lang="postcss">
 	.illustration {
-		@apply max-w-md w-full m-auto hover:scale-95
-		active:scale-90 transition-all drop-shadow-md;
+		@apply max-w-md w-full m-auto
 	}
 </style>

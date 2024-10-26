@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { randomColorHSL } from '$lib/utils';
+	import { debounce, randomColorHSL } from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	export let description = 'N/A';
 	export let descriptionHtml = 'N/A';
@@ -7,6 +8,19 @@
 	export let url = 'https://github.com/torvalds/linux';
 	export let avatarUrl = '';
 	const [h, s, l] = randomColorHSL();
+
+	let descriptionEl: HTMLElement;
+
+	onMount(() => {
+		const onResize = debounce(() => {
+			const csslineHeight = getComputedStyle(descriptionEl).lineHeight;
+			const possibleLines = Math.floor(descriptionEl.clientHeight / parseFloat(csslineHeight));
+			descriptionEl.style.webkitLineClamp = `${possibleLines}`;
+		}, 200);
+		window.addEventListener('resize', onResize);
+		onResize();
+		return () => window.removeEventListener('resize', onResize);
+	});
 </script>
 
 <a
@@ -14,7 +28,7 @@
 	title="{name}
 {description}"
 >
-	<div class="h-32 card card-side bg-base-200 rounded overflow-hidden">
+	<div class="h-32 card card-side rounded overflow-hidden">
 		{#if avatarUrl}
 			<div class="w-32 grid shrink-0 place-content-center">
 				<figure>
@@ -35,7 +49,7 @@
 		{/if}
 		<div class="card-body m-3 mr-6 p-0 project-info">
 			<h2 class="card-title">{name}</h2>
-			<div class="description">
+			<div bind:this={descriptionEl} class="description">
 				{@html descriptionHtml || '😞 Pas de description ... '}
 			</div>
 		</div>
@@ -44,7 +58,7 @@
 
 <style lang="postcss">
 	:global(.card a) {
-		@apply link focus:scale-105;
+		@apply focus:scale-105;
 	}
 	.description {
 		@apply line-clamp-2;

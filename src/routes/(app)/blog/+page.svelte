@@ -33,6 +33,6 @@
 	}
 
 	.time {
-		@apply text-base-content text-opacity-50 text-sm;
+		@apply  text-opacity-50 text-sm;
 	}
 </style>

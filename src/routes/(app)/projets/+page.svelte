@@ -89,7 +89,7 @@
 	}
 
 	.projects {
-		@apply list-none max-h-[540px] p-0 overflow-y-scroll border-y-2 border-base-content border-opacity-10
+		@apply list-none max-h-[540px] p-0 overflow-y-scroll border-y-2 border-opacity-10
 		snap-y snap-mandatory;
 	}
 	.project {

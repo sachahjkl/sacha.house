@@ -4,7 +4,7 @@
 </script>
 
 <p>
-	<a href="/" class="text-base-content opacity-60">
+	<a href="/" class=" opacity-60">
 		<span class="rotate-180 inline-block">➜</span> Home</a
 	>
 </p>

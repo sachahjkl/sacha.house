@@ -34,7 +34,7 @@
 
 		<p>
 			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code
-				class="bg-base-content text-base-100 p-1 px-2 rounded">{data.ip}</code
+				class=" p-1 px-2 rounded">{data.ip}</code
 			>
 		</p>
 	</section>

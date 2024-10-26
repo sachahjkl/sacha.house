@@ -1,28 +1,24 @@
-import daisyui from 'daisyui';
-import defaultTheme from 'tailwindcss/defaultTheme';
 import tailwindTypography from '@tailwindcss/typography';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
 	content: ['./src/routes/**/*.{svelte,js,ts}', './src/lib/**/*.{svelte,js,ts}'],
 	theme: {
 		fontFamily: {
-			sans: ['Inter', 'Inter-fallback', 'Noto Color Emoji', ...defaultTheme.fontFamily.sans]
+			sans: ['monospace', ...defaultTheme.fontFamily.mono, 'Noto Color Emoji'],
+			mono: ['Fira Code Medium', ...defaultTheme.fontFamily.mono, 'Noto Color Emoji']
 		},
 		container: {
 			center: true
-		}
-	},
+		},
+		extend: {
+			colors: {
+				bgColor: '#000000',
+				textColor: '#DDDDDD'
+			}
+		},
 
-	plugins: [tailwindTypography, daisyui],
-	daisyui: {
-		styled: true
-		// themes: true,
-		// base: true,
-		// utils: true,
-		// logs: true,
-		// rtl: false,
-		// prefix: '',
-		// darkTheme: 'dark'
+		plugins: [tailwindTypography]
 	}
 };

@@ -17,13 +17,13 @@
 </script>
 
 <section>
-	<h3 class="mb-0 font-bold text-base-content text-opacity-50">
+	<h3 class="mb-0 font-bold  text-opacity-50">
 		{#if lieu.website}
 			<a class="no-underline hover:underline font-bold" href={lieu.website}>{lieu.name} 🔗</a>
 		{:else}
 			{lieu.name}
 		{/if}
-		<!-- <small class="ml-1 text-base-content text-opacity-70 not-prose"
+		<!-- <small class="ml-1  text-opacity-70 not-prose"
 			>à
 
 		</small> -->
@@ -31,7 +31,7 @@
 	<h4 class="italic font-normal">
 		{titre}
 	</h4>
-	<small class="text-base-content text-opacity-50">
+	<small class=" text-opacity-50">
 		<time>
 			{startDate.toLocaleDateString('fr-FR', {
 				year: 'numeric',

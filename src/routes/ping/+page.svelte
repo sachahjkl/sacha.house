@@ -107,7 +107,7 @@
 
 <main class="prose">
 	<p>
-		<a class="text-base-content opacity-60" href="/" title="Home"
+		<a class=" opacity-60" href="/" title="Home"
 			><span class="rotate-180 inline-block">➜</span> 🏡 Retour à l'accueil</a
 		>
 	</p>
@@ -223,7 +223,7 @@
 			<div id="instructions" class="flex-grow flex-shrink basis-[400px]">
 				<h2>Instructions</h2>
 				<div class="flex flex-wrap gap-4">
-					<section class="basis-52 p-4 shadow-sm rounded bg-base-200">
+					<section class="basis-52 p-4 shadow-sm rounded">
 						<h3>Général</h3>
 
 						<ul class="list-none p-0">
@@ -232,7 +232,7 @@
 							<li>Reset : <kbd class="kbd kdb-sm">{KEYS.RESET}</kbd></li>
 						</ul>
 					</section>
-					<section class="basis-52 p-4 shadow-sm rounded bg-base-200">
+					<section class="basis-52 p-4 shadow-sm rounded">
 						<h3>Joueur 1</h3>
 						<ul class="list-none p-0">
 							<li>
@@ -241,7 +241,7 @@
 							<li>BAS : <kbd class="kbd kbd-sm">{KEYS.player1.DOWN}</kbd></li>
 						</ul>
 					</section>
-					<section class="basis-52 p-4 shadow-sm rounded bg-base-200">
+					<section class="basis-52 p-4 shadow-sm rounded">
 						<h3>Joueur 2</h3>
 						<ul class="list-none p-0">
 							<li>HAUT : <kbd class="kbd kbd-sm">{KEYS.player2.UP}</kbd></li>

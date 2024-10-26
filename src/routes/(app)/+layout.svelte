@@ -8,9 +8,8 @@
 	} from '$lib/assets/favicon_shadow.png?w=16;400;800&format=avif&as=srcset&imagetools';
 	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { MOI, PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
-	import { addSnow, capitalize, isChristmas } from '$lib/utils';
-	import { SvelteToast } from '@zerodevx/svelte-toast';
+	import { PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
+	import { addSnow, isChristmas } from '$lib/utils';
 	import nProgress from 'nprogress';
 	import { onMount } from 'svelte';
 	import type { LayoutServerData } from './$types';
@@ -68,17 +67,7 @@
 	<meta name="author" content={$page.data.seo?.author || AUTHOR} />
 </svelte:head>
 
-<Header activePagePathname={$page.url.pathname} navItems={data.navItems}>
-	<a slot="brand" href="/" data-sveltekit-preload-data>
-		<picture>
-			<source srcset={faviconAvif} type="image/avif" />
-			<source srcset={faviconWebp} type="image/webp" />
-			<img class="favicon" src="/favicon_shadow.png" height="1em" width="1em" alt="favicon" />
-		</picture>
-		{MOI.prenom.substring(1)}
-		{capitalize(MOI.nom)}
-	</a>
-</Header>
+<Header activePagePathname={$page.url.pathname} navItems={data.navItems} />
 
 <main>
 	<slot><!-- optional fallback --></slot>
@@ -93,7 +82,6 @@
 		</picture>
 	</a>
 </Footer>
-<SvelteToast options={{ duration: 2000 }} />
 
 <style lang="postcss">
 	main {

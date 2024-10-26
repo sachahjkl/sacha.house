@@ -6,7 +6,7 @@
 
 <div in:fade class="avatarTitle">
 	<div in:fly={{ x: -50 }} class="avatar">
-		<div class="w-[2em] rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+		<div class="w-[2em] rounded-full ring ring-primary ring-offset-2">
 			<img src={imgSrc} alt="title" />
 		</div>
 	</div>
