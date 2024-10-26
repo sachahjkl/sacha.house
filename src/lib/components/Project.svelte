@@ -28,9 +28,9 @@
 	title="{name}
 {description}"
 >
-	<div class="h-32 card card-side flex gap-4 overflow-hidden bg-bgColor text-textColor border-2 hover:border-textColor border-bgColor">
+	<div class="h-32 card card-side flex overflow-hidden bg-bgColor text-textColor border-4 hover:border-textColor border-bgColor">
 		{#if avatarUrl}
-			<div class="w-32 grid shrink-0 place-content-center p-4">
+			<div class="w-32 grid shrink-0 place-content-center">
 				<figure>
 					<img loading="lazy" src={avatarUrl} alt="avatar" />
 				</figure>
@@ -47,9 +47,9 @@
 				</span>
 			</div>
 		{/if}
-		<div class="overflow-hidden w-full text-textColor m-3 mr-6 p-0">
+		<div class="overflow-hidden w-full text-textColor p-0">
 			<h2 class="ps-2 font-bold bg-textColor text-bgColor">{name}</h2>
-			<div bind:this={descriptionEl} class="description">
+			<div bind:this={descriptionEl} class="description ps-2">
 				{@html descriptionHtml || '😞 Pas de description ... '}
 			</div>
 		</div>

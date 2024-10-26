@@ -16,24 +16,24 @@
 		</div>
 
 		<p>
-			Je m'appelle <b>{PRETTY_PRENOM} {PRETTY_NOM}</b>, j'ai
-			<em>{new Date().getFullYear() - MOI.dateNaissance.getFullYear()} ans</em>
-			j'habite à <em>{MOI.placeOfLiving}</em>.
+			My name is <b>{PRETTY_PRENOM} {PRETTY_NOM}</b>, I'm
+			<em>{new Date().getFullYear() - MOI.dateNaissance.getFullYear()} years old</em>
+			and I live in <em>{MOI.placeOfLiving}</em>.
 		</p>
-		<p>Je suis ingénieur en informatique. J'aspire à produire du travail simple et de qualité</p>
+		<p>I'm a software engineer. I strive to produce simple, high-quality work.</p>
 
 		<p>
-			N’hésitez pas à <a href="mailto:{MOI.mail}">m’envoyer un mail</a> à propos de ce que vous pensez
-			de ce site ou tout autre sujet qui pourrait m’intéresser (travail, discussion, projet, ...).
+			Feel free to <a href="mailto:{MOI.mail}">send me an email</a> about what you think
+			of this site or any other topic that might interest me (work, discussion, project, ...).
 		</p>
 		<p>
-			Vous pouvez <b>retrouver mon CV</b> en cliquant
-			<a href={MOI.curriculumVitae.toString()}>ici</a>.
+			You can <b>find my resume</b> by clicking
+			<a href={MOI.curriculumVitae.toString()}>here</a>.
 		</p>
 	</section>
 	<div class="divider" />
 	<section>
-		<h2 id="détails-professionnels">🖥️ Détails professionels</h2>
+		<h2 id="professional-details">🖥️ Professional Details</h2>
 		<hr class="mb-0" />
 		{#await data.streaming.profile}
 			<p>Loading ...</p>
@@ -44,7 +44,7 @@
 		{/await}
 	</section>
 	<section>
-		<h2 id="parcours-académique">🏫 Parcours académique</h2>
+		<h2 id="academic-background">🏫 Academic Background</h2>
 		<hr class="mb-0" />
 		{#await data.streaming.profile}
 			<p>Loading ...</p>
@@ -57,21 +57,21 @@
 	<div class="divider" />
 	<section>
 		<h2>🖋️ Contact</h2>
-		<p>Voici, en vrac, une liste d'information de contact me concernant :</p>
+		<p>Here's a list of my contact information:</p>
 		<ul>
-			<li>Mail : <CopyableValue value={MOI.mail} /></li>
-			<li>Adresse Ethereum : <CopyableValue value={MOI.ethAddress} /></li>
+			<li>Email: <CopyableValue value={MOI.mail} /></li>
+			<li>Ethereum Address: <CopyableValue value={MOI.ethAddress} /></li>
 			<li>
-				Adresse Monero : <CopyableValue value={MOI.moneroAdress} />
+				Monero Address: <CopyableValue value={MOI.moneroAdress} />
 			</li>
 			<li>
-				Profil LinkedIn : <a href={MOI.linkedin.toString()}>{MOI.linkedin.toString()}</a>
+				LinkedIn Profile: <a href={MOI.linkedin.toString()}>{MOI.linkedin.toString()}</a>
 			</li>
 			<li>
-				Profil GitHub : <a href={MOI.github.toString()}>{MOI.github.toString()}</a>
+				GitHub Profile: <a href={MOI.github.toString()}>{MOI.github.toString()}</a>
 			</li>
 			<li>
-				Profil GitLab : <a href={MOI.gitlab.toString()}>{MOI.gitlab.toString()}</a>
+				GitLab Profile: <a href={MOI.gitlab.toString()}>{MOI.gitlab.toString()}</a>
 			</li>
 		</ul>
 	</section>

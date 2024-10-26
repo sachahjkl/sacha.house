@@ -3,8 +3,6 @@
 	import { env } from '$env/dynamic/public';
 	import PrismJs from '$lib/components/PrismJS.svelte';
 
-	import { toast } from '@zerodevx/svelte-toast';
-
 	export let data;
 
 	const toastCredits = (credits: number) => `
@@ -26,15 +24,15 @@
 	<meta name="robots" content="noindex nofollow" />
 </svelte:head>
 
-<article>
+<article class="prose">
 	<h1>admin</h1>
 
 	<section>
 		<h2>🕵️ Adresse IP</h2>
 
 		<p>
-			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code
-				class=" p-1 px-2 rounded">{data.ip}</code
+			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code class=" p-1 px-2 rounded"
+				>{data.ip}</code
 			>
 		</p>
 	</section>
@@ -64,18 +62,21 @@
 					profileLoading = false;
 					if (result.type === 'success') {
 						const balance = Number(result.data?.creditBalance);
-						toast.push(toastCredits(balance));
+						// TODO: toast
 						data.creditBalance = balance;
 					}
 					if (result.type === 'failure') {
-						toast.push(toastError(`${result.data?.message}`));
+						// TODO: toast
 					}
 				};
 			}}
 		>
-			<button type="submit" class="refresh-linkedin btn btn-sm gap-2">
+			<button
+				type="submit"
+				class="refresh-linkedin flex gap-2 bg-textColor text-bgColor font-bold px-2"
+			>
 				<div class="refresh-icon">⚙️</div>
-				Rafraichir le profil (coûte 1 crédit)
+				<span class="hover:underline"> Rafraichir le profil (coûte 1 crédit) </span>
 			</button>
 		</form>
 

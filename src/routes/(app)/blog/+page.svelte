@@ -2,7 +2,7 @@
 	export let data;
 </script>
 
-<article >
+<article>
 	<h1 class="h1">blog</h1>
 
 	<h2 class="font-bold mb-2">📰 Available articles</h2>
@@ -15,13 +15,13 @@
 					<a href="/blog/{post.slug}">{post.title}</a>
 					-
 					<span class="time">
-						le
-						<time>{new Date(post.updatedAt).toLocaleDateString()} </time> à
+						on
+						<time>{new Date(post.updatedAt).toLocaleDateString()} </time> at
 						<time>{new Date(post.updatedAt).toLocaleTimeString()}</time>
 					</span>
 				</li>
 			{:else}
-				<li>Pas de poste</li>
+				<li>No posts available</li>
 			{/each}
 		</ul>
 	{/await}
@@ -37,6 +37,6 @@
 	}
 
 	.time {
-		@apply  text-opacity-50 text-sm;
+		@apply text-opacity-50 text-sm;
 	}
 </style>

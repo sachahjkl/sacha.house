@@ -10,7 +10,7 @@ body {
 	@apply text-3xl font-bold bg-textColor text-bgColor ps-4 my-4;
 }
 
-.h2 {
+.h {
 	@apply text-2xl font-bold bg-textColor text-bgColor ps-4 my-4;
 }
 

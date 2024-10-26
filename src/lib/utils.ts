@@ -118,3 +118,5 @@ export const statusCodeToText = (status: number) => {
 			return 'Unknown';
 	}
 };
+
+export const toId = (str: string) => str.replace(/[^a-zA-Z0-9]/g, '');

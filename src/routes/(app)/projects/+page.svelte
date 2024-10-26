@@ -91,6 +91,6 @@
 		scrollbar-width: thin;
 	}
 	.project {
-		@apply snap-start first-of-type:pt-1 last-of-type:pb-1;
+		@apply snap-start;
 	}
 </style>
