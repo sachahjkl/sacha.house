@@ -33,7 +33,7 @@
 				<ul class="flex flex-wrap gap-3 whitespace-nowrap">
 					{#each navItems as item, i}
 						<li class="flex-[100%] sm:flex-none">
-							<a class:active={activePagePathname === item.pathname} href={item.pathname}>
+							<a class="w-full inline-block" class:active={activePagePathname === item.pathname} href={item.pathname}>
 								{item.icon}
 								{item.title}
 							</a>
