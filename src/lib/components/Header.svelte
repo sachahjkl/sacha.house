@@ -8,16 +8,29 @@
 	}
 
 	let { navItems = [], activePagePathname = '', openNav = $bindable(false) }: Props = $props();
+
+	const pathMatch = (pathname: string, path: string) => {
+		let matches = false;
+		let isRoot = path == '/';
+		
+		if (isRoot) {
+			matches = pathname == '/';
+		} else {
+			matches = pathname.startsWith(path);
+		}
+
+		return matches;
+	};
 </script>
 
-<header class="sticky top-0 z-10 bg-bgColor p-3">
+<header class="sticky top-0 z-10 bg-bgColor px-3">
 	<nav data-sveltekit-preload-data>
 		<fieldset class="border-2 border-textColor p-2 px-4">
 			<legend class="ml-3 px-2">Navigation</legend>
 			<ul class="hidden flex-wrap gap-3 whitespace-nowrap sm:flex">
 				{#each navItems as item, i}
 					<li class="flex-[100%] sm:flex-none">
-						<a class:active={activePagePathname === item.pathname} href={item.pathname}>
+						<a class:active={pathMatch(activePagePathname, item.pathname)} href={item.pathname}>
 							{item.icon}
 							{item.title}
 						</a>
@@ -33,7 +46,11 @@
 				<ul class="flex flex-wrap gap-3 whitespace-nowrap">
 					{#each navItems as item, i}
 						<li class="flex-[100%] sm:flex-none">
-							<a class="w-full inline-block" class:active={activePagePathname === item.pathname} href={item.pathname}>
+							<a
+								class="inline-block w-full"
+								class:active={activePagePathname === item.pathname}
+								href={item.pathname}
+							>
 								{item.icon}
 								{item.title}
 							</a>

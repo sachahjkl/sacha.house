@@ -3,7 +3,7 @@
 </script>
 
 <article class="prose mx-auto">
-	<p>
+	<p class="mb-4">
 		<a href="/blog" class=" opacity-60">
 			<span class="inline-block rotate-180">➜</span> Go back to the articles list
 		</a>

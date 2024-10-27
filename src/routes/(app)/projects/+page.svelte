@@ -14,27 +14,32 @@
 
 <article>
 	<h1 class="h1">projects</h1>
-	<p>
-		A collection of my work, including both completed and ongoing projects. These repositories were
-		created to:
-	</p>
-	<ul class="ms-4 list-inside list-[square]">
-		<li>Explore new technologies</li>
-		<li>Practice project management, design, and software architecture</li>
-		<li>
-			Collaborate on personal projects (<a href={MOI.links.hayekfr.toString()}> website example </a>
-			and its <a href={MOI.links.hayekfrRepo.toString()}>repository</a>, task automation, etc.)
-		</li>
-		<li>Organize academic work</li>
-		<li>
-			Store personal environment files (e.g., <a href={MOI.links.dotfiles.toString()}>dotfiles</a>)
-		</li>
-	</ul>
-	<p>
-		Most of my work is hosted on <b>GitLab</b>, with some minor projects on <b>GitHub</b>.
-	</p>
+	<section class="mb-8">
+		<p>
+			A collection of my work, including both completed and ongoing projects. These repositories
+			were created to:
+		</p>
+		<ul class="ms-4 list-inside list-[square]">
+			<li>Explore new technologies</li>
+			<li>Practice project management, design, and software architecture</li>
+			<li>
+				Collaborate on personal projects (<a href={MOI.links.hayekfr.toString()}>
+					website example
+				</a>
+				and its <a href={MOI.links.hayekfrRepo.toString()}>repository</a>, task automation, etc.)
+			</li>
+			<li>Organize academic work</li>
+			<li>
+				Store personal environment files (e.g., <a href={MOI.links.dotfiles.toString()}>dotfiles</a
+				>)
+			</li>
+		</ul>
+		<p>
+			Most of my work is hosted on <b>GitLab</b>, with some minor projects on <b>GitHub</b>.
+		</p>
+	</section>
 	<div class="divider"></div>
-	<section>
+	<section class="mb-8">
 		<h2 class="h2">
 			<img class="title-logo" width="15" src={gitlabSrc} alt="GitLab Logo" /> GitLab /
 			<a href={MOI.gitlab.toString()}>@{MOI.gitlab.pathname.split('/').pop()}</a>
@@ -59,7 +64,7 @@
 			</ul>
 		{/await}
 	</section>
-	<section>
+	<section class="mb-8">
 		<h2 class="h2 mb-0">
 			<img class="title-logo" src={githubSrc} alt="GitHub Logo" /> GitHub /
 			<a href={MOI.github.toString()}>@{MOI.github.pathname.split('/').pop()}</a>

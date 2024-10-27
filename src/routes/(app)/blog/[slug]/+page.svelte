@@ -25,7 +25,7 @@
 	<meta property="og:article:author" content="{PRETTY_PRENOM} {PRETTY_NOM}" />
 </svelte:head>
 
-<p>
+<p class="mb-4 text-sm">
 	<a href="/blog" class="opacity-60"
 		><span class="inline-block rotate-180">➜</span> Go back to the articles list</a
 	>

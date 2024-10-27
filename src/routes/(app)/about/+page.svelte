@@ -2,7 +2,7 @@
 	import Avatar from '$lib/components/Avatar.svelte';
 	import CopyableValue from '$lib/components/CopyableValue.svelte';
 	import Education from '$lib/components/Education.svelte';
-	import Experience from "$lib/components/Experience.svelte";
+	import Experience from '$lib/components/Experience.svelte';
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
 	import type { PageData } from './$types';
 
@@ -15,7 +15,7 @@
 
 <article class="max-w-full text-sm sm:text-base">
 	<h1 class="h1">about</h1>
-	<section>
+	<section class="mb-8">
 		<div class="avatar mx-auto block">
 			<Avatar />
 		</div>
@@ -37,7 +37,7 @@
 		</p>
 	</section>
 
-	<section>
+	<section class="mb-8">
 		<h2 id="professional-details" class="h2">🖥️ Professional Details</h2>
 		<div class="flex flex-col gap-4">
 			{#await data.profile}
@@ -49,7 +49,7 @@
 			{/await}
 		</div>
 	</section>
-	<section>
+	<section class="mb-8">
 		<h2 id="academic-background" class="h2">🏫 Academic Background</h2>
 		<div class="flex flex-col gap-4">
 			{#await data.profile}

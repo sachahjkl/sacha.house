@@ -6,20 +6,23 @@
 
 <article>
 	<h1 class="h1">welcome to my website</h1>
+	<section class="mb-8">
+		<TitleArt />
+	</section>
 
-	<TitleArt />
+	<section class="mb-8">
+		<h2 class="h2">Quick links</h2>
 
-	<div class="divider"></div>
-	<h2 class="h2">Quick links</h2>
+		<ul class="">
+			<li><a href="/about">➜ about me</a></li>
+			<li><a href="mailto:{MOI.mail}">📧 shoot me an email (will reply asap)</a></li>
+			<li><a href="/teapot">🍵 teapot</a></li>
+		</ul>
+	</section>
 
-	<ul class="">
-		<li><a href="/about">➜ about me</a></li>
-		<li><a href="mailto:{MOI.mail}">📧 shoot me an email (will reply asap)</a></li>
-		<li><a href="/teapot">🍵 teapot</a></li>
-	</ul>
-
-	<div class="divider mt-4"></div>
-	<Illustration />
+	<section class="mb-8">
+		<Illustration />
+	</section>
 </article>
 
 <style lang="postcss">
