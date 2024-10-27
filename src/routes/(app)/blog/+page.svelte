@@ -15,8 +15,8 @@
 	{#await data.posts}
 		<p>Loading ...</p>
 	{:then posts}
-		<ul data-sveltekit-preload-data class="ms-4 list-inside list-[square]">
-			{#each posts as post}
+		<ul data-sveltekit-preload-data class="list-inside list-[square]">
+			{#each posts.reverse() as post}
 				<li>
 					<a href="/blog/{post.slug}">{post.title}</a>
 					-
@@ -39,7 +39,7 @@
 	}
 
 	a {
-		@apply hover:underline;
+		@apply underline;
 	}
 
 	.time {

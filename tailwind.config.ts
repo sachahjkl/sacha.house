@@ -22,6 +22,7 @@ export default {
 			typography: (theme) => ({
 				DEFAULT: {
 					css: {
+						maxWidth: theme('width.max'),
 						'--tw-prose-body': theme('colors.textColor'),
 						'--tw-prose-headings': theme('colors.textColor'),
 						'--tw-prose-lead': theme('colors.textColor'),

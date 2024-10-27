@@ -90,7 +90,7 @@
 	}
 
 	.projects {
-		@apply mx-4 flex max-h-[540px] snap-y snap-mandatory list-none flex-col gap-4 overflow-y-scroll border-y-2 border-textColor p-0;
+		@apply mx-4 flex max-h-[540px] snap-y snap-mandatory list-none flex-col gap-4 overflow-y-scroll border-y-4 border-textColor p-0;
 		scrollbar-width: thin;
 	}
 	.project {

@@ -7,11 +7,11 @@ body {
 }
 
 .h1 {
-	@apply my-4 bg-textColor ps-4 text-3xl font-bold text-bgColor;
+	@apply my-4 bg-textColor ps-4 text-2xl font-bold text-bgColor;
 }
 
 .h2 {
-	@apply my-4 bg-textColor ps-4 text-2xl font-bold text-bgColor;
+	@apply my-4 bg-textColor ps-4 text-xl font-bold text-bgColor;
 }
 
 :root {

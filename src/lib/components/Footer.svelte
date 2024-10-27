@@ -13,7 +13,7 @@
 </script>
 
 <footer
-	class="fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 bg-textColor px-2 py-1 text-sm font-bold text-bgColor"
+	class="fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 bg-textColor px-2 py-1 text-xs font-bold text-bgColor"
 >
 	<div>
 		<p>(C) {year} sacha.house</p>
@@ -24,11 +24,10 @@
 	>
 		<div class="flex items-center gap-1">
 			<img
-				height="15"
+				width="100"
 				src="https://gitlab.com/{env.PUBLIC_GIT_REPO_ID}/badges/master/pipeline.svg"
 				alt="Deploy Status Badge"
 			/>
-			<span>/</span>
 			{commitHash.substring(0, 8)}
 			<ExternalLinkIcon />
 		</div>

@@ -2,7 +2,7 @@
 	import Avatar from '$lib/components/Avatar.svelte';
 	import CopyableValue from '$lib/components/CopyableValue.svelte';
 	import Education from '$lib/components/Education.svelte';
-	import Experience from '$lib/components/Experience.svelte';
+	import Experience from "$lib/components/Experience.svelte";
 	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
 	import type { PageData } from './$types';
 
@@ -13,7 +13,7 @@
 	let { data }: Props = $props();
 </script>
 
-<article class="prose max-w-full">
+<article class="max-w-full text-sm sm:text-base">
 	<h1 class="h1">about</h1>
 	<section>
 		<div class="avatar mx-auto block">
@@ -36,34 +36,35 @@
 			<a href={MOI.curriculumVitae.toString()}>here</a>.
 		</p>
 	</section>
-	<div class="divider"></div>
+
 	<section>
-		<h2 id="professional-details">🖥️ Professional Details</h2>
-		<hr class="mb-0" />
-		{#await data.profile}
-			<p>Loading ...</p>
-		{:then profile}
-			{#each profile.experiences as experience, i (i)}
-				<Experience {experience} />
-			{/each}
-		{/await}
+		<h2 id="professional-details" class="h2">🖥️ Professional Details</h2>
+		<div class="flex flex-col gap-4">
+			{#await data.profile}
+				<p>Loading ...</p>
+			{:then profile}
+				{#each profile.experiences as experience, i (i)}
+					<Experience {experience} />
+				{/each}
+			{/await}
+		</div>
 	</section>
 	<section>
-		<h2 id="academic-background">🏫 Academic Background</h2>
-		<hr class="mb-0" />
-		{#await data.profile}
-			<p>Loading ...</p>
-		{:then profile}
-			{#each profile.education as edu, i (i)}
-				<Education education={edu} />
-			{/each}
-		{/await}
+		<h2 id="academic-background" class="h2">🏫 Academic Background</h2>
+		<div class="flex flex-col gap-4">
+			{#await data.profile}
+				<p>Loading ...</p>
+			{:then profile}
+				{#each profile.education as edu, i (i)}
+					<Education education={edu} />
+				{/each}
+			{/await}
+		</div>
 	</section>
-	<div class="divider"></div>
 	<section>
-		<h2>🖋️ Contact</h2>
+		<h2 id="contact" class="h2">🖋️ Contact</h2>
 		<p>Here's a list of my contact information:</p>
-		<ul>
+		<ul class="list-inside list-[square] break-words">
 			<li>Email: <CopyableValue value={MOI.mail} /></li>
 			<li>Ethereum Address: <CopyableValue value={MOI.ethAddress} /></li>
 			<li>
@@ -87,6 +88,10 @@
 		@apply mx-auto print:max-w-full;
 	}
 	a {
-		@apply transition-all hover:scale-105;
+		@apply underline;
+	}
+
+	p {
+		@apply mb-4;
 	}
 </style>

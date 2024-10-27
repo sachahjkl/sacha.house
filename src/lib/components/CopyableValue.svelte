@@ -4,11 +4,41 @@
 
 	interface Props {
 		value?: string;
+		iconEl?: HTMLElement;
 	}
 
-	let { value = '' }: Props = $props();
+	let { value = '', iconEl = $bindable() }: Props = $props();
 	const id = toId(value);
+	let timeout: number;
 </script>
 
-<a use:copy={value} id="copy-{id}" href="#copy-{id}" class="break-words">{value} </a>
-<span class="copy-icon">📋</span>
+<button
+	class="break-all text-start underline"
+	use:copy={{
+		text: value,
+		onCopy({ text }) {
+			if(timeout) clearTimeout(timeout);
+			console.log('Copied! ' + text);
+			iconEl?.classList.add('copied');
+			timeout = setTimeout(() => {
+				iconEl?.classList.remove('copied');
+			}, 1000);
+		},
+
+	}}
+	id="copy-{id}">{value}</button
+>
+<span bind:this={iconEl} class="copy-icon inline-block">📋</span>
+
+<style lang="postcss">
+	/* run a spin animation on the copy icon when the "copied" class is added but only forwards and once */
+	:global(.copy-icon.copied) {
+		/* add ease-in-out to the spin animation */
+		animation: icon-spin 0.5s ease-out forwards;
+	}
+	@keyframes icon-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+</style>

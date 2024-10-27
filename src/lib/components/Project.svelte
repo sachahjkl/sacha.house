@@ -39,12 +39,17 @@
 {description}"
 >
 	<div
-		class="card card-side flex h-32 overflow-hidden border-4 border-bgColor bg-bgColor text-textColor hover:border-textColor"
+		class="flex overflow-hidden border-4 border-bgColor bg-bgColor text-textColor hover:border-textColor"
 	>
 		{#if avatarUrl}
-			<div class="grid w-32 shrink-0 place-content-center">
+			<div class="grid shrink-0 place-content-center">
 				<figure>
-					<img loading="lazy" src={avatarUrl} alt="avatar" />
+					<img
+						class="aspect-square h-16 w-16 sm:h-32 sm:w-32"
+						loading="lazy"
+						src={avatarUrl}
+						alt="avatar"
+					/>
 				</figure>
 			</div>
 		{:else}
@@ -59,10 +64,11 @@
 				</span>
 			</div>
 		{/if}
-		<div class="w-full overflow-hidden p-0 text-textColor">
+		<div class="w-full overflow-hidden p-0 sm:text-base text-sm text-textColor">
 			<h2 class="bg-textColor ps-2 font-bold text-bgColor">{name}</h2>
-			<div bind:this={descriptionEl} class="description ps-2">
-				{@html descriptionHtml || '😞 Pas de description ... '}
+			<div bind:this={descriptionEl} class="description ps-2 pt-2">
+				{@html descriptionHtml ||
+					'😞 Unfortunately, no description is available (I was probs lazy ahh).'}
 			</div>
 		</div>
 	</div>
@@ -75,7 +81,7 @@
 
 	.letter-box {
 		--color: lightred;
-		@apply grid w-32 shrink-0 place-content-center bg-[color:var(--color)];
+		@apply grid aspect-square h-16 w-16 shrink-0 place-content-center bg-[color:var(--color)] sm:h-32 sm:w-32;
 	}
 
 	.letter {

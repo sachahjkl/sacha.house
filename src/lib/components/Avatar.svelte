@@ -16,5 +16,8 @@
 	.me,
 	picture {
 		@apply m-0;
+		img {
+			@apply m-auto my-4 block border-4 border-textColor;
+		}
 	}
 </style>

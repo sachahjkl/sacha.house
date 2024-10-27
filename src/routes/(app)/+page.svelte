@@ -2,8 +2,6 @@
 	import Illustration from '$lib/components/Illustration.svelte';
 	import TitleArt from '$lib/components/TitleArt.svelte';
 	import { MOI } from '$lib/me';
-
-	// export let data;
 </script>
 
 <article>
@@ -14,7 +12,7 @@
 	<div class="divider"></div>
 	<h2 class="h2">Quick links</h2>
 
-	<ul class="ms-8">
+	<ul class="">
 		<li><a href="/about">➜ about me</a></li>
 		<li><a href="mailto:{MOI.mail}">📧 shoot me an email (will reply asap)</a></li>
 		<li><a href="/teapot">🍵 teapot</a></li>

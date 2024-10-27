@@ -20,8 +20,9 @@
 		: null;
 </script>
 
-<section>
-	<h3 class="mb-0 font-bold text-opacity-50">
+<section class="border-s-[16px] py-2 border-textColor ps-4">
+	<div id="title" class="mb-3">
+	<h3 class="ms-0 font-bold">
 		{#if lieu.website}
 			<a class="font-bold no-underline hover:underline" href={lieu.website}>{lieu.name} 🔗</a>
 		{:else}
@@ -32,10 +33,11 @@
 
 		</small> -->
 	</h3>
-	<h4 class="font-normal italic">
+
+	<h4 class="italic">
 		{titre}
 	</h4>
-	<small class=" text-opacity-50">
+	<small class="text-bgOffColor">
 		<time>
 			{startDate.toLocaleDateString('fr-FR', {
 				year: 'numeric',
@@ -52,6 +54,8 @@
 			</time>
 		{/if}
 	</small>
+	</div>
+
 	<div>
 		{#each compétences as compétence}
 			<div class="badge badge-primary">{compétence}</div>

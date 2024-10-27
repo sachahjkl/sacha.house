@@ -6,7 +6,7 @@ import { GET_LATEST_COMMIT } from '$lib/queries';
 import { updateCounter } from '$lib/server/countapi';
 import { GraphQLClient } from 'graphql-request';
 
-export const load = async ({ fetch, getClientAddress, cookies }) => {
+export const load = async ({ fetch, getClientAddress, cookies, setHeaders }) => {
 	const clientAddress = getClientAddress();
 	const navItems = getAuthorizedNavItems(clientAddress);
 
@@ -19,26 +19,29 @@ export const load = async ({ fetch, getClientAddress, cookies }) => {
 		console.log('Cookie de visite défini');
 	}
 
-	const commitHash = async () => {
-		try {
-			const clientGL = new GraphQLClient(`${envPub.PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
-				fetch,
-				headers: {
-					Authorization: `Bearer ${envPriv.GITLAB_BEARER_TOKEN}`
-				}
-			});
-			const GL: LatestCommit = await clientGL.request(GET_LATEST_COMMIT, {
-				repoID: envPub.PUBLIC_GIT_REPO_ID
-			});
-			return `${GL.project.repository.paginatedTree.nodes.at(0)?.lastCommit.sha}`;
-		} catch (error) {
-			console.error('Erreur à la récupération du hash de version du dépôt.', error);
-		}
-		return 'inconnu';
-	};
+	let commitHash = 'unknown';
+	try {
+		const clientGL = new GraphQLClient(`${envPub.PUBLIC_GITLAB_API_ENDPOINT}/graphql`, {
+			fetch,
+			headers: {
+				Authorization: `Bearer ${envPriv.GITLAB_BEARER_TOKEN}`
+			}
+		});
+		const GL: LatestCommit = await clientGL.request(GET_LATEST_COMMIT, {
+			repoID: envPub.PUBLIC_GIT_REPO_ID
+		});
+		console.log('Commit hash:', GL.project.repository.paginatedTree.nodes.at(0)?.lastCommit.sha);
+		commitHash = `${GL.project.repository.paginatedTree.nodes.at(0)?.lastCommit.sha}`;
+	} catch (error) {
+		console.error('Erreur à la récupération du hash de version du dépôt.', error);
+	}
+
+	setHeaders({
+		'cache-control': 'max-age=' + 5 * 60
+	});
 
 	return {
 		navItems,
-		commitHash: await commitHash()
+		commitHash
 	};
 };
