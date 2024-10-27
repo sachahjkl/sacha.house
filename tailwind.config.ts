@@ -22,6 +22,9 @@ export default {
 			typography: (theme) => ({
 				DEFAULT: {
 					css: {
+						a: {
+							wordBreak: 'break-all'
+						},
 						maxWidth: theme('width.full'),
 						'--tw-prose-body': theme('colors.textColor'),
 						'--tw-prose-headings': theme('colors.textColor'),
