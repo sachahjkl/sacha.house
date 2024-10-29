@@ -54,7 +54,7 @@
 				<p>Loading ...</p>
 			{:then profile}
 				{#each profile.experiences as experience, i (i)}
-					<Experience {experience} />1
+					<Experience {experience} />
 				{/each}
 			{:catch error}
 				<p>{error}</p>
