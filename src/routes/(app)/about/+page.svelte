@@ -3,7 +3,7 @@
 	import CopyableValue from '$lib/components/CopyableValue.svelte';
 	import Education from '$lib/components/Education.svelte';
 	import Experience from '$lib/components/Experience.svelte';
-	import { MOI, PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
+	import { MOI, PRETTY_PRENOM } from '$lib/me';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -21,7 +21,7 @@
 		</div>
 
 		<p>
-			My name is <b>{PRETTY_PRENOM} {PRETTY_NOM}</b>, I'm
+			My name is <b>{PRETTY_PRENOM}</b>, I'm
 			<em>{new Date().getFullYear() - MOI.dateNaissance.getFullYear()} years old</em>
 			and I live in <em>{MOI.placeOfLiving}</em>.
 		</p>
@@ -32,8 +32,8 @@
 			or any other topic that might interest me (work, discussion, project, ...).
 		</p>
 		<p>
-			You can <b>find my resume</b> by clicking
-			<a href={MOI.curriculumVitae.toString()}>here</a>.
+			You can <b>find my curriculum vitae</b> by clicking
+			<a href={MOI.curriculumVitae.toString()}>here</a>. 
 		</p>
 	</section>
 

@@ -13,9 +13,9 @@ export const MOI = {
 	linkedin: new URL('https://www.linkedin.com/in/sachafroment/'),
 	homepage: new URL('https://sacha.house'),
 	mail: 'sacha@sacha.house',
-	curriculumVitae: new URL(
-		'https://mega.nz/file/bxUgHAKD#63H2N3PoF4s_FP8SK1l3W8qB1Day5fGta1qMqjsIg7c'
-	),
+	curriculumVitae: import.meta.env.DEV
+		? new URL('/cv/sacha-froment-cv.html', 'http://localhost:5173')
+		: new URL('/cv/sacha-froment-cv.html', 'https://sacha.house'),
 	ethAddress: '0xDfB091f812ea27Ca58e8f556B252f245660cba87',
 	moneroAdress:
 		'49ETBPrD54iCKeecWjPt2hfjciSRgptXzJc29Hd8FS97AQHzThdoxE1aE4NigAf8xYDxok1iaaGKD8a6EmUwUgkgTstDaFJ',
