@@ -4,6 +4,10 @@ export function clamp(value: number, min: number, max: number) {
 	return Math.min(Math.max(value, min), max);
 }
 
+export function isError(res: unknown | App.Error): res is App.Error {
+	return (res as App.Error).message !== undefined;
+}
+
 export function capitalize(s: string) {
 	return s[0].toUpperCase() + s.slice(1);
 }

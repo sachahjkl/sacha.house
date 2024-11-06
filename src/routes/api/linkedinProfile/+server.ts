@@ -28,7 +28,6 @@ export const GET = async () => {
 			}
 		});
 	} catch (err) {
-		console.error('Récupération du gist échouée.', err);
-		error(500, 'Erreur inattendue, récupération du gist échouée.');
+		error(500, `Erreur inattendue, récupération du gist échouée. (${err})`);
 	}
 };

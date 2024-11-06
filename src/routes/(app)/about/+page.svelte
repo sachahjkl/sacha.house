@@ -5,18 +5,28 @@
 	import Experience from '$lib/components/Experience.svelte';
 	import { MOI, PRETTY_PRENOM } from '$lib/me';
 	import type { PageData } from './$types';
+	import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
+	import { isError as isKitError } from '$lib/utils';
 
 	interface Props {
 		data: PageData;
 	}
 
 	let { data }: Props = $props();
+
+	let maybeProfile = $derived.by<Promise<LinkedinProfile>>(async () => {
+		let res = await data.profile;
+		if (isKitError(res)) {
+			return Promise.reject(res.message);
+		}
+		return res;
+	});
 </script>
 
 <article class="max-w-full text-sm sm:text-base">
 	<h1 class="h1">about</h1>
 	<section class="mb-8">
-		<div class="avatar mx-auto block">
+		<div class="avatar my-6 flex justify-center">
 			<Avatar />
 		</div>
 
@@ -40,24 +50,28 @@
 	<section class="mb-8">
 		<h2 id="professional-details" class="h2">🖥️ Professional Details</h2>
 		<div class="flex flex-col gap-4">
-			{#await data.profile}
+			{#await maybeProfile}
 				<p>Loading ...</p>
 			{:then profile}
 				{#each profile.experiences as experience, i (i)}
 					<Experience {experience} />
 				{/each}
+			{:catch error}
+				<p>{error}</p>
 			{/await}
 		</div>
 	</section>
 	<section class="mb-8">
 		<h2 id="academic-background" class="h2">🏫 Academic Background</h2>
 		<div class="flex flex-col gap-4">
-			{#await data.profile}
+			{#await maybeProfile}
 				<p>Loading ...</p>
 			{:then profile}
 				{#each profile.education as edu, i (i)}
 					<Education education={edu} />
 				{/each}
+			{:catch error}
+				<p>{error}</p>
 			{/await}
 		</div>
 	</section>
