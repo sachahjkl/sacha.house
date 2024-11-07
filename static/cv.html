@@ -10,14 +10,9 @@
 				font-family: 'CMU Sans Serif', sans-serif;
 				line-height: 1.5;
 				color: #333;
-				margin: 2.65cm 2.33cm;
+				/* margin: 2.65cm 2.33cm; */
+				margin: 1rem;
 				font-size: 10pt;
-			}
-
-			@media print {
-				body {
-					margin: 1rem;
-				}
 			}
 
 			h1 {
@@ -47,6 +42,10 @@
 			}
 
 			ul {
+				padding-left: 1rem;
+			}
+
+			ul ul {
 				padding-left: 1.5rem;
 			}
 			.date-and-location {
@@ -54,16 +53,39 @@
 				color: #666;
 				margin: 0;
 			}
+
+			.photo {
+				max-height: 110px;
+				border: 2px solid black;
+				box-shadow: 2px 2px rgba(0 0 0 / 0.2);
+				float: left;
+				margin-inline-end: 1rem;
+			}
+
+			#intro {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: row;
+				align-items: center;
+			}
+			#intro-text {
+				min-width: fit-content;
+			}
 		</style>
 	</head>
 	<body>
-		<h1>CV de Sacha FROMENT</h1>
-		<!-- make each line a paragraph without spacing -->
-		<section id="quick-facts">
-			<p>Localisation : Cérans Foulletourte, 72330</p>
-			<p>Nationalité : Français</p>
-			<p>Adresse Électronique : sacha@sacha.house</p>
-			<p>Adresse et numéro de téléphone disponible à la demande par e-mail.</p>
+		<section id="intro">
+			<img src="/me-portrait.jpg" alt="Photo de Sacha FROMENT" class="photo" />
+			<div id="intro-text">
+				<h1>CV de Sacha FROMENT</h1>
+				<!-- make each line a paragraph without spacing -->
+				<section id="quick-facts">
+					<p>Localisation : Cérans Foulletourte, 72330</p>
+					<p>Nationalité : Français</p>
+					<p>Adresse Électronique : sacha@sacha.house</p>
+					<p>Adresse et numéro de téléphone disponible à la demande par e-mail.</p>
+				</section>
+			</div>
 		</section>
 
 		<section id="experience">
