@@ -59,15 +59,17 @@
 				border: 2px solid black;
 				box-shadow: 2px 2px rgba(0 0 0 / 0.2);
 				float: left;
-				margin-inline-end: 1rem;
+        object-fit: cover;
 			}
 
-			#intro {
+			#intro-text {
 				display: flex;
 				flex-wrap: wrap;
 				flex-direction: row;
 				align-items: center;
+        gap: 1rem;
 			}
+      
 			#intro-text {
 				min-width: fit-content;
 			}
@@ -75,10 +77,10 @@
 	</head>
 	<body>
 		<section id="intro">
-			<img src="/me-portrait.jpg" alt="Photo de Sacha FROMENT" class="photo" />
-			<div id="intro-text">
 				<h1>CV de Sacha FROMENT</h1>
+			<div id="intro-text">
 				<!-- make each line a paragraph without spacing -->
+			<img src="/me-portrait.jpg" height="100px" width="100px" alt="Photo de Sacha FROMENT" class="photo" />
 				<section id="quick-facts">
 					<p>Localisation : Cérans Foulletourte, 72330</p>
 					<p>Nationalité : Français</p>
