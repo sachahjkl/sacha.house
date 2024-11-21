@@ -25,3 +25,8 @@ body {
 ._toastMsg {
 	@apply overflow-hidden text-ellipsis;
 }
+
+*::selection {
+  background: #868686;
+  color: #131313;
+}
