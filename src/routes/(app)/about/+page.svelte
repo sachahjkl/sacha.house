@@ -3,10 +3,10 @@
 	import CopyableValue from '$lib/components/CopyableValue.svelte';
 	import Education from '$lib/components/Education.svelte';
 	import Experience from '$lib/components/Experience.svelte';
-	import { MOI, PRETTY_PRENOM } from '$lib/me';
-	import type { PageData } from './$types';
 	import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
+	import { MOI, PRETTY_PRENOM } from '$lib/me';
 	import { isError as isKitError } from '$lib/utils';
+	import type { PageData } from './$types';
 
 	interface Props {
 		data: PageData;
@@ -83,6 +83,9 @@
 			<li>Ethereum Address: <CopyableValue value={MOI.ethAddress} /></li>
 			<li>
 				Monero Address: <CopyableValue value={MOI.moneroAdress} />
+			</li>
+			<li>
+				GPG Public key: <a href="/sachahjkl.gpg">21D64EBC463D12DFE373AE4F1EFE264F809A2118</a>
 			</li>
 			<li>
 				LinkedIn Profile: <a href={MOI.linkedin.toString()}>{MOI.linkedin.toString()}</a>

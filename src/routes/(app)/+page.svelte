@@ -16,6 +16,7 @@
 		<ul class="">
 			<li><a href="/about">➜ about me</a></li>
 			<li><a href="mailto:{MOI.mail}">📧 shoot me an email (will reply asap)</a></li>
+			<li><a href="/sachahjkl.gpg">🔐 my gpg key: 21D64EBC463D12DFE373AE4F1EFE264F809A2118</a></li>
 			<li><a href="/teapot">🍵 teapot</a></li>
 		</ul>
 	</section>

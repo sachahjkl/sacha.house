@@ -15,6 +15,7 @@ export const MOI = {
 	mail: 'sacha@sacha.house',
 	curriculumVitae: '/cv.html',
 	ethAddress: '0xDfB091f812ea27Ca58e8f556B252f245660cba87',
+	gpgPrint: '21D64EBC463D12DFE373AE4F1EFE264F809A2118',
 	moneroAdress:
 		'49ETBPrD54iCKeecWjPt2hfjciSRgptXzJc29Hd8FS97AQHzThdoxE1aE4NigAf8xYDxok1iaaGKD8a6EmUwUgkgTstDaFJ',
 	links: {
