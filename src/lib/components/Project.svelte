@@ -39,7 +39,7 @@
 {description}"
 >
 	<div
-		class="flex overflow-hidden border-4 border-bgColor bg-bgColor text-textColor hover:border-textColor"
+		class="border-bgColor bg-bgColor text-textColor hover:border-textColor flex overflow-hidden border-4"
 	>
 		{#if avatarUrl}
 			<div class="grid shrink-0 place-content-center">
@@ -55,36 +55,21 @@
 		{:else}
 			<div
 				style={(avatarUrl ?? '').trim() !== ''
-					? ''
+					? '--color: lightred'
 					: `--color: hsl(${h}, ${s * 100}%, ${l * 100}%)`}
-				class="letter-box"
+				class="bg-(--color) grid aspect-square h-16 w-16 shrink-0 place-content-center sm:h-32 sm:w-32"
 			>
-				<span class="letter">
+				<span class="flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-3xl text-neutral-100 shadow-smletter text-center">
 					{name[0].toUpperCase()}
 				</span>
 			</div>
 		{/if}
-		<div class="w-full overflow-hidden p-0 sm:text-base text-sm text-textColor">
-			<h2 class="bg-textColor ps-2 font-bold text-bgColor">{name}</h2>
-			<div bind:this={descriptionEl} class="description ps-2 pt-2">
+		<div class="text-textColor w-full overflow-hidden p-0 text-sm sm:text-base">
+			<h2 class="bg-textColor text-bgColor ps-2 font-bold">{name}</h2>
+			<div bind:this={descriptionEl} class="line-clamp-2 ps-2 pt-2">
 				{@html descriptionHtml ||
 					'😞 Unfortunately, no description is available (I was probs lazy ahh).'}
 			</div>
 		</div>
 	</div>
 </a>
-
-<style lang="postcss">
-	.description {
-		@apply line-clamp-2;
-	}
-
-	.letter-box {
-		--color: lightred;
-		@apply grid aspect-square h-16 w-16 shrink-0 place-content-center bg-[color:var(--color)] sm:h-32 sm:w-32;
-	}
-
-	.letter {
-		@apply flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900 bg-opacity-50 text-3xl text-neutral-100 shadow-sm;
-	}
-</style>

@@ -4,12 +4,6 @@
 	let { children } = $props();
 </script>
 
-<main>
+<main class="m-auto mt-6 max-w-5xl p-4">
 	{@render children?.()}
 </main>
-
-<style lang="postcss">
-	main {
-		@apply m-auto mt-6 max-w-5xl p-4;
-	}
-</style>

@@ -31,7 +31,7 @@
 	>
 </p>
 <h1 class="h1">{post.title}</h1>
-<small class="text-sm text-textColor text-opacity-50"
+<small class="text-textColor/50 text-sm"
 	>created on {createdAt.toLocaleDateString()} at {createdAt.toLocaleTimeString()} - last modified on
 	{updatedAt.toLocaleDateString()} at {updatedAt.toLocaleTimeString()}</small
 >
@@ -41,10 +41,10 @@
 
 <style lang="postcss">
 	article {
-		@apply mx-auto;
+		margin-inline: auto;
 	}
 
 	a {
-		@apply underline;
+		text-decoration-line: underline;
 	}
 </style>

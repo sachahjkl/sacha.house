@@ -12,7 +12,7 @@
 	const pathMatch = (pathname: string, path: string) => {
 		let matches = false;
 		let isRoot = path == '/';
-		
+
 		if (isRoot) {
 			matches = pathname == '/';
 		} else {
@@ -23,9 +23,9 @@
 	};
 </script>
 
-<header class="sticky top-0 z-10 bg-bgColor px-3">
+<header class="bg-bgColor sticky top-0 z-10 px-3">
 	<nav data-sveltekit-preload-data>
-		<fieldset class="border-2 border-textColor p-2 px-4">
+		<fieldset class="border-textColor border-2 p-2 px-4">
 			<legend class="ml-3 px-2">Navigation</legend>
 			<ul class="hidden flex-wrap gap-3 whitespace-nowrap sm:flex">
 				{#each navItems as item, i}
@@ -36,7 +36,7 @@
 						</a>
 					</li>
 					{#if i != navItems.length - 1}
-						<li class="hidden border-r-2 border-textColor sm:inline-block"></li>
+						<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
 					{/if}
 				{/each}
 			</ul>
@@ -56,7 +56,7 @@
 							</a>
 						</li>
 						{#if i != navItems.length - 1}
-							<li class="hidden border-r-2 border-textColor sm:inline-block"></li>
+							<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
 						{/if}
 					{/each}
 				</ul>
@@ -72,6 +72,7 @@
 
 	a:hover,
 	a.active {
-		@apply bg-textColor text-bgColor;
+		background-color: var(--color-textColor);
+		color: var(--color-bgColor);
 	}
 </style>

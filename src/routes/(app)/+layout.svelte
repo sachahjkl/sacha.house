@@ -66,13 +66,8 @@
 		<picture>
 			<source srcset={faviconAvif} type="image/avif" />
 			<source srcset={faviconWebp} type="image/webp" />
-			<img class="favicon" src={faviconFallback} height="1em" width="1em" alt="favicon" />
+			<img class="inline-block h-[1em] w-[1em] align-text-top" src={faviconFallback} height="1em" width="1em" alt="favicon" />
 		</picture>
 	</a>
 </Footer>
 
-<style lang="postcss">
-	img.favicon {
-		@apply inline-block h-[1em] w-[1em] align-text-top;
-	}
-</style>

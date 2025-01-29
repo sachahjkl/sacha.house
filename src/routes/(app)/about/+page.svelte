@@ -23,7 +23,7 @@
 	});
 </script>
 
-<article class="max-w-full text-sm sm:text-base">
+<article class="max-w-full text-sm sm:text-base mx-auto print:max-w-full">
 	<h1 class="h1">about</h1>
 	<section class="mb-8">
 		<div class="avatar my-6 flex justify-center">
@@ -43,7 +43,7 @@
 		</p>
 		<p>
 			You can <b>find my curriculum vitae</b> by clicking
-			<a href={MOI.curriculumVitae.toString()}>here</a>. 
+			<a href={MOI.curriculumVitae.toString()}>here</a>.
 		</p>
 	</section>
 
@@ -101,14 +101,11 @@
 </article>
 
 <style lang="postcss">
-	article {
-		@apply mx-auto print:max-w-full;
-	}
 	a {
-		@apply underline;
+		text-decoration-line: underline;
 	}
 
 	p {
-		@apply mb-4;
+		margin-bottom: calc(var(--spacing) * 4);
 	}
 </style>

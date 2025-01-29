@@ -20,7 +20,7 @@
 				<li>
 					<a href="/blog/{post.slug}">{post.title}</a>
 					-
-					<span class="time">
+					<span class="text-opacity-50 text-sm">
 						on
 						<time>{new Date(post.updatedAt).toLocaleDateString()} </time> at
 						<time>{new Date(post.updatedAt).toLocaleTimeString()}</time>
@@ -35,14 +35,10 @@
 
 <style lang="postcss">
 	article {
-		@apply mx-auto;
+		margin-inline: auto;
 	}
 
 	a {
-		@apply underline;
-	}
-
-	.time {
-		@apply text-sm text-opacity-50;
+		text-decoration-line: underline;
 	}
 </style>

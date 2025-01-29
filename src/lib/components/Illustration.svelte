@@ -7,11 +7,6 @@
 <picture>
 	<source srcset={avif} type="image/avif" />
 	<source srcset={webp} type="image/webp" />
-	<img class="illustration" src={fallback} width="1000" height="1305" alt="comrade" />
+	<img class="m-auto w-full max-w-md" src={fallback} width="1000" height="1305" alt="comrade" />
 </picture>
 
-<style lang="postcss">
-	.illustration {
-		@apply m-auto w-full max-w-md;
-	}
-</style>

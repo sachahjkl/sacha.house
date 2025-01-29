@@ -30,6 +30,6 @@
 
 <style lang="postcss">
 	a:hover {
-		@apply underline;
+		text-decoration-line: underline;
 	}
 </style>

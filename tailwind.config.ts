@@ -1,25 +1,11 @@
 import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
-import defaultTheme from 'tailwindcss/defaultTheme';
 
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
-		fontFamily: {
-			sans: ['monospace', ...defaultTheme.fontFamily.mono, 'Noto Color Emoji'],
-			mono: ['Fira Code Medium', ...defaultTheme.fontFamily.mono, 'Noto Color Emoji'],
-			serif: ['Noto Serif', ...defaultTheme.fontFamily.serif]
-		},
-		container: {
-			center: true
-		},
 		extend: {
-			colors: {
-				bgColor: '#000000',
-				bgOffColor: '#999999',
-				textColor: '#DDDDDD'
-			},
-			typography: (theme) => ({
+			typography: ({ theme }) => ({
 				DEFAULT: {
 					css: {
 						a: {

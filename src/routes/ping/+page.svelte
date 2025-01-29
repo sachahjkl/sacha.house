@@ -103,7 +103,7 @@
 	<title>Ping 👉 Pong</title>
 </svelte:head>
 
-<main>
+<main class="m-auto mt-6 max-w-5xl p-4">
 	<p>
 		<a class=" opacity-60" href="/" title="Home"
 			><span class="inline-block rotate-180">➜</span> 🏡 go back home</a
@@ -113,14 +113,14 @@
 
 	<div class="mb-[1em] flex gap-[1em]">
 		<button
-			class="bg-textColor px-2 text-bgColor"
+			class="bg-textColor text-bgColor px-2"
 			title="Click to pause the game (or click on the game itself)"
 			onclick={() => (playing = !playing)}
 		>
 			{playing ? '⏸ Pause' : '▶ Play '}
 		</button>
 		<button
-			class="bg-textColor px-2 text-bgColor"
+			class="bg-textColor text-bgColor px-2"
 			title="Reset the game"
 			onclick={throttle(function () {
 				console.log('test');
@@ -144,7 +144,7 @@
 			{#if !playing}
 				<span
 					transition:slide
-					class="text-shadow-xl absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-full p-2 text-3xl font-bold text-white shadow-red-500/50"
+					class="text-shadow-xl absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-full p-2 text-3xl font-bold text-white shadow-red-500/50"
 					>PAUSED</span
 				>
 			{/if}
@@ -157,7 +157,7 @@
 		</div> -->
 	{#if !error}
 		<div class="flex flex-wrap justify-items-stretch">
-			<div id="settings" class="flex-shrink flex-grow basis-[400px]">
+			<div id="settings" class="shrink grow basis-[400px]">
 				<h2 class="mb-2 text-2xl font-bold">Settings</h2>
 
 				<div class="flex flex-col gap-2">
@@ -208,7 +208,7 @@
 					>
 					<label for="scale">
 						Scale: <input
-							class="border-2 border-textColor bg-bgColor px-2 text-textColor"
+							class="border-textColor bg-bgColor text-textColor border-2 px-2"
 							type="text"
 							name="scale"
 							id="scale"
@@ -218,10 +218,10 @@
 					>
 				</div>
 			</div>
-			<div id="instructions" class="flex-shrink flex-grow basis-[400px]">
+			<div id="instructions" class="shrink grow basis-[400px]">
 				<h2>Instructions</h2>
 				<div class="flex flex-wrap gap-4">
-					<section class="basis-52 rounded p-4 shadow-sm">
+					<section class="basis-52 rounded-sm p-4 shadow-xs">
 						<h3>Général</h3>
 
 						<ul class="list-none p-0">
@@ -230,7 +230,7 @@
 							<li>Reset : <kbd class="kbd kdb-sm">{KEYS.RESET}</kbd></li>
 						</ul>
 					</section>
-					<section class="basis-52 rounded p-4 shadow-sm">
+					<section class="basis-52 rounded-sm p-4 shadow-xs">
 						<h3>Joueur 1</h3>
 						<ul class="list-none p-0">
 							<li>
@@ -239,7 +239,7 @@
 							<li>BAS : <kbd class="kbd kbd-sm">{KEYS.player1.DOWN}</kbd></li>
 						</ul>
 					</section>
-					<section class="basis-52 rounded p-4 shadow-sm">
+					<section class="basis-52 rounded-sm p-4 shadow-xs">
 						<h3>Joueur 2</h3>
 						<ul class="list-none p-0">
 							<li>HAUT : <kbd class="kbd kbd-sm">{KEYS.player2.UP}</kbd></li>
@@ -253,10 +253,7 @@
 </main>
 
 <style lang="postcss">
-	main {
-		@apply m-auto mt-6 max-w-5xl p-4;
-	}
 	#instructions h3 {
-		@apply mt-0;
+		margin-top: 0;
 	}
 </style>

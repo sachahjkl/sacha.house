@@ -22,15 +22,15 @@
 	<meta name="robots" content="noindex nofollow" />
 </svelte:head>
 
-<article class="prose">
+<article class="prose mx-auto">
 	<h1>admin</h1>
 
 	<section>
 		<h2>🕵️ Adresse IP</h2>
 
 		<p>
-			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code class=" rounded p-1 px-2"
-				>{data.ip}</code
+			L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code
+				class=" rounded-sm p-1 px-2">{data.ip}</code
 			>
 		</p>
 	</section>
@@ -71,9 +71,9 @@
 		>
 			<button
 				type="submit"
-				class="refresh-linkedin flex gap-2 bg-textColor px-2 font-bold text-bgColor"
+				class="refresh-linkedin bg-textColor text-bgColor flex gap-2 px-2 font-bold"
 			>
-				<div class="refresh-icon">⚙️</div>
+				<div class="animate-(--animate-spin) transition-all">⚙️</div>
 				<span class="hover:underline"> Rafraichir le profil (coûte 1 crédit) </span>
 			</button>
 		</form>
@@ -109,13 +109,6 @@
 </article>
 
 <style lang="postcss">
-	article {
-		@apply mx-auto;
-	}
-	button:hover .refresh-icon {
-		@apply animate-spin transition-all;
-	}
-
 	@keyframes bounce {
 		0%,
 		100% {
@@ -127,9 +120,4 @@
 			animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
 		}
 	}
-
-	/* button:hover .action-icon {
-		@apply transition-all;
-		animation: bounce 1s infinite;
-	} */
 </style>

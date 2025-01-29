@@ -22,15 +22,13 @@
 	<link rel="stylesheet" href={themeURL} />
 </svelte:head>
 
-<pre class="language-{language}"><code class="language-{language}">{@html formattedCode}</code
+<pre class="language-{language} max-h-[400px] overflow-y-auto whitespace-pre-wrap shadow"><code
+		class="language-{language}">{@html formattedCode}</code
 	></pre>
 
 <style lang="postcss">
-	pre {
-		@apply max-h-[400px] overflow-y-auto whitespace-pre-wrap shadow;
-	}
-
 	pre * {
-		@apply whitespace-pre-wrap break-all;
+		white-space: pre-wrap;
+		word-break: break-all;
 	}
 </style>
