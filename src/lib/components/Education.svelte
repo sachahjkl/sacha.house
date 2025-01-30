@@ -19,7 +19,7 @@
 	const { description } = education;
 </script>
 
-<section class="border-s-[16px] border-textColor py-2 ps-4">
+<section class="border-textColor border-s-[16px] py-2 ps-4">
 	<div id="title" class="mb-3">
 		<h3 class="ms-0 font-bold">
 			{#if lieu.website}

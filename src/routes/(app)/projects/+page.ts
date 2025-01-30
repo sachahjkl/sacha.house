@@ -1,5 +1,5 @@
 import type { ProjetsResponse } from '$lib/interfaces/Project';
-import { SITE_TITLE } from '$lib/me';
+import { MOI } from '$lib/me';
 
 export const load = async ({ fetch }) => {
 	const projects = fetch('/api/projets')
@@ -8,7 +8,7 @@ export const load = async ({ fetch }) => {
 	return {
 		projects: projects,
 		seo: {
-			title: `projects / ${SITE_TITLE}`,
+			title: `projects / ${MOI.siteTitle}`,
 			description: 'Mes projets personnels'
 		}
 	};

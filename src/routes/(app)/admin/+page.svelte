@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { env } from '$env/dynamic/public';
-	import PrismJs from '$lib/components/PrismJS.svelte';
+	import PrismJs from '$lib/components/Code.svelte';
 	import type { PageServerData } from './$types';
 
 	interface Props {

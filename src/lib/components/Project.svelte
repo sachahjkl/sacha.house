@@ -57,9 +57,11 @@
 				style={(avatarUrl ?? '').trim() !== ''
 					? '--color: lightred'
 					: `--color: hsl(${h}, ${s * 100}%, ${l * 100}%)`}
-				class="bg-(--color) grid aspect-square h-16 w-16 shrink-0 place-content-center sm:h-32 sm:w-32"
+				class="grid aspect-square h-16 w-16 shrink-0 place-content-center bg-(--color) sm:h-32 sm:w-32"
 			>
-				<span class="flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-3xl text-neutral-100 shadow-smletter text-center">
+				<span
+					class="shadow-smletter flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-center text-3xl text-neutral-100"
+				>
 					{name[0].toUpperCase()}
 				</span>
 			</div>

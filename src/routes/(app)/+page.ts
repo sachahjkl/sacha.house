@@ -1,4 +1,4 @@
-import { SITE_TITLE } from '$lib/me';
+import { MOI } from '$lib/me';
 
 export const load = async () => {
 	// const visites = fetch('/api/visites')
@@ -7,7 +7,7 @@ export const load = async () => {
 	return {
 		// visites,
 		seo: {
-			title: `home / ${SITE_TITLE}`
+			title: `home / ${MOI.siteTitle}`
 		}
 	};
 };

@@ -4,7 +4,7 @@
 	import Education from '$lib/components/Education.svelte';
 	import Experience from '$lib/components/Experience.svelte';
 	import type { LinkedinProfile } from '$lib/interfaces/LinkedinProfile';
-	import { MOI, PRETTY_PRENOM } from '$lib/me';
+	import { MOI } from '$lib/me';
 	import { isError as isKitError } from '$lib/utils';
 	import type { PageData } from './$types';
 
@@ -23,7 +23,7 @@
 	});
 </script>
 
-<article class="max-w-full text-sm sm:text-base mx-auto print:max-w-full">
+<article class="mx-auto max-w-full text-sm sm:text-base print:max-w-full">
 	<h1 class="h1">about</h1>
 	<section class="mb-8">
 		<div class="avatar my-6 flex justify-center">
@@ -31,7 +31,7 @@
 		</div>
 
 		<p>
-			My name is <b>{PRETTY_PRENOM}</b>, I'm
+			My name is <b>{MOI.prettyPrenom}</b>, I'm
 			<em>{new Date().getFullYear() - MOI.dateNaissance.getFullYear()} years old</em>
 			and I live in <em>{MOI.placeOfLiving}</em>.
 		</p>

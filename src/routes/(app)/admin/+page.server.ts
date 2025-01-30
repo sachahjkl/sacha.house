@@ -1,4 +1,4 @@
-import { MOI, SITE_TITLE } from '$lib/me';
+import { MOI } from '$lib/me';
 
 import { env as envPriv } from '$env/dynamic/private';
 import { env as envPub } from '$env/dynamic/public';
@@ -19,7 +19,7 @@ export const load = async ({ getClientAddress, fetch }) => {
 		profile,
 		ip: getClientAddress(),
 		seo: {
-			title: `admin / ${SITE_TITLE}`,
+			title: `admin / ${MOI.siteTitle}`,
 			description: "Panneau d'administration du site."
 		}
 	};

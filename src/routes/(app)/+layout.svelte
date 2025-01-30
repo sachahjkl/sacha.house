@@ -8,7 +8,7 @@
 	} from '$lib/assets/favicon_shadow.png?w=16;400;800&format=avif&as=srcset&imagetools';
 	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { PRETTY_NOM, PRETTY_PRENOM, SITE_TITLE } from '$lib/me';
+	import { MOI } from '$lib/me';
 	import { addSnow, isChristmas } from '$lib/utils';
 	import { onMount, type Snippet } from 'svelte';
 	import type { LayoutServerData } from './$types';
@@ -26,10 +26,10 @@
 		}
 	});
 
-	const TITLE = SITE_TITLE;
-	const DESCRIPTION = `Le site web personnel de ${PRETTY_PRENOM} ${PRETTY_NOM}`;
+	const TITLE = MOI.siteTitle;
+	const DESCRIPTION = `Le site web personnel de ${MOI.prettyPrenom} ${MOI.prettyNom}`;
 	const IMAGE = '/favicon_shadow.png';
-	const AUTHOR = `${PRETTY_PRENOM} ${PRETTY_NOM}`;
+	const AUTHOR = `${MOI.prettyPrenom} ${MOI.prettyNom}`;
 </script>
 
 <svelte:head>
@@ -66,8 +66,13 @@
 		<picture>
 			<source srcset={faviconAvif} type="image/avif" />
 			<source srcset={faviconWebp} type="image/webp" />
-			<img class="inline-block h-[1em] w-[1em] align-text-top" src={faviconFallback} height="1em" width="1em" alt="favicon" />
+			<img
+				class="inline-block h-[1em] w-[1em] align-text-top"
+				src={faviconFallback}
+				height="1em"
+				width="1em"
+				alt="favicon"
+			/>
 		</picture>
 	</a>
 </Footer>
-

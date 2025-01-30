@@ -20,40 +20,40 @@
 		: null;
 </script>
 
-<section class="border-s-[16px] py-2 border-textColor ps-4">
+<section class="border-textColor border-s-[16px] py-2 ps-4">
 	<div id="title" class="mb-3">
-	<h3 class="ms-0 font-bold">
-		{#if lieu.website}
-			<a class="font-bold no-underline hover:underline" href={lieu.website}>{lieu.name} 🔗</a>
-		{:else}
-			{lieu.name}
-		{/if}
-		<!-- <small class="ml-1  text-opacity-70 not-prose"
+		<h3 class="ms-0 font-bold">
+			{#if lieu.website}
+				<a class="font-bold no-underline hover:underline" href={lieu.website}>{lieu.name} 🔗</a>
+			{:else}
+				{lieu.name}
+			{/if}
+			<!-- <small class="ml-1  text-opacity-70 not-prose"
 			>à
 
 		</small> -->
-	</h3>
+		</h3>
 
-	<h4 class="italic">
-		{titre}
-	</h4>
-	<small class="text-bgOffColor">
-		<time>
-			{startDate.toLocaleDateString('fr-FR', {
-				year: 'numeric',
-				month: 'short'
-			})}
-		</time>
-		{#if endDate}
-			-
+		<h4 class="italic">
+			{titre}
+		</h4>
+		<small class="text-bgOffColor">
 			<time>
-				{endDate.toLocaleDateString('fr-FR', {
+				{startDate.toLocaleDateString('fr-FR', {
 					year: 'numeric',
 					month: 'short'
 				})}
 			</time>
-		{/if}
-	</small>
+			{#if endDate}
+				-
+				<time>
+					{endDate.toLocaleDateString('fr-FR', {
+						year: 'numeric',
+						month: 'short'
+					})}
+				</time>
+			{/if}
+		</small>
 	</div>
 
 	<div>

@@ -13,18 +13,17 @@
 </script>
 
 <button
-	class="break-all text-start underline"
+	class="text-start break-all underline"
 	use:copy={{
 		text: value,
 		onCopy({ text }) {
-			if(timeout) clearTimeout(timeout);
+			if (timeout) clearTimeout(timeout);
 			console.log('Copied! ' + text);
 			iconEl?.classList.add('copied');
 			timeout = setTimeout(() => {
 				iconEl?.classList.remove('copied');
 			}, 1000);
-		},
-
+		}
 	}}
 	id="copy-{id}">{value}</button
 >

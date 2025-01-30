@@ -7,5 +7,3 @@
 	<h1>{$page.status} {statusCodeToText($page.status)}</h1>
 	<p>{@html $page.error?.message.replaceAll('\n', '</br>')}</p>
 </main>
-
-

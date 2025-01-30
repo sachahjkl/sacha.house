@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/public';
 import type { ListedPost } from '$lib/interfaces/Post';
-import { SITE_TITLE } from '$lib/me';
+import { MOI } from '$lib/me';
 import { GET_POSTS } from '$lib/queries';
 import { error } from '@sveltejs/kit';
 import { GraphQLClient } from 'graphql-request';
@@ -25,7 +25,7 @@ export const load = async () => {
 	return {
 		posts: getPosts(),
 		seo: {
-			title: `blog / ${SITE_TITLE}`,
+			title: `blog / ${MOI.siteTitle}`,
 			description:
 				"Mon blog dans lequel je posterai (rarement) des sujets portant souvent sur l'informatique."
 		}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PRETTY_NOM, PRETTY_PRENOM } from '$lib/me';
+	import { MOI } from '$lib/me';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -22,7 +22,7 @@
 	{#if updatedAt}
 		<meta property="og:article:modified_time" content={updatedAt.toISOString()} />
 	{/if}
-	<meta property="og:article:author" content="{PRETTY_PRENOM} {PRETTY_NOM}" />
+	<meta property="og:article:author" content="{MOI.prettyPrenom} {MOI.prettyNom}" />
 </svelte:head>
 
 <p class="mb-4 text-sm">

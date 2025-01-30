@@ -1,3 +1,8 @@
+import js from '@shikijs/langs/javascript';
+import monokai from '@shikijs/themes/monokai';
+import { createHighlighterCoreSync } from 'shiki';
+import { createJavaScriptRegexEngine } from 'shiki/engine-javascript.mjs';
+
 export const one_second_in_ms = 1000;
 
 export function clamp(value: number, min: number, max: number) {
@@ -125,3 +130,9 @@ export const statusCodeToText = (status: number) => {
 };
 
 export const toId = (str: string) => str.replace(/[^a-zA-Z0-9]/g, '');
+
+export const highlighter = createHighlighterCoreSync({
+	langs: [js],
+	themes: [monokai],
+	engine: createJavaScriptRegexEngine()
+});

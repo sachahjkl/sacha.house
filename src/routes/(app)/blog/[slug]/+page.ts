@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/public';
 import type { Post } from '$lib/interfaces/Post';
-import { SITE_TITLE } from '$lib/me';
+import { MOI } from '$lib/me';
 import { GET_POST } from '$lib/queries';
 import { error } from '@sveltejs/kit';
 import { GraphQLClient } from 'graphql-request';
@@ -26,7 +26,7 @@ export const load = async ({ params, url }) => {
 	return {
 		post: await post,
 		seo: {
-			title: await post.then((post) => `${post.title} / ${SITE_TITLE}`),
+			title: await post.then((post) => `${post.title} / ${MOI.siteTitle}`),
 			description: await post.then((post) =>
 				post.content.text.length > 180
 					? `${post.content.text.substring(0, 180)}...`

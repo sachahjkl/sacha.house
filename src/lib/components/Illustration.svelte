@@ -9,4 +9,3 @@
 	<source srcset={webp} type="image/webp" />
 	<img class="m-auto w-full max-w-md" src={fallback} width="1000" height="1305" alt="comrade" />
 </picture>
-

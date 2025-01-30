@@ -24,9 +24,9 @@
 	/* fonts */
 	/* convert this to css format. use the var(--font-sans) format to get the default fonts */
 
-	--font-sans: 'Fira Code Medium', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+	--font-sans: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
 		'Liberation Mono', 'Courier New', monospace, 'Noto Color Emoji';
-	--font-mono: 'Fira Code Medium', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+	--font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
 		'Liberation Mono', 'Courier New', monospace, 'Noto Color Emoji';
 	--font-serif: 'Noto Serif', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
