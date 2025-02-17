@@ -50,6 +50,7 @@
 								class="inline-block w-full"
 								class:active={activePagePathname === item.pathname}
 								href={item.pathname}
+								onclick={() => (openNav = false)}
 							>
 								{item.icon}
 								{item.title}
