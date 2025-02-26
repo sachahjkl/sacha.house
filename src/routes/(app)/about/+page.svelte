@@ -32,7 +32,7 @@
 
 		<p>
 			My name is <b>{MOI.prettyPrenom}</b>, I'm
-			<em>{new Date().getFullYear() - MOI.dateNaissance.getFullYear()} years old</em>
+			<em>{MOI.ageRound} years old</em>
 			and I live in <em>{MOI.placeOfLiving}</em>.
 		</p>
 		<p>I'm a software engineer. I strive to produce simple, high-quality work.</p>

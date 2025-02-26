@@ -1,3 +1,4 @@
+import { Temporal } from 'temporal-polyfill';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { Gender } from './interfaces/Person';
 import { capitalize } from './utils';
@@ -8,7 +9,7 @@ export const MOI = {
 	username: 'sachahjkl',
 	/** @type {Gender} */
 	gender: '',
-	dateNaissance: new Date('1999-05-25T00:00:00+02:00'),
+	dateNaissance: Temporal.ZonedDateTime.from('1999-05-25T00:00:00+02:00[Europe/Paris]'),
 	placeOfLiving: 'le Mans',
 	github: new URL('https://github.com/sachahjkl'),
 	gitlab: new URL('https://gitlab.com/sachahjkl'),
@@ -33,5 +34,14 @@ export const MOI = {
 	},
 	get siteTitle() {
 		return `${this.prettyPrenom} ${this.prettyNom}`;
+	},
+	get age() {
+		return this.dateNaissance.until(Temporal.Now.zonedDateTimeISO('Europe/Paris')).total({
+			unit: 'years',
+			relativeTo: Temporal.Now.zonedDateTimeISO('Europe/Paris')
+		});
+	},
+	get ageRound() {
+		return Math.floor(this.age);
 	}
 };
