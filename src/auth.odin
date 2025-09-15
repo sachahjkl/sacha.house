@@ -5,11 +5,14 @@ import net "core:net"
 import http "odin-http"
 
 is_authorized :: proc(req: ^http.Request) -> bool {
-	address := req.client.address
-	client_ip_str := net.address_to_string(address)
+	
+	client_endpoint_str := net.endpoint_to_string(req.client)
 	
 	// Debug: log the client info
-	log.debugf("Client address: %v, string: %s", address, client_ip_str)
+	log.debugf("Client address: %v, string: %s", req.client, client_endpoint_str)
+
+	address := req.client.address
+	client_ip_str := net.address_to_string(address)
 	
 	// localhost is all good
 	if address == net.IP4_Loopback {

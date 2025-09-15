@@ -1,4 +1,3 @@
- #+feature global-context
 package http
 
 import "base:runtime"
@@ -61,14 +60,6 @@ Default_Server_Opts := Server_Opts {
 	// max_free_blocks_queued  = 64,
 }
 
-@(init, private)
-server_opts_init :: proc() {
-	when ODIN_OS == .Linux || ODIN_OS == .Darwin {
-		Default_Server_Opts.thread_count = os.processor_core_count()
-	} else {
-		Default_Server_Opts.thread_count = 1
-	}
-}
 
 Server_State :: enum {
 	Uninitialized,
@@ -360,7 +351,6 @@ connection_set_state :: proc(c: ^Connection, s: Connection_State) -> bool {
 Connection :: struct {
 	server:         ^Server,
 	socket:         net.TCP_Socket,
-	source:         net.Endpoint,
 	state:          Connection_State,
 	scanner:        Scanner,
 	temp_allocator: virtual.Arena,
@@ -452,7 +442,6 @@ on_accept :: proc(server: rawptr, sock: net.TCP_Socket, source: net.Endpoint, er
 	c.state = .New
 	c.server = server
 	c.socket = sock
-	c.source = source
 
 	td.conns[c.socket] = c
 
@@ -625,8 +614,7 @@ conn_handle_req :: proc(c: ^Connection, allocator := context.temp_allocator) {
 	c.loop.conn = c
 	c.loop.res._conn = c
 	c.loop.req._scanner = &c.scanner
-	// NOTE(sachahjkl): this might work ? otherwise, the client/source is simply uninitialized.
-	c.loop.req.client = c.source
+
 	request_init(&c.loop.req, allocator)
 	response_init(&c.loop.res, allocator)
 
