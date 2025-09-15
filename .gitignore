@@ -189,3 +189,14 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# config
+config.json
+
+# Odin
+sacha.house
+sacha.house.exe
+sacha.house.pdb
+temple_cli
+temple_cli.exe
+temple_cli.pdb

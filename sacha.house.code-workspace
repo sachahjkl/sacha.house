@@ -20,5 +20,9 @@
 			"**/dev-dist": true
 		},
 		"typescript.tsdk": "node_modules\\typescript\\lib"
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": []
 	}
 }

@@ -1,0 +1,15 @@
+</main>
+<footer class="bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 text-xs font-bold">
+	<div>
+		<p>(C)
+			{{ int(this.Footer.year) }}
+			sacha.house</p>
+	</div>
+	<a class="flex items-center gap-1" href="https://gitlab.com/{{ this.Footer.gitRepoId }}/-/commit/{{ this.Footer.commitHash }}">
+		<div class="flex items-center gap-1">
+			<img width="100" src="https://gitlab.com/{{ this.Footer.gitRepoId }}/badges/master/pipeline.svg" alt="Deploy Status Badge"/>
+			{{ this.Footer.commitHash }}
+			{% embed "_external_link_icon.temple.twig" %}
+		</div>
+	</a>
+</footer></body></html>

@@ -1,0 +1,136 @@
+{% embed "_header.temple.twig" with this.base %}
+<article class="mx-auto">
+	<h1 class="h1">projects</h1>
+	<section class="mb-8">
+		<p>
+			A collection of my work, including both completed and ongoing projects. These repositories
+			were created to:
+		</p>
+		<ul class="ms-4 list-inside list-[square]">
+			<li>Explore new technologies</li>
+			<li>Practice project management, design, and software architecture</li>
+			<li>
+				Collaborate on personal projects (<a href="{{ this.HayekFR }}">
+					website example
+				</a>
+				and its <a href="{{ this.HayekFRRepo }}">repository</a>, task automation, etc.)
+			</li>
+			<li>Organize academic work</li>
+			<li>
+				Store personal environment files (e.g., <a href="{{ this.Dotfiles }}">dotfiles</a>)
+			</li>
+		</ul>
+		<p>Most of my work is hosted on <b>GitLab</b>, with some minor projects on <b>GitHub</b>.</p>
+	</section>
+	<div class="divider"></div>
+	<section class="mb-8">
+		<h2 class="h2">
+			<img
+				class="m-0 mr-2 inline-block w-[1.2em] align-middle"
+				width="15"
+				src="/static/gitlab.png"
+				alt="GitLab Logo"
+			/>
+			GitLab / @{{ this.Username }}
+		</h2>
+		<ul 
+			class="scrollbar-thin border-textColor mx-4 flex max-h-[540px] snap-y snap-mandatory list-none flex-col gap-4 overflow-y-scroll border-y-4 p-0"
+
+		>
+			{% for p in this.GitLabProjects %}
+				<li class="snap-start">
+					<a href="{{ p.url }}" title="{{ p.name }} - {{ p.descriptionHtml }}">
+						<div class="border-bgColor bg-bgColor text-textColor hover:border-textColor flex overflow-hidden border-4">
+							{% if p.hasAvatar %}
+								<div class="grid shrink-0 place-content-center">
+									<figure>
+										<img
+											class="aspect-square max-w-fit size-16 sm:size-32"
+											loading="lazy"
+											src="{{ p.avatarUrl }}"
+											alt="avatar"
+										/>
+									</figure>
+								</div>
+							{% else %}
+								<div
+									style="background-color: {{ p.hslColor }};"
+									class="grid aspect-square size-16 shrink-0 place-content-center sm:size-32"
+								>
+									<span class="shadow-smletter flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-center text-3xl text-neutral-100">
+										{{ p.first_letter }}
+									</span>
+								</div>
+							{% end %}
+							<div class="text-textColor w-full overflow-hidden p-0 text-sm sm:text-base">
+								<h2 class="bg-textColor text-bgColor ps-2 font-bold">{{ p.name }}</h2>
+								<div class="line-clamp-2 ps-2 pt-2">
+									{% if p.descriptionHtml != "" %}
+										{{ p.descriptionHtml | raw }}
+									{% else %}
+										😞 Unfortunately, no description is available (I was probs lazy ahh).
+									{% end %}
+								</div>
+							</div>
+						</div>
+					</a>
+				</li>
+			{% end %}
+		</ul>
+	</section>
+	<section class="mb-8">
+		<h2 class="h2 mb-0">
+			<img
+				class="m-0 mr-2 inline-block w-[1.2em] align-middle"
+				src="/static/github.png"
+				alt="GitHub Logo"
+			/>
+			GitHub / @{{ this.Username }}
+		</h2>
+		<ul 
+			class="scrollbar-thin border-textColor mx-4 flex max-h-[540px] snap-y snap-mandatory list-none flex-col gap-4 overflow-y-scroll border-y-4 p-0"
+
+		>
+			{% for p in this.GitHubProjects %}
+				<li class="snap-start">
+					<a href="{{ p.url }}" title="{{ p.name }} - {{ p.descriptionHtml }}">
+						<div class="border-bgColor bg-bgColor text-textColor hover:border-textColor flex overflow-hidden border-4">
+							{% if p.hasAvatar %}
+								<div class="grid shrink-0 place-content-center">
+									<figure>
+										<img
+											class="aspect-square h-16 w-16 sm:h-32 sm:w-32"
+											loading="lazy"
+											src="{{ p.avatarUrl }}"
+											alt="avatar"
+										/>
+									</figure>
+								</div>
+							{% else %}
+								<div
+									style="background-color: {{ p.hslColor }};"
+									class="grid aspect-square h-16 w-16 shrink-0 place-content-center sm:h-32 sm:w-32"
+								>
+									<span class="shadow-smletter flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-center text-3xl text-neutral-100">
+										{{ p.first_letter }}
+									</span>
+								</div>
+							{% end %}
+							<div class="text-textColor w-full overflow-hidden p-0 text-sm sm:text-base">
+								<h2 class="bg-textColor text-bgColor ps-2 font-bold">{{ p.name }}</h2>
+								<div class="line-clamp-2 ps-2 pt-2">
+									{% if p.descriptionHtml != "" %}
+										{{ p.descriptionHtml | raw }}
+									{% else %}
+										😞 Unfortunately, no description is available (I was probs lazy ahh).
+									{% end %}
+								</div>
+							</div>
+						</div>
+					</a>
+				</li>
+			{% end %}
+		</ul>
+	</section>
+</article>
+{% embed "_footer.temple.twig" with this.base %}

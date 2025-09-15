@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+	{% embed "_head.temple.twig" with this %}
+		<body hx-boost="true" class="bg-bgColor text-textColor">
+			{% if this.IsATeapot %}
+				<main id="content" class="m-auto mt-16 max-w-5xl p-4">
+					<h1>418 I'm a teapot</h1>
+					<p>{{ this.BrewMessage.text }}</p>
+				</main>
+			{% else %}
+				<main id="content" class="m-auto mt-6 max-w-5xl p-4">
+					<p>
+						<a href="/" class="opacity-60">
+							<span class="inline-block rotate-180">➜</span>
+							Home</a>
+					</p>
+					<h1 class="h1">Here, let's make you a nice cup of :</h1>
+
+					<ul>
+						<li>
+							<a href="?drink=tea">Tea</a>
+						</li>
+						<li>
+							<a href="?drink=coffee">Coffee</a>
+						</li>
+						<li>
+							<a href="?drink={{ this.Spewage }}">Random spewage</a>
+						</li>
+					</ul>
+					{% if this.BrewMessage.text != ""  %}
+						<hr class="my-4 border-2"/>
+						<p class="text-center text-4xl font-black">{{ this.BrewMessage.text }}</p>
+						<p class="mt-20 animate-bounce text-center text-9xl drop-shadow-md">{{ this.BrewMessage.emoji }}</p>
+						{% end %}
+					</main>
+					{% end %}
+				</body>
+			</html>
+		</body>

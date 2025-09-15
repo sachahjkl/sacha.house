@@ -1,42 +1,60 @@
-FROM node:lts-slim AS base
+# Multi-stage build for lightweight release container
+FROM archlinux:base-devel AS builder
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+ARG GIT_COMMIT_HASH=dev
 
-# Secret env - undefined by default
-ENV GITHUB_BEARER_TOKEN ""
-ENV GITLAB_BEARER_TOKEN ""
-ENV PROXYCURL_BEARER_TOKEN ""
-# JSON array
-ENV ADMIN_IPS '[]'
+# Install dependencies
+RUN pacman -Syu --noconfirm clang openssl make libbacktrace git odin unzip tar
 
-# Public env - default values
-ENV PUBLIC_NETLIFY_SITE_ID "0afd9771-2b63-4228-9750-56921d8247a6"
-ENV PUBLIC_GITLAB_API_ENDPOINT "https://gitlab.com/api/graphql"
-ENV PUBLIC_GITHUB_API_ENDPOINT "https://api.github.com/graphql"
-ENV PUBLIC_PROXYCURL_API_ENDPOINT "https://nubela.co/proxycurl/api/v2"
-ENV PUBLIC_HYGRAPH_API_ENDPOINT "https://api-eu-central-1-shared-euc1-02.hygraph.com/v2/cl9bfrahc3vlz01t60835c8hx/master"
-ENV PUBLIC_LINKEDIN_GIST_ID "ff093380f245a9ecd280d1b2aaa17aa7"
-ENV PUBLIC_GIT_REPO_ID "sachahjkl/sacha.house"
+# Download and install specific Odin release
+RUN curl -L https://github.com/odin-lang/Odin/releases/download/dev-2025-09/odin-linux-amd64-dev-2025-09.zip -o odin.zip \
+    && unzip odin.zip -d /tmp \
+    && tar -C /opt -xzf /tmp/dist.tar.gz \
+    && ln -s /opt/odin-linux-amd64-nightly+2025-09-08/odin /usr/local/bin/odin
 
-RUN corepack enable
+# Install bun for CSS processing
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.2.19"
+ENV PATH="/root/.bun/bin:$PATH"
 
-COPY . /app
+# Set working directory
 WORKDIR /app
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+# Copy source files and build configuration
+COPY src/ ./src/
+COPY styles/ ./styles/
+COPY Makefile ./
+COPY tailwind.config.js ./
+COPY package.json ./
 
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build
+# Install dependencies and build in release mode
+RUN bun install --production
+RUN make build mode=release GIT_COMMIT_HASH=$GIT_COMMIT_HASH
 
-FROM base
+# Final lightweight stage
+FROM alpine:3.21
 
-ENV NODE_ENV=production
+# Install only runtime dependencies and create user
+RUN apk add --no-cache \
+    ca-certificates \
+    openssl \
+    gcompat \
+    tzdata \
+    && adduser -D -s /bin/false appuser
 
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=build /app/build /app/build
+# Copy only the binary
+COPY --from=builder /app/sacha.house.exe /app/sacha.house
 
-EXPOSE 3000
-CMD [ "node", "build"]
+# Set ownership and permissions
+RUN chown -R appuser:appuser /app && chmod +x /app/sacha.house
+
+# Switch to non-root user
+USER appuser
+WORKDIR /app
+
+# edit the hosts config
+
+# Expose port
+EXPOSE 6969
+
+# Run the application
+ENTRYPOINT ["./sacha.house"]

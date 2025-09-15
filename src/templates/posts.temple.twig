@@ -1,0 +1,18 @@
+{% embed "_header.temple.twig" with this.base %}
+	<article class="blog-page">
+		<h1 class="h1">blog</h1>
+		<h2 class="mb-2 font-bold">📰 Available articles</h2>
+		<ul class="list-inside list-[square]">
+			{% for post in this.Posts %}
+				<li>
+					<a href="/blog/{{ post.slug }}">{{ post.title }}</a> - 
+					<span class="text-opacity-50 text-sm">
+						on
+						<time>{{ post.dateString }}</time> at
+						<time>{{ post.timeString }}</time>
+					</span>
+				</li>
+				{% end %}
+			</ul>
+		</article>
+		{% embed "_footer.temple.twig" with this.base %}

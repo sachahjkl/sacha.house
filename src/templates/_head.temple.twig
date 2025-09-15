@@ -1,0 +1,60 @@
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>{{ this.Title }}</title>
+	<script src="/static/js/htmx.min.js"></script>
+
+    <script>
+        // htmx.config.responseHandling.push({"code":"418","swap":true,"error":false});
+
+        document.addEventListener("DOMContentLoaded", (event) => {
+            document.body.addEventListener('htmx:beforeSwap', function(evt) {
+                if (evt.detail.xhr.status === 418) {
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+            });
+        });
+    </script>
+
+
+	<link rel="icon" href="/static/favicon_shadow.png"/>
+	<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
+
+	<link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+	<link rel="dns-prefetch" href="https://fonts.gstatic.com"/>
+	<link rel="preconnect" href="https://fonts.googleapis.com"/>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+
+	<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap" rel="stylesheet"/>
+
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+
+	<noscript>
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet"/>
+	</noscript>
+
+	<link rel="mask-icon" href="%sveltekit.assets%/maskable_icon_x512.png" color="#000000"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
+	<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png"/>
+	<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png"/>
+	<link rel="manifest" href="/static/site.webmanifest"/>
+	<link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#000000"/>
+	<meta name="msapplication-TileColor" content="#000000"/>
+	<meta name="theme-color" content="#ffffff"/>
+
+
+	<link rel="stylesheet" href="/static/css/style.css"/>
+	<meta name="description" content="{{ this.SEO.description }}"/>
+	<meta name="og:description" content="{{ this.SEO.description }}"/>
+	<meta name="twitter:description" content="{{ this.SEO.description }}"/>
+	<meta name="twitter:image" content="{{ this.SEO.image }}"/>
+	<meta property="og:image" content="{{ this.SEO.image }}"/>
+	<meta name="keywords" content="Blog, Programmation, Programming, Portfolio, Personal, Personnel"/>
+	<meta name="generator" content="Odin"/>
+	<meta property="og:locale" content="fr_FR"/>
+	<meta name="twitter:card" content="summary_large_image"/>
+	<meta name="author" content="{{ this.SEO.author }}"/>
+
+</head>

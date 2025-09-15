@@ -1,0 +1,57 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./src/templates/**/*.twig"],
+  theme: {
+    extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            a: {
+              wordBreak: "break-all",
+            },
+            maxWidth: "var(--width-full)",
+            "--tw-prose-body": "var(--color-textColor)",
+            "--tw-prose-headings": "var(--color-textColor)",
+            "--tw-prose-lead": "var(--color-textColor)",
+            "--tw-prose-links": "var(--color-textColor)",
+            "--tw-prose-bold": "var(--color-textColor)",
+            "--tw-prose-counters": "var(--color-textColor)",
+            "--tw-prose-bullets": "var(--color-textColor)",
+            "--tw-prose-hr": "var(--color-textColor)",
+            "--tw-prose-quotes": "var(--color-textColor)",
+            "--tw-prose-quote-borders": "var(--color-textColor)",
+            "--tw-prose-captions": "var(--color-textColor)",
+            "--tw-prose-code": "var(--color-textColor)",
+            "--tw-prose-pre-code": "var(--color-bgColor)",
+            "--tw-prose-pre-bg": "var(--color-textColor)",
+            "--tw-prose-th-borders": "var(--color-textColor)",
+            "--tw-prose-td-borders": "var(--color-textColor)",
+            "--tw-prose-invert-body": "var(--color-bgColor)",
+            "--tw-prose-invert-headings": "var(--color-bgColor)",
+            "--tw-prose-invert-lead": "var(--color-bgColor)",
+            "--tw-prose-invert-links": "var(--color-bgColor)",
+            "--tw-prose-invert-bold": "var(--color-bgColor)",
+            "--tw-prose-invert-counters": "var(--color-bgColor)",
+            "--tw-prose-invert-bullets": "var(--color-bgColor)",
+            "--tw-prose-invert-hr": "var(--color-bgColor)",
+            "--tw-prose-invert-quotes": "var(--color-bgColor)",
+            "--tw-prose-invert-quote-borders": "var(--color-bgColor)",
+            "--tw-prose-invert-captions": "var(--color-bgColor)",
+            "--tw-prose-invert-code": "var(--color-bgColor)",
+            "--tw-prose-invert-pre-code": "var(--color-textColor)",
+            "--tw-prose-invert-pre-bg": "var(--color-bgColor)",
+            "--tw-prose-invert-th-borders": "var(--color-bgColor)",
+            "--tw-prose-invert-td-borders": "var(--color-bgColor)",
+            pre: {
+              backgroundColor: "var(--color-bgColor)",
+              color: "var(--color-textColor)",
+              borderWidth: "2px",
+              scrollBarWidth: "thin",
+              borderRadius: 0,
+            },
+          },
+        },
+      },
+    },
+  },
+};

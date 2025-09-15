@@ -1,0 +1,36 @@
+{% embed "_header.temple.twig" with this.base %}
+<article class="prose mx-auto">
+    <h1>admin</h1>
+
+    <section>
+        <h2>🕵️ Adresse IP</h2>
+        <p>
+            L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code class="rounded-sm p-1 px-2">{{ this.IpAddress }}</code>
+        </p>
+    </section>
+    <div class="divider"></div>
+    <section>
+        <h2>👔 Données du profil LinkedIn</h2>
+        <p>
+            <s>Les données pour le profil LinkedIn proviennent de l'API <a href="https://nubela.co/proxycurl">ProxyCurl</a>.</s>
+            Les données pour le profil LinkedIn proviennent d'un fichier JSON historiquement hébergé sur GitHub Gist.
+            <br>
+            Ce fichier json est maintenant mis à jour manuellement et est intégré au code de l'application via le fichier <code class="rounded-sm p-1 px-2">linkedin_profile.json</code>.
+        </p>
+        <p>
+            <s>Il reste <b>{{ int(this.CreditBalance) }} crédits</b> pour raffraichir ces données.</s>
+            <br>
+            Il n'y a plus de crédits à raffraichir ces données. (ProxyCurl a été arrêté)
+        </p>
+        <form method="POST" action="/admin/update-linkedin" disabled>
+            <button type="submit" class="refresh-linkedin bg-textColor text-bgColor flex gap-2 px-2 font-bold">
+                <div class="animate-spin transition-all">⚙️</div>
+                <span class="hover:underline"> Rafraichir le profil </span>
+                (désactivé car ProxyCurl a été arrêté)
+            </button>
+        </form>
+
+        <pre><code class="language-json">{{ this.ProfileData }}</code></pre>
+    </section>
+</article>
+{% embed "_footer.temple.twig" with this.base %}

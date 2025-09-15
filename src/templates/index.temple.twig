@@ -1,0 +1,44 @@
+{% embed "_header.temple.twig" with this.base %}
+<article>
+	<h1 class="h1">welcome to my website</h1>
+	<section class="mb-8">
+		<img
+			class="mx-auto block p-4 brightness-300"
+			height="192"
+			width="891"
+			src="/static/gifs/logo_house.gif"
+			alt="Logo"
+		/>
+	</section>
+
+	<section class="mb-8">
+		<h2 class="h2">Quick links</h2>
+
+		<ul class="">
+			<li><a href="/about">➜ about me</a></li>
+			<li><a href="mailto:{{ this.Mail }}">📧 shoot me an email (will reply asap)</a></li>
+			<li>
+				<a hx-boost="false" href="/sachahjkl.gpg">
+					🔐 my gpg key:
+					<span id="gpg-fingerprint" class="break-all">
+						{{ this.GpgPrint }}
+					</span>
+				</a>
+			</li>
+			<li><a href="/teapot">🍵 teapot</a></li>
+		</ul>
+	</section>
+
+	<section class="mb-8">
+		<picture>
+			<img
+				class="m-auto w-full max-w-md"
+				src="/static/c-omrade.jpg"
+				width="1000"
+				height="1305"
+				alt="comrade"
+			/>
+		</picture>
+	</section>
+</article>
+{% embed "_footer.temple.twig" with this.base %}

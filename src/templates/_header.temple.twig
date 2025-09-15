@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+	{% embed "_head.temple.twig" with this %}
+	<body hx-boost="true" class="bg-bgColor text-textColor">
+		<header class="bg-bgColor sticky top-0 z-10 px-3">
+			<nav hx-indicator="#nav-spinner">
+				<fieldset class="border-textColor border-2 p-2 px-4">
+					<legend class="ml-3 px-2">
+						Navigation
+						<span id="nav-spinner" class="htmx-indicator animate-spin inline-block">⏳</span>
+					</legend>
+					<ul class="hidden flex-wrap gap-3 whitespace-nowrap sm:flex">
+						{% for item, i in this.NavItems %}
+							{% if item.CanAccess %}
+							<li class="flex-[100%] sm:flex-none">
+								<a href="{{ item.Pathname }}" class="{% if item.IsActive %}active{% end %}">
+									{{ item.Icon }}
+									{{ item.Title }}
+								</a>
+							</li>
+							{% end %}
+							{% if i != len(this.NavItems) - 1 %}
+								<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
+								{% end %}
+								{% end %}
+							</ul>
+
+							<div class="block sm:hidden">
+								<details>
+									<summary id="nav-summary" class="mb-1">closed</summary>
+									<script>
+										document.addEventListener('DOMContentLoaded', () => {
+											const summary = document.getElementById('nav-summary');
+
+											summary.closest('details').addEventListener('toggle', () => {
+												summary.textContent = summary.closest('details').open ? 'open' : 'closed';
+											});
+										});
+									</script>
+									<style>
+										.htmx-indicator {
+											display: none;
+										}
+										.htmx-request .htmx-indicator,
+										.htmx-request.htmx-indicator {
+											display: inline-block;
+										}
+									</style>
+									<ul class="flex flex-wrap gap-3 whitespace-nowrap">
+										{% for item, i in this.NavItems %}
+											<li class="flex-[100%] sm:flex-none">
+												<a class="inline-block w-full {% if item.IsActive %}active{% end %}" href="{{ item.Pathname }}">
+													{{ item.Icon }}
+													{{ item.Title }}
+												</a>
+											</li>
+											{% if i != len(this.NavItems) - 1 %}
+												<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
+												{% end %}
+												{% end %}
+											</ul>
+										</details>
+									</div>
+								</fieldset>
+							</nav>
+						</header>
+						<main id="content" class="m-auto max-w-5xl p-3 pb-16">
