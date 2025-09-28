@@ -12,7 +12,7 @@ capitalize :: proc(s: string, allocator := context.temp_allocator) -> string {
 	return fmt.aprintf("%s%s", strings.to_upper(s[:1], context.temp_allocator), s[1:], allocator = allocator)
 }
 /*
-NOTE(Sacha Froment):
+NOTE(sachahjkl):
 - This function is used to set the Cache-Control header on the response.
 - The default value is "public, max-age=86400" which is 1 day.
 */
@@ -23,7 +23,7 @@ set_cache_header :: proc(res: ^http.Response, value := "public, max-age=86400") 
 CHARS :: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@"
 
 /*
-NOTE(Sacha Froment):
+NOTE(sachahjkl):
 - The previous implementation of `generate_random_string` was producing broken unicode strings.
 - This was likely due to a misuse of the random number generation functions.
 - The new implementation uses `crypto/rand` to generate random bytes and then maps them to the character set.

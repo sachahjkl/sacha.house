@@ -19,6 +19,8 @@ Config :: struct {
 	LINKEDIN_GIST_ID:            string,
 	ADMIN_IPS:                   []string,
 	GIT_REPO_ID:                 string,
+	ADMIN_USERNAME:              string,
+	ADMIN_PASSWORD:              string,
 }
 
 APP_CONFIG: Config

@@ -10,6 +10,39 @@
     </section>
     <div class="divider"></div>
     <section>
+        <h2>📁 Projets</h2>
+        <form id="refresh-projects" method="POST" action="/admin/refresh-projects">
+            <style>
+                /* Hide the loading text when the button is not loading */
+                #refresh-projects:not(.htmx-request) .loading-text {
+                    display: none;
+                }
+                
+                /* Show the loading text when the button is loading */
+                #refresh-projects.htmx-request .loading-text {
+                    display: block;
+                }
+
+                /* Hide the default text when the button is loading */
+                #refresh-projects.htmx-request .default-text {
+                    display: none;
+                }
+            </style>
+            <button type="submit" class="h-8 select-none rounded-lg bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]">
+
+            <span class="loading-text">
+                <span class="animate-spin transition-all">⚙️</span>
+                Rafraîchissement en cours...
+            </span>
+            <span class="default-text">
+                🚀 Rafraîchir les projets
+            </span>
+                
+            </button>
+        </form>
+    </section>
+    <div class="divider"></div>
+    <section>
         <h2>👔 Données du profil LinkedIn</h2>
         <p>
             <s>Les données pour le profil LinkedIn proviennent de l'API <a href="https://nubela.co/proxycurl">ProxyCurl</a>.</s>
@@ -23,8 +56,8 @@
             Il n'y a plus de crédits à raffraichir ces données. (ProxyCurl a été arrêté)
         </p>
         <form method="POST" action="/admin/update-linkedin" disabled>
-            <button type="submit" class="refresh-linkedin bg-textColor text-bgColor flex gap-2 px-2 font-bold">
-                <div class="animate-spin transition-all">⚙️</div>
+            <button type="submit" class="h-8 select-none rounded-lg bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]">
+                <span class="animate-spin transition-all">⚙️</span>
                 <span class="hover:underline"> Rafraichir le profil </span>
                 (désactivé car ProxyCurl a été arrêté)
             </button>

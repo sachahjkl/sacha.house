@@ -6,7 +6,7 @@ import "core:time"
 import "core:time/datetime"
 import "core:time/timezone"
 
-// NOTE(Sacha Froment):
+// NOTE(sachahjkl):
 // - This is a global variable that is used to store the timezone.
 // - It is initialized in the `init_timezone` function.
 // - Used for the whole duration of the program, no need to free it.

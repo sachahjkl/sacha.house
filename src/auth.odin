@@ -1,30 +1,45 @@
 package main
 
-import "core:log"
-import net "core:net"
+import "core:encoding/base64"
+import "core:strings"
 import http "odin-http"
 
+// NOTE(sachahjkl):
+// Basic auth challenge for the admin panel per MDN.
+// - Parse `Authorization: Basic base64(user:pass)`
+// - Compare to configured credentials from config file
 is_authorized :: proc(req: ^http.Request) -> bool {
-	
-	client_endpoint_str := net.endpoint_to_string(req.client)
-	
-	// Debug: log the client info
-	log.debugf("Client address: %v, string: %s", req.client, client_endpoint_str)
-
-	address := req.client.address
-	client_ip_str := net.address_to_string(address)
-	
-	// localhost is all good
-	if address == net.IP4_Loopback {
-		return true
+	auth_header := http.headers_get(req.headers, "Authorization") or_else ""
+	if auth_header == "" {
+		return false
 	}
 
-	for ip in APP_CONFIG.ADMIN_IPS {
-
-		if ip == client_ip_str {
-			return true
-		}
+	if !strings.has_prefix(auth_header, "Basic ") {
+		return false
 	}
 
-	return false
+	encoded := auth_header[6:]
+	decoded, err := base64.decode(encoded, allocator = context.temp_allocator)
+	if err != nil {
+		return false
+	}
+
+	creds := string(decoded)
+	sep := strings.index(creds, ":")
+	if sep == -1 {
+		return false
+	}
+
+	username := creds[:sep]
+	password := creds[sep + 1:]
+
+	return username == get_admin_username() && password == get_admin_password()
 }
+
+require_auth :: proc(res: ^http.Response) {
+	http.headers_set(&res.headers, "WWW-Authenticate", `Basic realm="Admin Panel"`)
+	http.respond_with_status(res, http.Status.Unauthorized)
+}
+
+get_admin_username :: proc() -> string {return APP_CONFIG.ADMIN_USERNAME}
+get_admin_password :: proc() -> string {return APP_CONFIG.ADMIN_PASSWORD}

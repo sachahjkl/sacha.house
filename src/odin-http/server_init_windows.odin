@@ -1,3 +1,5 @@
+#+feature global-context
+
 package http
 
 import "core:os"

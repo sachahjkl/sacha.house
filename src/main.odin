@@ -27,7 +27,7 @@ LoggerOpts :: log.Options{.Level, .Time, .Short_File_Path, .Line, .Terminal_Colo
 TRACK_LEAKS :: #config(TRACK_LEAKS, true)
 
 cleanup_globals :: proc() {
-	// NOTE(Sacha Froment):
+	// NOTE(sachahjkl):
 	// Cleanup global resources before exit
 	if TIMEZONE != nil {
 		free(TIMEZONE)

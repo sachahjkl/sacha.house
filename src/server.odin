@@ -15,7 +15,7 @@ import client "odin-http/client"
 import temple "temple"
 
 
-// NOTE(Sacha Froment):
+// NOTE(sachahjkl):
 // the http framework cleans up the `` context.temp_allocator``  at the end of each request
 // so we don't need to manually clean it up here.
 // This means we SHOULD USE it instead of context.allocator for values that only live for the duration of the request.
@@ -28,6 +28,10 @@ server_start :: proc() {
 	http.router_init(&router)
 	defer http.router_destroy(&router)
 	log.info("Initializing routes...")
+
+	// NOTE(sachahjkl):
+	// - Routes are tried in order, so the more specific routes should be placed first.
+	// - route patterns follow the Lua pattern syntax, see https://www.lua.org/pil/20.2.html and special characters are escaped with a '%' (eg. %-).
 
 	http.route_get(&router, "/static/(.*)", http.handler(serve_static_file))
 	http.route_get(&router, "/", http.handler(index_page))
@@ -46,28 +50,30 @@ server_start :: proc() {
 	// fallback to static serve but from the root
 	http.route_get(&router, "/(.*)", http.handler(serve_static_file))
 
+	http.route_post(&router, "/admin/refresh%-projects", http.handler(admin_refresh_projects))
+
 	log.info("Routes initialized.")
 
-
 	routed := http.router_handler(&router)
+	
+	if init_cache() != nil {
+		log.error("Failed to initialize cache")
+		return
+	}
+	
+	log.info("Cache initialized.")
+	
+	defer cleanup_cache()
 
 	listen_endpoint := net.Endpoint {
 		address = net.IP4_Any,
 		port    = 6969,
 	}
 
-	log.infof("Listening on http://%s", net.endpoint_to_string(listen_endpoint))
-
-	if init_cache() != nil {
-		log.error("Failed to initialize cache")
-		return
-	}
-
-	log.info("Cache initialized.")
-
-	defer cleanup_cache()
+	log.infof("Listening on http://localhost:%d", listen_endpoint.port)
 
 	err := http.listen_and_serve(&s, routed, listen_endpoint)
+
 	fmt.assertf(err == nil, "server stopped with error: %v", err)
 }
 
@@ -420,79 +426,18 @@ projects_page :: proc(req: ^http.Request, res: ^http.Response) {
 		HayekFR:        string,
 		HayekFRRepo:    string,
 		Dotfiles:       string,
-		GitLabProjects: []Template_Project,
-		GitHubProjects: []Template_Project,
+		GitLabProjects: []Standardized_Project,
+		GitHubProjects: []Standardized_Project,
 	}
 	page_template := temple.compiled("templates/projects.temple.twig", Page_Data)
 
-	now := time.now()
-	duration := duration_between(projects_cache.last_fetched, now)
+	projects_cache := fetch_projects(use_cache = true)
 
-	if projects_cache.last_fetched != {} && time.duration_minutes(duration) < 5 {
-		log.info("Serving projects from cache.")
-	} else {
-		reset_project_cache()
-
-		log.info("Fetching fresh projects, cache expired or empty.")
-		gitlab_projects_raw, gitlab_err := gitlab_projects_api()
-		if gitlab_err.type != .None {
-			log.errorf("could not get gitlab projects: %v", gitlab_err)
-		}
-		github_projects_raw, github_err := github_projects_api()
-		if github_err.type != .None {
-			log.errorf("could not get github projects: %v", github_err)
-		}
-
-		// NOTE(sachahjkl):
-		// use the context.allocator instead of context.temp_allocator here
-		// because the values are cached and will be used later
-		projects_cache.gitlab = make(
-			[]Template_Project,
-			len(gitlab_projects_raw),
-			projects_cache.allocator,
-		)
-
-		for project, i in gitlab_projects_raw {
-			first_letter :=
-				strings.to_upper(project.name[:1], projects_cache.allocator) if len(project.name) > 0 else ""
-			projects_cache.gitlab[i] = Template_Project {
-				name            = strings.clone(project.name, projects_cache.allocator),
-				url             = strings.clone(project.url, projects_cache.allocator),
-				descriptionHtml = strings.clone(project.descriptionHtml, projects_cache.allocator),
-				avatarUrl       = strings.clone(project.avatarUrl, projects_cache.allocator),
-				first_letter    = first_letter,
-				hslColor        = generate_random_hsl_string(projects_cache.allocator),
-				hasAvatar       = strings.clone(project.avatarUrl, projects_cache.allocator) != "",
-			}
-		}
-
-		// NOTE(sachahjkl):
-		// use the context.allocator instead of context.temp_allocator here
-		// because the values are cached and will be used later
-		projects_cache.github = make(
-			[]Template_Project,
-			len(github_projects_raw),
-			projects_cache.allocator,
-		)
-		for project, i in github_projects_raw {
-			first_letter :=
-				strings.to_upper(project.name[:1], projects_cache.allocator) if len(project.name) > 0 else ""
-			projects_cache.github[i] = Template_Project {
-				name            = strings.clone(project.name, projects_cache.allocator),
-				url             = strings.clone(project.url, projects_cache.allocator),
-				descriptionHtml = strings.clone(project.descriptionHtml, projects_cache.allocator),
-				avatarUrl       = strings.clone(project.owner.avatarUrl, projects_cache.allocator),
-				first_letter    = first_letter,
-				hslColor        = generate_random_hsl_string(projects_cache.allocator),
-				hasAvatar       = strings.clone(
-					project.owner.avatarUrl,
-					projects_cache.allocator,
-				) != "",
-			}
-		}
-		projects_cache.last_fetched = now
+	if projects_cache == nil {
+		log.error("Failed to fetch projects")
+		http.respond_with_status(res, http.Status.Internal_Server_Error)
+		return
 	}
-
 
 	data := Page_Data {
 		base           = create_base_page_data(
@@ -512,13 +457,25 @@ projects_page :: proc(req: ^http.Request, res: ^http.Response) {
 	}
 
 	render_page(req, res, page_template, data)
+}
 
+admin_refresh_projects :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+	if !is_authorized(req) {
+		require_auth(res)
+		return
+	}
+
+	fetch_projects(use_cache = false)
+
+	http.headers_set(&res.headers, "Location", "/projects")
+	http.respond(res, http.Status.See_Other)
 }
 
 admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
 	if !is_authorized(req) {
-		http.respond_with_status(res, http.Status.Unauthorized)
+		require_auth(res)
 		return
 	}
 
@@ -565,20 +522,9 @@ mariage_redirect :: proc(req: ^http.Request, res: ^http.Response) {
 	http.respond(res, http.Status.Found)
 }
 
-Template_Project :: struct {
-	name:            string,
-	url:             string,
-	descriptionHtml: string,
-	avatarUrl:       string,
-	first_letter:    string,
-	hslColor:        string,
-	hasAvatar:       bool,
-}
-
 fetch_posts :: proc() -> (posts: []Post, err: Error) {
 	req_body: GraphQL_Request
-	req_body.query =
-	`
+	req_body.query = `
 		query GET_POSTS {
 			posts(orderBy: publishedAt_ASC, stage: PUBLISHED) {
 				slug
@@ -639,8 +585,7 @@ fetch_posts :: proc() -> (posts: []Post, err: Error) {
 
 fetch_post :: proc(slug: string) -> (post: Post_Detail, err: Error) {
 	req_body: GraphQL_Request
-	req_body.query =
-	`
+	req_body.query = `
 		query GET_POST($slug: String!) {
 			post(where: { slug: $slug }) {
 				slug
@@ -735,37 +680,11 @@ format_linkedin_date :: proc(day: Linkedin_Day) -> string {
 // Projects cache
 
 init_cache :: proc() -> mem.Allocator_Error {
-	init_projects_cache() or_return
+	// Fuck it, let's load the projects cache on start
+	fetch_projects(use_cache = false)
 	return nil
 }
 
 cleanup_cache :: proc() {
 	cleanup_projects_cache()
-}
-
-Projects_Cache :: struct {
-	gitlab:       []Template_Project,
-	github:       []Template_Project,
-	last_fetched: time.Time,
-	arena:        virtual.Arena,
-	allocator:    mem.Allocator,
-}
-
-
-projects_cache: Projects_Cache
-
-init_projects_cache :: proc() -> mem.Allocator_Error {
-	virtual.arena_init_growing(&projects_cache.arena) or_return
-	projects_cache.allocator = virtual.arena_allocator(&projects_cache.arena)
-	return nil
-}
-
-
-reset_project_cache :: proc() {
-	virtual.arena_free_all(&projects_cache.arena)
-
-}
-
-cleanup_projects_cache :: proc() {
-	virtual.arena_destroy(&projects_cache.arena)
 }
