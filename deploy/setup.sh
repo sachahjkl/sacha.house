@@ -2,15 +2,15 @@
 
 set -e
 
-REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 INSTALL_DIR="/opt/sacha.house"
 SERVICE_NAME="sacha.house.service"
 BINARY_NAME="sacha.house-linux-amd64"
 SERVICE_USER="sacha"
+SERVICE_GROUP="sacha"
 EMAIL_TO="admin"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "=== sacha.house Setup Script ==="
-echo "Repository: $REPO_DIR"
 echo "Install directory: $INSTALL_DIR"
 echo ""
 
@@ -36,14 +36,14 @@ chown $SERVICE_USER:$SERVICE_USER "$INSTALL_DIR"
 
 echo "[3/8] Downloading latest binary..."
 cd "$INSTALL_DIR"
-RELEASE_DATA=$(curl -s "https://gitlab.com/api/v4/projects/sachahjkl%2Fsacha.house/releases" | head -1)
+RELEASE_DATA=$(curl -s "https://gitlab.com/api/v4/projects/sachahjkl%2Fsacha.house/releases")
 
 if [ -z "$RELEASE_DATA" ]; then
     echo "  ERROR: Failed to fetch latest release from GitLab"
     exit 1
 fi
 
-DOWNLOAD_URL=$(echo "$RELEASE_DATA" | grep -o '"url":"[^"]*sacha.house-linux-amd64[^"]*"' | cut -d'"' -f4)
+DOWNLOAD_URL=$(echo "$RELEASE_DATA" | grep -o '"url":"[^"]*sacha.house-linux-amd64[^"]*"' | head -1 | cut -d'"' -f4)
 
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "  ERROR: Failed to find download URL in release"
@@ -51,36 +51,19 @@ if [ -z "$DOWNLOAD_URL" ]; then
 fi
 
 echo "  Downloading from: $DOWNLOAD_URL"
-curl -L "$DOWNLOAD_URL" -o sacha.house
+curl -L -f "$DOWNLOAD_URL" -o sacha.house
 chmod +x sacha.house
-chown $SERVICE_USER:$SERVICE_USER sacha.house
+chown $SERVICE_USER:$SERVICE_GROUP sacha.house
 echo "  Binary installed"
 
-echo "[4/8] Copying static files and templates..."
-if [ -d "$REPO_DIR/src/static" ]; then
-    cp -r "$REPO_DIR/src/static" "$INSTALL_DIR/"
-    echo "  Copied static files"
-else
-    echo "  WARNING: $REPO_DIR/src/static not found, skipping"
-fi
-
-if [ -d "$REPO_DIR/src/templates" ]; then
-    cp -r "$REPO_DIR/src/templates" "$INSTALL_DIR/"
-    echo "  Copied templates"
-else
-    echo "  WARNING: $REPO_DIR/src/templates not found, skipping"
-fi
-
-chown -R $SERVICE_USER:$SERVICE_USER "$INSTALL_DIR"
-
-echo "[5/8] Installing systemd service..."
-cp "$REPO_DIR/deploy/sacha.house.service" /etc/systemd/system/
+echo "[4/7] Installing systemd service..."
+cp "$SCRIPT_DIR/sacha.house.service" /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable "$SERVICE_NAME"
 echo "  Service installed and enabled"
 
-echo "[6/8] Installing update script..."
-cp "$REPO_DIR/deploy/update.sh" "$INSTALL_DIR/"
+echo "[5/7] Installing update script..."
+cp "$SCRIPT_DIR/update.sh" "$INSTALL_DIR/"
 chmod +x "$INSTALL_DIR/update.sh"
 chown root:root "$INSTALL_DIR/update.sh"
 
@@ -89,7 +72,7 @@ if [ "$EMAIL_TO" != "admin" ]; then
 fi
 echo "  Update script installed"
 
-echo "[7/8] Setting up crontab for automatic updates..."
+echo "[6/7] Setting up crontab for automatic updates..."
 CRON_LINE="0 0 * * * $INSTALL_DIR/update.sh >> /var/log/sacha.house-update.log 2>&1"
 
 if crontab -l 2>/dev/null | grep -q "$INSTALL_DIR/update.sh"; then
@@ -99,7 +82,7 @@ else
     echo "  Crontab entry added"
 fi
 
-echo "[8/8] Creating log file..."
+echo "[7/7] Creating log file..."
 touch /var/log/sacha.house-update.log
 chmod 644 /var/log/sacha.house-update.log
 
