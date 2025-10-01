@@ -7,6 +7,7 @@ import "core:log"
 import "core:mem"
 import "core:mem/virtual"
 import "core:net"
+import "core:os"
 import "core:sort"
 import "core:strings"
 import "core:time"
@@ -55,14 +56,14 @@ server_start :: proc() {
 	log.info("Routes initialized.")
 
 	routed := http.router_handler(&router)
-	
-	if init_cache() != nil {
+
+	if init_cache() != .None {
 		log.error("Failed to initialize cache")
 		return
 	}
-	
+
 	log.info("Cache initialized.")
-	
+
 	defer cleanup_cache()
 
 	listen_endpoint := net.Endpoint {
@@ -681,8 +682,8 @@ format_linkedin_date :: proc(day: Linkedin_Day) -> string {
 
 init_cache :: proc() -> mem.Allocator_Error {
 	// Fuck it, let's load the projects cache on start
-	fetch_projects(use_cache = false)
-	return nil
+	first_load_projects_cache() or_return
+	return .None
 }
 
 cleanup_cache :: proc() {

@@ -188,14 +188,6 @@ github_projects_api :: proc() -> (projects: []GitHub_Project, err: Error) {
 
 fetch_projects :: proc(use_cache := true) -> ^Projects_Cache {
 
-	if projects_cache.status == .Unitialized {
-		log.info("Initializing projects cache.")
-		if init_projects_cache() != nil {
-			log.error("Could not initialize projects cache.")
-			return nil
-		}
-	}
-
 	if use_cache && projects_cache.status == .Filled {
 		log.info("Serving projects from cache.")
 		return &projects_cache
@@ -268,6 +260,8 @@ fetch_projects :: proc(use_cache := true) -> ^Projects_Cache {
 
 	log.info("Filled projects cache.")
 
+	dump_projects_cache(PROJECTS_CACHE_FILE)
+
 	return &projects_cache
 }
 
@@ -296,11 +290,74 @@ Projects_Cache :: struct {
 
 projects_cache: Projects_Cache
 
+PROJECTS_CACHE_FILE :: "projects_cache.json"
+
+Projects_Cache_Serializable :: struct {
+	gitlab: []Standardized_Project,
+	github: []Standardized_Project,
+}
+
+dump_projects_cache :: proc(path: string) -> bool {
+	if projects_cache.status != .Filled {
+		log.warn("Cannot dump projects cache: not filled")
+		return false
+	}
+
+	cache_data := Projects_Cache_Serializable {
+		gitlab = projects_cache.gitlab,
+		github = projects_cache.github,
+	}
+
+	json_bytes, marshal_err := json.marshal(cache_data, {pretty = true}, context.temp_allocator)
+	if marshal_err != nil {
+		log.errorf("Failed to marshal projects cache: %v", marshal_err)
+		return false
+	}
+
+	if !os.write_entire_file(path, json_bytes) {
+		log.errorf("Failed to write projects cache to %s", path)
+		return false
+	}
+
+	log.infof("Projects cache dumped to %s", path)
+	return true
+}
+
+restore_projects_cache :: proc(path: string) -> bool {
+	json_bytes, read_ok := os.read_entire_file(path, context.temp_allocator)
+	if !read_ok {
+		log.errorf("Failed to read projects cache from %s", path)
+		return false
+	}
+
+	cache_data: Projects_Cache_Serializable
+	unmarshal_err := json.unmarshal(json_bytes, &cache_data, allocator = projects_cache.allocator)
+	if unmarshal_err != nil {
+		log.errorf("Failed to unmarshal projects cache: %v", unmarshal_err)
+		return false
+	}
+
+	projects_cache.gitlab = cache_data.gitlab
+	projects_cache.github = cache_data.github
+	projects_cache.status = .Filled
+
+	log.infof("Projects cache restored from %s", path)
+	return true
+}
+
 init_projects_cache :: proc() -> mem.Allocator_Error {
+
+	if (projects_cache.status != .Unitialized) {
+		log.warn("Projects cache already initialized")
+		return .None
+	}
+
 	virtual.arena_init_growing(&projects_cache.arena) or_return
 	projects_cache.allocator = virtual.arena_allocator(&projects_cache.arena)
 	projects_cache.status = .Empty
-	return nil
+	log.info("Projects cache initialized")
+
+	return .None
 }
 
 
@@ -312,4 +369,23 @@ reset_project_cache :: proc() {
 cleanup_projects_cache :: proc() {
 	virtual.arena_destroy(&projects_cache.arena)
 	projects_cache.status = .Unitialized
+}
+
+first_load_projects_cache :: proc() -> mem.Allocator_Error {
+	log.info("Initializing projects cache.")
+	if err := init_projects_cache(); err != .None {
+		log.error("Could not initialize projects cache.")
+		return err
+	}
+
+	if os.exists(PROJECTS_CACHE_FILE) {
+		log.info("Found cached projects file, loading from disk")
+		if restore_projects_cache(PROJECTS_CACHE_FILE) {
+			return .None
+		}
+		log.warn("Failed to restore cache from disk, will fetch fresh")
+	}
+
+	fetch_projects(use_cache = false)
+	return .None
 }
