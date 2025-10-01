@@ -17,8 +17,9 @@ build:linux:
     - ln -s /opt/odin-linux-amd64-nightly+2025-09-08/odin /usr/local/bin/odin
     - curl -fsSL https://bun.sh/install | bash -s "bun-v1.2.19"
     - export PATH="/root/.bun/bin:$PATH"
-    - export VERSION_TAG="$(date +%Y.%m.%d).${CI_PIPELINE_IID}"
   script:
+    - export VERSION_TAG="$(date +%Y.%m.%d).${CI_PIPELINE_IID}"
+    - echo "VERSION_TAG=$VERSION_TAG" >> build.env
     - bun install --production
     - make build mode=release GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION_TAG=$VERSION_TAG
     - mv sacha.house.exe ${ARTIFACT_NAME}
@@ -26,6 +27,8 @@ build:linux:
   artifacts:
     paths:
       - ${ARTIFACT_NAME}
+    reports:
+      dotenv: build.env
     expire_in: 1 week
   only:
     - master
@@ -34,19 +37,15 @@ build:linux:
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  dependencies:
-    - build:linux
+  needs:
+    - job: build:linux
+      artifacts: true
   script:
-    - export VERSION_TAG="$(date +%Y.%m.%d).${CI_PIPELINE_IID}"
     - echo "Creating release $VERSION_TAG for sacha.house"
-    - echo "VERSION_TAG=$VERSION_TAG" >> release.env
-  artifacts:
-    reports:
-      dotenv: release.env
   release:
-    name: "sacha.house ${VERSION_TAG}"
-    tag_name: "${VERSION_TAG}"
-    description: "sacha.house automated release ${VERSION_TAG} from commit ${CI_COMMIT_SHORT_SHA}"
+    name: "sacha.house $VERSION_TAG"
+    tag_name: "$VERSION_TAG"
+    description: "sacha.house automated release $VERSION_TAG from commit $CI_COMMIT_SHORT_SHA"
     assets:
       links:
         - name: "sacha.house Linux AMD64 Binary"
