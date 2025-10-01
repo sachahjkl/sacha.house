@@ -36,14 +36,17 @@ release:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   dependencies:
     - build:linux
-  before_script:
-    - export VERSION_TAG="$(date +%Y.%m.%d).${CI_PIPELINE_IID}"
   script:
+    - export VERSION_TAG="$(date +%Y.%m.%d).${CI_PIPELINE_IID}"
     - echo "Creating release $VERSION_TAG for sacha.house"
+    - echo "VERSION_TAG=$VERSION_TAG" >> release.env
+  artifacts:
+    reports:
+      dotenv: release.env
   release:
-    name: "sacha.house $VERSION_TAG"
-    tag_name: "$VERSION_TAG"
-    description: "sacha.house automated release $VERSION_TAG from commit $CI_COMMIT_SHORT_SHA"
+    name: "sacha.house ${VERSION_TAG}"
+    tag_name: "${VERSION_TAG}"
+    description: "sacha.house automated release ${VERSION_TAG} from commit ${CI_COMMIT_SHORT_SHA}"
     assets:
       links:
         - name: "sacha.house Linux AMD64 Binary"
