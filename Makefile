@@ -37,7 +37,7 @@ all: build
 
 $(ODIN_OUT): $(OUT_TEMPLATE_FILE) $(ODIN_SOURCE_FILES) $(STATIC_EMBEDDED_FILES) $(OUT_CSS_FILE)
 	@echo "Building Odin application in $(mode) mode..."
-	@odin build $(ODIN_SRC) -out:$(ODIN_OUT) -define:GIT_COMMIT_HASH="$(GIT_COMMIT_HASH)" -define:VERSION_TAG="$(VERSION_TAG)" $(ODIN_FLAGS)
+	@odin build $(ODIN_SRC) -out:$(ODIN_OUT) -define:GIT_COMMIT_HASH="'$(GIT_COMMIT_HASH)'" -define:VERSION_TAG="$(VERSION_TAG)" $(ODIN_FLAGS)
 
 $(TEMPLE_CLI): $(TEMPLE_PATH)/cli/*.odin
 	@echo "Building temple CLI..."
