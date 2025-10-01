@@ -25,6 +25,7 @@ Footer_Data :: struct {
 	year:       int,
 	commitHash: string,
 	gitRepoId:  string,
+	version:    string,
 }
 
 Base_Page_Data :: struct {
@@ -79,6 +80,7 @@ create_base_page_data :: proc(
 			year = time.year(time.now()),
 			commitHash = GIT_COMMIT_HASH,
 			gitRepoId = APP_CONFIG.GIT_REPO_ID,
+			version = VERSION_TAG,
 		},
 		NavItems = nav_items,
 	}

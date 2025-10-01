@@ -4,12 +4,19 @@
 		<p>(C)
 			{{ int(this.Footer.year) }}
 			sacha.house</p>
+
 	</div>
-	<a class="flex items-center gap-1" href="https://gitlab.com/{{ this.Footer.gitRepoId }}/-/commit/{{ this.Footer.commitHash }}">
-		<div class="flex items-center gap-1">
-			<img width="100" src="https://gitlab.com/{{ this.Footer.gitRepoId }}/badges/master/pipeline.svg" loading="lazy" decoding="async" alt="Deploy Status Badge"/>
+	<div class="flex items-center gap-2">
+		{# <a class="underline" href="https://gitlab.com/{{ this.Footer.gitRepoId }}/-/commit/{{ this.Footer.commitHash }}">
 			{{ this.Footer.commitHash }}
-			{% embed "_external_link_icon.temple.twig" %}
-		</div>
-	</a>
+		</a> #}
+		<a class="underline" href="https://gitlab.com/{{ this.Footer.gitRepoId }}/-/commit/{{ this.Footer.commitHash }}">
+			{{ this.Footer.version }}
+		</a>
+		<span>|</span>
+		<a href="https://gitlab.com/{{ this.Footer.gitRepoId }}/-/commit/{{ this.Footer.commitHash }}">
+			<img width="100" src="https://gitlab.com/{{ this.Footer.gitRepoId }}/badges/master/pipeline.svg" loading="lazy" decoding="async" alt="Deploy Status Badge"/>
+		</a>
+	</div>
+
 </footer></body></html>
