@@ -70,6 +70,12 @@ lexer_next :: proc(l: ^Lexer) -> (t: Token) {
 	case l.ch == EOF:
 		t.type = .EOF
 
+	case l.ch == '{' && lexer_peek(l) == '#':
+		_ = lexer_consume(l, "{#")
+		_ = lexer_consume_until(l, "#}")
+		_ = lexer_consume(l, "#}")
+		return lexer_next(l)
+
 	case l.ch == '{' && lexer_peek(l) == '{':
 		t.type  = .Output_Open
 		t.value = lexer_consume(l, "{{")
@@ -136,7 +142,7 @@ lexer_next :: proc(l: ^Lexer) -> (t: Token) {
 
 	case:
 		t.type  = .Text
-		t.value = lexer_consume_until(l, "{{", "}}", "{%", "%}")
+		t.value = lexer_consume_until(l, "{{", "}}", "{%", "%}", "{#")
 	}
 
 	l.prev_token = t
