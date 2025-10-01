@@ -1,32 +1,53 @@
-# This file is a template, and might need editing before it works on your project.
-docker-build-master:
-  # Official docker image.
-  image: docker:latest
+stages:
+  - build
+  - release
+
+variables:
+  ARTIFACT_NAME: "sacha.house-linux-amd64"
+  ODIN_VERSION: "dev-2025-09"
+
+build:linux:
   stage: build
-  services:
-    - docker:dind
+  image: archlinux:base-devel
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - apk add --update git && rm -rf /var/cache/apk/*
-    - git --version
+    - pacman -Syu --noconfirm clang openssl make libbacktrace git unzip tar curl
+    - curl -L https://github.com/odin-lang/Odin/releases/download/${ODIN_VERSION}/odin-linux-amd64-${ODIN_VERSION}.zip -o odin.zip
+    - unzip odin.zip -d /tmp
+    - tar -C /opt -xzf /tmp/dist.tar.gz
+    - ln -s /opt/odin-linux-amd64-nightly+2025-09-08/odin /usr/local/bin/odin
+    - curl -fsSL https://bun.sh/install | bash -s "bun-v1.2.19"
+    - export PATH="/root/.bun/bin:$PATH"
   script:
-    - docker build --build-arg GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA  --cache-from $CI_REGISTRY_IMAGE:latest --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker push "$CI_REGISTRY_IMAGE"
+    - bun install --production
+    - make build mode=release GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA
+    - mv sacha.house.exe ${ARTIFACT_NAME}
+    - chmod +x ${ARTIFACT_NAME}
+  artifacts:
+    paths:
+      - ${ARTIFACT_NAME}
+    expire_in: 1 week
   only:
     - master
+    - tags
 
-docker-build:
-  # Official docker image.
-  image: docker:latest
-  stage: build
-  services:
-    - docker:dind
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  dependencies:
+    - build:linux
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - apk add --update git && rm -rf /var/cache/apk/*
-    - git --version
+    - apk add --no-cache git
   script:
-    - docker build --build-arg GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA --cache-from $CI_REGISTRY_IMAGE:latest --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-  except:
+    - echo "Creating release for sacha.house $CI_COMMIT_SHORT_SHA"
+    - git tag -f latest
+    - git push -f origin latest
+  release:
+    tag_name: '$CI_COMMIT_SHORT_SHA'
+    description: 'sacha.house automated release from commit $CI_COMMIT_SHORT_SHA'
+    assets:
+      links:
+        - name: 'sacha.house Linux AMD64 Binary'
+          url: '${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/${ARTIFACT_NAME}'
+          link_type: 'package'
+  only:
     - master

@@ -1,0 +1,19 @@
+[Unit]
+Description=Sacha House Web Server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=sacha
+Group=sacha
+WorkingDirectory=/opt/sacha.house
+ExecStart=/opt/sacha.house/sacha.house
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
