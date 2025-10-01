@@ -32,7 +32,6 @@ build:linux:
     expire_in: 1 week
   only:
     - master
-    - tags
 
 release:
   stage: release
