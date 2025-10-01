@@ -3,6 +3,7 @@ package main
 import "core:encoding/json"
 import "core:log"
 import "core:os"
+import "core:strconv"
 import "core:strings"
 
 GIT_COMMIT_HASH :: #config(GIT_COMMIT_HASH, "dev")
@@ -48,6 +49,18 @@ get_config_path :: proc() -> string {
 		return config_path
 	}
 	return "config.json"
+}
+
+get_port :: proc() -> int {
+	port_str := os.get_env("PORT", context.temp_allocator)
+	if port_str != "" {
+		port, ok := strconv.parse_int(port_str)
+		if ok && port > 0 && port <= 65535 {
+			return port
+		}
+		log.warnf("Invalid PORT value '%s', using default 6969", port_str)
+	}
+	return 6969
 }
 
 init_default_config :: proc(config_path: string) {

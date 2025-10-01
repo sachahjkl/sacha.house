@@ -27,9 +27,11 @@ print_help :: proc() {
 	
 	fmt.println("ENVIRONMENT VARIABLES:")
 	fmt.println("  CONFIG_PATH   Path to config file (default: config.json)")
+	fmt.println("  PORT          Port to listen on (default: 6969)")
 	fmt.println()
 	
 	fmt.println("EXAMPLES:")
 	fmt.println("  sacha.house")
-	fmt.println("  CONFIG_PATH=/etc/sacha.house/config.json sacha.house")
+	fmt.println("  PORT=8080 sacha.house")
+	fmt.println("  CONFIG_PATH=/etc/sacha.house/config.json PORT=8080 sacha.house")
 }

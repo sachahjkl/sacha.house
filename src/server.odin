@@ -68,7 +68,7 @@ server_start :: proc() {
 
 	listen_endpoint := net.Endpoint {
 		address = net.IP4_Any,
-		port    = 6969,
+		port    = get_port(),
 	}
 
 	log.infof("Listening on http://localhost:%d", listen_endpoint.port)
