@@ -26,8 +26,56 @@ Config :: struct {
 
 APP_CONFIG: Config
 
+DEFAULT_CONFIG :: Config {
+	PROXYCURL_API_ENDPOINT = "https://nubela.co/proxycurl/api/v2/linkedin",
+	GITHUB_REST_API_ENDPOINT = "https://api.github.com",
+	GITLAB_API_ENDPOINT = "https://gitlab.com/api/graphql",
+	GITHUB_GRAPHQL_API_ENDPOINT = "https://api.github.com/graphql",
+	HYGRAPH_API_ENDPOINT = "https://api-us-east-1-shared-usea1-02.hygraph.com/v2/cm0g4j8gx017007uvfwvwf3xn/master",
+	GITLAB_BEARER_TOKEN = "",
+	GITHUB_BEARER_TOKEN = "",
+	PROXYCURL_BEARER_TOKEN = "",
+	LINKEDIN_GIST_ID = "",
+	ADMIN_IPS = {},
+	GIT_REPO_ID = "",
+	ADMIN_USERNAME = "",
+	ADMIN_PASSWORD = "",
+}
+
+get_config_path :: proc() -> string {
+	config_path := os.get_env("CONFIG_PATH", context.temp_allocator)
+	if config_path != "" {
+		return config_path
+	}
+	return "config.json"
+}
+
+init_default_config :: proc(config_path: string) {
+	log.infof("Config file not found at %s, creating default config", config_path)
+	
+	json_bytes, marshal_err := json.marshal(DEFAULT_CONFIG, {pretty = true}, context.temp_allocator)
+	if marshal_err != nil {
+		log.errorf("Failed to marshal default config: %v", marshal_err)
+		return
+	}
+
+	if !os.write_entire_file(config_path, json_bytes) {
+		log.errorf("Failed to write default config to %s", config_path)
+		return
+	}
+
+	log.infof("Default config file created at %s", config_path)
+	log.info("Please edit the config file with your settings and restart the application")
+	return
+}
+
 load_config :: proc() -> bool {
-	config_path := "config.json"
+	config_path := get_config_path()
+
+	if !os.exists(config_path) {
+		init_default_config(config_path)
+		return false
+	}
 
 	config_bytes, ok := os.read_entire_file(config_path)
 	if !ok {
@@ -43,5 +91,6 @@ load_config :: proc() -> bool {
 		return false
 	}
 
+	log.infof("Config loaded from %s", config_path)
 	return true
 }

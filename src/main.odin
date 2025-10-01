@@ -1,6 +1,5 @@
 package main
 
-import "core:mem"
 import "core:bytes"
 import "core:encoding/json"
 import "core:fmt"
@@ -8,6 +7,7 @@ import "core:io"
 import "core:log"
 import "core:math"
 import "core:math/rand"
+import "core:mem"
 import "core:net"
 import "core:os"
 import "core:sort"
@@ -23,6 +23,7 @@ import client "odin-http/client"
 import temple "temple"
 
 LoggerOpts :: log.Options{.Level, .Time, .Short_File_Path, .Line, .Terminal_Color, .Thread_Id}
+
 
 TRACK_LEAKS :: #config(TRACK_LEAKS, true)
 
@@ -44,6 +45,8 @@ cleanup_globals :: proc() {
 }
 
 main :: proc() {
+
+	handle_cli_args()
 
 	level := log.Level.Debug when ODIN_DEBUG else log.Level.Info
 	context.logger = log.create_console_logger(level, LoggerOpts)
