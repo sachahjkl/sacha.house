@@ -28,7 +28,7 @@ if [ -z "$RELEASE_DATA" ]; then
     exit 1
 fi
 
-DOWNLOAD_URL=$(echo "$RELEASE_DATA" | grep -o '"url":"[^"]*sacha.house-linux-amd64[^"]*"' | cut -d'"' -f4)
+DOWNLOAD_URL=$(echo "$RELEASE_DATA" | grep -o '"url":"[^"]*sacha.house-linux-amd64[^"]*"' | head -1 | cut -d'"' -f4)
 
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "Failed to find download URL"
@@ -37,7 +37,7 @@ if [ -z "$DOWNLOAD_URL" ]; then
 fi
 
 echo "Downloading binary from $DOWNLOAD_URL..."
-curl -L "$DOWNLOAD_URL" -o "${BINARY_NAME}.new"
+curl -L -f "$DOWNLOAD_URL" -o "${BINARY_NAME}.new"
 
 chmod +x "${BINARY_NAME}.new"
 mv "${BINARY_NAME}.new" "$BINARY_NAME"
