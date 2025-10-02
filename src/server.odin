@@ -345,7 +345,7 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 		base = create_base_page_data(
 			Maybe_SEO_Data {
 				title = fmt.tprintf("%s / sacha.house", post.title),
-				description = string(post.content.text[:160]),
+				description = string(post.content.text[:min(len(post.content.text), 160)]),
 			},
 			req.url.path,
 			is_authorized(req),
