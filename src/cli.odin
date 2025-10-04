@@ -17,7 +17,7 @@ handle_cli_args :: proc() {
 
 @(private = "file")
 print_version :: proc() {
-	fmt.printf("%s+%s)\n", VERSION_TAG, GIT_COMMIT_HASH)
+	fmt.printf("%s+%s\n", VERSION_TAG, GIT_COMMIT_HASH)
 }
 
 @(private = "file")
