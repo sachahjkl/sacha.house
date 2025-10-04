@@ -11,14 +11,6 @@ EMAIL_TO="admin"
 
 cd "$INSTALL_DIR"
 
-echo "Stopping service..."
-sudo systemctl stop "$SERVICE_NAME"
-
-if [ -f "$BINARY_NAME" ]; then
-    echo "Backing up current binary..."
-    cp "$BINARY_NAME" "${BINARY_NAME}.bak"
-fi
-
 echo "Fetching latest release..."
 RELEASE_DATA=$(curl -s "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT}/releases" | head -1)
 
@@ -40,6 +32,30 @@ echo "Downloading binary from $DOWNLOAD_URL..."
 curl -L -f "$DOWNLOAD_URL" -o "${BINARY_NAME}.new"
 
 chmod +x "${BINARY_NAME}.new"
+
+# Check if the new binary is different from the current one
+if [ -f "$BINARY_NAME" ]; then
+    if cmp -s "$BINARY_NAME" "${BINARY_NAME}.new"; then
+        # Get version info from current binary
+        VERSION_INFO=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
+        echo "New binary is identical to current binary. No update needed - $VERSION_INFO"
+        rm "${BINARY_NAME}.new"
+        exit 0
+    fi
+fi
+
+# Get current version before updating
+CURRENT_VERSION=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
+
+echo "Binary is different, proceeding with update..."
+echo "Stopping service..."
+sudo systemctl stop "$SERVICE_NAME"
+
+if [ -f "$BINARY_NAME" ]; then
+    echo "Backing up current binary..."
+    cp "$BINARY_NAME" "${BINARY_NAME}.bak"
+fi
+
 mv "${BINARY_NAME}.new" "$BINARY_NAME"
 
 echo "Starting service..."
@@ -55,8 +71,10 @@ if ! sudo systemctl is-active --quiet "$SERVICE_NAME"; then
         sudo systemctl start "$SERVICE_NAME"
         
         if sudo systemctl is-active --quiet "$SERVICE_NAME"; then
-            echo "Rollback successful"
-            echo "Service failed to start with new binary. Rolled back to previous version." | mail -s "sacha.house Update Failed" "$EMAIL_TO"
+            # Get version info from rolled back binary
+            ROLLBACK_VERSION=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
+            echo "Rollback successful: $NEW_VERSION -> $ROLLBACK_VERSION"
+            echo "Service failed to start with new binary. Rolled back from $NEW_VERSION to $ROLLBACK_VERSION" | mail -s "sacha.house Update Failed" "$EMAIL_TO"
         else
             echo "Rollback failed"
             echo "Service failed to start even after rollback. Manual intervention required." | mail -s "sacha.house CRITICAL FAILURE" "$EMAIL_TO"
@@ -68,8 +86,11 @@ if ! sudo systemctl is-active --quiet "$SERVICE_NAME"; then
     exit 1
 fi
 
-echo "Update successful"
-echo "Successfully updated sacha.house to latest release" | mail -s "sacha.house Updated" "$EMAIL_TO"
+# Get version info from the updated binary
+NEW_VERSION=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
+
+echo "Update successful: $CURRENT_VERSION -> $NEW_VERSION"
+echo "Successfully updated sacha.house from $CURRENT_VERSION to $NEW_VERSION" | mail -s "sacha.house Updated" "$EMAIL_TO"
 
 rm -f "${BINARY_NAME}.bak"
 
