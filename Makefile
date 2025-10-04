@@ -11,7 +11,7 @@ TEMPLE_PATH = $(ODIN_SRC)/temple
 OUT_TEMPLATE_FILE = $(ODIN_SRC)/temple/templates.odin
 TEMPLATE_FILES = $(wildcard $(ODIN_SRC)/templates/*.temple.twig)
 GIT_COMMIT_HASH ?= dev # git rev-parse --short HEAD
-VERSION_TAG ?= dev
+VERSION ?= dev
 ODIN_SOURCE_FILES = $(wildcard $(ODIN_SRC)/*.odin)
 CSS_SOURCE_FILES = styles/app.css
 OUT_CSS_FILE = $(ODIN_SRC)/static/css/style.css
@@ -37,7 +37,7 @@ all: build
 
 $(ODIN_OUT): $(OUT_TEMPLATE_FILE) $(ODIN_SOURCE_FILES) $(STATIC_EMBEDDED_FILES) $(OUT_CSS_FILE)
 	@echo "Building Odin application in $(mode) mode..."
-	@odin build $(ODIN_SRC) -out:$(ODIN_OUT) -define:GIT_COMMIT_HASH="'$(GIT_COMMIT_HASH)'" -define:VERSION_TAG="$(VERSION_TAG)" $(ODIN_FLAGS)
+	@odin build $(ODIN_SRC) -out:$(ODIN_OUT) -define:GIT_COMMIT_HASH="'$(GIT_COMMIT_HASH)'" -define:VERSION="$(VERSION)" $(ODIN_FLAGS)
 
 $(TEMPLE_CLI): $(TEMPLE_PATH)/cli/*.odin
 	@echo "Building temple CLI..."

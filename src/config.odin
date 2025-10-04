@@ -7,7 +7,7 @@ import "core:strconv"
 import "core:strings"
 
 GIT_COMMIT_HASH :: #config(GIT_COMMIT_HASH, "dev")
-VERSION_TAG :: #config(VERSION_TAG, "dev")
+VERSION :: #config(VERSION, "dev")
 
 Config :: struct {
 	PROXYCURL_API_ENDPOINT:      string,

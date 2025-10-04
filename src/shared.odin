@@ -80,7 +80,7 @@ create_base_page_data :: proc(
 			year = time.year(time.now()),
 			commitHash = GIT_COMMIT_HASH,
 			gitRepoId = APP_CONFIG.GIT_REPO_ID,
-			version = VERSION_TAG,
+			version = VERSION,
 		},
 		NavItems = nav_items,
 	}

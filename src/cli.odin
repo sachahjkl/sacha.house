@@ -17,13 +17,13 @@ handle_cli_args :: proc() {
 
 @(private = "file")
 print_version :: proc() {
-	fmt.printf("%s+%s\n", VERSION_TAG, GIT_COMMIT_HASH)
+	fmt.printf("%s\n", VERSION)
 }
 
 @(private = "file")
 print_help :: proc() {
 	fmt.println("sacha.house - Personal website server")
-	fmt.printf("Version: %s+%s\n\n", VERSION_TAG, GIT_COMMIT_HASH)
+	fmt.printf("Version: %s\n\n", VERSION)
 	
 	fmt.println("USAGE:")
 	fmt.println("  sacha.house [OPTIONS]")
