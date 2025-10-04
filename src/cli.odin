@@ -11,6 +11,10 @@ handle_cli_args :: proc() {
 		} else if arg == "-v" || arg == "--version" {
 			print_version()
 			os.exit(0)
+		} else {
+			fmt.eprintf("Error: Unknown argument '%s'\n\n", arg)
+			print_help()
+			os.exit(1)
 		}
 	}
 }
