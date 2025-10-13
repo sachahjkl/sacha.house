@@ -9,6 +9,8 @@
 		'Courier New', monospace, 'Noto Color Emoji';
     --color-red-100: oklch(93.6% 0.032 17.717);
     --color-red-300: oklch(80.8% 0.114 19.571);
+    --color-red-600: oklch(57.7% 0.245 27.325);
+    --color-red-700: oklch(50.5% 0.213 27.518);
     --color-red-800: oklch(44.4% 0.177 26.899);
     --color-green-100: oklch(96.2% 0.044 156.743);
     --color-green-300: oklch(87.1% 0.15 154.449);
@@ -956,6 +958,9 @@
   .bg-red-100 {
     background-color: var(--color-red-100);
   }
+  .bg-red-600 {
+    background-color: var(--color-red-600);
+  }
   .bg-textColor {
     background-color: var(--color-textColor);
   }
@@ -1115,6 +1120,10 @@
     --tw-shadow: 0 -1px 0 1px var(--tw-shadow-color, #1e3a8a) inset, 0 0 0 1px var(--tw-shadow-color, #1d4ed8) inset, 0 0.5px 0 1.5px var(--tw-shadow-color, #60a5fa) inset;
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
+  .shadow-\[0_-1px_0_1px_\#991b1b_inset\,0_0_0_1px_\#dc2626_inset\,0_0\.5px_0_1\.5px_\#f87171_inset\] {
+    --tw-shadow: 0 -1px 0 1px var(--tw-shadow-color, #991b1b) inset, 0 0 0 1px var(--tw-shadow-color, #dc2626) inset, 0 0.5px 0 1.5px var(--tw-shadow-color, #f87171) inset;
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
   .shadow-\[0_-1px_0_1px_\#166534_inset\,0_0_0_1px_\#15803d_inset\,0_0\.5px_0_1\.5px_\#4ade80_inset\] {
     --tw-shadow: 0 -1px 0 1px var(--tw-shadow-color, #166534) inset, 0 0 0 1px var(--tw-shadow-color, #15803d) inset, 0 0.5px 0 1.5px var(--tw-shadow-color, #4ade80) inset;
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -1174,6 +1183,13 @@
       }
     }
   }
+  .hover\:bg-red-700 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-red-700);
+      }
+    }
+  }
   .hover\:underline {
     &:hover {
       @media (hover: hover) {
@@ -1201,6 +1217,11 @@
   .active\:bg-green-800 {
     &:active {
       background-color: var(--color-green-800);
+    }
+  }
+  .active\:bg-red-800 {
+    &:active {
+      background-color: var(--color-red-800);
     }
   }
   .active\:shadow-\[-1px_0px_1px_0px_rgba\(0\,0\,0\,\.2\)_inset\,1px_0px_1px_0px_rgba\(0\,0\,0\,\.2\)_inset\,0px_0\.125rem_0px_0px_rgba\(0\,0\,0\,\.6\)_inset\] {

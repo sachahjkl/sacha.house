@@ -49,6 +49,7 @@ server_start :: proc() {
 	http.route_get(&router, "/teapot", http.handler(teapot_page))
 	http.route_get(&router, "/admin/login", http.handler(admin_login_page))
 	http.route_post(&router, "/admin/login", http.handler(admin_login_submit))
+	http.route_get(&router, "/admin/logout", http.handler(admin_logout))
 	http.route_get(&router, "/admin", http.handler(admin_page))
 	http.route_get(
 		&router,
@@ -578,6 +579,18 @@ admin_login_submit :: proc(req: ^http.Request, res: ^http.Response) {
 			}
 		},
 	)
+}
+
+admin_logout :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	// Clear the session cookie
+	clear_session_cookie(res)
+
+	// Redirect to login page
+	http.headers_set(&res.headers, "HX-Redirect", "/admin/login")
+	http.headers_set(&res.headers, "Location", "/admin/login")
+	http.respond(res, http.Status.Temporary_Redirect)
 }
 
 admin_page :: proc(req: ^http.Request, res: ^http.Response) {

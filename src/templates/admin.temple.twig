@@ -14,7 +14,7 @@
         <h2>🔐 WebAuthn Passkey</h2>
         <div class="mb-4">
             <p>Register and test WebAuthn passkeys for this admin panel.</p>
-            <div class="flex gap-2 mt-4">
+            <div class="flex flex-wrap gap-2 mt-4">
                 <button onclick="registerPasskey()" class="h-8 select-none bg-green-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#166534_inset,0_0_0_1px_#15803d_inset,0_0.5px_0_1.5px_#4ade80_inset] hover:bg-green-700 active:bg-green-800">
                     🔑 Register New Passkey
                 </button>
@@ -24,6 +24,12 @@
             </div>
             <div id="passkey-status" class="mt-4 p-3 hidden"></div>
         </div>
+            
+        <form method="GET" action="/admin/logout">
+            <button type="submit" class="h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800">
+                👋 Logout
+            </button>
+        </form>
     </section>
     <div class="divider"></div>
     
