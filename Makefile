@@ -26,10 +26,17 @@ SSL_PORT = 3000
 # Defaults to debug mode.
 mode ?= debug
 
-ifeq ($(mode),release)
-	ODIN_FLAGS = -o:speed -define:TRACK_LEAKS=false -build-mode:exe
+# Detect OS and set appropriate linker flags
+ifeq ($(OS),Windows_NT)
+	LINKER_FLAGS = -extra-linker-flags:"/ignore:4099"
 else
-	ODIN_FLAGS = -debug -define:TRACK_LEAKS=true -build-mode:exe
+	LINKER_FLAGS = 
+endif
+
+ifeq ($(mode),release)
+	ODIN_FLAGS = -o:speed -define:TRACK_LEAKS=false -build-mode:exe $(LINKER_FLAGS)
+else
+	ODIN_FLAGS = -debug -define:TRACK_LEAKS=true -build-mode:exe $(LINKER_FLAGS)
 endif
 
 

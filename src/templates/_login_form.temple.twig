@@ -1,0 +1,35 @@
+{% if this.Error != "" %}
+<div class="mb-4 p-3 border-2 border-red-300 text-red-800">
+    ❌ {{ this.Error }}
+</div>
+{% end %}
+
+<!-- Username/Password Form -->
+<form hx-post="/admin/login" hx-target="#login-form-container" hx-swap="innerHTML" class="mt-4 mb-6">
+    <div class="flex flex-col gap-3">
+        <label for="username">Username</label>
+        <input type="text" 
+        id="username"
+        name="username" placeholder="Username" 
+        autocomplete="username"
+        required minlength="1"
+               class="h-10 px-3 bg-transparent text-white placeholder-neutral-400 focus:outline-none focus:ring-0 border-2 border-white">
+        <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password" 
+        autocomplete="current-password"
+        required minlength="1"
+               class="h-10 px-3 bg-transparent text-white placeholder-neutral-400 focus:outline-none focus:ring-0 border-2 border-white">
+        <button type="submit" class="h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center">
+            🔑 Login with Username/Password
+        </button>
+    </div>
+</form>
+
+<!-- Passkey Login -->
+<div class="flex flex-col gap-3 mt-4">
+    <button onclick="loginWebAuthnPasskey()" class="h-10 select-none bg-green-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#166534_inset,0_0_0_1px_#15803d_inset,0_0.5px_0_1.5px_#4ade80_inset] hover:bg-green-700 active:bg-green-800 text-center">
+        🔐 Login with Passkey
+    </button>
+</div>
+<div id="login-status" class="mt-4 p-3 hidden"></div>
+

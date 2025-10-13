@@ -82,8 +82,8 @@
 			{% end %}
 		</div>
 	</section>
-	<section id="contact">
-		<h2 id="contact" class="h2">🖋️ Contact</h2>
+	<section id="contact" class="mb-8">
+		<h2 id="contact" class="h2 ">🖋️ Contact</h2>
 		<p>Here's a list of my contact information:</p>
 		<ul class="list-inside list-[square] break-words">
 			<li>Email: {{ this.Mail }}</li>
@@ -104,6 +104,12 @@
 				GitLab Profile: <a href="{{ this.Gitlab }}">{{ this.Gitlab }}</a>
 			</li>
 		</ul>
+	</section>
+	<section id="project-build-status">
+		<h2 id="project-build-status" class="h2">🏗️ Project Build Status</h2>
+		<a href="https://gitlab.com/{{ this.Footer.gitRepoId }}/-/commit/{{ this.Footer.commitHash }}">
+			<img width="300" src="https://gitlab.com/{{ this.Footer.gitRepoId }}/badges/master/pipeline.svg" loading="lazy" decoding="async" alt="Deploy Status Badge"/>
+		</a>
 	</section>
 </article>
 {% embed "_footer.temple.twig" with this.base %}

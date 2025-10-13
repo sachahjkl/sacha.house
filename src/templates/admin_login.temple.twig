@@ -1,0 +1,15 @@
+{% embed "_header.temple.twig" with this.base %}
+<article class="prose mx-auto">
+    <h1 class="h1">admin login</h1>
+    
+    <section>
+        <h2>🔒 Login Required</h2>
+        <p>Please choose a login method:</p>
+        
+        <div id="login-form-container">
+            {% embed "_login_form.temple.twig" with this %}
+        </div>
+    </section>
+</article>
+{% embed "_footer.temple.twig" with this.base %}
+

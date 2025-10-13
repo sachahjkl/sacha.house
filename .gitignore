@@ -201,3 +201,4 @@ temple_cli
 temple_cli.exe
 temple_cli.pdb
 projects_cache.json
+webauthn_credentials.json

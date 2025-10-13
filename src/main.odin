@@ -1,6 +1,7 @@
 package main
 
 import "core:bytes"
+import "core:crypto"
 import "core:encoding/json"
 import "core:fmt"
 import "core:io"
@@ -57,6 +58,9 @@ main :: proc() {
 		defer trace.destroy(&global_trace_ctx)
 		context.assertion_failure_proc = debug_trace_assertion_failure_proc
 	}
+
+	// NOTE(sachahjkl): What a mess.
+	init_random_generator()
 
 	if !init_timezone() {
 		log.error("Failed to initialize timezone, exiting...")

@@ -11,5 +11,6 @@
   "ADMIN_IPS": [],
   "GIT_REPO_ID": "sachahjkl/sacha.house",
   "ADMIN_USERNAME": "admin",
-  "ADMIN_PASSWORD": "password123"
+  "ADMIN_PASSWORD": "password123",
+  "WEBAUTHN_CREDENTIALS_FILE": "webauthn_credentials.json"
 }

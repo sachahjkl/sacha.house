@@ -1,5 +1,6 @@
 package main
 
+import "core:encoding/base64"
 import "core:encoding/json"
 import "core:fmt"
 import "core:io"
@@ -46,12 +47,25 @@ server_start :: proc() {
 	http.route_get(&router, "/api/ip", http.handler(ip_api))
 	http.route_get(&router, "/mariage", http.handler(mariage_redirect))
 	http.route_get(&router, "/teapot", http.handler(teapot_page))
+	http.route_get(&router, "/admin/login", http.handler(admin_login_page))
+	http.route_post(&router, "/admin/login", http.handler(admin_login_submit))
 	http.route_get(&router, "/admin", http.handler(admin_page))
+	http.route_get(
+		&router,
+		"/admin/webauthn/register%-challenge",
+		http.handler(admin_webauthn_register_challenge),
+	)
+	http.route_post(&router, "/admin/webauthn/register", http.handler(admin_webauthn_register))
+	http.route_get(
+		&router,
+		"/admin/webauthn/login%-challenge",
+		http.handler(admin_webauthn_login_challenge),
+	)
+	http.route_post(&router, "/admin/webauthn/login", http.handler(admin_webauthn_login))
+	http.route_post(&router, "/admin/refresh%-projects", http.handler(admin_refresh_projects))
 
 	// fallback to static serve but from the root
 	http.route_get(&router, "/(.*)", http.handler(serve_static_file))
-
-	http.route_post(&router, "/admin/refresh%-projects", http.handler(admin_refresh_projects))
 
 	log.info("Routes initialized.")
 
@@ -66,6 +80,16 @@ server_start :: proc() {
 
 	defer cleanup_cache()
 
+	if err := init_sessions(); err != .None {
+		log.fatalf("Failed to initialize sessions: %v", err)
+	}
+	defer cleanup_sessions()
+
+	if err := init_webauthn(); err != .None {
+		log.fatalf("Failed to initialize WebAuthn: %v", err)
+	}
+	defer cleanup_webauthn()
+
 	listen_endpoint := net.Endpoint {
 		address = net.IP4_Any,
 		port    = get_port(),
@@ -78,43 +102,6 @@ server_start :: proc() {
 	fmt.assertf(err == nil, "server stopped with error: %v", err)
 }
 
-render_page :: proc(
-	req: ^http.Request,
-	res: ^http.Response,
-	page_template: $T,
-	data: $D,
-	status := http.Status.OK,
-	use_cache := false,
-) where T ==
-	temple.Compiled(D) {
-	path := req.url.path
-	log.infof("Rendering page %v...", path)
-	if use_cache {
-		set_cache_header(res)
-		log.infof("Cache header set for %v.", path)
-	}
-
-	rw := http.Response_Writer{}
-
-	// make 16kb buffer
-	buf := make([]byte, 16 * 1024, context.temp_allocator)
-
-	http.response_writer_init(&rw, res, buf)
-
-	_, err := page_template.with(rw.w, data)
-	if err != nil {
-		log.errorf("Failed to write template to buffer for %v: %v", path, err)
-		http.respond_with_status(res, http.Status.Internal_Server_Error)
-		return
-	}
-
-	http.response_status(res, status)
-	err = io.close(rw.w)
-	if err != nil {
-		log.errorf("Failed to close response writer for %v: %v", path, err)
-	}
-	log.infof("Page %v rendered successfully.", path)
-}
 
 index_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
@@ -131,7 +118,7 @@ index_page :: proc(req: ^http.Request, res: ^http.Response) {
 				description = "Sacha Froment's personal website.",
 			},
 			req.url.path,
-			is_authorized(req),
+			get_auth_level(req, res) == .Authorized,
 		),
 		Mail     = ME.mail,
 		GpgPrint = ME.gpgPrint,
@@ -160,7 +147,6 @@ about_page :: proc(req: ^http.Request, res: ^http.Response) {
 		LinkedInExperiences: []Template_Experience,
 		LinkedInEducation:   []Template_Education,
 	}
-	page_template := temple.compiled("templates/about.temple.twig", Page_Data)
 
 	profile, err := get_gist_profile()
 	log.infof("Fetched gist profile")
@@ -216,7 +202,7 @@ about_page :: proc(req: ^http.Request, res: ^http.Response) {
 				),
 			},
 			req.url.path,
-			is_authorized(req),
+			get_auth_level(req, res) == .Authorized,
 		),
 		Prenom              = capitalize(ME.prenom),
 		Age                 = ME.age,
@@ -233,6 +219,7 @@ about_page :: proc(req: ^http.Request, res: ^http.Response) {
 		LinkedInEducation   = template_education,
 	}
 
+	page_template := temple.compiled("templates/about.temple.twig", Page_Data)
 	render_page(req, res, page_template, data)
 
 }
@@ -255,7 +242,6 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 		using base: Base_Page_Data,
 		Posts:      []Page_Posts,
 	}
-	page_template := temple.compiled("templates/posts.temple.twig", Page_Data)
 
 	posts, err := fetch_posts()
 	if err.type != .None {
@@ -301,11 +287,12 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 				description = "My blog in which I will (rarely) post subjects often related to computer science.",
 			},
 			req.url.path,
-			is_authorized(req),
+			get_auth_level(req, res) == .Authorized,
 		),
 		Posts = template_posts,
 	}
 
+	page_template := temple.compiled("templates/posts.temple.twig", Page_Data)
 	render_page(req, res, page_template, data)
 }
 
@@ -315,7 +302,7 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 		using base: Base_Page_Data,
 		Post:       Template_Post_Detail,
 	}
-	page_template := temple.compiled("templates/post.temple.twig", Page_Data)
+
 
 	slug := req.url_params[0]
 	post, err := fetch_post(slug)
@@ -348,11 +335,11 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 				description = string(post.content.text[:min(len(post.content.text), 160)]),
 			},
 			req.url.path,
-			is_authorized(req),
+			get_auth_level(req, res) == .Authorized,
 		),
 		Post = template_post,
 	}
-
+	page_template := temple.compiled("templates/post.temple.twig", Page_Data)
 	render_page(req, res, page_template, data)
 
 }
@@ -369,7 +356,6 @@ teapot_page :: proc(req: ^http.Request, res: ^http.Response) {
 		BrewMessage: Brew_Message,
 		IsATeapot:   bool,
 	}
-	page_template := temple.compiled("templates/teapot.temple.twig", Page_Data)
 
 	next_spewage := generate_random_string(5, "abcdefghijklmnopqrstuvwxyz1234567890")
 	brew_message := Brew_Message{}
@@ -404,13 +390,14 @@ teapot_page :: proc(req: ^http.Request, res: ^http.Response) {
 		base        = create_base_page_data(
 			Maybe_SEO_Data{title = "teapot / sacha.house", description = "I'm a teapot."},
 			req.url.path,
-			is_authorized(req),
+			get_auth_level(req, res) == .Authorized,
 		),
 		Spewage     = next_spewage,
 		BrewMessage = brew_message,
 		IsATeapot   = is_a_teapot,
 	}
 
+	page_template := temple.compiled("templates/teapot.temple.twig", Page_Data)
 	render_page(req, res, page_template, data, status)
 }
 
@@ -430,7 +417,6 @@ projects_page :: proc(req: ^http.Request, res: ^http.Response) {
 		GitLabProjects: []Standardized_Project,
 		GitHubProjects: []Standardized_Project,
 	}
-	page_template := temple.compiled("templates/projects.temple.twig", Page_Data)
 
 	projects_cache := fetch_projects(use_cache = true)
 
@@ -447,7 +433,7 @@ projects_page :: proc(req: ^http.Request, res: ^http.Response) {
 				description = "My personal projects.",
 			},
 			req.url.path,
-			is_authorized(req),
+			get_auth_level(req, res) == .Authorized,
 		),
 		Username       = ME.username,
 		HayekFR        = ME.hayekfr,
@@ -457,13 +443,15 @@ projects_page :: proc(req: ^http.Request, res: ^http.Response) {
 		GitHubProjects = projects_cache.github,
 	}
 
+	page_template := temple.compiled("templates/projects.temple.twig", Page_Data)
 	render_page(req, res, page_template, data)
 }
 
 admin_refresh_projects :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if !is_authorized(req) {
-		require_auth(res)
+	if get_auth_level(req, res) != .Authorized {
+		http.headers_set(&res.headers, "Location", "/admin/login")
+		http.respond(res, http.Status.Temporary_Redirect)
 		return
 	}
 
@@ -473,10 +461,132 @@ admin_refresh_projects :: proc(req: ^http.Request, res: ^http.Response) {
 	http.respond(res, http.Status.See_Other)
 }
 
+Webauthn_Credential_Response :: struct {
+	id:       string,
+	rawId:    string,
+	response: struct {
+		clientDataJSON:    string,
+		attestationObject: string,
+	},
+	type:     string,
+}
+
+Webauthn_Assertion_Response :: struct {
+	id:       string,
+	rawId:    string,
+	response: struct {
+		clientDataJSON:    string,
+		authenticatorData: string,
+		signature:         string,
+		userHandle:        string,
+	},
+	type:     string,
+}
+
+admin_login_page :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	// Redirect to admin if already authenticated
+	if get_auth_level(req, res) == .Authorized {
+		http.headers_set(&res.headers, "Location", "/admin")
+		http.respond(res, http.Status.Temporary_Redirect)
+		return
+	}
+
+	Page_Data :: struct {
+		using base: Base_Page_Data,
+		Error:      string,
+	}
+	page_template := temple.compiled("templates/admin_login.temple.twig", Page_Data)
+
+	data := Page_Data {
+		base  = create_base_page_data(
+			Maybe_SEO_Data{title = "admin login / sacha.house", description = "Admin login."},
+			req.url.path,
+			false,
+		),
+		Error = "",
+	}
+
+	render_page(req, res, page_template, data)
+}
+
+admin_login_submit :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	Context_Data :: struct {
+		res:           ^http.Response,
+		req:           ^http.Request,
+		form_template: temple.Compiled(Login_Form_Data),
+	}
+
+
+	Login_Form_Data :: struct {
+		Error: string,
+	}
+
+	// Check credentials
+	form_template := temple.compiled("templates/_login_form.temple.twig", Login_Form_Data)
+
+
+	ctx := Context_Data {
+		res           = res,
+		req           = req,
+		form_template = form_template,
+	}
+
+	http.body(
+		req,
+		-1,
+		&ctx,
+		proc(user_data: rawptr, body: http.Body, err: http.Body_Error) {
+			ctx := cast(^Context_Data)user_data
+			res := ctx.res
+			req := ctx.req
+			form_template := ctx.form_template
+
+			if err != nil {
+				http.respond_with_status(res, http.Status.Bad_Request)
+				return
+			}
+
+			// Parse form data from body
+			form_data, ok := http.body_url_encoded(body)
+			if !ok {
+				http.respond_with_status(res, http.Status.Bad_Request)
+				return
+			}
+
+			username := form_data["username"] or_else ""
+			password := form_data["password"] or_else ""
+
+
+			if username == get_admin_username() && password == get_admin_password() {
+				// Create session and redirect
+				session_id := create_session()
+				set_session_cookie(res, session_id)
+				http.headers_set(&res.headers, "HX-Redirect", "/admin")
+				http.respond_with_status(res, http.Status.OK)
+			} else {
+				// Invalid credentials, render form with error
+
+				data := Login_Form_Data {
+					Error = "Invalid username or password",
+				}
+
+				render_page(req, res, form_template, data)
+			}
+		},
+	)
+}
+
 admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if !is_authorized(req) {
-		require_auth(res)
+
+	// Require authentication
+	if get_auth_level(req, res) != .Authorized {
+		http.headers_set(&res.headers, "Location", "/admin/login")
+		http.respond(res, http.Status.Temporary_Redirect)
 		return
 	}
 
@@ -486,29 +596,363 @@ admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 		CreditBalance: int,
 		ProfileData:   string,
 	}
-	page_template := temple.compiled("templates/admin.temple.twig", Page_Data)
-
-	// ProxyCurl is dead, we'll keep the balance at 0 and show it for historical purposes
-	balance := 0
 
 	profile_json := ""
 	if profile_json_str := get_gist_profile_string(); profile_json_str != nil {
 		profile_json = profile_json_str.(string)
 	}
 
-
 	data := Page_Data {
 		base          = create_base_page_data(
 			Maybe_SEO_Data{title = "admin / sacha.house", description = "Admin panel."},
 			req.url.path,
-			is_authorized(req),
+			true,
 		),
 		IpAddress     = net.address_to_string(req.client.address),
-		CreditBalance = balance,
+		CreditBalance = 0,
 		ProfileData   = profile_json,
 	}
 
+	page_template := temple.compiled("templates/admin.temple.twig", Page_Data)
 	render_page(req, res, page_template, data)
+}
+
+
+admin_webauthn_register_challenge :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	// Require authentication for WebAuthn registration
+	if get_auth_level(req, res) != .Authorized {
+		http.respond_with_status(res, http.Status.Unauthorized)
+		return
+	}
+
+	challenge_id := generate_id()
+	log.infof("Challenge ID: %s", challenge_id)
+
+	challenge := generate_challenge()
+	log.infof("Generated challenge: %d bytes", len(challenge))
+
+	store_challenge(challenge_id, challenge)
+	log.infof("Stored challenge for session")
+
+	rp_id := get_rp_id(req)
+	log.infof("RP ID: %s", rp_id)
+
+	Challenge_Response :: struct {
+		challenge: string,
+		rp_id:     string,
+		user_id:   string,
+	}
+
+	challenge_b64 := base64.encode(challenge, allocator = context.temp_allocator)
+	log.infof("Challenge base64: %s", challenge_b64)
+
+	response := Challenge_Response {
+		challenge = challenge_b64,
+		rp_id     = rp_id,
+		user_id   = "admin",
+	}
+
+	json_data, err := json.marshal(response, allocator = context.temp_allocator)
+	if err != nil {
+		log.errorf("Failed to marshal challenge response: %v", err)
+		http.respond_plain(res, "JSON marshal error", http.Status.Internal_Server_Error)
+		return
+	}
+
+	set_challenge_cookie(res, challenge_id)
+
+	http.headers_set(&res.headers, "Content-Type", "application/json")
+	http.respond_plain(res, string(json_data), http.Status.OK)
+}
+
+admin_webauthn_register :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+	// Require authentication for WebAuthn registration
+	if get_auth_level(req, res) != .Authorized {
+		http.respond_with_status(res, http.Status.Unauthorized)
+		return
+	}
+
+	// Get or create session (reuse existing if available)
+	challenge_id, ok := http.request_cookie_get(req, CHALLENGE_KEY)
+
+	if !ok {
+		http.respond_plain(res, "No challenge ID found", http.Status.Bad_Request)
+		return
+	}
+
+	Context_Data :: struct {
+		res:          ^http.Response,
+		challenge_id: string,
+	}
+
+	ctx := Context_Data {
+		res          = res,
+		challenge_id = challenge_id,
+	}
+
+	http.body(
+		req,
+		-1,
+		&ctx,
+		proc(user_data: rawptr, body: http.Body, err: http.Body_Error) {
+			ctx := cast(^Context_Data)user_data
+			res := ctx.res
+			challenge_id := ctx.challenge_id
+
+			if err != nil {
+				http.respond(res, http.body_error_status(err))
+				return
+			}
+
+			cred_data: Webauthn_Credential_Response
+			if uerr := json.unmarshal(
+				transmute([]byte)body,
+				&cred_data,
+				allocator = context.temp_allocator,
+			); uerr != nil {
+				http.respond_plain(res, "Invalid JSON", http.Status.Bad_Request)
+				return
+			}
+
+
+			client_data, cok := parse_client_data_json(cred_data.response.clientDataJSON)
+			if !cok {
+				http.respond_plain(res, "Invalid clientDataJSON", http.Status.Bad_Request)
+				return
+			}
+
+
+			challenge_val, has_challenge := client_data["challenge"]
+			if !has_challenge {
+				http.respond_plain(res, "Missing challenge", http.Status.Bad_Request)
+				return
+			}
+
+			challenge_str, is_string := challenge_val.(string)
+			if !is_string {
+				http.respond_plain(res, "Invalid challenge type", http.Status.Bad_Request)
+				return
+			}
+
+			// Convert URL-safe base64 to standard base64
+			standard_challenge, _ := strings.replace_all(
+				challenge_str,
+				"-",
+				"+",
+				context.temp_allocator,
+			)
+			standard_challenge, _ = strings.replace_all(
+				standard_challenge,
+				"_",
+				"/",
+				context.temp_allocator,
+			)
+
+			challenge_bytes := base64.decode(
+				standard_challenge,
+				allocator = context.temp_allocator,
+			)
+			if challenge_bytes == nil {
+				http.respond_plain(res, "Invalid challenge encoding", http.Status.Bad_Request)
+				return
+			}
+
+
+			if !verify_and_consume_challenge(challenge_id, challenge_bytes) {
+				log.errorf("Challenge verification failed for challenge: %s", challenge_id)
+				http.respond_plain(res, "Challenge verification failed", http.Status.Bad_Request)
+				return
+			}
+
+
+			public_key, parse_ok := verify_attestation_object(cred_data.response.attestationObject)
+			if !parse_ok {
+				http.respond_plain(res, "Failed to parse attestation", http.Status.Bad_Request)
+				return
+			}
+
+			// Store using the credential ID sent by the client (URL-safe base64)
+			// This must match what the client sends during login
+			store_credential(cred_data.id, public_key)
+
+			// Cleanup the challenge cookie
+			clear_challenge_cookie(res)
+
+			log.infof("Registered WebAuthn credential: %s", cred_data.id)
+			http.respond_plain(res, "Registration successful", http.Status.OK)
+		},
+	)
+}
+
+admin_webauthn_login_challenge :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	if !has_credentials() {
+		http.respond_plain(res, "No passkeys registered yet", http.Status.Bad_Request)
+		return
+	}
+
+	challenge_id := generate_id()
+	log.infof("Challenge ID: %s", challenge_id)
+
+	challenge := generate_challenge()
+	store_challenge(challenge_id, challenge)
+
+
+	rp_id := get_rp_id(req)
+
+	Challenge_Response :: struct {
+		challenge: string,
+		rp_id:     string,
+	}
+
+	response := Challenge_Response {
+		challenge = base64.encode(challenge, allocator = context.temp_allocator),
+		rp_id     = rp_id,
+	}
+
+	json_data, err := json.marshal(response, allocator = context.temp_allocator)
+	if err != nil {
+		log.errorf("Failed to marshal challenge response: %v", err)
+		http.respond_with_status(res, http.Status.Internal_Server_Error)
+		return
+	}
+
+	set_challenge_cookie(res, challenge_id)
+
+	http.headers_set(&res.headers, "Content-Type", "application/json")
+	http.respond_plain(res, string(json_data), http.Status.OK)
+}
+
+admin_webauthn_login :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	challenge_id, ok := http.request_cookie_get(req, CHALLENGE_KEY)
+	if !ok {
+		http.respond_plain(res, "No challenge ID found", http.Status.Bad_Request)
+		return
+	}
+
+	Context_Data :: struct {
+		res:          ^http.Response,
+		challenge_id: string,
+	}
+
+	ctx := Context_Data {
+		res          = res,
+		challenge_id = challenge_id,
+	}
+
+	http.body(
+		req,
+		-1,
+		&ctx,
+		proc(user_data: rawptr, body: http.Body, err: http.Body_Error) {
+			ctx := cast(^Context_Data)user_data
+			res := ctx.res
+			challenge_id := ctx.challenge_id
+
+			if err != nil {
+				http.respond(res, http.body_error_status(err))
+				return
+			}
+
+			assertion_data: Webauthn_Assertion_Response
+			if uerr := json.unmarshal(
+				transmute([]byte)body,
+				&assertion_data,
+				allocator = context.temp_allocator,
+			); uerr != nil {
+				http.respond_plain(res, "Invalid JSON", http.Status.Bad_Request)
+				return
+			}
+
+
+			client_data, cok := parse_client_data_json(assertion_data.response.clientDataJSON)
+			if !cok {
+				http.respond_plain(res, "Invalid clientDataJSON", http.Status.Bad_Request)
+				return
+			}
+
+			challenge_val, has_challenge := client_data["challenge"]
+			if !has_challenge {
+				http.respond_plain(res, "Missing challenge", http.Status.Bad_Request)
+				return
+			}
+
+			challenge_str, is_string := challenge_val.(string)
+			if !is_string {
+				http.respond_plain(res, "Invalid challenge type", http.Status.Bad_Request)
+				return
+			}
+
+			// Convert URL-safe base64 to standard base64
+			standard_challenge, _ := strings.replace_all(
+				challenge_str,
+				"-",
+				"+",
+				context.temp_allocator,
+			)
+			standard_challenge, _ = strings.replace_all(
+				standard_challenge,
+				"_",
+				"/",
+				context.temp_allocator,
+			)
+
+			challenge_bytes := base64.decode(
+				standard_challenge,
+				allocator = context.temp_allocator,
+			)
+			if challenge_bytes == nil {
+				http.respond_plain(res, "Invalid challenge encoding", http.Status.Bad_Request)
+				return
+			}
+
+			if !verify_and_consume_challenge(challenge_id, challenge_bytes) {
+				http.respond_plain(res, "Challenge verification failed", http.Status.Bad_Request)
+				return
+			}
+
+			credential, cred_ok := get_credential(assertion_data.id)
+			if !cred_ok {
+				http.respond_plain(res, "Unknown credential", http.Status.Unauthorized)
+				return
+			}
+
+			if !verify_assertion_signature(
+				credential,
+				assertion_data.response.authenticatorData,
+				assertion_data.response.clientDataJSON,
+				assertion_data.response.signature,
+			) {
+				http.respond_plain(res, "Signature verification failed", http.Status.Unauthorized)
+				return
+			}
+
+			// Grant a session
+			new_session_id := create_session()
+			set_session_cookie(res, new_session_id)
+
+			// Cleanup the challenge cookie
+			clear_challenge_cookie(res)
+
+			log.info("WebAuthn login successful")
+			http.respond_plain(res, "Login successful", http.Status.OK)
+		},
+	)
+}
+
+get_rp_id :: proc(req: ^http.Request) -> string {
+	host :=
+		http.headers_get(req.headers, "Host") or_else fmt.tprintf("%s:%d", "localhost", get_port())
+	if strings.contains(host, ":") {
+		host = host[:strings.index(host, ":")]
+	}
+	return host
 }
 
 ip_api :: proc(req: ^http.Request, res: ^http.Response) {

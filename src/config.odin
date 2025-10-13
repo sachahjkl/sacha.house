@@ -23,6 +23,7 @@ Config :: struct {
 	GIT_REPO_ID:                 string,
 	ADMIN_USERNAME:              string,
 	ADMIN_PASSWORD:              string,
+	WEBAUTHN_CREDENTIALS_FILE:   string,
 }
 
 APP_CONFIG: Config
@@ -41,6 +42,7 @@ DEFAULT_CONFIG :: Config {
 	GIT_REPO_ID = "",
 	ADMIN_USERNAME = "",
 	ADMIN_PASSWORD = "",
+	WEBAUTHN_CREDENTIALS_FILE = "webauthn_credentials.json",
 }
 
 get_config_path :: proc() -> string {
