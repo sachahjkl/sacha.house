@@ -3,7 +3,7 @@ package main
 import "core:path/filepath"
 import "core:strings"
 
-import http "odin-http"
+import http "lib:odin-http"
 
 Static_File :: struct {
 	data:      []u8,

@@ -2,8 +2,8 @@ package main
 
 import "core:io"
 import "core:log"
-import http "odin-http"
-import temple "temple"
+import http "lib:odin-http"
+import temple "lib:temple"
 
 render_page :: proc(
 	req: ^http.Request,

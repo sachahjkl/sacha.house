@@ -19,9 +19,9 @@ import "core:time"
 import "core:debug/trace"
 
 
-import http "odin-http"
-import client "odin-http/client"
-import temple "temple"
+import http "lib:odin-http"
+import client "lib:odin-http/client"
+import temple "lib:temple"
 
 LoggerOpts :: log.Options{.Level, .Time, .Short_File_Path, .Line, .Terminal_Color, .Thread_Id}
 

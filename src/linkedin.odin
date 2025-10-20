@@ -8,8 +8,8 @@ import "core:os"
 import "core:strings"
 import "core:time"
 
-import client "odin-http/client"
-import http "odin-http"
+import client "lib:odin-http/client"
+import http "lib:odin-http"
 
 Linkedin_Day :: struct {
 	day:   int,

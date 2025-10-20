@@ -14,7 +14,7 @@ import "core:os"
 import "core:strings"
 import "core:time"
 
-import http "odin-http"
+import http "lib:odin-http"
 
 WebAuthn_Challenge :: struct {
 	challenge: []byte,

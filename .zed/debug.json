@@ -1,0 +1,20 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+  {
+    "label": "Debug project",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "sacha.house.exe",
+    "build": "Build project"
+    //"args": [],
+    // Env overrides for the command, will be appended to the terminal's environment from the settings.
+    // "env": { "foo": "bar" },
+    // "cwd": "/path/to/project",
+    // "group": "build",
+    // "presentation": "default",
+    // "problemMatcher": []
+  }
+]

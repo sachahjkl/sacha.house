@@ -4,8 +4,8 @@ import "core:encoding/json"
 import "core:fmt"
 import "core:log"
 
-import client "odin-http/client"
-import http "odin-http"
+import client "lib:odin-http/client"
+import http "lib:odin-http"
 
 with_bearer_auth :: proc(req: ^client.Request, token: string) {
 	http.headers_set(&req.headers, "Authorization", fmt.tprintf("Bearer %s", token))

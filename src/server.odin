@@ -12,9 +12,9 @@ import "core:os"
 import "core:sort"
 import "core:strings"
 import "core:time"
-import http "odin-http"
-import client "odin-http/client"
-import temple "temple"
+import http "lib:odin-http"
+import client "lib:odin-http/client"
+import temple "lib:temple"
 
 
 // NOTE(sachahjkl):

@@ -5,10 +5,11 @@
 # Variables
 ODIN_SRC = src
 ODIN_OUT = sacha.house.exe
+LIB = lib
 BUN = bun
 TEMPLE_CLI = temple_cli.exe
-TEMPLE_PATH = $(ODIN_SRC)/temple
-OUT_TEMPLATE_FILE = $(ODIN_SRC)/temple/templates.odin
+TEMPLE_PATH = $(LIB)/temple
+OUT_TEMPLATE_FILE = $(LIB)/temple/templates.odin
 TEMPLATE_FILES = $(wildcard $(ODIN_SRC)/templates/*.temple.twig)
 GIT_COMMIT_HASH ?= dev # git rev-parse --short HEAD
 VERSION ?= dev
@@ -30,13 +31,15 @@ mode ?= debug
 ifeq ($(OS),Windows_NT)
 	LINKER_FLAGS = -extra-linker-flags:"/ignore:4099"
 else
-	LINKER_FLAGS = 
+	LINKER_FLAGS =
 endif
 
+ODIN_DEFAULT_FLAGS = -collection:lib=$(LIB)
+
 ifeq ($(mode),release)
-	ODIN_FLAGS = -o:speed -define:TRACK_LEAKS=false -build-mode:exe $(LINKER_FLAGS)
+	ODIN_FLAGS = $(ODIN_DEFAULT_FLAGS) -o:speed -define:TRACK_LEAKS=false -build-mode:exe $(LINKER_FLAGS)
 else
-	ODIN_FLAGS = -debug -define:TRACK_LEAKS=true -build-mode:exe $(LINKER_FLAGS)
+	ODIN_FLAGS = $(ODIN_DEFAULT_FLAGS) -debug -define:TRACK_LEAKS=true -build-mode:exe $(LINKER_FLAGS)
 endif
 
 
