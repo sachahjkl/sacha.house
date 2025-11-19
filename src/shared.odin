@@ -33,6 +33,7 @@ Base_Page_Data :: struct {
 	SEO:      SEO_Data,
 	Footer:   Footer_Data,
 	NavItems: []NavItem,
+	HotReload:    bool,
 }
 
 
@@ -83,5 +84,6 @@ create_base_page_data :: proc(
 			version = VERSION,
 		},
 		NavItems = nav_items,
+		HotReload = HOT_RELOAD,
 	}
 }

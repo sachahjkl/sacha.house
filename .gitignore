@@ -195,8 +195,10 @@ config.json
 
 # Odin
 sacha.house
-sacha.house.exe
-sacha.house.pdb
+sacha.house*.exe
+dev_watcher.exe
+sacha.house*.pdb
+dev_watcher.pdb
 temple_cli
 temple_cli.exe
 temple_cli.pdb

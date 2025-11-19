@@ -11,6 +11,8 @@ handle_cli_args :: proc() {
 		} else if arg == "-v" || arg == "--version" {
 			print_version()
 			os.exit(0)
+		} else if arg == "-dev" {
+			HOT_RELOAD = true
 		} else {
 			fmt.eprintf("Error: Unknown argument '%s'\n\n", arg)
 			print_help()
@@ -36,6 +38,7 @@ print_help :: proc() {
 	fmt.println("OPTIONS:")
 	fmt.println("  -h, --help    Show this help message")
 	fmt.println("  -v, --version Show version")
+	fmt.println("  -dev          Run in development mode (enables hot reload)")
 	fmt.println()
 	
 	fmt.println("ENVIRONMENT VARIABLES:")

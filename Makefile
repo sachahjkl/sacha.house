@@ -1,6 +1,6 @@
 # Makefile for the Odin rewrite of sacha.house
 
-.PHONY: all build css run clean templates run-ssl
+.PHONY: all build css run clean templates run-ssl dev build-watcher
 
 # Variables
 ODIN_SRC = src
@@ -79,4 +79,10 @@ clean:
 	@rm -f $(ODIN_OUT)
 	@rm -f $(OUT_CSS_FILE)
 	@rm -f $(TEMPLE_CLI)
-	@rm -rf temple
+
+dev: build-watcher
+	@./dev_watcher.exe
+
+build-watcher:
+	@echo "Building dev watcher..."
+	@odin build tools/dev-watcher -out:dev_watcher.exe
