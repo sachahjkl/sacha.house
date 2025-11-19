@@ -1,4 +1,3 @@
-#+feature  global-context
 package openssl
 
 import "core:c"
@@ -8,15 +7,32 @@ SHARED :: #config(OPENSSL_SHARED, false)
 
 when ODIN_OS == .Windows {
 	when SHARED {
-		foreign import lib {"./includes/windows/libssl.lib", "./includes/windows/libcrypto.lib"}
+		foreign import lib {
+			"./includes/windows/libssl.lib",
+			"./includes/windows/libcrypto.lib",
+		}
 	} else {
 		// @(extra_linker_flags="/nodefaultlib:libcmt")
-		foreign import lib {"./includes/windows/libssl_static.lib", "./includes/windows/libcrypto_static.lib", "system:ws2_32.lib", "system:gdi32.lib", "system:advapi32.lib", "system:crypt32.lib", "system:user32.lib"}
+		foreign import lib {
+			"./includes/windows/libssl_static.lib",
+			"./includes/windows/libcrypto_static.lib",
+			"system:ws2_32.lib",
+			"system:gdi32.lib",
+			"system:advapi32.lib",
+			"system:crypt32.lib",
+			"system:user32.lib",
+		}
 	}
 } else when ODIN_OS == .Darwin {
-	foreign import lib {"system:ssl.3", "system:crypto.3"}
+	foreign import lib {
+		"system:ssl.3",
+		"system:crypto.3",
+	}
 } else {
-	foreign import lib {"system:ssl", "system:crypto"}
+	foreign import lib {
+		"system:ssl",
+		"system:crypto",
+	}
 }
 
 Version :: bit_field u32 {
@@ -29,9 +45,9 @@ Version :: bit_field u32 {
 VERSION: Version
 
 @(private, init)
-version_check :: proc() {
-	VERSION = Version(OpenSSL_version_num())
-	assert(VERSION.major == 3, "invalid OpenSSL library version, expected 3.x")
+version_check :: proc "contextless" () {
+    VERSION = Version(OpenSSL_version_num())
+    assert_contextless(VERSION.major == 3, "invalid OpenSSL library version, expected 3.x")
 }
 
 SSL_METHOD :: struct {}
@@ -55,7 +71,7 @@ foreign lib {
 	SSL_CTX_free :: proc(ctx: ^SSL_CTX) ---
 	ERR_print_errors_fp :: proc(fp: ^libc.FILE) ---
 	SSL_ctrl :: proc(ssl: ^SSL, cmd: c.int, larg: c.long, parg: rawptr) -> c.long ---
-	OpenSSL_version_num :: proc() -> c.ulong ---
+    OpenSSL_version_num :: proc() -> c.ulong ---
 }
 
 // This is a macro in c land.

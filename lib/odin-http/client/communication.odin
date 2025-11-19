@@ -56,7 +56,7 @@ format_request :: proc(target: http.URL, request: ^Request, allocator := context
 
 			// Write the length into unwritten portion.
 			unwritten := http._dynamic_unwritten(buf.buf)
-			l := len(strconv.itoa(unwritten, buf_len))
+			l := len(strconv.write_int(unwritten, i64(buf_len), 10))
 			assert(l <= 20)
 			http._dynamic_add_len(&buf.buf, l)
 
@@ -187,9 +187,11 @@ parse_response :: proc(socket: Communication, allocator := context.allocator) ->
 		}
 
 		if key == "set-cookie" {
-			cookie_str := http.headers_get_unsafe(res.headers, "set-cookie")
+			cookie_str := strings.trim_space(line[len(key)+1:])
+			value := http.headers_get_unsafe(res.headers, "set-cookie")
 			http.headers_delete_unsafe(&res.headers, "set-cookie")
 			delete(key, allocator)
+			delete(value, allocator)
 
 			cookie, cok := http.cookie_parse(cookie_str, allocator)
 			if !cok {

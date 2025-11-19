@@ -29,8 +29,8 @@ Response :: struct {
 }
 
 response_init :: proc(r: ^Response, allocator := context.allocator) {
-	r.status = .Not_Found
-	r.cookies.allocator = allocator
+	r.status             = .Not_Found
+	r.cookies.allocator  = allocator
 	r._buf.buf.allocator = allocator
 
 	headers_init(&r.headers, allocator)
@@ -60,7 +60,7 @@ If, after calling, you want to change the status code, use the `response_status`
 For bodies where you do not know the size or want an `io.Writer`, use the `response_writer_init`
 procedure to create a writer.
 */
-body_set :: proc {
+body_set :: proc{
 	body_set_str,
 	body_set_bytes,
 }
@@ -69,7 +69,7 @@ body_set :: proc {
 Sets the status code with the safety of being able to do this after writing (part of) the body.
 */
 response_status :: proc(r: ^Response, status: Status) {
-	if r.status == status {return}
+	if r.status == status { return }
 
 	r.status = status
 
@@ -115,29 +115,20 @@ response_writer_init :: proc(rw: ^Response_Writer, r: ^Response, buffer: []byte)
 	_response_write_heading(r, -1)
 
 	rw.buf = slice.into_dynamic(buffer)
-	rw.r = r
+	rw.r   = r
 
-	rw.w = io.Stream {
-		procedure = proc(
-			stream_data: rawptr,
-			mode: io.Stream_Mode,
-			p: []byte,
-			offset: i64,
-			whence: io.Seek_From,
-		) -> (
-			n: i64,
-			err: io.Error,
-		) {
+	rw.w = io.Stream{
+		procedure = proc(stream_data: rawptr, mode: io.Stream_Mode, p: []byte, offset: i64, whence: io.Seek_From) -> (n: i64, err: io.Error) {
 			ws :: bytes.buffer_write_string
 			write_chunk :: proc(b: ^bytes.Buffer, chunk: []byte) {
 				plen := i64(len(chunk))
-				if plen == 0 {return}
+				if plen == 0 { return }
 
 				log.debugf("response_writer chunk of size: %i", plen)
 
 				bytes.buffer_grow(b, 16)
 				size_buf := _dynamic_unwritten(b.buf)
-				size := strconv.write_int(size_buf[:], plen, 16)
+				size := strconv.write_int(size_buf, plen, 16)
 				_dynamic_add_len(&b.buf, len(size))
 
 				ws(b, "\r\n")
@@ -223,16 +214,16 @@ You can pass `content_length < 0` to omit the content-length header, note that t
 required on most responses, but there are things like transfer-encodings that could leave it out.
 */
 _response_write_heading :: proc(r: ^Response, content_length: int) {
-	if r._heading_written {return}
+	if r._heading_written { return }
 	r._heading_written = true
 
-	ws :: bytes.buffer_write_string
+	ws   :: bytes.buffer_write_string
 	conn := r._conn
-	b := &r._buf
+	b    := &r._buf
 
-	MIN :: len("HTTP/1.1 200 \r\ndate: \r\ncontent-length: 1000\r\n") + DATE_LENGTH
+	MIN             :: len("HTTP/1.1 200 \r\ndate: \r\ncontent-length: 1000\r\n") + DATE_LENGTH
 	AVG_HEADER_SIZE :: 20
-	reserve_size := MIN + content_length + (AVG_HEADER_SIZE * headers_count(r.headers))
+	reserve_size    := MIN + content_length + (AVG_HEADER_SIZE * headers_count(r.headers))
 	bytes.buffer_grow(&r._buf, reserve_size)
 
 	// According to RFC 7230 3.1.2 the reason phrase is insignificant,
@@ -256,9 +247,11 @@ _response_write_heading :: proc(r: ^Response, content_length: int) {
 		ws(b, "\r\n")
 	}
 
-	if (content_length > -1 &&
-		   !headers_has_unsafe(r.headers, "content-length") &&
-		   response_needs_content_length(r, conn)) {
+	if (
+		content_length > -1                              &&
+		!headers_has_unsafe(r.headers, "content-length") &&
+		response_needs_content_length(r, conn) \
+	) {
 		if content_length == 0 {
 			ws(b, "content-length: 0\r\n")
 		} else {
@@ -266,7 +259,7 @@ _response_write_heading :: proc(r: ^Response, content_length: int) {
 
 			assert(content_length < 1000000000000000000 && content_length > -1000000000000000000)
 			buf: [20]byte
-			ws(b, strconv.itoa(buf[:], content_length))
+			ws(b, strconv.write_int(buf[:], i64(content_length), 10))
 			ws(b, "\r\n")
 		}
 	}
@@ -334,7 +327,7 @@ response_send_got_body :: proc(r: ^Response, will_close: bool) {
 	conn := r._conn
 
 	if will_close {
-		if !connection_set_state(r._conn, .Will_Close) {return}
+		if !connection_set_state(r._conn, .Will_Close) { return }
 	}
 
 	if bytes.buffer_length(&r._buf) == 0 {
@@ -352,7 +345,7 @@ on_response_sent :: proc(conn_: rawptr, sent: int, err: net.Network_Error) {
 
 	if err != nil {
 		log.errorf("could not send response: %v", err)
-		if !connection_set_state(conn, .Will_Close) {return}
+		if !connection_set_state(conn, .Will_Close) { return }
 	}
 
 	clean_request_loop(conn)
@@ -373,7 +366,7 @@ clean_request_loop :: proc(conn: ^Connection, close: Maybe(bool) = nil) {
 	if c, ok := close.?; (ok && c) || conn.state == .Will_Close {
 		connection_close(conn)
 	} else {
-		if !connection_set_state(conn, .Idle) {return}
+		if !connection_set_state(conn, .Idle) { return }
 		conn_handle_req(conn, context.temp_allocator)
 	}
 }
