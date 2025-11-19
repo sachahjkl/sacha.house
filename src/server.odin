@@ -39,6 +39,8 @@ server_start :: proc() {
 	http.route_get(&router, "/", http.handler(index_page))
 	http.route_get(&router, "/ping", http.handler(ping))
 	http.route_get(&router, "/blog", http.handler(blog_page))
+	http.route_get(&router, "/blog/rss.xml", http.handler(blog_rss_feed))
+	http.route_get(&router, "/blog/atom.xml", http.handler(blog_atom_feed))
 	// slug of shape : word-... (lowercase) and all words separated by a dash
 	http.route_get(&router, "/blog/([%w-]+)", http.handler(blog_post_page))
 	http.route_get(&router, "/about", http.handler(about_page))
@@ -116,7 +118,7 @@ index_page :: proc(req: ^http.Request, res: ^http.Response) {
 		base     = create_base_page_data(
 			Maybe_SEO_Data {
 				title = "home / sacha.house",
-				description = "Sacha Froment's personal website.",
+				description = fmt.tprintf("%s's personal website.", ME.fullName),
 			},
 			req.url.path,
 			get_auth_level(req, res) == .Authorized,
@@ -326,6 +328,7 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 		updatedAtTime = format_time(updatedAt),
 		createdOn     = format_date(createdAt),
 		createdAtTime = format_time(createdAt),
+		author        = post.author.name,
 		content       = post.content,
 	}
 
@@ -343,6 +346,146 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 	page_template := temple.compiled("templates/post.temple.twig", Page_Data)
 	render_page(req, res, page_template, data)
 
+}
+
+blog_rss_feed :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	posts, err := fetch_posts()
+	if err.type != .None {
+		log.errorf("could not fetch posts: %v", err)
+		http.respond_with_status(res, http.Status.Internal_Server_Error)
+		return
+	}
+
+	sort.quick_sort_proc(posts, proc(a, b: Post) -> int {
+		updatedAtA, _, _ := time.iso8601_to_time_and_offset(a.updatedAt)
+		updatedAtB, _, _ := time.iso8601_to_time_and_offset(b.updatedAt)
+		return int(
+			clamp(time.time_to_unix_nano(updatedAtB) - time.time_to_unix_nano(updatedAtA), -1, 1),
+		)
+	})
+
+	sb := strings.builder_make(context.temp_allocator)
+
+	strings.write_string(&sb, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n")
+	strings.write_string(&sb, "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n")
+	strings.write_string(&sb, "	<channel>\n")
+	strings.write_string(&sb, "		<title>sacha.house blog</title>\n")
+	strings.write_string(&sb, "		<link>https://sacha.house/blog</link>\n")
+	strings.write_string(
+		&sb,
+		fmt.tprintf("		<description>%s's personal blog.</description>\n", ME.fullName),
+	)
+	strings.write_string(
+		&sb,
+		"		<atom:link href=\"https://sacha.house/blog/feed.xml\" rel=\"self\" type=\"application/rss+xml\" />\n",
+	)
+	strings.write_string(&sb, "		<language>en-us</language>\n")
+
+	if len(posts) > 0 {
+		latest, _, _ := time.iso8601_to_time_and_offset(posts[0].updatedAt)
+		pubDate := format_rfc1123(latest, context.temp_allocator)
+		strings.write_string(&sb, fmt.tprintf("		<lastBuildDate>%s</lastBuildDate>\n", pubDate))
+	}
+
+	for post in posts {
+		strings.write_string(&sb, "		<item>\n")
+
+		title := xml_escape(post.title, context.temp_allocator)
+		strings.write_string(&sb, fmt.tprintf("			<title>%s</title>\n", title))
+
+		link := fmt.tprintf("https://sacha.house/blog/%s", post.slug)
+		strings.write_string(&sb, fmt.tprintf("			<link>%s</link>\n", link))
+		strings.write_string(&sb, fmt.tprintf("			<guid>%s</guid>\n", link))
+
+		t, _, _ := time.iso8601_to_time_and_offset(post.updatedAt)
+		pubDate := format_rfc1123(t, context.temp_allocator)
+		strings.write_string(&sb, fmt.tprintf("			<pubDate>%s</pubDate>\n", pubDate))
+
+		if post.author.name != "" {
+			author_name := xml_escape(post.author.name, context.temp_allocator)
+			strings.write_string(&sb, fmt.tprintf("			<author>%s</author>\n", author_name))
+		}
+
+		strings.write_string(&sb, "		</item>\n")
+	}
+
+	strings.write_string(&sb, "	</channel>\n")
+	strings.write_string(&sb, "</rss>")
+
+	http.headers_set_content_type_string(&res.headers, "application/rss+xml")
+	set_cache_header(res, "public, max-age=600") // 10 minutes
+	http.body_set_str(res, strings.to_string(sb))
+	http.respond(res, http.Status.OK)
+}
+
+blog_atom_feed :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	posts, err := fetch_posts()
+	if err.type != .None {
+		log.errorf("could not fetch posts: %v", err)
+		http.respond_with_status(res, http.Status.Internal_Server_Error)
+		return
+	}
+
+	sort.quick_sort_proc(posts, proc(a, b: Post) -> int {
+		updatedAtA, _, _ := time.iso8601_to_time_and_offset(a.updatedAt)
+		updatedAtB, _, _ := time.iso8601_to_time_and_offset(b.updatedAt)
+		return int(
+			clamp(time.time_to_unix_nano(updatedAtB) - time.time_to_unix_nano(updatedAtA), -1, 1),
+		)
+	})
+
+	sb := strings.builder_make(context.temp_allocator)
+
+	strings.write_string(&sb, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
+	strings.write_string(&sb, "<feed xmlns=\"http://www.w3.org/2005/Atom\">\n")
+	strings.write_string(&sb, "	<title>sacha.house blog</title>\n")
+	strings.write_string(&sb, fmt.tprintf("	<subtitle>%s's personal blog</subtitle>\n", ME.fullName))
+	strings.write_string(&sb, "	<link href=\"https://sacha.house/blog\"/>\n")
+	strings.write_string(&sb, "	<link href=\"https://sacha.house/blog/atom.xml\" rel=\"self\"/>\n")
+
+	if len(posts) > 0 {
+		strings.write_string(&sb, fmt.tprintf("	<updated>%s</updated>\n", posts[0].updatedAt))
+	}
+
+	strings.write_string(&sb, "	<author>\n")
+	strings.write_string(&sb, fmt.tprintf("		<name>%s</name>\n", ME.fullName))
+	strings.write_string(&sb, fmt.tprintf("		<email>%s</email>\n", ME.mail))
+	strings.write_string(&sb, "	</author>\n")
+	strings.write_string(&sb, "	<id>https://sacha.house/blog</id>\n")
+
+	for post in posts {
+		strings.write_string(&sb, "	<entry>\n")
+
+		title := xml_escape(post.title, context.temp_allocator)
+		strings.write_string(&sb, fmt.tprintf("		<title>%s</title>\n", title))
+
+		link := fmt.tprintf("https://sacha.house/blog/%s", post.slug)
+		strings.write_string(&sb, fmt.tprintf("		<link href=\"%s\"/>\n", link))
+		strings.write_string(&sb, fmt.tprintf("		<id>%s</id>\n", link))
+
+		strings.write_string(&sb, fmt.tprintf("		<updated>%s</updated>\n", post.updatedAt))
+
+		// Assuming we want the author per post if available, otherwise fallback or omit
+		if post.author.name != "" {
+			strings.write_string(&sb, "		<author>\n")
+			author_name := xml_escape(post.author.name, context.temp_allocator)
+			strings.write_string(&sb, fmt.tprintf("			<name>%s</name>\n", author_name))
+			strings.write_string(&sb, "		</author>\n")
+		}
+
+		strings.write_string(&sb, "	</entry>\n")
+	}
+
+	strings.write_string(&sb, "</feed>")
+
+	http.headers_set_content_type_string(&res.headers, "application/atom+xml")
+	set_cache_header(res, "public, max-age=600") // 10 minutes
+	http.body_set_str(res, strings.to_string(sb))
+	http.respond(res, http.Status.OK)
 }
 
 teapot_page :: proc(req: ^http.Request, res: ^http.Response) {
@@ -676,8 +819,7 @@ admin_webauthn_register_challenge :: proc(req: ^http.Request, res: ^http.Respons
 
 	set_challenge_cookie(res, challenge_id)
 
-	http.headers_set(&res.headers, "Content-Type", "application/json")
-	http.respond_plain(res, string(json_data), http.Status.OK)
+	http.respond_json(res, response, http.Status.OK)
 }
 
 admin_webauthn_register :: proc(req: ^http.Request, res: ^http.Response) {
@@ -836,8 +978,7 @@ admin_webauthn_login_challenge :: proc(req: ^http.Request, res: ^http.Response) 
 
 	set_challenge_cookie(res, challenge_id)
 
-	http.headers_set(&res.headers, "Content-Type", "application/json")
-	http.respond_plain(res, string(json_data), http.Status.OK)
+	http.respond_json(res, response, http.Status.OK)
 }
 
 admin_webauthn_login :: proc(req: ^http.Request, res: ^http.Response) {
@@ -988,6 +1129,9 @@ fetch_posts :: proc() -> (posts: []Post, err: Error) {
 				slug
 				title
 				updatedAt
+				author {
+          	        name
+        		}
 			}
 		}
 	`
@@ -1050,6 +1194,9 @@ fetch_post :: proc(slug: string) -> (post: Post_Detail, err: Error) {
 				title
 				updatedAt
 				createdAt
+				author {
+					name
+				}
 				content {
 					html
 					text

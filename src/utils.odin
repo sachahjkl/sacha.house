@@ -61,3 +61,12 @@ generate_random_hsl_string :: proc(allocator := context.allocator) -> string {
 	lightness := rand.int31_max(light_max - light_min) + light_min
 	return fmt.aprintf("hsl(%d, %d%%, %d%%)", hue, saturation, lightness, allocator = allocator)
 }
+
+xml_escape :: proc(s: string, allocator := context.allocator) -> string {
+	res, _ := strings.replace_all(s, "&", "&amp;", allocator)
+	res, _ = strings.replace_all(res, "<", "&lt;", allocator)
+	res, _ = strings.replace_all(res, ">", "&gt;", allocator)
+	res, _ = strings.replace_all(res, "\"", "&quot;", allocator)
+	res, _ = strings.replace_all(res, "'", "&apos;", allocator)
+	return res
+}

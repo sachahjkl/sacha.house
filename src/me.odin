@@ -1,7 +1,6 @@
 package main
 
 import "core:fmt"
-import "core:strings"
 import "core:time"
 
 Me_Info :: struct {
@@ -37,8 +36,8 @@ init_me :: proc(allocator := context.allocator) {
 	age := age(dateNaissance)
 	nom := "froment"
 	prenom := "sacha"
-	fullName := fmt.aprintf("%s %s", capitalize(prenom), capitalize(nom), allocator)
-	siteTitle := fmt.aprintf("Le site web personnel de %s %s", capitalize(prenom), capitalize(nom), allocator)
+	fullName := fullName(prenom, nom, allocator)
+	siteTitle := siteTitle(prenom, nom, allocator)
 	
 	ME = Me_Info {
 		nom             = nom,

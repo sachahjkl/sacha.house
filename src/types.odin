@@ -4,6 +4,7 @@ Post :: struct {
 	slug:      string,
 	title:     string,
 	updatedAt: string,
+	author: Post_Author,
 }
 
 Posts_Response :: struct {
@@ -12,11 +13,16 @@ Posts_Response :: struct {
 	},
 }
 
+Post_Author :: struct {
+	name: string,
+}
+
 Post_Detail :: struct {
 	slug:      string,
 	title:     string,
 	updatedAt: string,
 	createdAt: string,
+	author:    Post_Author,
 	content:   struct {
 		html: string,
 		text: string,
@@ -30,15 +36,16 @@ Post_Response :: struct {
 }
 
 Template_Post_Detail :: struct {
-	slug:        string,
-	title:       string,
-	updatedAt:   string,
-	createdAt:   string,
-	updatedOn:   string,
+	slug:          string,
+	title:         string,
+	updatedAt:     string,
+	createdAt:     string,
+	updatedOn:     string,
 	updatedAtTime: string,
-	createdOn:   string,
+	createdOn:     string,
 	createdAtTime: string,
-	content:     struct {
+	author:        string,
+	content:       struct {
 		html: string,
 		text: string,
 	},
