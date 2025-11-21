@@ -11,20 +11,23 @@
 </h1>
 
 		<h2 class="mb-2 font-bold">📰 Available articles</h2>
-		<ul class="list-inside list-[square]">
-			{% for post in this.Posts %}
-				<li>
-					<a href="/blog/{{ post.slug }}">{{ post.title }}</a> - 
-					<span class="text-opacity-50 text-sm">
+		{% for group in this.YearGroups %}
+			<h3 class="text-xl font-bold mt-4 mb-2">{{ int(group.year) }}</h3>
+			<ul class="list-inside list-[square]">
+				{% for post in group.posts %}
+					<li>
+						<a href="/blog/{{ post.slug }}">{{ post.title }}</a> - 
+						<span class="text-opacity-50 text-sm">
 by
 {{ post.author.name }}
 on
 
-						<time>{{ post.dateString }}</time> at
-						<time>{{ post.timeString }}</time>
-					</span>
-				</li>
+							<time>{{ post.dateString }}</time> at
+							<time>{{ post.timeString }}</time>
+						</span>
+					</li>
 				{% end %}
 			</ul>
+		{% end %}
 		</article>
 		{% embed "_footer.temple.twig" with this.base %}

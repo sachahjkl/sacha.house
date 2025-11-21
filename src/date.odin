@@ -31,6 +31,11 @@ format_date :: proc(date: datetime.DateTime) -> string {
 	return fmt.tprintf("%02d/%02d/%04d", local_date.day, local_date.month, local_date.year)
 }
 
+get_local_year :: proc(date: datetime.DateTime) -> i64 {
+	local_date := timezone.datetime_to_tz(date, TIMEZONE)
+	return local_date.year
+}
+
 format_time :: proc(date: datetime.DateTime) -> string {
 	local_date := timezone.datetime_to_tz(date, TIMEZONE)
 	hour, minute, second := local_date.hour, local_date.minute, local_date.second

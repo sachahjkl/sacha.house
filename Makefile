@@ -46,36 +46,36 @@ endif
 all: build
 
 $(ODIN_OUT): $(OUT_TEMPLATE_FILE) $(ODIN_SOURCE_FILES) $(STATIC_EMBEDDED_FILES) $(OUT_CSS_FILE)
-	@echo "Building Odin application in $(mode) mode..."
+	@echo Building Odin application in $(mode) mode...
 	@odin build $(ODIN_SRC) -out:$(ODIN_OUT) -define:GIT_COMMIT_HASH="'$(GIT_COMMIT_HASH)'" -define:VERSION="$(VERSION)" $(ODIN_FLAGS)
 
 $(TEMPLE_CLI): $(TEMPLE_PATH)/cli/*.odin
-	@echo "Building temple CLI..."
+	@echo Building temple CLI...
 	@odin build $(TEMPLE_PATH)/cli -o:speed -out:$(TEMPLE_CLI)
 
 $(OUT_TEMPLATE_FILE): $(TEMPLE_CLI) $(TEMPLATE_FILES)
-	@echo "Transpiling templates..." $(TEMPLATE_FILES)
+	@echo Transpiling templates... $(TEMPLATE_FILES)
 	@./$(TEMPLE_CLI) $(ODIN_SRC) $(TEMPLE_PATH)
 
 templates: $(OUT_TEMPLATE_FILE)
 css: $(OUT_CSS_FILE)
 
 $(OUT_CSS_FILE): $(CSS_SOURCE_FILES) $(TEMPLATE_FILES) $(TAILWIND_CONFIG_FILE)
-	@echo "Building Tailwind CSS..."
+	@echo Building Tailwind CSS...
 	@$(BUN) run build:css
 
 build: $(ODIN_OUT)
 
 run: $(ODIN_OUT)
-	@echo "Running 'sacha.house' web server..."
+	@echo Running 'sacha.house' web server...
 	@./$(ODIN_OUT)
 
 run-ssl:
-	@echo "Running 'sacha.house' web server with SSL..."
+	@echo Running 'sacha.house' web server with SSL...
 	@$(BUN) x local-ssl-proxy --source $(SSL_PORT) --target $(PORT) --cert localhost.pem --key localhost-key.pem
 
 clean:
-	@echo "Cleaning up build artifacts..."
+	@echo Cleaning up build artifacts...
 	@rm -f $(ODIN_OUT)
 	@rm -f $(OUT_CSS_FILE)
 	@rm -f $(TEMPLE_CLI)
@@ -84,5 +84,5 @@ dev: build-watcher
 	@./dev_watcher.exe
 
 build-watcher:
-	@echo "Building dev watcher..."
+	@echo Building dev watcher...
 	@odin build tools/dev-watcher -out:dev_watcher.exe

@@ -241,9 +241,14 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 		timeString: string,
 	}
 
+	Year_Group :: struct {
+		year:  int,
+		posts: []Page_Posts,
+	}
+
 	Page_Data :: struct {
 		using base: Base_Page_Data,
-		Posts:      []Page_Posts,
+		YearGroups: []Year_Group,
 	}
 
 	posts, err := fetch_posts()
@@ -270,17 +275,36 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 		},
 	)
 
-	// NOTE(sachahjkl):
-	// use the context.temp_allocator, the values are only used for the duration of the request
-	template_posts := make([]Page_Posts, len(posts), context.temp_allocator)
-	for post, i in posts {
-		template_posts[i] = Page_Posts {
+	year_groups := make([dynamic]Year_Group, context.temp_allocator)
+	current_year := -1
+	current_group_posts := make([dynamic]Page_Posts, context.temp_allocator)
+
+	for post in posts {
+		updatedAt, _ := iso8601_to_datetime(post.updatedAt)
+		year := int(get_local_year(updatedAt))
+
+		if current_year != -1 && year != current_year {
+			append(
+				&year_groups,
+				Year_Group{year = current_year, posts = current_group_posts[:]},
+			)
+			current_group_posts = make([dynamic]Page_Posts, context.temp_allocator)
+		}
+		current_year = year
+
+		pp := Page_Posts {
 			post = post,
 		}
+		pp.dateString = format_date(updatedAt)
+		pp.timeString = format_time(updatedAt)
+		append(&current_group_posts, pp)
+	}
 
-		updatedAt, _ := iso8601_to_datetime(post.updatedAt)
-		template_posts[i].dateString = format_date(updatedAt)
-		template_posts[i].timeString = format_time(updatedAt)
+	if len(current_group_posts) > 0 {
+		append(
+			&year_groups,
+			Year_Group{year = current_year, posts = current_group_posts[:]},
+		)
 	}
 
 	data := Page_Data {
@@ -292,7 +316,7 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 			req.url.path,
 			get_auth_level(req, res) == .Authorized,
 		),
-		Posts = template_posts,
+		YearGroups = year_groups[:],
 	}
 
 	page_template := temple.compiled("templates/posts.temple.twig", Page_Data)
