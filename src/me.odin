@@ -65,11 +65,11 @@ init_me :: proc(allocator := context.allocator) {
 }
 
 siteTitle :: proc( prenom: string, nom: string, allocator := context.allocator) -> string {
-	return fmt.aprintf("Le site web personnel de %s %s", capitalize(prenom), capitalize(nom), allocator)
+	return fmt.aprintf("Le site web personnel de %s %s", capitalize(prenom), capitalize(nom), allocator = allocator)
 }
 
 fullName :: proc( prenom: string, nom: string, allocator := context.allocator) -> string {
-	return fmt.aprintf("%s %s", capitalize(prenom), capitalize(nom), allocator)
+	return fmt.aprintf("%s %s", capitalize(prenom), capitalize(nom), allocator = allocator)
 }
 
 age :: proc( dateNaissance: time.Time ) -> int {

@@ -5,22 +5,17 @@
 			Go back to the articles list
 		</a>
 	</p>
-	<h1 class="h1">{{ this.Post.title }}</h1>
-	<small class="text-textColor/50 text-sm">
-by
-{{ this.Post.author }}
--
+	<hgroup class="mb-4">
+		<h1 class="h1 mb-0">{{ this.Post.title }}</h1>
+		<small class="text-textColor/50 text-sm">
+			crea:
+			<span title="created on {{ this.Post.createdOn }} at {{ this.Post.createdAtTime }}">{{ this.Post.createdOn }}</span>
+			/ upd:
+			<span title="last updated on {{ this.Post.updatedOn }} at {{ this.Post.updatedAtTime }}">{{ this.Post.updatedOn }}</span>
 
-		created on
-		{{ this.Post.createdOn }}
-		at
-		{{ this.Post.createdAtTime }}
-		- last modified on
-		{{ this.Post.updatedOn }}
-		at
-		{{ this.Post.updatedAtTime }}
-	</small>
-	<article class="prose mt-4">
+		</small>
+	</hgroup>
+	<article class="prose">
 		{{ this.Post.content.html | raw }}
 	</article>
 

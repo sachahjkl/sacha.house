@@ -1,14 +1,15 @@
 {% embed "_header.temple.twig" with this.base %}
 	<article class="blog-page">
-<h1 class="h1 flex items-center gap-2">
-	blog
-	<a href="/blog/rss.xml" hx-boost="false" target="_blank" title="RSS Feed" class="opacity-50 hover:opacity-100 ">
-		<img src="/static/rss.svg" alt="RSS Feed" class="h-6 w-6"/>
-	</a>
-	<a href="/blog/atom.xml" hx-boost="false" target="_blank" title="Atom Feed" class="opacity-50 hover:opacity-100">
-		<img src="/static/atom.svg" alt="Atom Feed" class="h-6 w-6"/>
-	</a>
-</h1>
+		<h1 class="h1 flex items-center gap-2">
+			blog
+			<a href="/blog/rss.xml" hx-boost="false" target="_blank" title="RSS Feed" class="opacity-50 hover:opacity-100 ">
+				<img src="/static/rss.svg" alt="RSS Feed" class="h-6 w-6"/>
+			</a>
+			<a href="/blog/atom.xml" hx-boost="false" target="_blank" title="Atom Feed" class="opacity-50 hover:opacity-100">
+				<img src="/static/atom.svg" alt="Atom Feed" class="h-6 w-6"/>
+			</a>
+		</h1>
+
 
 		<h2 class="mb-2 font-bold">📰 Available articles</h2>
 		{% for group in this.YearGroups %}
@@ -16,18 +17,10 @@
 			<ul class="list-inside list-[square]">
 				{% for post in group.posts %}
 					<li>
-						<a href="/blog/{{ post.slug }}">{{ post.title }}</a> - 
-						<span class="text-opacity-50 text-sm">
-by
-{{ post.author.name }}
-on
-
-							<time>{{ post.dateString }}</time> at
-							<time>{{ post.timeString }}</time>
-						</span>
+						<a href="/blog/{{ post.slug }}" title="{{ post.title }}">
+							{{ post.title }}
+						</a>
 					</li>
-				{% end %}
-			</ul>
-		{% end %}
-		</article>
-		{% embed "_footer.temple.twig" with this.base %}
+					{% end %}</ul>
+				{% end %}</article>
+			{% embed "_footer.temple.twig" with this.base %}
