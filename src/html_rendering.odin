@@ -27,6 +27,7 @@ render_page :: proc(
 	buf := make([]byte, 16 * 1024, context.temp_allocator)
 
 	http.response_writer_init(&rw, res, buf)
+	http.headers_set_content_type_string(&res.headers, "text/html; charset=utf-8")
 
 	_, err := page_template.with(rw.w, data)
 	if err != nil {
