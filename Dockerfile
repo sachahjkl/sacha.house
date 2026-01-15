@@ -2,18 +2,19 @@
 FROM archlinux:base-devel AS builder
 
 ARG GIT_COMMIT_HASH=dev
+ARG ODIN_VERSION=dev-2026-01
+ARG BUN_VERSION=1.3.1
 
 # Install dependencies
 RUN pacman -Syu --noconfirm clang openssl make libbacktrace git odin unzip tar
 
 # Download and install specific Odin release
-RUN curl -L https://github.com/odin-lang/Odin/releases/download/dev-2025-09/odin-linux-amd64-dev-2025-09.zip -o odin.zip \
-    && unzip odin.zip -d /tmp \
-    && tar -C /opt -xzf /tmp/dist.tar.gz \
-    && ln -s /opt/odin-linux-amd64-nightly+2025-09-08/odin /usr/local/bin/odin
+RUN curl -L https://github.com/odin-lang/Odin/releases/download/${ODIN_VERSION}/odin-linux-amd64-${ODIN_VERSION}.tar.gz -o odin.tar.gz \
+    && tar -C /opt -xzf odin.tar.gz \
+    && ln -s /opt/odin-linux-amd64-${ODIN_VERSION}-04/odin /usr/local/bin/odin
 
 # Install bun for CSS processing
-RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.2.19"
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"
 ENV PATH="/root/.bun/bin:$PATH"
 
 # Set working directory
