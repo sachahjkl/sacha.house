@@ -3,13 +3,9 @@ package main
 import "core:encoding/json"
 import "core:fmt"
 import "core:log"
-import "core:net"
-import "core:os"
-import "core:strings"
 import "core:time"
 
 import client "lib:odin-http/client"
-import http "lib:odin-http"
 
 Linkedin_Day :: struct {
 	day:   int,

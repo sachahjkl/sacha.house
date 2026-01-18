@@ -21,13 +21,14 @@ render_page :: proc(
 		log.infof("Cache header set for %v.", path)
 	}
 
-	rw := http.Response_Writer{}
+	headers_set_content_type_app_mime(&res.headers, .Html)
 
-	// make 16kb buffer
-	buf := make([]byte, 16 * 1024, context.temp_allocator)
+	rw:  http.Response_Writer
+	buf: [128]byte
+	http.response_writer_init(&rw, res, buf[:])
+	defer io.close(rw.w)
 
-	http.response_writer_init(&rw, res, buf)
-	http.headers_set_content_type_string(&res.headers, "text/html; charset=utf-8")
+	log.debugf("Content type: %v", http.headers_get(res.headers, "content-type"))
 
 	_, err := page_template.with(rw.w, data)
 	if err != nil {
@@ -37,9 +38,6 @@ render_page :: proc(
 	}
 
 	http.response_status(res, status)
-	err = io.close(rw.w)
-	if err != nil {
-		log.errorf("Failed to close response writer for %v: %v", path, err)
-	}
+	
 	log.infof("Page %v rendered successfully.", path)
 }

@@ -7,11 +7,6 @@ import "core:mem"
 import "core:mem/virtual"
 import "core:os"
 import "core:strings"
-import "core:time"
-
-import http "lib:odin-http"
-import client "lib:odin-http/client"
-
 
 GitLab_Project :: struct {
 	name:            string,

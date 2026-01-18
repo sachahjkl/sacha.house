@@ -3,12 +3,9 @@ package main
 import "core:encoding/base64"
 import "core:encoding/json"
 import "core:fmt"
-import "core:io"
 import "core:log"
 import "core:mem"
-import "core:mem/virtual"
 import "core:net"
-import "core:os"
 import "core:sort"
 import "core:strings"
 import "core:time"
@@ -438,7 +435,7 @@ blog_rss_feed :: proc(req: ^http.Request, res: ^http.Response) {
 	strings.write_string(&sb, "	</channel>\n")
 	strings.write_string(&sb, "</rss>")
 
-	http.headers_set_content_type_string(&res.headers, "application/rss+xml")
+	headers_set_content_type_app_mime(&res.headers, .Rss)
 	set_cache_header(res, "public, max-age=600") // 10 minutes
 	http.body_set_str(res, strings.to_string(sb))
 	http.respond(res, http.Status.OK)
@@ -506,7 +503,8 @@ blog_atom_feed :: proc(req: ^http.Request, res: ^http.Response) {
 
 	strings.write_string(&sb, "</feed>")
 
-	http.headers_set_content_type_string(&res.headers, "application/atom+xml")
+	headers_set_content_type_app_mime(&res.headers, .Atom)
+
 	set_cache_header(res, "public, max-age=600") // 10 minutes
 	http.body_set_str(res, strings.to_string(sb))
 	http.respond(res, http.Status.OK)

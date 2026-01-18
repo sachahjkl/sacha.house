@@ -1,13 +1,7 @@
 package main
 
-import "core:math/rand"
-import "core:crypto"
-import "core:encoding/base64"
-import "core:encoding/uuid"
-import "core:log"
 import "core:mem"
 import "core:mem/virtual"
-import "core:strings"
 import "core:time"
 import http "lib:odin-http"
 

@@ -209,9 +209,6 @@
   }
 }
 @layer utilities {
-  .absolute {
-    position: absolute;
-  }
   .fixed {
     position: fixed;
   }
@@ -747,9 +744,6 @@
   .block {
     display: block;
   }
-  .contents {
-    display: contents;
-  }
   .flex {
     display: flex;
   }
@@ -1139,10 +1133,6 @@
   }
   .shadow-\[0_-1px_0_1px_\#166534_inset\,0_0_0_1px_\#15803d_inset\,0_0\.5px_0_1\.5px_\#4ade80_inset\] {
     --tw-shadow: 0 -1px 0 1px var(--tw-shadow-color, #166534) inset, 0 0 0 1px var(--tw-shadow-color, #15803d) inset, 0 0.5px 0 1.5px var(--tw-shadow-color, #4ade80) inset;
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
-  .ring {
-    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .brightness-300 {

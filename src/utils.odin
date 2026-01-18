@@ -1,15 +1,19 @@
 package main
 
 import "core:fmt"
-import "core:log"
 import "core:math/rand"
 import "core:strings"
 
 import http "lib:odin-http"
-import client "lib:odin-http/client"
+
 
 capitalize :: proc(s: string, allocator := context.temp_allocator) -> string {
-	return fmt.aprintf("%s%s", strings.to_upper(s[:1], context.temp_allocator), s[1:], allocator = allocator)
+	return fmt.aprintf(
+		"%s%s",
+		strings.to_upper(s[:1], context.temp_allocator),
+		s[1:],
+		allocator = allocator,
+	)
 }
 /*
 NOTE(sachahjkl):

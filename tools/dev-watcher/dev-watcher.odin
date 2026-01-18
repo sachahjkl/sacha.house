@@ -28,6 +28,8 @@ main :: proc() {
 	for {
 		// blocking wait
 		if wait_for_changes() {
+			// Measure time
+			start_time := time.now()
 			fmt.println("[dev] Changes detected...")
 
 			// Stop server BEFORE building to release file lock on Windows
@@ -39,8 +41,10 @@ main :: proc() {
 			// Consume any pending events during debounce
 			consume_pending_changes()
 
-			fmt.println("[dev] Rebuilding...")
+			fmt.println("[dev] Rebuilding... ")
 			if build_project() {
+				elapsed := time.since(start_time)
+				fmt.printfln("[dev] Dev watcher finished (took %v)", elapsed)
 				start_server()
 			}
 		}
