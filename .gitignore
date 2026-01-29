@@ -194,6 +194,7 @@ vite.config.ts.timestamp-*
 config.json
 
 # Odin
+*.obj
 sacha.house
 sacha.house*.exe
 dev_watcher.exe
@@ -204,3 +205,14 @@ temple_cli.exe
 temple_cli.pdb
 projects_cache.json
 webauthn_credentials.json
+
+# lib
+lib/**/*.md
+lib/**/docs
+lib/**/*.pem
+lib/**/comparisons
+lib/**/*odinfmt.json
+lib/**/*pkg
+lib/**/*editorconfig
+lib/**/*.yml
+lib/**/old_nbio
