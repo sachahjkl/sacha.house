@@ -9,13 +9,14 @@ import "core:fmt"
 import "core:log"
 import "core:mem"
 import "core:mem/virtual"
-import "core:nbio"
 import "core:net"
 import "core:os"
 import "core:slice"
 import "core:sync"
 import "core:thread"
 import "core:time"
+
+import "nbio"
 
 Server_Opts :: struct {
 	// Whether the server should accept every request that sends a "Expect: 100-continue" header automatically.
@@ -59,6 +60,16 @@ Default_Server_Opts := Server_Opts {
 	// max_free_blocks_queued  = 64,
 }
 
+@(init, private)
+server_opts_init :: proc "contextless" () {
+	when ODIN_OS == .Linux || ODIN_OS == .Darwin {
+		context = runtime.default_context()
+		Default_Server_Opts.thread_count = os.processor_core_count()
+	} else {
+		Default_Server_Opts.thread_count = 1
+	}
+}
+
 Server_State :: enum {
 	Uninitialized,
 	Idle,
@@ -75,8 +86,9 @@ Server :: struct {
 	tcp_sock:       net.TCP_Socket,
 	conn_allocator: mem.Allocator,
 	handler:        Handler,
+	main_thread:    int,
 
-	threads:        []Server_Thread,
+	threads:        []^thread.Thread,
 	// Once the server starts closing/shutdown this is set to true, all threads will check it
 	// and start their thread local shutdown procedure.
 	//
@@ -93,11 +105,9 @@ Server :: struct {
 }
 
 Server_Thread :: struct {
-	thread:     ^thread.Thread,
-	event_loop: ^nbio.Event_Loop,
-	conns:      map[net.TCP_Socket]^Connection,
-	state:      Server_State,
-	accept:     ^nbio.Operation,
+	conns: map[net.TCP_Socket]^Connection,
+	state: Server_State,
+	io:    nbio.IO,
 
 	// free_temp_blocks:       map[int]queue.Queue(^Block),
 	// free_temp_blocks_count: int,
@@ -109,7 +119,7 @@ assert_has_td :: #force_inline proc(loc := #caller_location) {
 }
 
 @(thread_local)
-td: ^Server_Thread
+td: Server_Thread
 
 Default_Endpoint := net.Endpoint {
 	address = net.IP4_Any,
@@ -123,17 +133,17 @@ listen :: proc(
 ) -> (err: net.Network_Error) {
 	s.opts = opts
 	s.conn_allocator = context.allocator
+	s.main_thread = sync.current_thread_id()
 	// initial_block_cap = int(s.opts.initial_temp_block_cap)
 	// max_free_blocks_queued = int(s.opts.max_free_blocks_queued)
 
-	acquire_err := nbio.acquire_thread_event_loop()
+	errno := nbio.init(&td.io)
 	// TODO: error handling.
-	assert(acquire_err == nil)
+	assert(errno == os.ERROR_NONE)
 
-	s.tcp_sock, err = nbio.listen_tcp(endpoint)
+	s.tcp_sock, err = nbio.open_and_listen_tcp(&td.io, endpoint)
 	if err != nil {
-		nbio.run()
-		nbio.release_thread_event_loop()
+		nbio.destroy(&td.io)
 		server_shutdown(s)
 	}
 	return
@@ -143,21 +153,18 @@ serve :: proc(s: ^Server, h: Handler) -> (err: net.Network_Error) {
 	if atomic_load(&s.closing) { return }
 	s.handler = h
 
-	if s.opts.thread_count == 0 {
-		s.opts.thread_count = os.processor_core_count()
-	}
-
-	thread_count := max(1, s.opts.thread_count)
+	thread_count := max(0, s.opts.thread_count - 1)
 	sync.wait_group_add(&s.threads_closed, thread_count)
-	s.threads = make([]Server_Thread, thread_count, s.conn_allocator)
-	for &td in s.threads[1:] {
-		td.thread = thread.create_and_start_with_poly_data2(s, &td, _server_thread_init, context)
+	s.threads = make([]^thread.Thread, thread_count, s.conn_allocator)
+	for i in 0 ..< thread_count {
+		s.threads[i] = thread.create_and_start_with_poly_data(s, _server_thread_init, context)
 	}
 
 	// Start keeping track of and caching the date for the required date header.
 	server_date_start(s)
 
-	_server_thread_init(s, &s.threads[0])
+	sync.wait_group_add(&s.threads_closed, 1)
+	_server_thread_init(s)
 
 	sync.wait(&s.threads_closed)
 
@@ -165,7 +172,7 @@ serve :: proc(s: ^Server, h: Handler) -> (err: net.Network_Error) {
 
 	net.shutdown(s.tcp_sock, .Both)
 	net.close(s.tcp_sock)
-	for t in s.threads[1:] { thread.destroy(t.thread) }
+	for t in s.threads { thread.destroy(t) }
 	delete(s.threads)
 
 	return nil
@@ -181,23 +188,19 @@ listen_and_serve :: proc(
 	return serve(s, h)
 }
 
-_server_thread_init :: proc(s: ^Server, ttd: ^Server_Thread) {
-	td = ttd
-
+_server_thread_init :: proc(s: ^Server) {
 	td.conns = make(map[net.TCP_Socket]^Connection)
 	// td.free_temp_blocks = make(map[int]queue.Queue(^Block))
 
-	if td != &s.threads[0] {
-		err := nbio.acquire_thread_event_loop()
+	if sync.current_thread_id() != s.main_thread {
+		errno := nbio.init(&td.io)
 		// TODO: error handling.
-		assert(err == nil)
+		assert(errno == os.ERROR_NONE)
 	}
-
-	td.event_loop = nbio.current_thread_event_loop()
 
 	log.debug("accepting connections")
 
-	td.accept = nbio.accept_poly(s.tcp_sock, s, on_accept)
+	nbio.accept(&td.io, s.tcp_sock, s, on_accept)
 
 	log.debug("starting event loop")
 	td.state = .Serving
@@ -206,18 +209,23 @@ _server_thread_init :: proc(s: ^Server, ttd: ^Server_Thread) {
 		if td.state == .Closed { break }
 		if td.state == .Cleaning { continue }
 
-		err := nbio.tick()
-		if err != nil {
-			log.errorf("non-blocking io tick error: %v", err)
+		errno := nbio.tick(&td.io)
+		if errno != os.ERROR_NONE {
+			// TODO: check how this behaves on Windows.
+			when ODIN_OS != .Windows {
+				if errno == os.EINTR {
+					server_shutdown(s)
+					continue
+				}
+			}
+
+			log.errorf("non-blocking io tick error: %v", errno)
 			break
 		}
 	}
 
 	log.debug("event loop end")
 
-	if td != &s.threads[0] {
-		runtime.default_temp_allocator_destroy(auto_cast context.temp_allocator.data)
-	}
 	sync.wait_group_done(&s.threads_closed)
 }
 
@@ -238,9 +246,6 @@ SHUTDOWN_INTERVAL :: time.Millisecond * 100
 // 5. Signal 'server_start' it can return.
 server_shutdown :: proc(s: ^Server) {
 	atomic_store(&s.closing, true)
-	for t in s.threads {
-		nbio.wake_up(t.event_loop)
-	}
 }
 
 _server_thread_shutdown :: proc(s: ^Server, loc := #caller_location) {
@@ -261,7 +266,7 @@ _server_thread_shutdown :: proc(s: ^Server, loc := #caller_location) {
 	// 	log.infof("had %i temp blocks to spare", blocks)
 	// }
 
-	for {
+	for i := 0; ; i += 1 {
 		for sock, conn in td.conns {
 			#partial switch conn.state {
 			case .Active:
@@ -270,7 +275,8 @@ _server_thread_shutdown :: proc(s: ^Server, loc := #caller_location) {
 				log.infof("shutdown: closing connection %i", sock)
 				connection_close(conn)
 			case .Closing:
-				log.debugf("shutdown: connection %i is closing", sock)
+				// Only logging this every 10_000 calls to avoid spam.
+				if i % 10_000 == 0 { log.debugf("shutdown: connection %i is closing", sock) }
 			case .Closed:
 				log.warn("closed connection in connections map, maybe a race or logic error")
 			}
@@ -280,18 +286,12 @@ _server_thread_shutdown :: proc(s: ^Server, loc := #caller_location) {
 			break
 		}
 
-		err := nbio.tick()
-		fmt.assertf(err == nil, "IO tick error during shutdown: %v")
+		err := nbio.tick(&td.io)
+		fmt.assertf(err == os.ERROR_NONE, "IO tick error during shutdown: %v")
 	}
 
 	td.state = .Cleaning
-
-	nbio.remove(td.accept)
-	td.accept = nil
-
-	nbio.run()
-	nbio.release_thread_event_loop()
-
+	nbio.destroy(&td.io)
 	td.state = .Closed
 
 	log.info("shutdown: done")
@@ -395,8 +395,11 @@ connection_close :: proc(c: ^Connection, loc := #caller_location) {
 	// to process the closing and receive any remaining data.
 	net.shutdown(c.socket, net.Shutdown_Manner.Send)
 
-	nbio.timeout_poly(Conn_Close_Delay, c, proc(_: ^nbio.Operation, c: ^Connection) {
-		nbio.close_poly(c.socket, c, proc(_: ^nbio.Operation, c: ^Connection) {
+	nbio.timeout(&td.io, Conn_Close_Delay, c, proc(c: rawptr) {
+		c := cast(^Connection)c
+		nbio.close(&td.io, c.socket, c, proc(c: rawptr, ok: bool) {
+			c := cast(^Connection)c
+
 			log.debugf("closed connection: %i", c.socket)
 
 			c.state = .Closed
@@ -412,30 +415,33 @@ connection_close :: proc(c: ^Connection, loc := #caller_location) {
 }
 
 @(private)
-on_accept :: proc(op: ^nbio.Operation, server: ^Server) {
-	td.accept = nil
+on_accept :: proc(server: rawptr, sock: net.TCP_Socket, source: net.Endpoint, err: net.Network_Error) {
+	server := cast(^Server)server
 
-	if op.accept.err != nil {
-		#partial switch op.accept.err {
-		case .Insufficient_Resources:
-			log.error("Connection limit reached, trying again in a bit")
-			nbio.timeout_poly(time.Second, server, proc(_: ^nbio.Operation, server: ^Server) {
-				td.accept = nbio.accept_poly(server.tcp_sock, server, on_accept)
-			})
-			return
+	if err != nil {
+		#partial switch e in err {
+		case net.Accept_Error:
+			#partial switch e {
+			case .Insufficient_Resources:
+				log.error("Connection limit reached, trying again in a bit")
+				nbio.timeout(&td.io, time.Second, server, proc(server: rawptr) {
+					server := cast(^Server)server
+					nbio.accept(&td.io, server.tcp_sock, server, on_accept)
+				})
+				return
+			}
 		}
 
-		fmt.panicf("accept error: %v", op.accept.err)
+		fmt.panicf("accept error: %v", err)
 	}
 
 	// Accept next connection.
-	td.accept = nbio.accept_poly(server.tcp_sock, server, on_accept)
+	nbio.accept(&td.io, server.tcp_sock, server, on_accept)
 
 	c := new(Connection, server.conn_allocator)
 	c.state = .New
 	c.server = server
-	c.socket = op.accept.client
-	c.loop.req.client = op.accept.client_endpoint
+	c.socket = sock
 
 	td.conns[c.socket] = c
 
@@ -625,15 +631,14 @@ Server_Date :: struct {
 @(private)
 server_date_start :: proc(s: ^Server) {
 	s.date.buf.buf = slice.into_dynamic(s.date.buf_backing[:])
-	server_date_update(nil, s)
+	server_date_update(s)
 }
 
 // Updates the time and schedules itself for after a second.
 @(private)
-server_date_update :: proc(_: ^nbio.Operation, s: ^Server) {
-	if atomic_load(&s.closing) { return }
-
-	nbio.timeout_poly(time.Second, s, server_date_update)
+server_date_update :: proc(s: rawptr) {
+	s := cast(^Server)s
+	nbio.timeout(&td.io, time.Second, s, server_date_update)
 
 	bytes.buffer_reset(&s.date.buf)
 	date_write(bytes.buffer_to_stream(&s.date.buf), time.now())
