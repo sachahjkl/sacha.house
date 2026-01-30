@@ -64,7 +64,7 @@ init_static_files :: proc() {
 		full_path := strings.concatenate({share_prefix, path})
 		defer delete(full_path)
 		mime_type := get_mime_type(full_path)
-		static_files[strings.clone(full_path)] = Static_File{file.data, mime_type}
+		static_files[strings.clone(full_path)] = Static_File{file.data[:], mime_type}
 	}
 }
 
@@ -74,7 +74,7 @@ serve_static_file :: proc(req: ^http.Request, res: ^http.Response) {
 		set_cache_header(res)
 		http.headers_set(&res.headers, "Content-Type", file.mime_type)
 		
-		http.body_set(res, file.data)
+		http.body_set(res, file.data[:])
 		http.respond(res, http.Status.OK)
 	} else {
 		http.respond(res, http.Status.Not_Found)
