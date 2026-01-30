@@ -6,11 +6,7 @@
   "workflow": {
     "rules": [
       {
-        "if": "$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != \"\"",
-        "when": "always"
-      },
-      {
-        "if": "$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != \"\"",
+        "if": '$CI_COMMIT_BRANCH == "master"',
         "when": "always"
       },
       {
@@ -29,7 +25,7 @@
     "image": "archlinux:base-devel",
     "rules": [
       {
-        "if": "$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != \"\"",
+        "if": '$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != ""',
         "when": "on_success"
       }
     ],
@@ -37,13 +33,13 @@
       "pacman -Syu --noconfirm clang openssl make libbacktrace git unzip tar curl",
       "curl -L https://github.com/odin-lang/Odin/releases/download/${ODIN_RELEASE_VERSION}/odin-linux-amd64-${ODIN_RELEASE_VERSION}.tar.gz -o odin.tar.gz",
       "tar -C /opt -xzf odin.tar.gz",
-      "ln -s $(find /opt -maxdepth 1 -type d -name \"odin-linux-amd64*\" | head -n 1)/odin /usr/local/bin/odin",
-      "curl -fsSL https://bun.sh/install | bash -s \"bun-v${BUN_VERSION}\"",
-      "export PATH=\"/root/.bun/bin:$PATH\""
+      'ln -s $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
+      'curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"',
+      'export PATH="/root/.bun/bin:$PATH"'
     ],
     "script": [
-      "export VERSION=\"$(date +%Y.%m.%d)+${CI_COMMIT_SHORT_SHA}\"",
-      "echo \"VERSION=$VERSION\" >> build.env",
+      "export VERSION=$(date +%Y.%m.%d)+${CI_COMMIT_SHORT_SHA}",
+      'echo "VERSION=$VERSION" >> build.env',
       "bun install --production",
       "make build mode=release GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION",
       "mv sacha.house.exe ${ARTIFACT_NAME}",
@@ -64,21 +60,21 @@
     "image": "archlinux:base-devel",
     "rules": [
       {
-        "if": "$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != \"\"",
+        "if": '$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != ""',
         "when": "on_success"
       }
     ],
     "before_script": [
       "pacman -Syu --noconfirm clang openssl make libbacktrace git unzip tar curl",
-      "curl -L \"${ODIN_NIGHTLY_URL}\" -o odin.tar.gz",
+      'curl -L "${ODIN_NIGHTLY_URL}" -o odin.tar.gz',
       "tar -C /opt -xzf odin.tar.gz",
-      "ln -s $(find /opt -maxdepth 1 -type d -name \"odin-linux-amd64*\" | head -n 1)/odin /usr/local/bin/odin",
-      "curl -fsSL https://bun.sh/install | bash -s \"bun-v${BUN_VERSION}\"",
-      "export PATH=\"/root/.bun/bin:$PATH\""
+      'ln -s $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
+      'curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"',
+      'export PATH="/root/.bun/bin:$PATH"'
     ],
     "script": [
-      "export VERSION=\"$(date +%Y.%m.%d)-nightly+${CI_COMMIT_SHORT_SHA}\"",
-      "echo \"VERSION=$VERSION\" >> build.env",
+      "export VERSION=$(date +%Y.%m.%d)-nightly+${CI_COMMIT_SHORT_SHA}",
+      "echo VERSION=$VERSION >> build.env",
       "bun install --production",
       "make build mode=release GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION",
       "mv sacha.house.exe ${ARTIFACT_NAME}",
@@ -99,7 +95,7 @@
     "image": "registry.gitlab.com/gitlab-org/release-cli:latest",
     "rules": [
       {
-        "if": "$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != \"\"",
+        "if": '$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != ""',
         "when": "on_success"
       }
     ],
@@ -110,7 +106,7 @@
       }
     ],
     "script": [
-      "echo \"Creating release $VERSION for sacha.house\""
+      "echo Creating release $VERSION for sacha.house"
     ],
     "release": {
       "name": "sacha.house $VERSION",
@@ -132,7 +128,7 @@
     "image": "registry.gitlab.com/gitlab-org/release-cli:latest",
     "rules": [
       {
-        "if": "$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != \"\"",
+        "if": '$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != ""',
         "when": "on_success"
       }
     ],
@@ -143,7 +139,7 @@
       }
     ],
     "script": [
-      "echo \"Creating nightly release $VERSION for sacha.house\""
+      'echo Creating nightly release $VERSION for sacha.house'
     ],
     "release": {
       "name": "sacha.house $VERSION",
