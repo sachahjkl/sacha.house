@@ -72,12 +72,9 @@ serve_static_file :: proc(req: ^http.Request, res: ^http.Response) {
 	path := req.url_params[0]
 	if file, ok := static_files[path]; ok {
 		set_cache_header(res)
-		http.headers_set(&res.headers, "Content-Type", file.mime_type)
-		
-		http.body_set(res, file.data[:])
-		http.respond(res, http.Status.OK)
+		http.respond_file_content(res, path, file.data[:])
 	} else {
-		http.respond(res, http.Status.Not_Found)
+		http.respond_with_status(res, http.Status.Not_Found)
 	}
 }
 
