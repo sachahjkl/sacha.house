@@ -37,7 +37,8 @@ endif
 ODIN_DEFAULT_FLAGS = -collection:lib=$(LIB)
 
 ifeq ($(mode),release)
-	ODIN_FLAGS = $(ODIN_DEFAULT_FLAGS) -o:speed -define:TRACK_LEAKS=false -build-mode:exe $(LINKER_FLAGS)
+# Using -lto:thin on linux requires lld to be installed
+	ODIN_FLAGS = $(ODIN_DEFAULT_FLAGS) -o:speed -define:TRACK_LEAKS=false -build-mode:exe -lto:thin $(LINKER_FLAGS)
 else
 	ODIN_FLAGS = $(ODIN_DEFAULT_FLAGS) -debug -define:TRACK_LEAKS=true -build-mode:exe $(LINKER_FLAGS)
 endif

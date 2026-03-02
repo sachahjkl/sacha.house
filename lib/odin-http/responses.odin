@@ -6,7 +6,6 @@ import "core:io"
 import "core:log"
 import "core:nbio"
 import "core:os"
-import "core:path/filepath"
 import "core:strings"
 
 // Sets the response to one that sends the given HTML.
@@ -26,7 +25,7 @@ respond_plain :: proc(r: ^Response, text: string, status: Status = .OK, loc := #
 }
 
 @(private)
-ENOENT :: os.ERROR_FILE_NOT_FOUND when ODIN_OS == .Windows else os.ENOENT
+ENOENT :: os.General_Error.Not_Exist
 
 /*
 Sends the content of the file at the given path as the response.
@@ -126,14 +125,14 @@ respond_dir :: proc(r: ^Response, base, target, request: string, loc := #caller_
 	}
 
 	// Detect path traversal attacks.
-	req_clean := filepath.clean(request, context.temp_allocator)
-	base_clean := filepath.clean(base, context.temp_allocator)
+	req_clean, _ := os.clean_path(request, context.temp_allocator)
+	base_clean, _ := os.clean_path(base, context.temp_allocator)
 	if !strings.has_prefix(req_clean, base_clean) {
 		respond(r, Status.Not_Found)
 		return
 	}
 
-	file_path := filepath.join([]string{"./", target, strings.trim_prefix(req_clean, base_clean)}, context.temp_allocator)
+	file_path, _ := os.join_path([]string{"./", target, strings.trim_prefix(req_clean, base_clean)}, context.temp_allocator)
 	respond_file(r, file_path, loc = loc)
 }
 

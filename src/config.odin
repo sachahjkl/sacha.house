@@ -46,7 +46,7 @@ DEFAULT_CONFIG :: Config {
 }
 
 get_config_path :: proc() -> string {
-	config_path := os.get_env("CONFIG_PATH", context.temp_allocator)
+	config_path := os.get_env_alloc("CONFIG_PATH", context.temp_allocator)
 	if config_path != "" {
 		return config_path
 	}
@@ -54,7 +54,7 @@ get_config_path :: proc() -> string {
 }
 
 get_port :: proc() -> int {
-	port_str := os.get_env("PORT", context.temp_allocator)
+	port_str := os.get_env_alloc("PORT", context.temp_allocator)
 	if port_str != "" {
 		port, ok := strconv.parse_int(port_str)
 		if ok && port > 0 && port <= 65535 {
@@ -74,7 +74,7 @@ init_default_config :: proc(config_path: string) {
 		return
 	}
 
-	if !os.write_entire_file(config_path, json_bytes) {
+	if err := os.write_entire_file_from_bytes(config_path, json_bytes); err != os.ERROR_NONE {
 		log.errorf("Failed to write default config to %s", config_path)
 		return
 	}
@@ -92,17 +92,17 @@ load_config :: proc() -> bool {
 		return false
 	}
 
-	config_bytes, ok := os.read_entire_file(config_path)
-	if !ok {
+	config_bytes, err := os.read_entire_file_from_path(config_path, context.allocator)
+	if err != os.ERROR_NONE {
 		log.errorf("Could not read config file: %s", config_path)
 		return false
 	}
 
 	defer delete(config_bytes)
 
-	err := json.unmarshal(config_bytes, &APP_CONFIG, allocator = context.temp_allocator)
-	if err != nil {
-		log.errorf("Could not unmarshal config file: %v", err)
+	unmarshal_err := json.unmarshal(config_bytes, &APP_CONFIG, allocator = context.temp_allocator)
+	if unmarshal_err != nil {
+		log.errorf("Could not unmarshal config file: %v", unmarshal_err)
 		return false
 	}
 

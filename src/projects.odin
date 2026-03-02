@@ -309,7 +309,7 @@ dump_projects_cache :: proc(path: string) -> bool {
 		return false
 	}
 
-	if !os.write_entire_file(path, json_bytes) {
+	if err := os.write_entire_file_from_bytes(path, json_bytes); err != os.ERROR_NONE {
 		log.errorf("Failed to write projects cache to %s", path)
 		return false
 	}
@@ -319,8 +319,8 @@ dump_projects_cache :: proc(path: string) -> bool {
 }
 
 restore_projects_cache :: proc(path: string) -> bool {
-	json_bytes, read_ok := os.read_entire_file(path, context.temp_allocator)
-	if !read_ok {
+	json_bytes, err := os.read_entire_file_from_path(path, context.temp_allocator)
+	if err != os.ERROR_NONE {
 		log.errorf("Failed to read projects cache from %s", path)
 		return false
 	}

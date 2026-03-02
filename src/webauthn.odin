@@ -69,8 +69,8 @@ load_webauthn_credentials :: proc() {
 		return
 	}
 
-	data, ok := os.read_entire_file(creds_path)
-	if !ok {
+	data, err := os.read_entire_file_from_path(creds_path, context.allocator)
+	if err != os.ERROR_NONE {
 		log.warn("Failed to read WebAuthn credentials file")
 		return
 	}
@@ -148,7 +148,7 @@ save_webauthn_credentials :: proc() {
 	defer delete(data)
 
 	creds_path := get_webauthn_credentials_path()
-	if !os.write_entire_file(creds_path, data) {
+	if err := os.write_entire_file_from_bytes(creds_path, data); err != os.ERROR_NONE {
 		log.errorf("Failed to write WebAuthn credentials to %s", creds_path)
 		return
 	}

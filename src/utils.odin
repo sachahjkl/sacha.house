@@ -1,5 +1,6 @@
 package main
 
+import "core:crypto"
 import "core:fmt"
 import "core:math/rand"
 import "core:strings"
@@ -28,11 +29,8 @@ CHARS :: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@"
 
 /*
 NOTE(sachahjkl):
-- The previous implementation of `generate_random_string` was producing broken unicode strings.
-- This was likely due to a misuse of the random number generation functions.
-- The new implementation uses `crypto/rand` to generate random bytes and then maps them to the character set.
-- It uses rejection sampling to avoid modulo bias, ensuring a uniform distribution of characters.
-- The default length of the generated string has been set to 15, as requested.
+- Uses crypto.rand_bytes so output is always from the character set (no broken Unicode).
+- Rejection sampling avoids modulo bias; only indices in [0, len(choices)) are used.
 */
 generate_random_string :: proc(
 	n: int = 15,
@@ -43,13 +41,26 @@ generate_random_string :: proc(
 		return ""
 	}
 
+	N := len(choices)
+	// Rejection sampling: accept bytes in [0, cap) so that b % N is uniform.
+	cap := 256 - (256 % N) // e.g. N=36 -> cap=252
+
 	builder := strings.Builder{}
 	strings.builder_init(&builder, allocator)
 	defer strings.builder_destroy(&builder)
 
-	for i in 0 ..< n {
-		idx := rand.int31_max(i32(len(choices))) // random index into choices
-		strings.write_byte(&builder, choices[idx])
+	// Scratch buffer for random bytes; refill as needed until we have n accepted.
+	buf: [32]u8
+	written: int
+	for written < n {
+		crypto.rand_bytes(buf[:])
+		for b in buf {
+			if written >= n do break
+			if b < u8(cap) {
+				strings.write_byte(&builder, choices[int(b) % N])
+				written += 1
+			}
+		}
 	}
 
 	return strings.to_string(builder)

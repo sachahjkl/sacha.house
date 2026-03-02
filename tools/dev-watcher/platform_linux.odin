@@ -3,7 +3,6 @@ package main
 
 import "core:fmt"
 import "core:os"
-import "core:path/filepath"
 import "core:strings"
 import "core:sys/linux"
 import "core:sys/posix"
@@ -63,6 +62,7 @@ stop_server :: proc() {
 // --- Watcher (inotify) ---
 
 inotify_fd: i32
+inotify_file: ^os.File
 watch_descriptors: map[i32]string // wd -> path
 
 init_watcher :: proc() -> bool {
@@ -76,6 +76,7 @@ init_watcher :: proc() -> bool {
 		return false
 	}
 	inotify_fd = i32(fd)
+	inotify_file = os.new_file(uintptr(inotify_fd), "inotify")
 
 	// Add watches recursively
 	for dir in WATCH_DIRS {
@@ -101,13 +102,13 @@ add_watch_recursive :: proc(dir: string) {
 	f, ferr := os.open(dir)
 	if ferr == os.ERROR_NONE {
 		defer os.close(f)
-		fis, _ := os.read_dir(f, -1)
-		defer os.file_info_slice_delete(fis)
+		fis, _ := os.read_directory(f, -1, context.temp_allocator)
+		defer os.file_info_slice_delete(fis, context.temp_allocator)
 
 		for fi in fis {
-			if fi.is_dir {
+			if fi.type == os.File_Type.Directory {
 				if fi.name == "." || fi.name == ".." {continue}
-				path := filepath.join({dir, fi.name})
+				path, _ := os.join_path([]string{dir, fi.name}, context.temp_allocator)
 				add_watch_recursive(path)
 				// path leaked in map if success, deleted otherwise?
 				// wait, filepath.join allocates.
@@ -123,7 +124,7 @@ add_watch_recursive :: proc(dir: string) {
 }
 
 cleanup_watcher :: proc() {
-	os.close(os.Handle(inotify_fd))
+	os.close(inotify_file)
 }
 
 wait_for_changes :: proc() -> bool {
@@ -131,7 +132,7 @@ wait_for_changes :: proc() -> bool {
 	// This blocks
 
 	buf: [4096]byte
-	n, err := os.read(os.Handle(inotify_fd), buf[:])
+	n, err := os.read(inotify_file, buf[:])
 	if err != os.ERROR_NONE || n <= 0 {
 		return false
 	}
@@ -163,7 +164,7 @@ wait_for_changes :: proc() -> bool {
 					// name is null terminated string at buf[offset + size_of(linux.Inotify_Event)]
 					name_ptr := &buf[offset + size_of(linux.Inotify_Event)]
 					name_str := string(cstring(name_ptr))
-					new_path := filepath.join({wd_path, name_str})
+					new_path, _ := os.join_path([]string{wd_path, name_str}, context.temp_allocator)
 					add_watch_recursive(new_path)
 				}
 			}
