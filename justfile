@@ -39,8 +39,7 @@ templates:
 
 [windows]
 templates:
-  @echo Building temple CLI...
-  odin build {{ temple_path / 'cli' }} -o:speed -out:{{ temple_cli }}
+  @if exist {{ temple_cli }} (echo Temple CLI up to date.) else (echo Building temple CLI... & odin build {{ temple_path / 'cli' }} -o:speed -out:{{ temple_cli }})
   @echo Transpiling templates...
   .\\{{ temple_cli }} {{ odin_src }} {{ temple_path }}
 

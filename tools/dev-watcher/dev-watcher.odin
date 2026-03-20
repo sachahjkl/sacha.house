@@ -28,6 +28,12 @@ main :: proc() {
 	for {
 		// blocking wait
 		if wait_for_changes() {
+			if ignore_next_change {
+				ignore_next_change = false
+				consume_pending_changes()
+				continue
+			}
+
 			// Measure time
 			start_time := time.now()
 			fmt.println("[dev] Changes detected...")
@@ -43,6 +49,7 @@ main :: proc() {
 
 			fmt.println("[dev] Rebuilding... ")
 			if build_project() {
+				ignore_next_change = true
 				elapsed := time.since(start_time)
 				fmt.printfln("[dev] Dev watcher finished (took %v)", elapsed)
 				start_server()
@@ -52,6 +59,7 @@ main :: proc() {
 }
 
 server_running := false
+ignore_next_change := false
 
 start_server_if_needed :: proc() {
 	if !server_running {

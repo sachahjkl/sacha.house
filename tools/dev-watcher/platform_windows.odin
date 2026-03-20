@@ -52,7 +52,9 @@ start_server :: proc() {
 stop_server :: proc() {
 	if !server_running {return}
 	fmt.println("[dev] Stopping server...")
-	win.TerminateProcess(server_process, 0)
+	_ = win.TerminateProcess(server_process, 0)
+	// Ensure process fully exits so linker can overwrite sacha.house.dev.exe.
+	_ = win.WaitForSingleObject(server_process, 5000)
 	win.CloseHandle(server_process)
 	server_process = INVALID_PROCESS_HANDLE
 	server_running = false

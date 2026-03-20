@@ -18,7 +18,12 @@ import temple "lib:temple"
 // the http framework cleans up the `` context.temp_allocator``  at the end of each request
 // so we don't need to manually clean it up here.
 // This means we SHOULD USE it instead of context.allocator for values that only live for the duration of the request.
+server_boot_id := ""
+
 server_start :: proc() {
+	if HOT_RELOAD && server_boot_id == "" {
+		server_boot_id = fmt.tprintf("%d", time.time_to_unix_nano(time.now()))
+	}
 
 	s: http.Server
 	http.server_shutdown_on_interrupt(&s)
@@ -226,6 +231,10 @@ about_page :: proc(req: ^http.Request, res: ^http.Response) {
 
 ping :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
+	if HOT_RELOAD {
+		http.headers_set(&res.headers, "X-Dev-Server-Boot", server_boot_id)
+		http.headers_set(&res.headers, "Cache-Control", "no-store")
+	}
 	http.respond_plain(res, "pong")
 }
 
@@ -1315,3 +1324,4 @@ init_cache :: proc() -> mem.Allocator_Error {
 cleanup_cache :: proc() {
 	cleanup_projects_cache()
 }
+
