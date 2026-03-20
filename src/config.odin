@@ -21,7 +21,6 @@ Config :: struct {
 	LINKEDIN_GIST_ID:            string,
 	ADMIN_IPS:                   []string,
 	GIT_REPO_ID:                 string,
-	ADMIN_USERNAME:              string,
 	ADMIN_PASSWORD:              string,
 	WEBAUTHN_CREDENTIALS_FILE:   string,
 }
@@ -40,7 +39,6 @@ DEFAULT_CONFIG :: Config {
 	LINKEDIN_GIST_ID = "",
 	ADMIN_IPS = {},
 	GIT_REPO_ID = "",
-	ADMIN_USERNAME = "",
 	ADMIN_PASSWORD = "",
 	WEBAUTHN_CREDENTIALS_FILE = "webauthn_credentials.json",
 }

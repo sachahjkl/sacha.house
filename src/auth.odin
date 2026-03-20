@@ -103,7 +103,6 @@ get_auth_level :: proc(req: ^http.Request, res: ^http.Response) -> Authorization
 	return .Authorized
 }
 
-get_admin_username :: proc() -> string {return APP_CONFIG.ADMIN_USERNAME}
 get_admin_password :: proc() -> string {return APP_CONFIG.ADMIN_PASSWORD}
 
 get_session :: proc(req: ^http.Request) -> Maybe(Session) {

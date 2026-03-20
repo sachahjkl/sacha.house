@@ -58,7 +58,7 @@ See `config.example.json` for required fields:
 *   `HYGRAPH_API_ENDPOINT`: URL for the blog CMS.
 *   `GITHUB_TOKEN`: For fetching repositories.
 *   `GITLAB_TOKEN`: For fetching repositories.
-*   `ADMIN_USERNAME`/`PASSWORD`: Fallback credentials.
+*   `ADMIN_PASSWORD`: Fallback password.
 
 ## Project Structure
 

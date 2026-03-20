@@ -732,11 +732,10 @@ admin_login_submit :: proc(req: ^http.Request, res: ^http.Response) {
 				return
 			}
 
-			username := form_data["username"] or_else ""
 			password := form_data["password"] or_else ""
 
 
-			if username == get_admin_username() && password == get_admin_password() {
+			if password == get_admin_password() {
 				// Create session and redirect
 				session_id := create_session()
 				set_session_cookie(res, session_id)
@@ -746,7 +745,7 @@ admin_login_submit :: proc(req: ^http.Request, res: ^http.Response) {
 				// Invalid credentials, render form with error
 
 				data := Login_Form_Data {
-					Error = "Invalid username or password",
+					Error = "Invalid password",
 				}
 
 				render_page(req, res, form_template, data)

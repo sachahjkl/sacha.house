@@ -10,7 +10,6 @@
   "LINKEDIN_GIST_ID": "ff093380f245a9ecd280d1b2aaa17aa7",
   "ADMIN_IPS": [],
   "GIT_REPO_ID": "sachahjkl/sacha.house",
-  "ADMIN_USERNAME": "admin",
   "ADMIN_PASSWORD": "password123",
   "WEBAUTHN_CREDENTIALS_FILE": "webauthn_credentials.json"
 }
