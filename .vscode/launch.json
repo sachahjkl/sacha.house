@@ -9,7 +9,7 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "Build (Debug)",
-      "program": "${workspaceFolder}/sacha.house.exe",
+      "program": "${workspaceFolder}/bin/debug/x86_64/sacha.house.exe",
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"
@@ -19,7 +19,7 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "Live Dev",
-      "program": "${workspaceFolder}/dev_watcher.exe",
+      "program": "${workspaceFolder}/bin/debug/x86_64/dev_watcher.exe",
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"

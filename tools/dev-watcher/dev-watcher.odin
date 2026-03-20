@@ -6,7 +6,7 @@ import "core:strings"
 import "core:time"
 
 // Configuration
-WATCH_DIRS := []string{"src", "lib"}
+WATCH_DIRS := []string{"src", "lib", "styles"}
 EXTENSIONS := []string{".odin", ".twig", ".css", ".js"}
 BUILD_CMD := "just"
 

@@ -48,7 +48,7 @@ RUN apk add --no-cache \
     && adduser -D -s /bin/false appuser
 
 # Copy only the binary
-COPY --from=builder /app/sacha.house.exe /app/sacha.house
+COPY --from=builder /app/bin/release/x86_64/sacha.house.exe /app/sacha.house
 
 # Set ownership and permissions
 RUN chown -R appuser:appuser /app && chmod +x /app/sacha.house

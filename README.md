@@ -47,7 +47,7 @@ To build for production:
 just build release
 ```
 
-This generates the `sacha.house.exe` binary.
+This generates the binary at `bin/release/x86_64/sacha.house.exe` (arch directory depends on host architecture).
 
 ## Configuration
 

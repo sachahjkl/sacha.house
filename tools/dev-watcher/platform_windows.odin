@@ -13,7 +13,7 @@ INVALID_PROCESS_HANDLE :: cast(Process_Handle)(uintptr(0))
 server_process: Process_Handle = INVALID_PROCESS_HANDLE
 
 get_build_args :: proc() -> string {
-	return "build debug sacha.house.dev.exe"
+	return "build-dev"
 }
 
 start_server :: proc() {

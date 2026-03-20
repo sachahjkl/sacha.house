@@ -13,7 +13,7 @@ server_process: Process_Handle = INVALID_PROCESS_HANDLE
 server_running := false
 
 get_build_args :: proc() -> string {
-	return "build debug sacha.house.dev"
+	return "build-dev"
 }
 
 start_server :: proc() {

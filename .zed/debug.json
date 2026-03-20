@@ -7,7 +7,7 @@
     "label": "Debug project",
     "adapter": "CodeLLDB",
     "request": "launch",
-    "program": "sacha.house.exe",
+    "program": "bin/debug/x86_64/sacha.house.exe",
     "build": "Build project"
     //"args": [],
     // Env overrides for the command, will be appended to the terminal's environment from the settings.

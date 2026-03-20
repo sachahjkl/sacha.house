@@ -734,17 +734,23 @@ admin_login_submit :: proc(req: ^http.Request, res: ^http.Response) {
 
 			password := form_data["password"] or_else ""
 
-
-			if password == get_admin_password() {
+			if result, seconds_left := evaluate_login_attempt(req, password); result == .Authorized {
 				// Create session and redirect
 				session_id := create_session()
 				set_session_cookie(res, session_id)
 				http.headers_set(&res.headers, "HX-Redirect", "/admin")
 				http.respond_with_status(res, http.Status.OK)
+			} else if result == .Blocked {
+				data := Login_Form_Data{
+					Error = fmt.tprintf(
+						"Too many failed attempts. Try again in %d second(s).",
+						seconds_left,
+					),
+				}
+				render_page(req, res, form_template, data)
+				return
 			} else {
-				// Invalid credentials, render form with error
-
-				data := Login_Form_Data {
+				data := Login_Form_Data{
 					Error = "Invalid password",
 				}
 

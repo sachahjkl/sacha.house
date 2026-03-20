@@ -42,7 +42,7 @@
       'echo "VERSION=$VERSION" >> build.env',
       "bun install --production",
       "GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION just build release",
-      "mv sacha.house.exe ${ARTIFACT_NAME}",
+      "mv bin/release/x86_64/sacha.house.exe ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
     "artifacts": {
@@ -77,7 +77,7 @@
       "echo VERSION=$VERSION >> build.env",
       "bun install --production",
       "GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION just build release",
-      "mv sacha.house.exe ${ARTIFACT_NAME}",
+      "mv bin/release/x86_64/sacha.house.exe ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
     "artifacts": {

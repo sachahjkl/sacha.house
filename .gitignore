@@ -195,6 +195,7 @@ config.json
 
 # Odin
 *.obj
+bin/
 sacha.house
 sacha.house*.exe
 dev_watcher.exe

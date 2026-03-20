@@ -3,14 +3,22 @@
 set windows-shell := ['cmd.exe', '/c']
 
 odin_src := 'src'
-odin_out := 'sacha.house.exe'
-out_pdb := 'sacha.house.pdb'
-odin_out_dev := 'sacha.house.dev.exe'
-out_pdb_dev := 'sacha.house.dev.pdb'
-dev_watcher_out := 'dev_watcher.exe'
+arch_dir := arch()
+bin_root := 'bin'
+debug_dir := bin_root / 'debug' / arch_dir
+release_dir := bin_root / 'release' / arch_dir
+odin_out := debug_dir / 'sacha.house.exe'
+odin_out_release := release_dir / 'sacha.house.exe'
+out_pdb := debug_dir / 'sacha.house.pdb'
+odin_out_dev := debug_dir / 'sacha.house.dev.exe'
+out_pdb_dev := debug_dir / 'sacha.house.dev.pdb'
+dev_watcher_out := debug_dir / 'dev_watcher.exe'
+legacy_dev_out := 'sacha.house.dev.exe'
+legacy_temple_cli := 'temple_cli.exe'
 lib := 'lib'
 bun := 'bun'
-temple_cli := 'temple_cli.exe'
+tools_dir := bin_root / 'tools'
+temple_cli := tools_dir / 'temple_cli.exe'
 temple_path := lib / 'temple'
 out_css_file := odin_src / 'static' / 'css' / 'style.css'
 port := '6969'
@@ -32,6 +40,7 @@ default: build
 # Optional: `just templates`, `just css`
 [unix]
 templates:
+  @mkdir -p {{ tools_dir }}
   @echo Building temple CLI...
   odin build {{ temple_path / 'cli' }} -o:speed -out:{{ temple_cli }}
   @echo Transpiling templates...
@@ -39,17 +48,39 @@ templates:
 
 [windows]
 templates:
-  @if exist {{ temple_cli }} (echo Temple CLI up to date.) else (echo Building temple CLI... & odin build {{ temple_path / 'cli' }} -o:speed -out:{{ temple_cli }})
+  @if not exist {{ replace(tools_dir, '/', '\\') }} mkdir {{ replace(tools_dir, '/', '\\') }}
+  @if exist {{ replace(temple_cli, '/', '\\') }} (echo Temple CLI up to date.) else (echo Building temple CLI... & odin build {{ temple_path / 'cli' }} -o:speed -out:{{ temple_cli }})
   @echo Transpiling templates...
-  .\\{{ temple_cli }} {{ odin_src }} {{ temple_path }}
+  .\\{{ replace(temple_cli, '/', '\\') }} {{ odin_src }} {{ temple_path }}
 
 css:
   @echo Building Tailwind CSS...
   {{ bun }} run build:css
 
-build mode='debug' out=odin_out: templates css
+[windows]
+_ensure-bin-dirs:
+  @if not exist {{ replace(debug_dir, '/', '\\') }} mkdir {{ replace(debug_dir, '/', '\\') }}
+  @if not exist {{ replace(release_dir, '/', '\\') }} mkdir {{ replace(release_dir, '/', '\\') }}
+
+[unix]
+_ensure-bin-dirs:
+  @mkdir -p {{ debug_dir }} {{ release_dir }}
+
+build mode='debug' out='': templates css _ensure-bin-dirs
   @echo Building Odin application in {{ mode }} mode...
-  odin build {{ odin_src }} -out:{{ out }} -define:GIT_COMMIT_HASH="'{{ git_commit_hash }}'" -define:VERSION="{{ version }}" {{ odin_default_flags }} {{ if mode == 'release' { '-o:speed -define:TRACK_LEAKS=false -build-mode:exe -lto:thin ' + linker_flags } else { '-debug -define:TRACK_LEAKS=true -build-mode:exe ' + linker_flags } }}
+  odin build {{ odin_src }} -out:{{ if out != '' { out } else if mode == 'release' { odin_out_release } else { odin_out } }} -define:GIT_COMMIT_HASH="'{{ git_commit_hash }}'" -define:VERSION="{{ version }}" {{ odin_default_flags }} {{ if mode == 'release' { '-o:speed -define:TRACK_LEAKS=false -build-mode:exe -lto:thin ' + linker_flags } else { '-debug -define:TRACK_LEAKS=true -build-mode:exe ' + linker_flags } }}
+
+[windows]
+build-dev: templates css _ensure-bin-dirs
+  @echo Building Odin application in debug-dev mode...
+  odin build {{ odin_src }} -out:{{ odin_out_dev }} -define:GIT_COMMIT_HASH="'{{ git_commit_hash }}'" -define:VERSION="{{ version }}" {{ odin_default_flags }} -debug -define:TRACK_LEAKS=true -build-mode:exe {{ linker_flags }}
+  @copy /Y {{ replace(odin_out_dev, '/', '\\') }} {{ legacy_dev_out }} >nul
+
+[unix]
+build-dev: templates css _ensure-bin-dirs
+  @echo Building Odin application in debug-dev mode...
+  odin build {{ odin_src }} -out:{{ odin_out_dev }} -define:GIT_COMMIT_HASH="'{{ git_commit_hash }}'" -define:VERSION="{{ version }}" {{ odin_default_flags }} -debug -define:TRACK_LEAKS=true -build-mode:exe {{ linker_flags }}
+  @cp -f {{ odin_out_dev }} {{ legacy_dev_out }}
 
 [unix]
 run: build
@@ -59,7 +90,7 @@ run: build
 [windows]
 run: build
   @echo Running 'sacha.house' web server...
-  .\\{{ odin_out }}
+  .\\{{ replace(odin_out, '/', '\\') }}
 
 run-ssl:
   @echo Running 'sacha.house' web server with SSL...
@@ -68,21 +99,23 @@ run-ssl:
 [windows]
 clean:
   @echo Cleaning up build artifacts...
-  @-del /F /Q {{ replace(odin_out, '/', '\\') }} 2>nul & del /F /Q {{ replace(out_pdb, '/', '\\') }} 2>nul & del /F /Q {{ replace(out_css_file, '/', '\\') }} 2>nul & del /F /Q {{ replace(temple_cli, '/', '\\') }} 2>nul & del /F /Q {{ replace(odin_out_dev, '/', '\\') }} 2>nul & del /F /Q {{ replace(out_pdb_dev, '/', '\\') }} 2>nul & del /F /Q {{ replace(dev_watcher_out, '/', '\\') }} 2>nul
+  @-rmdir /S /Q {{ replace(bin_root, '/', '\\') }} 2>nul
+  @-del /F /Q {{ replace(out_css_file, '/', '\\') }} 2>nul & del /F /Q {{ replace(temple_cli, '/', '\\') }} 2>nul & del /F /Q {{ legacy_temple_cli }} 2>nul & del /F /Q {{ legacy_dev_out }} 2>nul
 
 [unix]
 clean:
   @echo Cleaning up build artifacts...
-  rm -f {{ odin_out }} {{ out_pdb }} {{ out_css_file }} {{ temple_cli }} {{ odin_out_dev }} {{ out_pdb_dev }} {{ dev_watcher_out }}
+  rm -rf {{ bin_root }}
+  rm -f {{ out_css_file }} {{ temple_cli }} {{ legacy_temple_cli }} {{ legacy_dev_out }}
 
 [unix]
 dev: build-watcher
-  ./dev_watcher.exe
+  ./{{ dev_watcher_out }}
 
 [windows]
 dev: build-watcher
-  .\\dev_watcher.exe
+  .\\{{ replace(dev_watcher_out, '/', '\\') }}
 
-build-watcher:
+build-watcher: _ensure-bin-dirs
   @echo Building dev watcher...
-  odin build tools/dev-watcher -out:dev_watcher.exe
+  odin build tools/dev-watcher -out:{{ dev_watcher_out }}
