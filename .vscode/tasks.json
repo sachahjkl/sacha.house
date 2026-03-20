@@ -1,30 +1,33 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
       {
         "label": "Build (Debug)",
         "type": "process",
-        "command": "make",
-        "args": ["build", "mode=debug"]
+        "command": "just",
+        "args": ["build"],
+        "options": { "cwd": "${workspaceFolder}" }
       },
       {
         "label": "Live Dev",
         "type": "process",
-        "command": "make",
-        "args": ["build-watcher"]
+        "command": "just",
+        "args": ["build-watcher"],
+        "options": { "cwd": "${workspaceFolder}" }
       },
       {
         "label": "Build (Release)",
         "type": "process",
-        "command": "make",
-        "args": ["build", "mode=release"]
+        "command": "just",
+        "args": ["build", "release"],
+        "options": { "cwd": "${workspaceFolder}" }
       },
       {
         "label": "Clean",
         "type": "process",
-        "command": "make clean"
+        "command": "just",
+        "args": ["clean"],
+        "options": { "cwd": "${workspaceFolder}" }
       }
     ]
 }

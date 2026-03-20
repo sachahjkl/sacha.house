@@ -22,7 +22,7 @@ This project is a custom web server written in the [Odin programming language](h
 
 *   [Odin](https://odin-lang.org/) (latest version recommended)
 *   [Bun](https://bun.sh/) (for Tailwind CSS and JS dependencies)
-*   `make` (or `gmake` on Linux)
+*   [`just`](https://github.com/casey/just) command runner
 *   `cl` (MSVC) on Windows or `gcc`/`clang` on Linux
 
 ## Development
@@ -30,7 +30,7 @@ This project is a custom web server written in the [Odin programming language](h
 To start the development server with **hot reloading**:
 
 ```bash
-make dev
+just dev
 ```
 
 This command:
@@ -44,7 +44,7 @@ This command:
 To build for production:
 
 ```bash
-make build mode=release
+just build release
 ```
 
 This generates the `sacha.house.exe` binary.

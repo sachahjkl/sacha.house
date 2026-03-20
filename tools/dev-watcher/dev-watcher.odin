@@ -8,7 +8,7 @@ import "core:time"
 // Configuration
 WATCH_DIRS := []string{"src", "lib"}
 EXTENSIONS := []string{".odin", ".twig", ".css", ".js"}
-BUILD_CMD := "make"
+BUILD_CMD := "just"
 
 main :: proc() {
 	fmt.println("[dev] Starting dev watcher...")
@@ -66,7 +66,7 @@ build_project :: proc() -> bool {
 	cmd := fmt.tprintf("%s %s", BUILD_CMD, args)
 
 	// NOTE(Sacha):
-	// While libc.system is blocking, it is the simplest way to run a shell command like 'make'
+	// While libc.system is blocking, it is the simplest way to run a shell command like 'just'
 	// without manually parsing arguments and handling path resolution for the executable.
 	// Since 'build_project' is intended to be a blocking operation that prevents the server
 	// from starting until it completes, this is acceptable.

@@ -7,7 +7,7 @@ ARG ODIN_NIGHTLY_URL=
 ARG BUN_VERSION=1.3.1
 
 # Install dependencies
-RUN pacman -Syu --noconfirm clang openssl make libbacktrace git odin unzip tar
+RUN pacman -Syu --noconfirm clang openssl just libbacktrace git odin unzip tar
 
 # Download and install specific Odin release or nightly
 RUN if [ -n "$ODIN_NIGHTLY_URL" ]; then \
@@ -28,13 +28,13 @@ WORKDIR /app
 # Copy source files and build configuration
 COPY src/ ./src/
 COPY styles/ ./styles/
-COPY Makefile ./
+COPY justfile ./
 COPY tailwind.config.js ./
 COPY package.json ./
 
 # Install dependencies and build in release mode
 RUN bun install --production
-RUN make build mode=release GIT_COMMIT_HASH=$GIT_COMMIT_HASH
+RUN GIT_COMMIT_HASH=$GIT_COMMIT_HASH just build release
 
 # Final lightweight stage
 FROM alpine:3.21

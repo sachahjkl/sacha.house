@@ -30,7 +30,7 @@
       }
     ],
     "before_script": [
-      "pacman -Syu --noconfirm clang openssl make libbacktrace git unzip tar curl lld",
+      "pacman -Syu --noconfirm clang openssl just libbacktrace git unzip tar curl lld",
       "curl -L https://github.com/odin-lang/Odin/releases/download/${ODIN_RELEASE_VERSION}/odin-linux-amd64-${ODIN_RELEASE_VERSION}.tar.gz -o odin.tar.gz",
       "tar -C /opt -xzf odin.tar.gz",
       'ln -s $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
@@ -41,7 +41,7 @@
       "export VERSION=$(date +%Y.%m.%d)+${CI_COMMIT_SHORT_SHA}",
       'echo "VERSION=$VERSION" >> build.env',
       "bun install --production",
-      "make build mode=release GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION",
+      "GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION just build release",
       "mv sacha.house.exe ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
@@ -65,7 +65,7 @@
       }
     ],
     "before_script": [
-      "pacman -Syu --noconfirm clang openssl make libbacktrace git unzip tar curl lld",
+      "pacman -Syu --noconfirm clang openssl just libbacktrace git unzip tar curl lld",
       'curl -L "${ODIN_NIGHTLY_URL}" -o odin.tar.gz',
       "tar -C /opt -xzf odin.tar.gz",
       'ln -s $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
@@ -76,7 +76,7 @@
       "export VERSION=$(date +%Y.%m.%d)-nightly+${CI_COMMIT_SHORT_SHA}",
       "echo VERSION=$VERSION >> build.env",
       "bun install --production",
-      "make build mode=release GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION",
+      "GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION just build release",
       "mv sacha.house.exe ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
