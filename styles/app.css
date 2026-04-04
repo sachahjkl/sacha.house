@@ -69,6 +69,21 @@ hgroup .h1 {
   @apply bg-textColor text-bgColor mb-4 ps-4 text-xl font-bold;
 }
 
+.status-error {
+  @apply border-2 p-3;
+  background-color: #fee2e2;
+  border-color: #991b1b;
+  color: #7f1d1d;
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-error {
+    background-color: #7f1d1d;
+    border-color: #fca5a5;
+    color: #ffffff;
+  }
+}
+
 :root {
   --toastWidth: 30ch;
   --toastBackground: hsla(var(--b2) / var(--tw-text-opacity, 1));

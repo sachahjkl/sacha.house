@@ -12,16 +12,19 @@ LoggerOpts :: log.Options{.Level, .Time, .Short_File_Path, .Line, .Terminal_Colo
 
 TRACK_LEAKS :: #config(TRACK_LEAKS, true)
 HOT_RELOAD := false
+globals_cleaned_up := false
 
 cleanup_globals :: proc() {
+	if globals_cleaned_up {
+		return
+	}
+	globals_cleaned_up = true
+
 	// NOTE(sachahjkl):
 	// Cleanup global resources before exit
-	if TIMEZONE != nil {
-		free(TIMEZONE)
-		TIMEZONE = nil
-	}
-
-	delete(static_files)
+	cleanup_timezone()
+	cleanup_static_files()
+	cleanup_me()
 
 	// Cleanup linkedin profile cache
 	if linkedin_profile_cache != nil {
@@ -31,9 +34,6 @@ cleanup_globals :: proc() {
 }
 
 main :: proc() {
-
-	handle_cli_args()
-
 	level := log.Level.Debug when ODIN_DEBUG else log.Level.Info
 	context.logger = log.create_console_logger(level, LoggerOpts)
 	defer cleanup_globals()
@@ -46,6 +46,14 @@ main :: proc() {
 
 	// NOTE(sachahjkl): What a mess.
 	init_random_generator()
+
+	when TRACK_LEAKS {
+		track: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&track, context.allocator)
+		context.allocator = mem.tracking_allocator(&track)
+	}
+
+	handle_cli_args()
 
 	if !init_timezone() {
 		log.error("Failed to initialize timezone, exiting...")
@@ -64,13 +72,9 @@ main :: proc() {
 	init_me()
 	log.info("Static files and ME initialized.")
 
-	when TRACK_LEAKS {
-		track: mem.Tracking_Allocator
-		mem.tracking_allocator_init(&track, context.allocator)
-		context.allocator = mem.tracking_allocator(&track)
-	}
-
 	server_start()
+
+	cleanup_globals()
 
 	when TRACK_LEAKS {
 		for _, leak in track.allocation_map {

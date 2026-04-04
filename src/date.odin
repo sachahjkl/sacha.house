@@ -9,15 +9,22 @@ import "core:time/timezone"
 // NOTE(sachahjkl):
 // - This is a global variable that is used to store the timezone.
 // - It is initialized in the `init_timezone` function.
-// - Used for the whole duration of the program, no need to free it.
+// - Used for the whole duration of the program and released during shutdown.
 TIMEZONE: ^datetime.TZ_Region
 
 init_timezone :: proc() -> bool {
 	if tz, ok := timezone.region_load("Europe/Paris"); ok {
-		TIMEZONE = new_clone(tz)^
+		TIMEZONE = tz
 		return true
 	}
 	return false
+}
+
+cleanup_timezone :: proc() {
+	if TIMEZONE != nil {
+		timezone.region_destroy(TIMEZONE)
+		TIMEZONE = nil
+	}
 }
 
 

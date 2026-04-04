@@ -24,7 +24,7 @@ init_static_files :: proc() {
 	for file in STATIC_ASSETS {
 		path, _ := os.replace_path_separators(file.name, '/', context.temp_allocator)
 		mime_type := get_mime_type(path)
-		static_files[path] = Static_File{file.data, mime_type}
+		static_files[strings.clone(path)] = Static_File{file.data, mime_type}
 	}
 	css_prefix :: "css/"
 	for file in STATIC_ASSETS_CSS {
@@ -66,6 +66,17 @@ init_static_files :: proc() {
 		mime_type := get_mime_type(full_path)
 		static_files[strings.clone(full_path)] = Static_File{file.data[:], mime_type}
 	}
+}
+
+cleanup_static_files :: proc() {
+	if static_files == nil {
+		return
+	}
+	for path in static_files {
+		delete(path)
+	}
+	delete(static_files)
+	static_files = nil
 }
 
 serve_static_file :: proc(req: ^http.Request, res: ^http.Response) {

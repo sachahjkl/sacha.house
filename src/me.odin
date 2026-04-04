@@ -30,6 +30,13 @@ Me_Info :: struct {
 
 ME: Me_Info
 
+cleanup_me :: proc() {
+	delete(ME.fullName)
+	delete(ME.siteTitle)
+	ME.fullName = ""
+	ME.siteTitle = ""
+}
+
 init_me :: proc(allocator := context.allocator) {
 
 	dateNaissance, _ := time.datetime_to_time(1999, 5, 25, 0, 0, 0)

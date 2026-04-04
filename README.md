@@ -58,7 +58,8 @@ See `config.example.json` for required fields:
 *   `HYGRAPH_API_ENDPOINT`: URL for the blog CMS.
 *   `GITHUB_TOKEN`: For fetching repositories.
 *   `GITLAB_TOKEN`: For fetching repositories.
-*   `ADMIN_PASSWORD`: Fallback password.
+*   `ADMIN_PASSWORD_HASH`: Argon2id password hash for admin login.
+*   `PASSWORD_SALT`: Secret pepper used when hashing/verifying the admin password.
 
 ## Project Structure
 

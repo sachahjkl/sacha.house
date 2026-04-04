@@ -68,11 +68,11 @@ async function registerPasskey() {
       statusEl.textContent = "✅ Passkey registered successfully!";
     } else {
       const error = await verifyRes.text();
-      statusEl.className = "mt-4 p-3 bg-red-100 border-2 border-red-300 text-red-800";
+      statusEl.className = "status-error mt-4";
       statusEl.textContent = "❌ Registration failed: " + error;
     }
   } catch (error) {
-    statusEl.className = "mt-4 p-3 bg-red-100 border-2 border-red-300 text-red-800";
+    statusEl.className = "status-error mt-4";
     statusEl.textContent = "❌ Error: " + error.message;
   }
 }
@@ -131,11 +131,11 @@ async function testPasskey() {
       statusEl.textContent = "✅ Passkey authentication successful!";
     } else {
       const error = await verifyRes.text();
-      statusEl.className = "mt-4 p-3 bg-red-100 border-2 border-red-300 text-red-800";
+      statusEl.className = "status-error mt-4";
       statusEl.textContent = "❌ Authentication failed: " + error;
     }
   } catch (error) {
-    statusEl.className = "mt-4 p-3 bg-red-100 border-2 border-red-300 text-red-800";
+    statusEl.className = "status-error mt-4";
     statusEl.textContent = "❌ Error: " + error.message;
   }
 }
@@ -149,7 +149,7 @@ async function loginWebAuthnPasskey() {
   try {
     const challengeRes = await fetch("/admin/webauthn/login-challenge", {});
     if (!challengeRes.ok) {
-      statusEl.className = "mt-4 p-3 bg-red-100 border-2 border-red-300 text-red-800";
+      statusEl.className = "status-error mt-4";
       statusEl.textContent = "❌ No passkeys registered yet";
       return;
     }
@@ -194,11 +194,11 @@ async function loginWebAuthnPasskey() {
       window.location.href = "/admin";
     } else {
       const error = await verifyRes.text();
-      statusEl.className = "mt-4 p-3 bg-red-100 border-2 border-red-300 text-red-800";
+      statusEl.className = "status-error mt-4";
       statusEl.textContent = "❌ Authentication failed: " + error;
     }
   } catch (error) {
-    statusEl.className = "mt-4 p-3 bg-red-100 border-2 border-red-300 text-red-800";
+    statusEl.className = "status-error mt-4";
     statusEl.textContent = "❌ Error: " + error.message;
   }
 }

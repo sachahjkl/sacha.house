@@ -1,8 +1,14 @@
 package main
 
+import "core:crypto"
+import "core:crypto/argon2id"
+import "core:encoding/base64"
+import "core:fmt"
 import "core:mem"
 import "core:mem/virtual"
 import "core:net"
+import "core:strconv"
+import "core:strings"
 import "core:sync"
 import "core:time"
 import "core:log"
@@ -123,7 +129,135 @@ get_auth_level :: proc(req: ^http.Request, res: ^http.Response) -> Authorization
 	return .Authorized
 }
 
-get_admin_password :: proc() -> string {return APP_CONFIG.ADMIN_PASSWORD}
+get_admin_password_hash :: proc() -> string { return APP_CONFIG.ADMIN_PASSWORD_HASH }
+
+get_password_salt :: proc() -> string { return APP_CONFIG.PASSWORD_SALT }
+
+hash_password :: proc(password: string, allocator := context.allocator) -> (string, bool) {
+	salt: [argon2id.RECOMMENDED_SALT_SIZE]byte
+	crypto.rand_bytes(salt[:])
+
+	tag_size := argon2id.RECOMMENTED_TAG_SIZE
+	tag := make([]u8, tag_size, allocator = allocator)
+	defer delete(tag)
+
+	secret := transmute([]u8)(get_password_salt())
+
+	err := argon2id.derive(&argon2id.PARAMS_OWASP,
+		transmute([]u8)(password),
+		salt[:],
+		tag,
+		secret,
+	)
+	if err != .None {
+		return "", false
+	}
+
+	salt_b64, ok1 := base64.encode(salt[:], allocator = allocator)
+	if ok1 != .None { return "", false }
+	defer delete(salt_b64)
+	tag_b64, ok2 := base64.encode(tag, allocator = allocator)
+	if ok2 != .None { return "", false }
+	defer delete(tag_b64)
+
+	p := &argon2id.PARAMS_OWASP
+	params_str := fmt.tprintf("m=%d,t=%d,p=%d", p.memory_size, p.passes, p.parallelism)
+
+	result := fmt.aprintf(
+		"$argon2id$v=19$%s$%s$%s",
+		params_str,
+		salt_b64,
+		tag_b64,
+		allocator = allocator,
+	)
+	return result, true
+}
+
+parse_argon2_hash :: proc(hash_str: string, allocator := context.allocator) -> (salt: []u8, tag: []u8, params: argon2id.Parameters, ok: bool) {
+	if !strings.has_prefix(hash_str, "$argon2id$v=19$") {
+		return nil, nil, argon2id.Parameters{}, false
+	}
+
+	rest := hash_str[len("$argon2id$v=19$"):]
+	parts := strings.split(rest, "$", allocator = allocator)
+	defer delete(parts)
+
+	if len(parts) != 3 {
+		return nil, nil, argon2id.Parameters{}, false
+	}
+
+	params_str := parts[0]
+	salt_b64 := parts[1]
+	tag_b64 := parts[2]
+
+	params = argon2id.PARAMS_OWASP
+
+	param_parts := strings.split(params_str, ",", allocator = allocator)
+	defer delete(param_parts)
+	for part in param_parts {
+		kv := strings.split_n(part, "=", 2, allocator = allocator)
+		defer delete(kv)
+		if len(kv) != 2 { continue }
+
+		val, parse_ok := strconv.parse_int(kv[1])
+		if !parse_ok { continue }
+
+		if strings.has_prefix(kv[0], "m") {
+			params.memory_size = u32(val)
+		} else if strings.has_prefix(kv[0], "t") {
+			params.passes = u32(val)
+		} else if strings.has_prefix(kv[0], "p") {
+			params.parallelism = u32(val)
+		}
+	}
+
+	salt_bytes, salt_ok := base64.decode(salt_b64, allocator = allocator)
+	if salt_ok != .None { return nil, nil, argon2id.Parameters{}, false }
+	defer delete(salt_bytes)
+
+	tag_bytes, tag_ok := base64.decode(tag_b64, allocator = allocator)
+	if tag_ok != .None { return nil, nil, argon2id.Parameters{}, false }
+	defer delete(tag_bytes)
+
+	salt_out := make([]u8, len(salt_bytes), allocator = allocator)
+	copy(salt_out, salt_bytes)
+
+	tag_out := make([]u8, len(tag_bytes), allocator = allocator)
+	copy(tag_out, tag_bytes)
+
+	return salt_out, tag_out, params, true
+}
+
+verify_password :: proc(password: string, hash_str: string, allocator := context.allocator) -> bool {
+	if hash_str == "" || get_password_salt() == "" {
+		return false
+	}
+
+	salt, expected_tag, params, ok := parse_argon2_hash(hash_str, allocator)
+	if !ok { return false }
+	defer delete(salt)
+	defer delete(expected_tag)
+
+	tag_size := len(expected_tag)
+	actual_tag := make([]u8, tag_size, allocator = allocator)
+	defer delete(actual_tag)
+
+	secret := transmute([]u8)(get_password_salt())
+
+	err := argon2id.derive(&params,
+		transmute([]u8)(password),
+		salt,
+		actual_tag,
+		secret,
+	)
+	if err != .None { return false }
+
+	return crypto.compare_constant_time(actual_tag, expected_tag) == 1
+}
+
+is_admin_password_configured :: proc() -> bool {
+	return get_admin_password_hash() != "" && get_password_salt() != ""
+}
 
 get_login_attempt_key :: proc(req: ^http.Request) -> string {
 	return net.address_to_string(req.client.address)
@@ -149,7 +283,7 @@ evaluate_login_attempt :: proc(req: ^http.Request, password: string) -> (result:
 		attempt = Login_Attempt{}
 	}
 
-	remaining_seconds := time.duration_seconds(time.diff(now, attempt.blocked_until))
+	remaining_seconds := int(time.duration_seconds(time.diff(now, attempt.blocked_until)))
 	log.infof("Remaining seconds: %d", remaining_seconds)
 	if remaining_seconds > 0 {
 		attempt.blocked_until = time.time_add(now, LOGIN_COOLDOWN)
@@ -157,7 +291,7 @@ evaluate_login_attempt :: proc(req: ^http.Request, password: string) -> (result:
 		return .Blocked, int(LOGIN_COOLDOWN / time.Second)
 	}
 
-	if password == get_admin_password() {
+	if is_admin_password_configured() && verify_password(password, get_admin_password_hash()) {
 		delete_key(&session_storage.login_attempts, key)
 		return .Authorized, 0
 	}
