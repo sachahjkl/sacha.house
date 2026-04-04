@@ -30,9 +30,17 @@
     monospace, "Noto Color Emoji";
   --font-serif: "Noto Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 
-  --color-bgColor: #000000;
-  --color-bgOffColor: #999999;
-  --color-textColor: #dddddd;
+  --color-bgColor: #ffffff;
+  --color-bgOffColor: #666666;
+  --color-textColor: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bgColor: #000000;
+    --color-bgOffColor: #999999;
+    --color-textColor: #ffffff;
+  }
 }
 
 @utility scrollbar-thin {
