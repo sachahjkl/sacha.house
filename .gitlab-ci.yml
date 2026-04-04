@@ -16,7 +16,7 @@
   },
   "variables": {
     "ARTIFACT_NAME": "sacha.house-linux-amd64",
-    "ODIN_RELEASE_VERSION": "dev-2026-03",
+    "ODIN_RELEASE_VERSION": "dev-2026-04",
     "ODIN_NIGHTLY_URL": "",
     "BUN_VERSION": "1.3.5"
   },
