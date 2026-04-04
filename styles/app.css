@@ -68,6 +68,10 @@ hgroup .h1 {
   --toastBarBackground: hsl(var(--p));
 }
 
+html {
+  font-size: 14px
+}
+
 ._toastMsg {
   @apply overflow-hidden text-ellipsis;
 }
