@@ -68,7 +68,7 @@ _ensure-bin-dirs:
 
 build mode='debug' out='': templates css _ensure-bin-dirs
   @echo Building Odin application in {{ mode }} mode...
-  odin build {{ odin_src }} -out:{{ if out != '' { out } else if mode == 'release' { odin_out_release } else { odin_out } }} -define:GIT_COMMIT_HASH="'{{ git_commit_hash }}'" -define:VERSION="{{ version }}" {{ odin_default_flags }} {{ if mode == 'release' { '-o:speed -define:TRACK_LEAKS=false -build-mode:exe -lto:thin ' + linker_flags } else { '-debug -define:TRACK_LEAKS=true -build-mode:exe ' + linker_flags } }}
+  odin build {{ odin_src }} -out:{{ if out != '' { out } else if mode == 'release' { odin_out_release } else { odin_out } }} -define:GIT_COMMIT_HASH="'{{ git_commit_hash }}'" -define:VERSION="{{ version }}" {{ odin_default_flags }} {{ if mode == 'release' { '-o:speed -define:TRACK_LEAKS=false -build-mode:exe ' + linker_flags } else { '-debug -define:TRACK_LEAKS=true -build-mode:exe ' + linker_flags } }}
 
 [windows]
 build-dev: templates css _ensure-bin-dirs
