@@ -25,7 +25,7 @@ if (!window.HOT_RELOAD_REGISTERED) {
           }
 
           if (isReconnecting) {
-            window.location.reload();
+            window.location.reload(true);
           }
         })
         .catch(function () {

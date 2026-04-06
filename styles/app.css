@@ -125,8 +125,14 @@ main a:hover {
   @apply underline;
 }
 
+html {
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
 .ascii-logo-page {
-  min-height: 100svh;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 .ascii-logo-wrap {
@@ -144,7 +150,6 @@ main a:hover {
 
 .ascii-logo-wrap-debug {
   width: 100%;
-  min-height: calc(100svh - 5rem);
   padding-inline: 32px;
   margin: auto;
   display: grid;
@@ -152,18 +157,22 @@ main a:hover {
 }
 
 .ascii-logo {
-  font-size: 1.6cqw;
-  line-height: 1.5;
-  font-family: Consolas, "Liberation Mono", "Courier New", monospace, "Noto Color Emoji";
+  font-family: "Fira Mono", "Courier New", monospace;
+  
+  font-size: 1.5cqw;
+  line-height: 1.7;
+  letter-spacing: -.1%;
   font-weight: 400;
   font-feature-settings: normal;
   font-variation-settings: normal;
+  font-kerning: none;
+  font-variant-ligatures: none;
   white-space: pre;
   line-height-trim: both;
   margin: 0;
   margin-inline: auto;
-  text-size-adjust: none;
-  -webkit-text-size-adjust: none;
+  /*text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;*/
   color: var(--color-textColor);
 }
 

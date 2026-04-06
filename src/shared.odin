@@ -1,5 +1,6 @@
 package main
 
+import "core:fmt"
 import "core:strings"
 import "core:time"
 import "core:time/datetime"
@@ -33,6 +34,7 @@ Base_Page_Data :: struct {
 	SEO:      SEO_Data,
 	Footer:   Footer_Data,
 	NavItems: []NavItem,
+	StyleVersion: string,
 	HotReload:    bool,
 }
 
@@ -67,6 +69,10 @@ create_base_page_data :: proc(
 	}
 
 	nav_items := compute_nav_items(active_pathname, is_admin)
+	style_version := GIT_COMMIT_HASH
+	when ODIN_DEBUG {
+		style_version = fmt.tprintf("%d", time.time_to_unix_nano(time.now()))
+	}
 
 
 	return Base_Page_Data {
@@ -84,6 +90,7 @@ create_base_page_data :: proc(
 			version = VERSION,
 		},
 		NavItems = nav_items,
+		StyleVersion = style_version,
 		HotReload = HOT_RELOAD,
 	}
 }
