@@ -47,6 +47,7 @@ server_start :: proc() {
 	http.route_get(&router, "/blog/([%w-]+)", http.handler(blog_post_page))
 	http.route_get(&router, "/about", http.handler(about_page))
 	http.route_get(&router, "/projects", http.handler(projects_page))
+	http.route_get(&router, "/debug/logo", http.handler(debug_logo_page))
 	http.route_get(&router, "/ip", http.handler(ip_page))
 	http.route_get(&router, "/api/ip", http.handler(ip_api))
 	http.route_get(&router, "/mariage", http.handler(mariage_redirect))
@@ -130,6 +131,23 @@ index_page :: proc(req: ^http.Request, res: ^http.Response) {
 	}
 
 	page_template := temple.compiled("templates/index.temple.twig", Page_Data)
+
+	render_page(req, res, page_template, data)
+}
+
+debug_logo_page :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+
+	data := create_base_page_data(
+		Maybe_SEO_Data {
+			title = "logo debug / sacha.house",
+			description = "Debug page for the live ASCII logo renderer.",
+		},
+		req.url.path,
+		get_auth_level(req, res) == .Authorized,
+	)
+
+	page_template := temple.compiled("templates/debug_logo.temple.twig", Base_Page_Data)
 
 	render_page(req, res, page_template, data)
 }

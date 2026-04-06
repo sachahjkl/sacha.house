@@ -952,6 +952,9 @@
   .bg-transparent {
     background-color: transparent;
   }
+  .bg-clip-text {
+    background-clip: text;
+  }
   .p-0 {
     padding: calc(var(--spacing) * 0);
   }
@@ -981,6 +984,9 @@
   }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
+  }
+  .py-6 {
+    padding-block: calc(var(--spacing) * 6);
   }
   .ps-2 {
     padding-inline-start: calc(var(--spacing) * 2);
@@ -1073,6 +1079,9 @@
       color: color-mix(in oklab, var(--color-textColor) 50%, transparent);
     }
   }
+  .text-transparent {
+    color: transparent;
+  }
   .text-zinc-50 {
     color: var(--color-zinc-50);
   }
@@ -1113,10 +1122,6 @@
   .shadow-\[0_-1px_0_1px_\#166534_inset\,0_0_0_1px_\#15803d_inset\,0_0\.5px_0_1\.5px_\#4ade80_inset\] {
     --tw-shadow: 0 -1px 0 1px var(--tw-shadow-color, #166534) inset, 0 0 0 1px var(--tw-shadow-color, #15803d) inset, 0 0.5px 0 1.5px var(--tw-shadow-color, #4ade80) inset;
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
-  .brightness-300 {
-    --tw-brightness: brightness(300%);
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   .drop-shadow-md {
     --tw-drop-shadow-size: drop-shadow(0 3px 3px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.12)));
@@ -1353,6 +1358,55 @@ main a:hover {
 }
 .about-page #contact a {
   text-decoration-line: underline;
+}
+.ascii-logo-page {
+  min-height: 100svh;
+}
+.ascii-logo-wrap {
+  width: 100%;
+  container-type: inline-size;
+  display: grid;
+  justify-items: center;
+}
+.ascii-logo-wrap-hero {
+  --ascii-logo-size: clamp(0.1rem, calc(100cqw / 62), 1rem);
+  max-width: 891px;
+  margin-inline: auto;
+  padding-top: 10px;
+}
+.ascii-logo-wrap-debug {
+  --ascii-logo-size: clamp(0.1rem, calc(100cqw / 62), 1rem);
+  max-width: 891px;
+  width: 100%;
+  min-height: calc(100svh - 5rem);
+  display: grid;
+  place-items: center;
+}
+.ascii-logo {
+  font-size: var(--ascii-logo-size, 1.4vw);
+  line-height: 1.5;
+  font-family: Consolas, "Liberation Mono", "Courier New", monospace, "Noto Color Emoji";
+  font-weight: 400;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  white-space: pre;
+  line-height-trim: both;
+  margin: 0;
+  margin-inline: auto;
+  color: var(--color-textColor);
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .ascii-logo-fire {
+    color: transparent;
+    background-image: url("/static/gifs/fire-8bit-smoother.gif");
+    background-size: 150% 150%;
+    background-position: center 90%;
+    background-repeat: no-repeat;
+    background-clip: text;
+    -webkit-background-clip: text;
+    image-rendering: pixelated;
+    filter: saturate(1.4) contrast(1.25) brightness(1.15);
+  }
 }
 @property --tw-rotate-x {
   syntax: "*";
