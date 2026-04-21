@@ -1,0 +1,101 @@
+{% embed "_header.temple.twig" with this.base %}
+<article class="mx-auto max-w-5xl">
+    <p class="mb-4 text-sm">
+        <a href="/admin/blogposts" class="opacity-60 underline">
+            <span class="inline-block rotate-180">➜</span>
+            Go back to the blogposts manager
+        </a>
+    </p>
+
+    {% if this.Form.IsNew %}
+        <h1 class="h1 mb-4">new blogpost</h1>
+    {% end %}
+    {% if !this.Form.IsNew %}
+        <h1 class="h1 mb-4">edit blogpost</h1>
+    {% end %}
+
+    {% if this.Error != "" %}
+        <div class="mb-4 border-2 border-red-500 bg-red-100 p-3 text-red-800">{{ this.Error }}</div>
+    {% end %}
+
+    <div id="blog-editor-status" class="mb-4 hidden border-2 border-blue-300 bg-blue-100 p-3 text-blue-800"></div>
+
+    <form method="POST" action="{{ this.Form.FormAction }}" data-blog-editor class="flex flex-col gap-4">
+        <div class="grid gap-4 md:grid-cols-2">
+            <label class="flex flex-col gap-1">
+                <span>Title</span>
+                <input id="blog-title" type="text" name="title" value="{{ this.Form.Title }}" required class="h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0"/>
+            </label>
+
+            <label class="flex flex-col gap-1">
+                <span>Slug</span>
+                <input id="blog-slug" type="text" name="slug" value="{{ this.Form.Slug }}" required class="h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0"/>
+            </label>
+
+            <label class="flex flex-col gap-1">
+                <span>Status</span>
+                {% if this.Form.Status == "published" %}
+                    <select name="status" class="h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0">
+                        <option value="draft" class="bg-bgColor text-textColor">draft</option>
+                        <option value="published" selected class="bg-bgColor text-textColor">published</option>
+                    </select>
+                {% end %}
+                {% if this.Form.Status != "published" %}
+                    <select name="status" class="h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0">
+                        <option value="draft" selected class="bg-bgColor text-textColor">draft</option>
+                        <option value="published" class="bg-bgColor text-textColor">published</option>
+                    </select>
+                {% end %}
+            </label>
+
+            <label class="flex flex-col gap-1">
+                <span>Published At</span>
+                <div class="flex gap-2">
+                    <input id="blog-published-at" type="datetime-local" name="publishedAt" value="{{ this.Form.PublishedAt }}" class="h-10 min-w-0 flex-1 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0"/>
+                    <button type="button" id="blog-published-at-picker" class="h-10 border-2 border-textColor px-3 leading-8">
+                        pick
+                    </button>
+                </div>
+            </label>
+        </div>
+
+        <div>
+            <p class="mb-2 text-sm opacity-70">
+                Paste an image directly into the markdown textarea with Ctrl+V and it will upload automatically.
+                Set the slug first so the image is stored under the correct post.
+            </p>
+            <label class="flex flex-col gap-1">
+                <span>Markdown</span>
+                <textarea id="blog-markdown" name="markdown" rows="24" class="min-h-[32rem] border-2 border-textColor bg-transparent p-3 font-mono text-sm text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0">{{ this.Form.Markdown }}</textarea>
+            </label>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <button type="submit" class="h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center">
+                Save blogpost
+            </button>
+
+            {% if this.Form.PublicUrl != "" %}
+                <a href="{{ this.Form.PublicUrl }}" class="inline-block h-10 border-2 border-textColor px-4 leading-10">Open public page</a>
+            {% end %}
+        </div>
+
+        {% if this.Form.CreatedAt != "" || this.Form.UpdatedAt != "" %}
+            <p class="text-sm opacity-70">
+                {% if this.Form.CreatedAt != "" %}created {{ this.Form.CreatedAt }}{% end %}
+                {% if this.Form.CreatedAt != "" && this.Form.UpdatedAt != "" %} / {% end %}
+                {% if this.Form.UpdatedAt != "" %}updated {{ this.Form.UpdatedAt }}{% end %}
+            </p>
+        {% end %}
+    </form>
+
+    <div class="divider"></div>
+
+    <section>
+        <h2 class="mb-4 text-2xl font-bold">Preview</h2>
+        <article class="prose max-w-none">
+            {{ this.PreviewHtml | raw }}
+        </article>
+    </section>
+</article>
+{% embed "_footer.temple.twig" with this.base %}

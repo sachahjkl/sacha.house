@@ -38,6 +38,7 @@ server_start :: proc() {
 	// - route patterns follow the Lua pattern syntax, see https://www.lua.org/pil/20.2.html and special characters are escaped with a '%' (eg. %-).
 
 	http.route_get(&router, "/static/(.*)", http.handler(serve_static_file))
+	http.route_get(&router, "/media/(.*)", http.handler(blog_media_file))
 	http.route_get(&router, "/", http.handler(index_page))
 	http.route_get(&router, "/ping", http.handler(ping))
 	http.route_get(&router, "/blog", http.handler(blog_page))
@@ -56,6 +57,16 @@ server_start :: proc() {
 	http.route_post(&router, "/admin/login", http.handler(admin_login_submit))
 	http.route_get(&router, "/admin/logout", http.handler(admin_logout))
 	http.route_get(&router, "/admin", http.handler(admin_page))
+	http.route_get(&router, "/admin/blogposts", http.handler(admin_blogposts_page))
+	http.route_get(&router, "/admin/blogposts/new", http.handler(admin_blogpost_new_page))
+	http.route_post(&router, "/admin/blogposts/new", http.handler(admin_blogpost_create))
+	http.route_post(
+		&router,
+		"/admin/blogposts/upload%-image",
+		http.handler(admin_blogpost_upload_image),
+	)
+	http.route_post(&router, "/admin/blogposts/([%w-]+)/save", http.handler(admin_blogpost_save))
+	http.route_get(&router, "/admin/blogposts/([%w-]+)", http.handler(admin_blogpost_edit_page))
 	http.route_get(
 		&router,
 		"/admin/webauthn/register%-challenge",
@@ -275,7 +286,7 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 		YearGroups: []Year_Group,
 	}
 
-	posts, err := fetch_posts()
+	posts, err := fetch_local_posts()
 	if err.type != .None {
 		log.errorf("could not fetch posts: %v", err)
 	}
@@ -284,14 +295,13 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 	sort.quick_sort_proc(
 		posts,
 		proc(a, b: Post) -> int {
-			// parse dates and compare timestamps
-			updatedAtA, offsetA, _ := time.iso8601_to_time_and_offset(a.updatedAt)
-			updatedAtB, offsetB, _ := time.iso8601_to_time_and_offset(b.updatedAt)
+			sortTimeA, _, _ := time.iso8601_to_time_and_offset(a.publishedAt)
+			sortTimeB, _, _ := time.iso8601_to_time_and_offset(b.publishedAt)
 
 
 			return int(
 				clamp(
-					time.time_to_unix_nano(updatedAtB) - time.time_to_unix_nano(updatedAtA),
+					time.time_to_unix_nano(sortTimeB) - time.time_to_unix_nano(sortTimeA),
 					-1,
 					1,
 				),
@@ -304,8 +314,8 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 	current_group_posts := make([dynamic]Page_Posts, context.temp_allocator)
 
 	for post in posts {
-		updatedAt, _ := iso8601_to_datetime(post.updatedAt)
-		year := int(get_local_year(updatedAt))
+		sortAt, _ := iso8601_to_datetime(post.publishedAt)
+		year := int(get_local_year(sortAt))
 
 		if current_year != -1 && year != current_year {
 			append(
@@ -319,8 +329,8 @@ blog_page :: proc(req: ^http.Request, res: ^http.Response) {
 		pp := Page_Posts {
 			post = post,
 		}
-		pp.dateString = format_date(updatedAt)
-		pp.timeString = format_time(updatedAt)
+		pp.dateString = format_date(sortAt)
+		pp.timeString = format_time(sortAt)
 		append(&current_group_posts, pp)
 	}
 
@@ -356,7 +366,7 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 
 
 	slug := req.url_params[0]
-	post, err := fetch_post(slug)
+	post, err := fetch_local_post(slug)
 	if err.type != .None {
 		log.errorf("could not fetch post: %v", err)
 		http.respond_with_status(res, http.Status.Not_Found)
@@ -384,7 +394,7 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 		base = create_base_page_data(
 			Maybe_SEO_Data {
 				title = fmt.tprintf("%s / sacha.house", post.title),
-				description = string(post.content.text[:min(len(post.content.text), 160)]),
+				description = excerpt_from_plain_text(post.content.text, 180, context.temp_allocator),
 			},
 			req.url.path,
 			get_auth_level(req, res) == .Authorized,
@@ -399,7 +409,7 @@ blog_post_page :: proc(req: ^http.Request, res: ^http.Response) {
 blog_rss_feed :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
 
-	posts, err := fetch_posts()
+	posts, err := fetch_local_posts()
 	if err.type != .None {
 		log.errorf("could not fetch posts: %v", err)
 		http.respond_with_status(res, http.Status.Internal_Server_Error)
@@ -407,8 +417,8 @@ blog_rss_feed :: proc(req: ^http.Request, res: ^http.Response) {
 	}
 
 	sort.quick_sort_proc(posts, proc(a, b: Post) -> int {
-		updatedAtA, _, _ := time.iso8601_to_time_and_offset(a.updatedAt)
-		updatedAtB, _, _ := time.iso8601_to_time_and_offset(b.updatedAt)
+		updatedAtA, _, _ := time.iso8601_to_time_and_offset(a.publishedAt)
+		updatedAtB, _, _ := time.iso8601_to_time_and_offset(b.publishedAt)
 		return int(
 			clamp(time.time_to_unix_nano(updatedAtB) - time.time_to_unix_nano(updatedAtA), -1, 1),
 		)
@@ -432,7 +442,7 @@ blog_rss_feed :: proc(req: ^http.Request, res: ^http.Response) {
 	strings.write_string(&sb, "		<language>en-us</language>\n")
 
 	if len(posts) > 0 {
-		latest, _, _ := time.iso8601_to_time_and_offset(posts[0].updatedAt)
+		latest, _, _ := time.iso8601_to_time_and_offset(posts[0].publishedAt)
 		pubDate := format_rfc1123(latest, context.temp_allocator)
 		strings.write_string(&sb, fmt.tprintf("		<lastBuildDate>%s</lastBuildDate>\n", pubDate))
 	}
@@ -447,7 +457,7 @@ blog_rss_feed :: proc(req: ^http.Request, res: ^http.Response) {
 		strings.write_string(&sb, fmt.tprintf("			<link>%s</link>\n", link))
 		strings.write_string(&sb, fmt.tprintf("			<guid>%s</guid>\n", link))
 
-		t, _, _ := time.iso8601_to_time_and_offset(post.updatedAt)
+		t, _, _ := time.iso8601_to_time_and_offset(post.publishedAt)
 		pubDate := format_rfc1123(t, context.temp_allocator)
 		strings.write_string(&sb, fmt.tprintf("			<pubDate>%s</pubDate>\n", pubDate))
 
@@ -471,7 +481,7 @@ blog_rss_feed :: proc(req: ^http.Request, res: ^http.Response) {
 blog_atom_feed :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
 
-	posts, err := fetch_posts()
+	posts, err := fetch_local_posts()
 	if err.type != .None {
 		log.errorf("could not fetch posts: %v", err)
 		http.respond_with_status(res, http.Status.Internal_Server_Error)
@@ -479,8 +489,8 @@ blog_atom_feed :: proc(req: ^http.Request, res: ^http.Response) {
 	}
 
 	sort.quick_sort_proc(posts, proc(a, b: Post) -> int {
-		updatedAtA, _, _ := time.iso8601_to_time_and_offset(a.updatedAt)
-		updatedAtB, _, _ := time.iso8601_to_time_and_offset(b.updatedAt)
+		updatedAtA, _, _ := time.iso8601_to_time_and_offset(a.publishedAt)
+		updatedAtB, _, _ := time.iso8601_to_time_and_offset(b.publishedAt)
 		return int(
 			clamp(time.time_to_unix_nano(updatedAtB) - time.time_to_unix_nano(updatedAtA), -1, 1),
 		)
@@ -496,7 +506,7 @@ blog_atom_feed :: proc(req: ^http.Request, res: ^http.Response) {
 	strings.write_string(&sb, "	<link href=\"https://sacha.house/blog/atom.xml\" rel=\"self\"/>\n")
 
 	if len(posts) > 0 {
-		strings.write_string(&sb, fmt.tprintf("	<updated>%s</updated>\n", posts[0].updatedAt))
+		strings.write_string(&sb, fmt.tprintf("	<updated>%s</updated>\n", posts[0].publishedAt))
 	}
 
 	strings.write_string(&sb, "	<author>\n")
@@ -515,7 +525,7 @@ blog_atom_feed :: proc(req: ^http.Request, res: ^http.Response) {
 		strings.write_string(&sb, fmt.tprintf("		<link href=\"%s\"/>\n", link))
 		strings.write_string(&sb, fmt.tprintf("		<id>%s</id>\n", link))
 
-		strings.write_string(&sb, fmt.tprintf("		<updated>%s</updated>\n", post.updatedAt))
+		strings.write_string(&sb, fmt.tprintf("		<updated>%s</updated>\n", post.publishedAt))
 
 		// Assuming we want the author per post if available, otherwise fallback or omit
 		if post.author.name != "" {

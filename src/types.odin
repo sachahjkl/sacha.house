@@ -1,10 +1,13 @@
 package main
 
 Post :: struct {
-	slug:      string,
-	title:     string,
-	updatedAt: string,
-	author: Post_Author,
+	slug:        string,
+	title:       string,
+	excerpt:     string,
+	publishedAt: string,
+	updatedAt:   string,
+	createdAt:   string,
+	author:      Post_Author,
 }
 
 Posts_Response :: struct {

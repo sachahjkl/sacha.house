@@ -12,14 +12,22 @@
 
 
 		<h2 class="mb-2 font-bold">📰 Available articles</h2>
+		{% if len(this.YearGroups) == 0 %}
+			<p>No articles yet.</p>
+		{% end %}
 		{% for group in this.YearGroups %}
 			<h3 class="text-xl font-bold mt-4 mb-2">{{ int(group.year) }}</h3>
 			<ul class="list-inside list-[square]">
 				{% for post in group.posts %}
 					<li>
-						<a href="/blog/{{ post.slug }}" title="{{ post.title }}">
+						<a href="/blog/{{ post.slug }}" {% if post.excerpt != "" %}aria-describedby="excerpt-{{ post.slug }}"{% end %}>
 							{{ post.title }}
 						</a>
+						{% if post.excerpt != "" %}
+							<p id="excerpt-{{ post.slug }}" class="mb-3 mt-1 list-none text-sm opacity-70">
+								{{ post.excerpt }}
+							</p>
+						{% end %}
 					</li>
 					{% end %}</ul>
 				{% end %}</article>
