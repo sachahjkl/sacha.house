@@ -22,7 +22,7 @@
   },
   "build:linux:release": {
     "stage": "build",
-    "image": "archlinux:base-devel",
+    "image": "debian:bookworm",
     "rules": [
       {
         "if": '$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != ""',
@@ -30,14 +30,12 @@
       }
     ],
     "before_script": [
-      "pacman-key --init",
-      "pacman-key --populate archlinux",
-      "pacman -Sy --noconfirm archlinux-keyring",
-      "pacman -Syu --noconfirm clang openssl just libbacktrace git unzip tar curl lld cmark",
+      "apt-get update",
+      "DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bash build-essential clang libssl-dev just libbacktrace-dev git unzip tar curl lld libcmark-dev ca-certificates",
       "curl -L https://github.com/odin-lang/Odin/releases/download/${ODIN_RELEASE_VERSION}/odin-linux-amd64-${ODIN_RELEASE_VERSION}.tar.gz -o odin.tar.gz",
       "tar -C /opt -xzf odin.tar.gz",
       'ln -s $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
-      'curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"',
+      'curl -fsSL https://bun.sh/install | bash -s -- "bun-v${BUN_VERSION}"',
       'export PATH="/root/.bun/bin:$PATH"'
     ],
     "script": [
@@ -60,7 +58,7 @@
   },
   "build:linux:nightly": {
     "stage": "build",
-    "image": "archlinux:base-devel",
+    "image": "debian:bookworm",
     "rules": [
       {
         "if": '$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != ""',
@@ -68,14 +66,12 @@
       }
     ],
     "before_script": [
-      "pacman-key --init",
-      "pacman-key --populate archlinux",
-      "pacman -Sy --noconfirm archlinux-keyring",
-      "pacman -Syu --noconfirm clang openssl just libbacktrace git unzip tar curl lld cmark",
+      "apt-get update",
+      "DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bash build-essential clang libssl-dev just libbacktrace-dev git unzip tar curl lld libcmark-dev ca-certificates",
       'curl -L "${ODIN_NIGHTLY_URL}" -o odin.tar.gz',
       "tar -C /opt -xzf odin.tar.gz",
       'ln -s $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
-      'curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"',
+      'curl -fsSL https://bun.sh/install | bash -s -- "bun-v${BUN_VERSION}"',
       'export PATH="/root/.bun/bin:$PATH"'
     ],
     "script": [

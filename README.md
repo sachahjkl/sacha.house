@@ -4,15 +4,16 @@ The personal website of Sacha Froment, built with **Odin**.
 
 ## Overview
 
-This project is a custom web server written in the [Odin programming language](https://odin-lang.org/), featuring a handmade templating engine, GraphQL integrations, and modern web technologies.
+This project is a custom web server written in the [Odin programming language](https://odin-lang.org/), featuring a handmade templating engine, a filesystem-backed blog CMS, and modern web technologies.
 
 ### Key Features
 
 *   **Odin Backend**: Built on top of `odin-http`, utilizing a custom router and middleware.
 *   **Temple**: A custom templating engine (`lib/temple`) that transpiles Twig-like syntax into native Odin code for type-safe, high-performance rendering.
+*   **Local Blog CMS**: Blog posts are stored on disk under `data/blog/`, rendered from markdown, and managed from the `/admin` panel.
 *   **Hot Reloading**: A custom-built development watcher (`tools/dev-watcher`) that monitors source files, recompiles the server, and hot-reloads the browser automatically. Supports both Windows and Linux.
-*   **GraphQL Integration**: Fetches blog content from [Hygraph](https://hygraph.com/).
-*   **External APIs**:
+*   **Blog Migration Tooling**: Includes a migration script under `tools/blog-migrate/` for importing historical Hygraph content into the local blog store.
+*   **External APIs and Integrations**:
     *   Fetches pinned repositories from **GitHub** and **GitLab**.
     *   Loads user profile data from a **GitHub Gist**.
 *   **WebAuthn**: Implements Passkey authentication for the admin panel (`/admin`).
@@ -24,6 +25,14 @@ This project is a custom web server written in the [Odin programming language](h
 *   [Bun](https://bun.sh/) (for Tailwind CSS and JS dependencies)
 *   [`just`](https://github.com/casey/just) command runner
 *   `cl` (MSVC) on Windows or `gcc`/`clang` on Linux
+
+On Debian-based Linux hosts, install the native build/runtime dependencies first:
+
+```bash
+sudo apt install clang just libssl-dev libbacktrace-dev libcmark-dev
+```
+
+`vendor:commonmark` links against the system `libcmark` on Linux, so Linux binaries should be built on the same distro family they will run on. The GitLab CI pipeline uses `debian:bookworm` for this reason.
 
 ## Development
 
@@ -49,6 +58,8 @@ just build release
 
 This generates the binary at `bin/release/x86_64/sacha.house.exe` (arch directory depends on host architecture).
 
+For Linux deployment, build on the target distro family instead of shipping a binary compiled against a different system `libcmark` soname.
+
 ## Configuration
 
 Configuration is loaded from `config.json` (looked for in `CONFIG_PATH` env var or default location) and environment variables.
@@ -71,6 +82,7 @@ See `config.example.json` for required fields:
     *   `temple/`: Templating engine compiler and runtime.
 *   `tools/`:
     *   `dev-watcher/`: Development tool for hot reloading.
+    *   `blog-migrate/`: Hygraph-to-local-blog migration script.
 *   `deploy/`: Deployment scripts (systemd, fail2ban).
 *   `styles/`: Tailwind CSS input files.
 
