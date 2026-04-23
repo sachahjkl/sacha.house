@@ -246,13 +246,15 @@ admin_blogpost_upload_image :: proc(req: ^http.Request, res: ^http.Response) {
 			}
 
 			assets_dir := blog_post_assets_dir(slug)
-			if mkdir_err := os.make_directory_all(assets_dir); mkdir_err != nil {
-				http.respond_plain(
-					ctx.res,
-					fmt.tprintf("Could not create assets directory: %v", mkdir_err),
-					http.Status.Internal_Server_Error,
-				)
-				return
+			if !os.exists(assets_dir) {
+				if mkdir_err := os.make_directory_all(assets_dir); mkdir_err != nil {
+					http.respond_plain(
+						ctx.res,
+						fmt.tprintf("Could not create assets directory: %v", mkdir_err),
+						http.Status.Internal_Server_Error,
+					)
+					return
+				}
 			}
 
 			ext := os.ext(upload.filename)

@@ -107,6 +107,9 @@ blog_post_assets_dir :: proc(slug: string, allocator := context.temp_allocator) 
 }
 
 ensure_blog_root_exists :: proc() -> Error {
+	if os.exists(BLOG_DATA_ROOT) {
+		return Error{type = .None}
+	}
 	if err := os.make_directory_all(BLOG_DATA_ROOT); err != nil {
 		return Error{type = .Filesystem, msg = fmt.tprintf("Could not create %s: %v", BLOG_DATA_ROOT, err)}
 	}
@@ -397,8 +400,10 @@ save_blog_post :: proc(input: Blog_Post_Save_Input, old_slug := "") -> (saved_sl
 		}
 	}
 
-	if mkdir_err := os.make_directory_all(new_dir); mkdir_err != nil {
-		return "", Error{type = .Filesystem, msg = fmt.tprintf("Could not create blog directory %s: %v", new_slug, mkdir_err)}
+	if !os.exists(new_dir) {
+		if mkdir_err := os.make_directory_all(new_dir); mkdir_err != nil {
+			return "", Error{type = .Filesystem, msg = fmt.tprintf("Could not create blog directory %s: %v", new_slug, mkdir_err)}
+		}
 	}
 
 	created_at := existing.meta.createdAt
