@@ -8,6 +8,53 @@ const SUPPORTED_ALGORITHMS = [
   { alg: ALGORITHM_MAP["RS256"], type: "public-key" },
 ];
 
+function getPasskeyLabel() {
+  const input = document.getElementById("passkey-label");
+  return input ? input.value.trim() : "";
+}
+
+function bytesToBase64(bytes) {
+  return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+}
+
+function bytesToHex(bytes) {
+  return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function parseAuthenticatorData(buffer) {
+  const bytes = new Uint8Array(buffer);
+  if (bytes.length < 37) {
+    return { byteLength: bytes.length, error: "authenticatorData is shorter than expected" };
+  }
+
+  const flags = bytes[32];
+  const signCountView = new DataView(bytes.buffer, bytes.byteOffset + 33, 4);
+
+  return {
+    byteLength: bytes.length,
+    rpIdHashHex: bytesToHex(bytes.slice(0, 32)),
+    flags: {
+      up: Boolean(flags & 0x01),
+      uv: Boolean(flags & 0x04),
+      be: Boolean(flags & 0x08),
+      bs: Boolean(flags & 0x10),
+      at: Boolean(flags & 0x40),
+      ed: Boolean(flags & 0x80),
+      rawHex: flags.toString(16).padStart(2, "0"),
+    },
+    signCount: signCountView.getUint32(0, false),
+  };
+}
+
+function setPasskeyDebugOutput(data, isError = false) {
+  const outputEl = document.getElementById("passkey-debug-output");
+  if (!outputEl) return;
+
+  outputEl.classList.remove("hidden");
+  outputEl.classList.toggle("status-error", isError);
+  outputEl.textContent = JSON.stringify(data, null, 2);
+}
+
 async function registerPasskey() {
   const statusEl = document.getElementById("passkey-status");
   statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
@@ -49,6 +96,7 @@ async function registerPasskey() {
 
     const credentialData = {
       id: credential.id,
+      label: getPasskeyLabel(),
       rawId: btoa(String.fromCharCode(...new Uint8Array(credential.rawId))),
       response: {
         clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON))),
@@ -66,6 +114,9 @@ async function registerPasskey() {
     if (verifyRes.ok) {
       statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
       statusEl.textContent = "✅ Passkey registered successfully!";
+      if (window.htmx) {
+        htmx.ajax("GET", "/admin/webauthn/passkeys", { target: "#passkey-list", swap: "outerHTML" });
+      }
     } else {
       const error = await verifyRes.text();
       statusEl.className = "status-error mt-4";
@@ -74,6 +125,85 @@ async function registerPasskey() {
   } catch (error) {
     statusEl.className = "status-error mt-4";
     statusEl.textContent = "❌ Error: " + error.message;
+  }
+}
+
+async function debugPasskey(event) {
+  event.preventDefault();
+
+  const statusEl = document.getElementById("passkey-status");
+  const userVerificationEl = document.getElementById("passkey-debug-user-verification");
+  const userVerification = userVerificationEl ? userVerificationEl.value : "preferred";
+
+  if (statusEl) {
+    statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
+    statusEl.textContent = "⏳ Fetching debug challenge...";
+    statusEl.classList.remove("hidden");
+  }
+
+  try {
+    const challengeRes = await fetch("/admin/webauthn/debug-challenge", {});
+    if (!challengeRes.ok) {
+      throw new Error(await challengeRes.text());
+    }
+
+    const challenge = await challengeRes.json();
+    const requestOptions = {
+      challenge: Uint8Array.from(atob(challenge.challenge), (c) => c.charCodeAt(0)),
+      timeout: 60000,
+      rpId: challenge.rp_id,
+      userVerification,
+    };
+
+    if (statusEl) {
+      statusEl.textContent = "🔐 Touch the authenticator to collect debug info...";
+    }
+
+    const assertion = await navigator.credentials.get({ publicKey: requestOptions });
+    const clientDataText = new TextDecoder().decode(assertion.response.clientDataJSON);
+    const capabilities = typeof PublicKeyCredential !== "undefined" && PublicKeyCredential.getClientCapabilities
+      ? await PublicKeyCredential.getClientCapabilities()
+      : null;
+
+    setPasskeyDebugOutput({
+      challenge,
+      requestOptions: {
+        rpId: requestOptions.rpId,
+        timeout: requestOptions.timeout,
+        userVerification: requestOptions.userVerification,
+        challengeByteLength: requestOptions.challenge.length,
+      },
+      browser: {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        clientCapabilities: capabilities,
+      },
+      credential: {
+        id: assertion.id,
+        type: assertion.type,
+        authenticatorAttachment: assertion.authenticatorAttachment || null,
+        rawIdBase64: bytesToBase64(assertion.rawId),
+      },
+      response: {
+        clientDataJSONText: clientDataText,
+        authenticatorDataBase64: bytesToBase64(assertion.response.authenticatorData),
+        authenticatorData: parseAuthenticatorData(assertion.response.authenticatorData),
+        signatureBase64: bytesToBase64(assertion.response.signature),
+        signatureByteLength: new Uint8Array(assertion.response.signature).length,
+        userHandleBase64: assertion.response.userHandle ? bytesToBase64(assertion.response.userHandle) : null,
+      },
+    });
+
+    if (statusEl) {
+      statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
+      statusEl.textContent = "✅ Debug info captured below.";
+    }
+  } catch (error) {
+    setPasskeyDebugOutput({ error: error.message || String(error) }, true);
+    if (statusEl) {
+      statusEl.className = "status-error mt-4";
+      statusEl.textContent = "❌ Debug failed: " + (error.message || error);
+    }
   }
 }
 

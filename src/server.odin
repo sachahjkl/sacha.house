@@ -72,7 +72,14 @@ server_start :: proc() {
 		"/admin/webauthn/register%-challenge",
 		http.handler(admin_webauthn_register_challenge),
 	)
+	http.route_get(&router, "/admin/webauthn/passkeys", http.handler(admin_webauthn_passkeys))
 	http.route_post(&router, "/admin/webauthn/register", http.handler(admin_webauthn_register))
+	http.route_post(&router, "/admin/webauthn/remove", http.handler(admin_webauthn_remove))
+	http.route_get(
+		&router,
+		"/admin/webauthn/debug%-challenge",
+		http.handler(admin_webauthn_debug_challenge),
+	)
 	http.route_get(
 		&router,
 		"/admin/webauthn/login%-challenge",
@@ -666,6 +673,7 @@ admin_refresh_projects :: proc(req: ^http.Request, res: ^http.Response) {
 
 Webauthn_Credential_Response :: struct {
 	id:       string,
+	label:    string,
 	rawId:    string,
 	response: struct {
 		clientDataJSON:    string,
@@ -684,6 +692,34 @@ Webauthn_Assertion_Response :: struct {
 		userHandle:        string,
 	},
 	type:     string,
+}
+
+Passkey_List_Item :: struct {
+	Id:    string,
+	Label: string,
+}
+
+Passkey_List_Data :: struct {
+	Passkeys: []Passkey_List_Item,
+}
+
+admin_passkey_list_data :: proc() -> Passkey_List_Data {
+	credentials := list_credentials(context.temp_allocator)
+	sort.quick_sort_proc(credentials, proc(a, b: WebAuthn_Credential) -> int {
+		return strings.compare(a.label, b.label)
+	})
+
+	passkeys := make([]Passkey_List_Item, len(credentials), context.temp_allocator)
+	for cred, i in credentials {
+		passkeys[i] = Passkey_List_Item{Id = cred.id, Label = cred.label}
+	}
+
+	return Passkey_List_Data{Passkeys = passkeys}
+}
+
+render_admin_passkey_list :: proc(req: ^http.Request, res: ^http.Response) {
+	template := temple.compiled("templates/_admin_passkey_list.temple.twig", Passkey_List_Data)
+	render_page(req, res, template, admin_passkey_list_data())
 }
 
 admin_login_page :: proc(req: ^http.Request, res: ^http.Response) {
@@ -815,6 +851,7 @@ admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 		IpAddress:     string,
 		CreditBalance: int,
 		ProfileData:   string,
+		Passkeys:      Passkey_List_Data,
 	}
 
 	profile_json := ""
@@ -831,6 +868,7 @@ admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 		IpAddress     = net.address_to_string(req.client.address),
 		CreditBalance = 0,
 		ProfileData   = profile_json,
+		Passkeys      = admin_passkey_list_data(),
 	}
 
 	page_template := temple.compiled("templates/admin.temple.twig", Page_Data)
@@ -884,6 +922,15 @@ admin_webauthn_register_challenge :: proc(req: ^http.Request, res: ^http.Respons
 	set_challenge_cookie(res, challenge_id)
 
 	http.respond_json(res, response, http.Status.OK)
+}
+
+admin_webauthn_passkeys :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+	if get_auth_level(req, res) != .Authorized {
+		http.respond_with_status(res, http.Status.Unauthorized)
+		return
+	}
+	render_admin_passkey_list(req, res)
 }
 
 admin_webauthn_register :: proc(req: ^http.Request, res: ^http.Response) {
@@ -995,7 +1042,7 @@ admin_webauthn_register :: proc(req: ^http.Request, res: ^http.Response) {
 
 			// Store using the credential ID sent by the client (URL-safe base64)
 			// This must match what the client sends during login
-			store_credential(cred_data.id, public_key)
+			store_credential(cred_data.id, cred_data.label, public_key)
 
 			// Cleanup the challenge cookie
 			clear_challenge_cookie(res)
@@ -1004,6 +1051,85 @@ admin_webauthn_register :: proc(req: ^http.Request, res: ^http.Response) {
 			http.respond_plain(res, "Registration successful", http.Status.OK)
 		},
 	)
+}
+
+admin_webauthn_remove :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+	if get_auth_level(req, res) != .Authorized {
+		http.respond_with_status(res, http.Status.Unauthorized)
+		return
+	}
+
+	Context_Data :: struct {
+		req: ^http.Request,
+		res: ^http.Response,
+	}
+
+	ctx := new_clone(Context_Data{req = req, res = res})
+	http.body(
+		req,
+		-1,
+		ctx,
+		proc(user_data: rawptr, body: http.Body, err: http.Body_Error) {
+			ctx := cast(^Context_Data)user_data
+			defer free(ctx)
+			if err != nil {
+				http.respond(ctx.res, http.body_error_status(err))
+				return
+			}
+
+			form_data, ok := http.body_url_encoded(body)
+			if !ok {
+				http.respond_with_status(ctx.res, http.Status.Bad_Request)
+				return
+			}
+
+			credential_id := strings.trim_space(form_data["id"] or_else "")
+			if credential_id == "" {
+				http.respond_plain(ctx.res, "Missing credential id", http.Status.Bad_Request)
+				return
+			}
+
+			if !remove_credential(credential_id) {
+				http.respond_plain(ctx.res, "Unknown credential", http.Status.Not_Found)
+				return
+			}
+
+			if _, is_htmx := http.headers_get(ctx.req.headers, "HX-Request"); is_htmx {
+				render_admin_passkey_list(ctx.req, ctx.res)
+				return
+			}
+
+			http.headers_set(&ctx.res.headers, "Location", "/admin")
+			http.respond(ctx.res, http.Status.See_Other)
+		},
+	)
+}
+
+admin_webauthn_debug_challenge :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+	if get_auth_level(req, res) != .Authorized {
+		http.respond_with_status(res, http.Status.Unauthorized)
+		return
+	}
+
+	if !has_credentials() {
+		http.respond_plain(res, "No passkeys registered yet", http.Status.Bad_Request)
+		return
+	}
+
+	Challenge_Response :: struct {
+		challenge: string,
+		rp_id:     string,
+	}
+
+	challenge := generate_challenge()
+	response := Challenge_Response{
+		challenge = base64.encode(challenge, allocator = context.temp_allocator),
+		rp_id     = get_rp_id(req),
+	}
+
+	http.respond_json(res, response, http.Status.OK)
 }
 
 admin_webauthn_login_challenge :: proc(req: ^http.Request, res: ^http.Response) {

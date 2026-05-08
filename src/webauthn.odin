@@ -23,7 +23,27 @@ WebAuthn_Challenge :: struct {
 
 WebAuthn_Credential :: struct {
 	id:         string,
+	label:      string,
 	public_key: []byte,
+	counter:    u32,
+}
+
+Stored_Credential :: struct {
+	id:         string,
+	label:      string,
+	public_key: string,
+	counter:    u32,
+}
+
+Stored_Credentials :: struct {
+	version:     int,
+	credentials: []Stored_Credential,
+}
+
+Legacy_Stored_Credential :: struct {
+	id:         string,
+	label:      string,
+	public_key: string,
 	counter:    u32,
 }
 
@@ -36,6 +56,7 @@ WebAuthn_Storage :: struct {
 
 CHALLENGE_EXPIRATION_TIME := 5 * time.Minute
 CHALLENGE_KEY := "webauthn_challenge"
+WEBAUTHN_CREDENTIALS_VERSION :: 1
 
 webauthn_storage: WebAuthn_Storage
 
@@ -76,23 +97,12 @@ load_webauthn_credentials :: proc() {
 	}
 	defer delete(data)
 
-	Stored_Credential :: struct {
-		id:         string,
-		public_key: string,
-		counter:    u32,
-	}
-
-	Stored_Credentials :: struct {
-		credentials: []Stored_Credential,
-	}
-
-	stored: Stored_Credentials
-	if err := json.unmarshal(data, &stored, allocator = context.temp_allocator); err != nil {
-		log.warnf("Failed to parse WebAuthn credentials: %v", err)
+	stored, needs_migration, ok := parse_stored_credentials(data)
+	if !ok {
 		return
 	}
 
-	for cred in stored.credentials {
+	for cred, i in stored.credentials {
 		pk_bytes, decode_err := base64.decode(
 			cred.public_key,
 			allocator = webauthn_storage.allocator,
@@ -101,29 +111,64 @@ load_webauthn_credentials :: proc() {
 			log.warnf("Failed to decode public key for credential %s", cred.id)
 			continue
 		}
+
+		label := normalize_passkey_label(cred.label, i + 1)
+		if label != cred.label {
+			needs_migration = true
+		}
+
 		id_copy := strings.clone(cred.id, webauthn_storage.allocator)
+		label_copy := strings.clone(label, webauthn_storage.allocator)
 		webauthn_storage.credentials[id_copy] = WebAuthn_Credential {
 			id         = id_copy,
+			label      = label_copy,
 			public_key = pk_bytes,
 			counter    = cred.counter,
 		}
 	}
 
 	log.infof("Loaded %d WebAuthn credentials", len(webauthn_storage.credentials))
+	if needs_migration {
+		save_webauthn_credentials()
+		log.info("Migrated WebAuthn credentials file to multi-passkey format")
+	}
+}
+
+parse_stored_credentials :: proc(data: []byte) -> (Stored_Credentials, bool, bool) {
+	stored := Stored_Credentials{}
+	needs_migration := false
+
+	if strings.contains(string(data), "\"credentials\"") {
+		if err := json.unmarshal(data, &stored, allocator = context.temp_allocator); err != nil {
+			log.warnf("Failed to parse WebAuthn credentials: %v", err)
+			return stored, false, false
+		}
+		if stored.version != WEBAUTHN_CREDENTIALS_VERSION {
+			needs_migration = true
+		}
+		return stored, needs_migration, true
+	}
+
+	legacy := Legacy_Stored_Credential{}
+	if err := json.unmarshal(data, &legacy, allocator = context.temp_allocator); err != nil {
+		log.warnf("Failed to parse legacy WebAuthn credential: %v", err)
+		return stored, false, false
+	}
+
+	stored.version = WEBAUTHN_CREDENTIALS_VERSION
+	stored.credentials = make([]Stored_Credential, 1, context.temp_allocator)
+	stored.credentials[0] = Stored_Credential {
+		id         = legacy.id,
+		label      = legacy.label,
+		public_key = legacy.public_key,
+		counter    = legacy.counter,
+	}
+
+	return stored, true, true
 }
 
 save_webauthn_credentials :: proc() {
-	Stored_Credential :: struct {
-		id:         string,
-		public_key: string,
-		counter:    u32,
-	}
-
-	Stored_Credentials :: struct {
-		credentials: []Stored_Credential,
-	}
-
-	stored := Stored_Credentials{}
+	stored := Stored_Credentials{version = WEBAUTHN_CREDENTIALS_VERSION}
 	stored.credentials = make(
 		[]Stored_Credential,
 		len(webauthn_storage.credentials),
@@ -134,6 +179,7 @@ save_webauthn_credentials :: proc() {
 	for _, cred in webauthn_storage.credentials {
 		stored.credentials[i] = Stored_Credential {
 			id         = cred.id,
+			label      = cred.label,
 			public_key = base64.encode(cred.public_key, allocator = context.temp_allocator),
 			counter    = cred.counter,
 		}
@@ -158,6 +204,14 @@ save_webauthn_credentials :: proc() {
 
 get_webauthn_credentials_path :: proc() -> string {
 	return APP_CONFIG.WEBAUTHN_CREDENTIALS_FILE
+}
+
+normalize_passkey_label :: proc(label: string, fallback_index: int) -> string {
+	trimmed := strings.trim_space(label)
+	if trimmed != "" {
+		return trimmed
+	}
+	return fmt.tprintf("Passkey %d", fallback_index)
 }
 
 generate_challenge :: proc() -> []byte {
@@ -202,13 +256,18 @@ verify_and_consume_challenge :: proc(challenge_id: string, challenge: []byte) ->
 	return true
 }
 
-store_credential :: proc(id: string, public_key: []byte) {
+store_credential :: proc(id: string, label: string, public_key: []byte) {
 	id_copy := strings.clone(id, webauthn_storage.allocator)
+	label_copy := strings.clone(
+		normalize_passkey_label(label, len(webauthn_storage.credentials) + 1),
+		webauthn_storage.allocator,
+	)
 	pk_copy := make([]byte, len(public_key), webauthn_storage.allocator)
 	copy(pk_copy, public_key)
 
 	webauthn_storage.credentials[id_copy] = WebAuthn_Credential {
 		id         = id_copy,
+		label      = label_copy,
 		public_key = pk_copy,
 		counter    = 0,
 	}
@@ -222,6 +281,23 @@ get_credential :: proc(id: string) -> (WebAuthn_Credential, bool) {
 
 has_credentials :: proc() -> bool {
 	return len(webauthn_storage.credentials) > 0
+}
+
+list_credentials :: proc(allocator := context.temp_allocator) -> []WebAuthn_Credential {
+	credentials := make([dynamic]WebAuthn_Credential, 0, len(webauthn_storage.credentials), allocator)
+	for _, cred in webauthn_storage.credentials {
+		append(&credentials, cred)
+	}
+	return credentials[:]
+}
+
+remove_credential :: proc(id: string) -> bool {
+	if _, ok := webauthn_storage.credentials[id]; !ok {
+		return false
+	}
+	delete_key(&webauthn_storage.credentials, id)
+	save_webauthn_credentials()
+	return true
 }
 
 parse_client_data_json :: proc(
