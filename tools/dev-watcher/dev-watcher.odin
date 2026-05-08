@@ -21,6 +21,7 @@ main :: proc() {
 
 	// Initial build and run
 	if build_project() {
+		consume_pending_changes()
 		start_server()
 	}
 
@@ -49,7 +50,7 @@ main :: proc() {
 
 			fmt.println("[dev] Rebuilding... ")
 			if build_project() {
-				ignore_next_change = true
+				consume_pending_changes()
 				elapsed := time.since(start_time)
 				fmt.printfln("[dev] Dev watcher finished (took %v)", elapsed)
 				start_server()

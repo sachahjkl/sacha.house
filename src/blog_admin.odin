@@ -35,12 +35,28 @@ Blog_Image_Upload_Response :: struct {
 	markdown: string,
 }
 
-require_admin :: proc(req: ^http.Request, res: ^http.Response) -> bool {
+Ensure_Admin_Next :: enum {
+	RedirectLogin,
+	Unauthorized,
+}
+
+ensure_admin :: proc(
+	req: ^http.Request,
+	res: ^http.Response,
+	do_next: Ensure_Admin_Next = .Unauthorized,
+) -> bool {
 	if get_auth_level(req, res) == .Authorized {
 		return true
 	}
-	http.headers_set(&res.headers, "Location", "/admin/login")
-	http.respond(res, http.Status.Temporary_Redirect)
+
+	switch do_next {
+	case .RedirectLogin:
+		http.headers_set(&res.headers, "Location", "/admin/login")
+		http.respond(res, http.Status.Temporary_Redirect)
+	case .Unauthorized:
+		http.respond_with_status(res, http.Status.Unauthorized)
+	}
+
 	return false
 }
 
@@ -62,7 +78,7 @@ render_admin_blog_editor :: proc(req: ^http.Request, res: ^http.Response, form: 
 
 admin_blogposts_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if !require_admin(req, res) {
+	if !ensure_admin(req, res, .RedirectLogin) {
 		return
 	}
 
@@ -98,7 +114,7 @@ admin_blogposts_page :: proc(req: ^http.Request, res: ^http.Response) {
 
 admin_blogpost_new_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if !require_admin(req, res) {
+	if !ensure_admin(req, res, .RedirectLogin) {
 		return
 	}
 	render_admin_blog_editor(req, res, build_blog_editor_form(empty_blog_post_document(), "", true), "")
@@ -106,7 +122,7 @@ admin_blogpost_new_page :: proc(req: ^http.Request, res: ^http.Response) {
 
 admin_blogpost_edit_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if !require_admin(req, res) {
+	if !ensure_admin(req, res, .RedirectLogin) {
 		return
 	}
 
@@ -146,7 +162,7 @@ blog_form_to_editor_form :: proc(input: Blog_Post_Save_Input, current_slug: stri
 }
 
 handle_blogpost_submit :: proc(req: ^http.Request, res: ^http.Response, old_slug: string, is_new: bool) {
-	if !require_admin(req, res) {
+	if !ensure_admin(req, res) {
 		return
 	}
 
@@ -206,7 +222,7 @@ admin_blogpost_save :: proc(req: ^http.Request, res: ^http.Response) {
 
 admin_blogpost_upload_image :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if !require_admin(req, res) {
+	if !ensure_admin(req, res) {
 		return
 	}
 

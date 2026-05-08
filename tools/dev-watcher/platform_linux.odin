@@ -4,6 +4,7 @@ package main
 import "core:fmt"
 import "core:os"
 import "core:strings"
+import "core:time"
 import "core:sys/linux"
 import "core:sys/posix"
 
@@ -22,7 +23,7 @@ start_server :: proc() {
 	if server_running {return}
 
 	fmt.println("[dev] Starting server...")
-	cmd := "./sacha.house.dev"
+	cmd := "./sacha.house.dev.exe"
 	args := []string{"-dev"}
 
 	pid := posix.fork()
@@ -50,10 +51,10 @@ start_server :: proc() {
 stop_server :: proc() {
 	if !server_running {return}
 	fmt.println("[dev] Stopping server...")
-	posix.kill(server_process, posix.SIGTERM)
+	posix.kill(server_process, .SIGTERM)
 
 	status: i32
-	posix.waitpid(server_process, &status, 0)
+	posix.waitpid(server_process, &status, {})
 
 	server_process = INVALID_PROCESS_HANDLE
 	server_running = false
@@ -70,13 +71,14 @@ init_watcher :: proc() -> bool {
 	// Use linux syscall or libc if available.
 	// core:sys/linux has inotify_init
 
-	fd, err := linux.inotify_init()
-	if err != nil {
+	fd, err := linux.inotify_init1({.NONBLOCK})
+	if err != .NONE {
 		fmt.println("[dev] inotify_init failed")
 		return false
 	}
 	inotify_fd = i32(fd)
 	inotify_file = os.new_file(uintptr(inotify_fd), "inotify")
+	watch_descriptors = make(map[i32]string)
 
 	// Add watches recursively
 	for dir in WATCH_DIRS {
@@ -88,10 +90,11 @@ init_watcher :: proc() -> bool {
 
 add_watch_recursive :: proc(dir: string) {
 	// IN_MODIFY | IN_CREATE | IN_DELETE | IN_MOVE
-	mask := linux.Inotify_Watch_Mask{.MODIFY, .CREATE, .DELETE, .MOVE}
+	mask := linux.Inotify_Event_Mask{.MODIFY, .CREATE, .DELETE, .MOVED_FROM, .MOVED_TO}
+	dir_cstring := strings.clone_to_cstring(dir, context.temp_allocator)
 
-	wd, err := linux.inotify_add_watch(linux.Fd(inotify_fd), dir, mask)
-	if err == nil {
+	wd, err := linux.inotify_add_watch(linux.Fd(inotify_fd), dir_cstring, mask)
+	if err == .NONE {
 		watch_descriptors[i32(wd)] = strings.clone(dir)
 		// fmt.printf("[dev] Watched: %s\n", dir)
 	} else {
@@ -125,15 +128,29 @@ add_watch_recursive :: proc(dir: string) {
 
 cleanup_watcher :: proc() {
 	os.close(inotify_file)
+	delete(watch_descriptors)
 }
 
 wait_for_changes :: proc() -> bool {
-	// Read from inotify_fd
-	// This blocks
+	for {
+		buf: [4096]byte
+		n, err := linux.read(linux.Fd(inotify_fd), buf[:])
+		if err == .EAGAIN {
+			time.sleep(50 * time.Millisecond)
+			continue
+		}
+		if err != .NONE || n <= 0 {
+			return false
+		}
 
-	buf: [4096]byte
-	n, err := os.read(inotify_file, buf[:])
-	if err != os.ERROR_NONE || n <= 0 {
+		return process_inotify_events(buf[:n])
+	}
+
+	return false
+}
+
+process_inotify_events :: proc(buf: []byte) -> bool {
+	if len(buf) == 0 {
 		return false
 	}
 
@@ -150,8 +167,8 @@ wait_for_changes :: proc() -> bool {
 	// };
 
 	offset := 0
-	for offset < n {
-		if offset + size_of(linux.Inotify_Event) > n {break}
+	for offset < len(buf) {
+		if offset + size_of(linux.Inotify_Event) > len(buf) {break}
 
 		event := cast(^linux.Inotify_Event)&buf[offset]
 
@@ -177,8 +194,15 @@ wait_for_changes :: proc() -> bool {
 }
 
 consume_pending_changes :: proc() {
-	// Read with non-blocking?
-	// Or just assume debounce sleep was enough.
-	// To do properly we'd need poll/select on fd with 0 timeout.
-	// For now, simple sleep in main loop is likely enough.
+	for {
+		buf: [4096]byte
+		n, err := linux.read(linux.Fd(inotify_fd), buf[:])
+		if err == .EAGAIN || n <= 0 {
+			return
+		}
+		if err != .NONE {
+			return
+		}
+		process_inotify_events(buf[:n])
+	}
 }

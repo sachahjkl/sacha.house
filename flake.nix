@@ -82,17 +82,11 @@
           stdcppLibbacktraceCompat
         ];
         runtimeLibraryPath = lib.makeLibraryPath runtimeLibraries;
-        npmDeps = pkgs.importNpmLock {
-          npmRoot = ./.;
-        };
         sachaHouse = pkgs.stdenv.mkDerivation {
           pname = "sacha.house";
           inherit version;
           src = lib.cleanSource ./.;
-          npmDeps = npmDeps;
           nativeBuildInputs = [
-            pkgs.nodejs
-            pkgs.importNpmLock.npmConfigHook
             pkgs.odin
           ];
           buildInputs = runtimeLibraries;
@@ -103,11 +97,10 @@
             export HOME="$TMPDIR"
             odin build lib/temple/cli -o:speed -out:temple_cli
             ./temple_cli src lib/temple
-            npm run build:css
             odin build src \
               -out:sacha.house \
               -define:GIT_COMMIT_HASH="'${gitCommitHash}'" \
-              -define:VERSION="${version}" \
+              -define:VERSION="'${version}'" \
               -collection:lib=lib \
               -o:speed \
               -define:TRACK_LEAKS=false \
