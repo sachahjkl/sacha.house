@@ -52,6 +52,11 @@
   margin-inline: auto;
 }
 
+@utility wrap-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 body {
   @apply bg-bgColor text-textColor;
 }
