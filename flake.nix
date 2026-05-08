@@ -12,6 +12,9 @@
         pkgs = import nixpkgs {
           inherit system;
         };
+        lib = pkgs.lib;
+        gitCommitHash = if self ? shortRev then self.shortRev else "dev";
+        version = if self ? lastModifiedDate then self.lastModifiedDate else "dev";
         stdcppLibbacktraceCompat = pkgs.runCommand "stdcxx-libbacktrace-compat"
           {
             nativeBuildInputs = [ pkgs.clang ];
@@ -71,6 +74,53 @@
             -L${pkgs.libbacktrace}/lib -lbacktrace \
             -o "$out/lib/libstdc++_libbacktrace.so"
         '';
+        runtimeLibraries = [
+          pkgs.openssl
+          pkgs.cmark
+          pkgs.libbacktrace
+          pkgs.stdenv.cc.cc.lib
+          stdcppLibbacktraceCompat
+        ];
+        runtimeLibraryPath = lib.makeLibraryPath runtimeLibraries;
+        npmDeps = pkgs.importNpmLock {
+          npmRoot = ./.;
+        };
+        sachaHouse = pkgs.stdenv.mkDerivation {
+          pname = "sacha.house";
+          inherit version;
+          src = lib.cleanSource ./.;
+          npmDeps = npmDeps;
+          nativeBuildInputs = [
+            pkgs.nodejs
+            pkgs.importNpmLock.npmConfigHook
+            pkgs.odin
+          ];
+          buildInputs = runtimeLibraries;
+          LD_LIBRARY_PATH = runtimeLibraryPath;
+          LIBRARY_PATH = runtimeLibraryPath;
+          buildPhase = ''
+            runHook preBuild
+            export HOME="$TMPDIR"
+            odin build lib/temple/cli -o:speed -out:temple_cli
+            ./temple_cli src lib/temple
+            npm run build:css
+            odin build src \
+              -out:sacha.house \
+              -define:GIT_COMMIT_HASH="'${gitCommitHash}'" \
+              -define:VERSION="${version}" \
+              -collection:lib=lib \
+              -o:speed \
+              -define:TRACK_LEAKS=false \
+              -build-mode:exe
+            runHook postBuild
+          '';
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/bin
+            cp sacha.house $out/bin/sacha.house
+            runHook postInstall
+          '';
+        };
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
@@ -119,6 +169,35 @@
 
             echo "Dev shell ready. Common commands: just dev, just build release"
           '';
+        };
+
+        packages = {
+          default = sachaHouse;
+        } // lib.optionalAttrs pkgs.stdenv.isLinux {
+          dockerImage = pkgs.dockerTools.buildLayeredImage {
+            name = "sacha.house";
+            tag = gitCommitHash;
+            contents = [
+              sachaHouse
+              pkgs.cacert
+              pkgs.tzdata
+            ] ++ runtimeLibraries;
+            config = {
+              WorkingDir = "/data";
+              Env = [
+                "CONFIG_PATH=/data/config.json"
+                "LD_LIBRARY_PATH=${runtimeLibraryPath}"
+                "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+              ];
+              Volumes = {
+                "/data" = { };
+              };
+              ExposedPorts = {
+                "6969/tcp" = { };
+              };
+              Cmd = [ "/bin/sacha.house" ];
+            };
+          };
         };
       });
 }

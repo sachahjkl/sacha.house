@@ -16,10 +16,12 @@
   },
   "variables": {
     "ARTIFACT_NAME": "sacha.house-linux-amd64",
+    "DOCKER_IMAGE_ARTIFACT": "sacha.house-docker-image.tar.gz",
     "ODIN_RELEASE_VERSION": "dev-2026-04",
     "ODIN_NIGHTLY_URL": "",
     "BUN_VERSION": "1.3.5",
-    "PATH": "/root/.bun/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin"
+    "PATH": "/root/.bun/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "NIX_CONFIG": "experimental-features = nix-command flakes"
   },
   "build:linux:release": {
     "stage": "build",
@@ -99,6 +101,25 @@
       "expire_in": "1 week"
     }
   },
+  "build:docker:image": {
+    "stage": "build",
+    "image": "nixos/nix:2.24.14",
+    "script": [
+      "export VERSION=$(date +%Y.%m.%d)+${CI_COMMIT_SHORT_SHA}",
+      "echo VERSION=$VERSION >> build.env",
+      "nix build .#dockerImage",
+      "cp result ${DOCKER_IMAGE_ARTIFACT}"
+    ],
+    "artifacts": {
+      "paths": [
+        "${DOCKER_IMAGE_ARTIFACT}"
+      ],
+      "reports": {
+        "dotenv": "build.env"
+      },
+      "expire_in": "1 week"
+    }
+  },
   "release:release": {
     "stage": "release",
     "image": "registry.gitlab.com/gitlab-org/release-cli:latest",
@@ -111,6 +132,10 @@
     "needs": [
       {
         "job": "build:linux:release",
+        "artifacts": true
+      },
+      {
+        "job": "build:docker:image",
         "artifacts": true
       }
     ],
@@ -126,6 +151,11 @@
           {
             "name": "sacha.house Linux AMD64 Binary",
             "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${ARTIFACT_NAME}?job=build:linux:release",
+            "link_type": "package"
+          },
+          {
+            "name": "sacha.house Docker Image",
+            "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${DOCKER_IMAGE_ARTIFACT}?job=build:docker:image",
             "link_type": "package"
           }
         ]
@@ -145,6 +175,10 @@
       {
         "job": "build:linux:nightly",
         "artifacts": true
+      },
+      {
+        "job": "build:docker:image",
+        "artifacts": true
       }
     ],
     "script": [
@@ -159,6 +193,11 @@
           {
             "name": "sacha.house Linux AMD64 Binary",
             "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${ARTIFACT_NAME}?job=build:linux:nightly",
+            "link_type": "package"
+          },
+          {
+            "name": "sacha.house Docker Image",
+            "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${DOCKER_IMAGE_ARTIFACT}?job=build:docker:image",
             "link_type": "package"
           }
         ]
