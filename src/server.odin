@@ -58,6 +58,7 @@ server_start :: proc() {
 	http.route_get(&router, "/admin/logout", http.handler(admin_logout))
 	http.route_get(&router, "/admin", http.handler(admin_page))
 	http.route_get(&router, "/admin/blogposts", http.handler(admin_blogposts_page))
+	http.route_get(&router, "/admin/webauthn", http.handler(admin_webauthn_page))
 	http.route_get(&router, "/admin/blogposts/new", http.handler(admin_blogpost_new_page))
 	http.route_post(&router, "/admin/blogposts/new", http.handler(admin_blogpost_create))
 	http.route_post(
@@ -131,8 +132,8 @@ index_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
 	Page_Data :: struct {
 		using base: Base_Page_Data,
-		Mail:       string,
-		GpgPrint:   string,
+		Mail:  string,
+		Cv:    string,
 	}
 
 	data := Page_Data {
@@ -144,8 +145,8 @@ index_page :: proc(req: ^http.Request, res: ^http.Response) {
 			req.url.path,
 			get_auth_level(req, res) == .Authorized,
 		),
-		Mail     = ME.mail,
-		GpgPrint = ME.gpgPrint,
+		Mail = ME.mail,
+		Cv   = ME.curriculumVitae,
 	}
 
 	page_template := temple.compiled("templates/index.temple.twig", Page_Data)
@@ -659,9 +660,7 @@ projects_page :: proc(req: ^http.Request, res: ^http.Response) {
 
 admin_refresh_projects :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if get_auth_level(req, res) != .Authorized {
-		http.headers_set(&res.headers, "Location", "/admin/login")
-		http.respond(res, http.Status.Temporary_Redirect)
+	if !ensure_admin(req, res) {
 		return
 	}
 
@@ -839,10 +838,7 @@ admin_logout :: proc(req: ^http.Request, res: ^http.Response) {
 admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
 
-	// Require authentication
-	if get_auth_level(req, res) != .Authorized {
-		http.headers_set(&res.headers, "Location", "/admin/login")
-		http.respond(res, http.Status.Temporary_Redirect)
+	if !ensure_admin(req, res, .RedirectLogin) {
 		return
 	}
 
@@ -851,7 +847,6 @@ admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 		IpAddress:     string,
 		CreditBalance: int,
 		ProfileData:   string,
-		Passkeys:      Passkey_List_Data,
 	}
 
 	profile_json := ""
@@ -868,10 +863,33 @@ admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 		IpAddress     = net.address_to_string(req.client.address),
 		CreditBalance = 0,
 		ProfileData   = profile_json,
-		Passkeys      = admin_passkey_list_data(),
 	}
 
 	page_template := temple.compiled("templates/admin.temple.twig", Page_Data)
+	render_page(req, res, page_template, data)
+}
+
+admin_webauthn_page :: proc(req: ^http.Request, res: ^http.Response) {
+	log.infof("Serving %v", req.url.path)
+	if !ensure_admin(req, res, .RedirectLogin) {
+		return
+	}
+
+	Page_Data :: struct {
+		using base: Base_Page_Data,
+		Passkeys:   Passkey_List_Data,
+	}
+
+	data := Page_Data {
+		base     = create_base_page_data(
+			Maybe_SEO_Data{title = "manage passkeys / sacha.house", description = "Manage WebAuthn passkeys."},
+			req.url.path,
+			true,
+		),
+		Passkeys = admin_passkey_list_data(),
+	}
+
+	page_template := temple.compiled("templates/admin_webauthn.temple.twig", Page_Data)
 	render_page(req, res, page_template, data)
 }
 
@@ -879,9 +897,7 @@ admin_page :: proc(req: ^http.Request, res: ^http.Response) {
 admin_webauthn_register_challenge :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
 
-	// Require authentication for WebAuthn registration
-	if get_auth_level(req, res) != .Authorized {
-		http.respond_with_status(res, http.Status.Unauthorized)
+	if !ensure_admin(req, res) {
 		return
 	}
 
@@ -926,8 +942,7 @@ admin_webauthn_register_challenge :: proc(req: ^http.Request, res: ^http.Respons
 
 admin_webauthn_passkeys :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if get_auth_level(req, res) != .Authorized {
-		http.respond_with_status(res, http.Status.Unauthorized)
+	if !ensure_admin(req, res) {
 		return
 	}
 	render_admin_passkey_list(req, res)
@@ -935,9 +950,7 @@ admin_webauthn_passkeys :: proc(req: ^http.Request, res: ^http.Response) {
 
 admin_webauthn_register :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	// Require authentication for WebAuthn registration
-	if get_auth_level(req, res) != .Authorized {
-		http.respond_with_status(res, http.Status.Unauthorized)
+	if !ensure_admin(req, res) {
 		return
 	}
 
@@ -1055,8 +1068,7 @@ admin_webauthn_register :: proc(req: ^http.Request, res: ^http.Response) {
 
 admin_webauthn_remove :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if get_auth_level(req, res) != .Authorized {
-		http.respond_with_status(res, http.Status.Unauthorized)
+	if !ensure_admin(req, res) {
 		return
 	}
 
@@ -1100,7 +1112,7 @@ admin_webauthn_remove :: proc(req: ^http.Request, res: ^http.Response) {
 				return
 			}
 
-			http.headers_set(&ctx.res.headers, "Location", "/admin")
+			http.headers_set(&ctx.res.headers, "Location", "/admin/webauthn")
 			http.respond(ctx.res, http.Status.See_Other)
 		},
 	)
@@ -1108,8 +1120,7 @@ admin_webauthn_remove :: proc(req: ^http.Request, res: ^http.Response) {
 
 admin_webauthn_debug_challenge :: proc(req: ^http.Request, res: ^http.Response) {
 	log.infof("Serving %v", req.url.path)
-	if get_auth_level(req, res) != .Authorized {
-		http.respond_with_status(res, http.Status.Unauthorized)
+	if !ensure_admin(req, res) {
 		return
 	}
 
@@ -1483,4 +1494,3 @@ init_cache :: proc() -> mem.Allocator_Error {
 cleanup_cache :: proc() {
 	cleanup_projects_cache()
 }
-

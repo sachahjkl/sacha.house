@@ -5,9 +5,9 @@
     {% else %}
         <ul class="mt-3 space-y-[2px] pl-0 text-base">
             {% for passkey in this.Passkeys %}
-                <li class="m-0 flex flex-wrap items-start justify-between gap-2 p-0">
+                <li class="m-0 flex flex-wrap content-start justify-between gap-2 p-0">
                     <div class="min-w-0 flex flex-1 items-center gap-2">
-                        <p class="m-0 wrap-anywhere">{{ passkey.Label }}</p>
+                        <p class="!m-0 wrap-anywhere">{{ passkey.Label }}</p>
                         <code class="min-w-0 flex-1 truncate opacity-50">{{ passkey.Id }}</code>
                     </div>
                     <form method="POST" action="/admin/webauthn/remove" hx-post="/admin/webauthn/remove" hx-target="#passkey-list" hx-swap="outerHTML" class="shrink-0">

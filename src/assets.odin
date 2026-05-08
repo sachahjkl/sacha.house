@@ -96,6 +96,8 @@ get_mime_type :: proc(path: string) -> string {
 		return "text/html"
 	case ".gpg":
 		return "application/pgp-keys"
+	case ".pub":
+		return "text/plain"
 	case ".css":
 		return "text/css"
 	case ".js":
