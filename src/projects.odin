@@ -130,7 +130,7 @@ github_projects_api :: proc() -> (projects: []GitHub_Project, err: Error) {
 						name
 						url
 						description
-						descriptionHTML
+						descriptionHtml: descriptionHTML
 						visibility
 						owner {
 							avatarUrl
