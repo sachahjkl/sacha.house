@@ -17,39 +17,25 @@
   "variables": {
     "ARTIFACT_NAME": "sacha.house-linux-amd64",
     "DOCKER_IMAGE_ARTIFACT": "sacha.house-docker-image.tar.gz",
-    "ODIN_RELEASE_VERSION": "dev-2026-04",
     "ODIN_NIGHTLY_URL": "",
-    "BUN_VERSION": "1.3.5",
-    "NIX_CONFIG": "experimental-features = nix-command flakes"
+    "NIX_CONFIG": "experimental-features = nix-command flakes\naccept-flake-config = true"
   },
   "build:linux:release": {
     "stage": "build",
-    "image": "debian:bookworm",
-    "rules": [
-      {
-        "if": '$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != ""',
-        "when": "on_success"
-      }
-    ],
+    "image": "nixos/nix:2.32.8",
     "before_script": [
-      "apt-get update",
-      "DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bash build-essential clang libssl-dev git unzip tar curl lld libcmark-dev ca-certificates findutils",
-      "curl -L https://github.com/odin-lang/Odin/releases/download/${ODIN_RELEASE_VERSION}/odin-linux-amd64-${ODIN_RELEASE_VERSION}.tar.gz -o odin.tar.gz",
-      "tar -C /opt -xzf odin.tar.gz",
-      'ln -sf $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
-      'curl -fsSL https://bun.sh/install | bash -s -- "bun-v${BUN_VERSION}"',
-      "export PATH=/root/.bun/bin:$PATH",
-      "mkdir -p bin/tools bin/release/x86_64"
+      "nix profile install nixpkgs#cachix",
+      "export PATH=$HOME/.nix-profile/bin:$PATH",
+      "cachix use sachahjkl",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
     ],
     "script": [
-      "export VERSION=$(date +%Y.%m.%d)+${CI_COMMIT_SHORT_SHA}",
+      "export VERSION=$(tr -d '[:space:]' < VERSION)+${CI_COMMIT_SHORT_SHA}",
       'echo "VERSION=$VERSION" >> build.env',
-      "bun install --production",
-      "odin build lib/temple/cli -o:speed -out:bin/tools/temple_cli.exe",
-      "./bin/tools/temple_cli.exe src lib/temple",
-      "bun run build:css",
-      "GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION odin build src -out:bin/release/x86_64/sacha.house.exe -define:GIT_COMMIT_HASH=\"'$CI_COMMIT_SHORT_SHA'\" -define:VERSION=\"$VERSION\" -collection:lib=lib -o:speed -define:TRACK_LEAKS=false -build-mode:exe",
-      "mv bin/release/x86_64/sacha.house.exe ${ARTIFACT_NAME}",
+      "nix build .#default --out-link result-nix",
+      "nix build .#linuxBinary --out-link result-linux",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive result-nix result-linux | cachix push sachahjkl; fi",
+      "cp result-linux/${ARTIFACT_NAME} ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
     "artifacts": {
@@ -64,7 +50,7 @@
   },
   "build:linux:nightly": {
     "stage": "build",
-    "image": "debian:bookworm",
+    "image": "nixos/nix:2.32.8",
     "rules": [
       {
         "if": '$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != ""',
@@ -72,24 +58,18 @@
       }
     ],
     "before_script": [
-      "apt-get update",
-      "DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bash build-essential clang libssl-dev git unzip tar curl lld libcmark-dev ca-certificates findutils",
-      'curl -L "${ODIN_NIGHTLY_URL}" -o odin.tar.gz',
-      "tar -C /opt -xzf odin.tar.gz",
-      'ln -sf $(find /opt -maxdepth 1 -type d -name "odin-linux-amd64*" | head -n 1)/odin /usr/local/bin/odin',
-      'curl -fsSL https://bun.sh/install | bash -s -- "bun-v${BUN_VERSION}"',
-      "export PATH=/root/.bun/bin:$PATH",
-      "mkdir -p bin/tools bin/release/x86_64"
+      "nix profile install nixpkgs#cachix",
+      "export PATH=$HOME/.nix-profile/bin:$PATH",
+      "cachix use sachahjkl",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
     ],
     "script": [
-      "export VERSION=$(date +%Y.%m.%d)-nightly+${CI_COMMIT_SHORT_SHA}",
+      "export VERSION=$(tr -d '[:space:]' < VERSION)-nightly+${CI_COMMIT_SHORT_SHA}",
       "echo VERSION=$VERSION >> build.env",
-      "bun install --production",
-      "odin build lib/temple/cli -o:speed -out:bin/tools/temple_cli.exe",
-      "./bin/tools/temple_cli.exe src lib/temple",
-      "bun run build:css",
-      "GIT_COMMIT_HASH=$CI_COMMIT_SHORT_SHA VERSION=$VERSION odin build src -out:bin/release/x86_64/sacha.house.exe -define:GIT_COMMIT_HASH=\"'$CI_COMMIT_SHORT_SHA'\" -define:VERSION=\"$VERSION\" -collection:lib=lib -o:speed -define:TRACK_LEAKS=false -build-mode:exe",
-      "mv bin/release/x86_64/sacha.house.exe ${ARTIFACT_NAME}",
+      "nix build .#default --out-link result-nix",
+      "nix build .#linuxBinary --out-link result-linux",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive result-nix result-linux | cachix push sachahjkl; fi",
+      "cp result-linux/${ARTIFACT_NAME} ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
     "artifacts": {
@@ -104,11 +84,18 @@
   },
   "build:docker:image": {
     "stage": "build",
-    "image": "nixos/nix:2.24.14",
+    "image": "nixos/nix:2.32.8",
+    "before_script": [
+      "nix profile install nixpkgs#cachix",
+      "export PATH=$HOME/.nix-profile/bin:$PATH",
+      "cachix use sachahjkl",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
+    ],
     "script": [
-      "export VERSION=$(date +%Y.%m.%d)+${CI_COMMIT_SHORT_SHA}",
+      "export VERSION=$(tr -d '[:space:]' < VERSION)+${CI_COMMIT_SHORT_SHA}",
       "echo VERSION=$VERSION >> build.env",
       "nix build .#dockerImage",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive result | cachix push sachahjkl; fi",
       "cp result ${DOCKER_IMAGE_ARTIFACT}"
     ],
     "artifacts": {
@@ -124,12 +111,6 @@
   "release:release": {
     "stage": "release",
     "image": "registry.gitlab.com/gitlab-org/release-cli:latest",
-    "rules": [
-      {
-        "if": '$ODIN_RELEASE_VERSION != null && $ODIN_RELEASE_VERSION != ""',
-        "when": "on_success"
-      }
-    ],
     "needs": [
       {
         "job": "build:linux:release",

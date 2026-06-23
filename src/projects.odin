@@ -236,9 +236,10 @@ fetch_projects :: proc(use_cache := true) -> ^Projects_Cache {
 		projects_cache.allocator,
 	)
 	for project, i in github_projects_raw {
+		display_index := len(github_projects_raw) - 1 - i
 		first_letter :=
 			strings.to_upper(project.name[:1], projects_cache.allocator) if len(project.name) > 0 else ""
-		projects_cache.github[i] = Standardized_Project {
+		projects_cache.github[display_index] = Standardized_Project {
 			name            = strings.clone(project.name, projects_cache.allocator),
 			url             = strings.clone(project.url, projects_cache.allocator),
 			descriptionHtml = strings.clone(project.descriptionHtml, projects_cache.allocator),

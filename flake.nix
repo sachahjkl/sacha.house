@@ -1,20 +1,32 @@
 {
   description = "Development shell for sacha.house";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://sachahjkl.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "sachahjkl.cachix.org-1:cepX7PCUV88hCchnh9prZM5V72wRkCf6oSJL6JfgWs0="
+    ];
+  };
+
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
+        pkgs = nixpkgs.legacyPackages.${system};
         lib = pkgs.lib;
-        gitCommitHash = if self ? shortRev then self.shortRev else "dev";
-        version = if self ? lastModifiedDate then self.lastModifiedDate else "dev";
+        pname = "sacha.house";
+        versionPrefix = lib.strings.trim (builtins.readFile ./VERSION);
+        gitCommitHash =
+          if self ? shortRev then self.shortRev
+          else if self ? dirtyShortRev then self.dirtyShortRev
+          else "dev";
+        packageVersion = "${versionPrefix}+${gitCommitHash}";
         stdcppLibbacktraceCompat = pkgs.runCommand "stdcxx-libbacktrace-compat"
           {
             nativeBuildInputs = [ pkgs.clang ];
@@ -82,9 +94,25 @@
           stdcppLibbacktraceCompat
         ];
         runtimeLibraryPath = lib.makeLibraryPath runtimeLibraries;
+        linuxArch =
+          if system == "x86_64-linux" then "amd64"
+          else if system == "aarch64-linux" then "arm64"
+          else system;
+        fhsDynamicLinker =
+          if system == "x86_64-linux" then "/lib64/ld-linux-x86-64.so.2"
+          else if system == "aarch64-linux" then "/lib/ld-linux-aarch64.so.1"
+          else null;
+        fhsLibraryPath = lib.concatStringsSep ":" [
+          "/usr/lib/${pkgs.stdenv.hostPlatform.config}"
+          "/lib/${pkgs.stdenv.hostPlatform.config}"
+          "/usr/lib64"
+          "/usr/lib"
+          "/lib64"
+          "/lib"
+        ];
         sachaHouse = pkgs.stdenv.mkDerivation {
-          pname = "sacha.house";
-          inherit version;
+          inherit pname;
+          version = packageVersion;
           src = lib.cleanSource ./.;
           nativeBuildInputs = [
             pkgs.odin
@@ -100,7 +128,7 @@
             odin build src \
               -out:sacha.house \
               -define:GIT_COMMIT_HASH="'${gitCommitHash}'" \
-              -define:VERSION="'${version}'" \
+              -define:VERSION="'${packageVersion}'" \
               -collection:lib=lib \
               -o:speed \
               -define:TRACK_LEAKS=false \
@@ -114,6 +142,17 @@
             runHook postInstall
           '';
         };
+        linuxBinary = pkgs.runCommand "${pname}-linux-${linuxArch}"
+          {
+            nativeBuildInputs = [ pkgs.patchelf ];
+          } ''
+          install -Dm755 ${sachaHouse}/bin/sacha.house "$out/${pname}-linux-${linuxArch}"
+          chmod u+w "$out/${pname}-linux-${linuxArch}"
+          patchelf \
+            --set-interpreter ${fhsDynamicLinker} \
+            --set-rpath ${lib.escapeShellArg fhsLibraryPath} \
+            "$out/${pname}-linux-${linuxArch}"
+        '';
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
@@ -167,6 +206,7 @@
         packages = {
           default = sachaHouse;
         } // lib.optionalAttrs pkgs.stdenv.isLinux {
+          inherit linuxBinary;
           dockerImage = pkgs.dockerTools.buildLayeredImage {
             name = "sacha.house";
             tag = gitCommitHash;
@@ -192,5 +232,85 @@
             };
           };
         };
-      });
+      })
+    // {
+      nixosModules.default = { config, lib, pkgs, ... }:
+        with lib;
+        let
+          cfg = config.services.sacha-house;
+          pkg = cfg.package;
+        in {
+          options.services.sacha-house = {
+            enable = mkEnableOption "sacha.house web service";
+
+            package = mkOption {
+              type = types.package;
+              default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+              defaultText = literalExpression "sacha-house.packages.\${pkgs.stdenv.hostPlatform.system}.default";
+              description = "Package to run for the sacha.house service.";
+            };
+
+            port = mkOption {
+              type = types.port;
+              default = 6969;
+              description = "Port to listen on.";
+            };
+
+            dataDir = mkOption {
+              type = types.path;
+              default = "/var/lib/sacha.house";
+              description = "Writable directory for runtime data and caches.";
+            };
+
+            configFile = mkOption {
+              type = types.path;
+              default = "${cfg.dataDir}/config.json";
+              description = "Path to the sacha.house JSON config file.";
+            };
+
+            openFirewall = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Open the configured port in the firewall.";
+            };
+          };
+
+          config = mkIf cfg.enable {
+            users.users.sacha-house = {
+              isSystemUser = true;
+              group = "sacha-house";
+              home = cfg.dataDir;
+              createHome = true;
+            };
+            users.groups.sacha-house = { };
+
+            systemd.services.sacha-house = {
+              description = "sacha.house web service";
+              after = [ "network.target" ];
+              wantedBy = [ "multi-user.target" ];
+
+              serviceConfig = {
+                Type = "simple";
+                User = "sacha-house";
+                Group = "sacha-house";
+                WorkingDirectory = cfg.dataDir;
+                ExecStart = "${pkg}/bin/sacha.house";
+                Restart = "on-failure";
+                RestartSec = 5;
+                NoNewPrivileges = true;
+                PrivateTmp = true;
+                ProtectHome = true;
+                ProtectSystem = "strict";
+                ReadWritePaths = [ cfg.dataDir ];
+                Environment = [
+                  "CONFIG_PATH=${cfg.configFile}"
+                  "PORT=${toString cfg.port}"
+                ];
+              };
+            };
+
+            networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.port ];
+          };
+        };
+    };
 }
