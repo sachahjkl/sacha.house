@@ -34,7 +34,7 @@
       'echo "VERSION=$VERSION" >> build.env',
       "nix build .#default --out-link result-nix",
       "nix build .#linuxBinary --out-link result-linux",
-      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive result-nix result-linux | cachix push sachahjkl; fi",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result-nix ./result-linux | cachix push sachahjkl; fi",
       "cp result-linux/${ARTIFACT_NAME} ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
@@ -68,7 +68,7 @@
       "echo VERSION=$VERSION >> build.env",
       "nix build .#default --out-link result-nix",
       "nix build .#linuxBinary --out-link result-linux",
-      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive result-nix result-linux | cachix push sachahjkl; fi",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result-nix ./result-linux | cachix push sachahjkl; fi",
       "cp result-linux/${ARTIFACT_NAME} ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}"
     ],
@@ -95,7 +95,7 @@
       "export VERSION=$(tr -d '[:space:]' < VERSION)+${CI_COMMIT_SHORT_SHA}",
       "echo VERSION=$VERSION >> build.env",
       "nix build .#dockerImage",
-      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive result | cachix push sachahjkl; fi",
+      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result | cachix push sachahjkl; fi",
       "cp result ${DOCKER_IMAGE_ARTIFACT}"
     ],
     "artifacts": {
