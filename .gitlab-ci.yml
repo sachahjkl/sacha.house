@@ -24,7 +24,7 @@
     "stage": "build",
     "image": "nixos/nix:2.32.8",
     "before_script": [
-      "nix profile install nixpkgs#cachix",
+      "nix profile add nixpkgs#cachix",
       "export PATH=$HOME/.nix-profile/bin:$PATH",
       "cachix use sachahjkl",
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
@@ -58,7 +58,7 @@
       }
     ],
     "before_script": [
-      "nix profile install nixpkgs#cachix",
+      "nix profile add nixpkgs#cachix",
       "export PATH=$HOME/.nix-profile/bin:$PATH",
       "cachix use sachahjkl",
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
@@ -86,7 +86,7 @@
     "stage": "build",
     "image": "nixos/nix:2.32.8",
     "before_script": [
-      "nix profile install nixpkgs#cachix",
+      "nix profile add nixpkgs#cachix",
       "export PATH=$HOME/.nix-profile/bin:$PATH",
       "cachix use sachahjkl",
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
