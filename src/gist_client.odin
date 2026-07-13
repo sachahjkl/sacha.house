@@ -225,7 +225,7 @@ gist_create :: proc(
 
 	target := fmt.tprintf("%s/gists", client.base_url)
 	gist: Gist
-	err := gist_request_json(client, .Post, target, input, .Created, true, &gist, allocator)
+	err := gist_request_json(client, .Post, target, input^, .Created, true, &gist, allocator)
 	if err.kind != .None {
 		return {}, err
 	}
@@ -253,7 +253,7 @@ gist_update :: proc(
 
 	target := fmt.tprintf("%s/gists/%s", client.base_url, id)
 	gist: Gist
-	err := gist_request_json(client, .Patch, target, input, .OK, true, &gist, allocator)
+	err := gist_request_json(client, .Patch, target, input^, .OK, true, &gist, allocator)
 	if err.kind != .None {
 		return {}, err
 	}
@@ -327,7 +327,7 @@ gist_request_json :: proc(
 		if marshal_err := http_client.with_json(&request, payload); marshal_err != nil {
 			return {
 				kind = .Validation,
-				message = "could not encode GitHub Gist request",
+				message = fmt.tprintf("could not encode GitHub Gist request: %v", marshal_err),
 			}
 		}
 	}
