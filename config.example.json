@@ -13,7 +13,7 @@
   "WEBAUTHN_ORIGIN": "https://sacha.house",
   "WEBAUTHN_REQUIRE_USER_VERIFICATION": true,
   "TRUST_PROXY_HTTPS": true,
-  "PASTE_ENABLED": true,
+  "PASTE_ENABLED": false,
   "PASTE_SECRETS_FILE": "/etc/sacha.house/paste-secrets.json",
   "PASTE_MAX_BODY_BYTES": 262144,
   "PASTE_MAX_LIST_ITEMS": 200

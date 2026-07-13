@@ -70,9 +70,19 @@ Important fields:
 * `TRUST_PROXY_HTTPS`: emit HSTS and Secure cookies only when the trusted reverse proxy guarantees HTTPS.
 * `PASTE_ENABLED`, `PASTE_SECRETS_FILE`, `PASTE_MAX_BODY_BYTES`, and `PASTE_MAX_LIST_ITEMS`: encrypted Gist paste feature, secrets file, and bounds.
 
+When upgrading an existing configuration, merge every field from `config.example.json`. In particular, HTTPS deployments behind a trusted reverse proxy need `TRUST_PROXY_HTTPS: true`; without it, the admin login's same-origin check rejects browser HTTPS requests. Configure `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN` for the public hostname as well.
+
+The password login requires both a stable `PASSWORD_SALT` and its matching Argon2id `ADMIN_PASSWORD_HASH`. To check a password against the active configuration without changing it:
+
+```bash
+CONFIG_PATH=/path/to/config.json sacha.house --verify-password='password'
+```
+
+The password is passed as a command-line argument, so prefer a temporary shell with an unrecorded history and do not use this command on a multi-user host.
+
 ### Encrypted Gist paste secrets
 
-When `PASTE_ENABLED` is `true`, `PASTE_SECRETS_FILE` in `config.json` must point to a read-only runtime file outside the repository, image, and Nix store:
+`PASTE_ENABLED` defaults to `false`. When enabling it, create the file named by `PASTE_SECRETS_FILE` yourself; the application never generates it because it contains the Gist token and encryption keys. Keep it outside the repository, image, and Nix store:
 
 ```json
 {
@@ -94,7 +104,19 @@ Protect both the token and every encryption key with mode `0600`. Losing an old 
 
 The hardened systemd unit runs as an unprivileged user, keeps releases root-owned under `/opt/sacha.house`, and writes runtime state only under `/var/lib/sacha.house`. Configuration and paste secrets are mounted read-only.
 
-For the NixOS module, set `services.sacha-house.configFile` to a runtime path and set `PASTE_SECRETS_FILE` inside that JSON config to the secret mount. The container uses UID/GID `10001`, `/data` for writable state, `/config/config.json` for configuration, and `/run/secrets/paste-secrets.json` for paste credentials.
+For the NixOS module, set `services.sacha-house.configFile` to a runtime path. For this homelab's wrapper, it is `${dataDir}/config.json`, which defaults to `/data/Services/sacha.house/config.json`. Keep writable state, including `WEBAUTHN_CREDENTIALS_FILE`, under `dataDir`:
+
+```json
+{
+  "WEBAUTHN_CREDENTIALS_FILE": "/data/Services/sacha.house/webauthn-credentials.json",
+  "WEBAUTHN_RP_ID": "sacha.house",
+  "WEBAUTHN_ORIGIN": "https://sacha.house",
+  "TRUST_PROXY_HTTPS": true,
+  "PASTE_ENABLED": false
+}
+```
+
+If pastes are enabled, point `PASTE_SECRETS_FILE` at the provisioned secret under `dataDir` or configure the module's read-only secret mount. The container uses UID/GID `10001`, `/data` for writable state, `/config/config.json` for configuration, and `/run/secrets/paste-secrets.json` for paste credentials.
 
 Operational scripts:
 
