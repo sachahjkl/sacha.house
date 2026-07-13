@@ -1,62 +1,36 @@
 {
-  "public_identifier": "sachafroment",
-  "profile_pic_url": "https://s3.us-west-000.backblazeb2.com/proxycurl/person/sachafroment/profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0004d7f56a0400b0000000001%2F20250130%2Fus-west-000%2Fs3%2Faws4_request&X-Amz-Date=20250130T141656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=135e3cfe67338340b1d2fb6b52d36dab8952776d769deee85412811b7bfeb608",
-  "background_cover_image_url": "https://s3.us-west-000.backblazeb2.com/proxycurl/person/sachafroment/cover?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0004d7f56a0400b0000000001%2F20250130%2Fus-west-000%2Fs3%2Faws4_request&X-Amz-Date=20250130T141656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=ebaa85b59c28a1c53ebee887346e0a6433fa48b73328ed28ea9b5cae8454ae8f",
-  "first_name": "Sacha",
-  "last_name": "Froment",
-  "full_name": "Sacha Froment",
-  "follower_count": null,
-  "occupation": "ProductIngénieur Logiciel at Catamania",
-  "headline": "Ingénieur Logiciel",
-  "summary": "Professionnel, polyvalent et efficace, je m'adapte aisément à divers environnements de travail. Bilingue français-anglais.\n\nFort d'une solide expérience en C# et dans l'écosystème .NET (Core et Framework), je possède une expertise approfondie dans de nombreux domaines de l'informatique, alimentée par une curiosité insatiable. Mon objectif est de concevoir des projets rigoureux, architecturalement robustes et facilement maintenables.\n\nMes compétences s'étendent également à l'administration de systèmes Linux et à la mise en place d'intégrations continues, démontrant ainsi ma capacité à gérer l'ensemble du cycle de vie des applications, de leur développement à leur déploiement.\n\nGrâce à mes nombreux projets personnels et hobbies informatiques, j'ai acquis une forte expérience des technologies web modernes, notamment :\n\n- SvelteKit & Svelte (+ TailwindCSS)\n- HTMX et vanilla JS\n- Ponctuellement, diverses technos : Symfony, VueJs et React\n\nCette pratique personnelle approfondie complète mes compétences professionnelles, me permettant d'avoir une vision large et actualisée du paysage technologique.\n\nMa démarche de développement professionnel continu inclut :\n\n- L'élargissement constant de mon champ de compétences en matière d'outils, de langages et de technologies\n- La lecture quotidienne de blogs spécialisés et de sources d'actualités tech (Hacker News, Lobste.rs, DevURLs.com, etc.) pour rester à la pointe des tendances du secteur\n- La réalisation régulière de projets personnels pour maîtriser les nouveaux outils et adopter les meilleures pratiques de développement logiciel\n\nCette approche proactive me permet d'acquérir une expertise pratique dans un large éventail de technologies et méthodologies de développement, renforçant ainsi ma capacité à apporter une valeur ajoutée significative à tout projet informatique, qu'il s'agisse de développement, d'administration système ou d'optimisation des processus de déploiement.",
-  "country": "FR",
-  "country_full_name": "France",
-  "city": "Le Mans",
-  "state": null,
   "experiences": [
     {
       "starts_at": { "day": 1, "month": 4, "year": 2025 },
       "ends_at": null,
       "company": "Catamania",
       "company_linkedin_profile_url": "https://www.linkedin.com/company/catamania",
-      "company_facebook_profile_url": null,
       "title": "Ingénieur logiciel",
-      "description": "Développement de logiciels en mission (ASP.NET Core, Angular, SQL Server)",
-      "location": "Tours, Indre-et-Loire, France",
-      "logo_url": null
+      "description": "Développement de logiciels en mission (ASP.NET Core, Angular, SQL Server)"
     },
     {
       "starts_at": { "day": 1, "month": 6, "year": 2022 },
       "ends_at": { "day": 31, "month": 10, "year": 2022 },
       "company": "AG2R LA MONDIALE",
       "company_linkedin_profile_url": "https://fr.linkedin.com/company/ag2r-la-mondiale",
-      "company_facebook_profile_url": null,
       "title": "Product Owner Caroline/UDI",
-      "description": "Inventaire et cartographie des technologies, serveurs et logiciels du SI d'AG2RLM",
-      "location": "Paris, Île-de-France, France",
-      "logo_url": "https://s3.us-west-000.backblazeb2.com/proxycurl/company/ag2r-la-mondiale/profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0004d7f56a0400b0000000001%2F20250130%2Fus-west-000%2Fs3%2Faws4_request&X-Amz-Date=20250130T141656Z&X-Amz-Expires=1800&X-Amz-SignedHeaders=host&X-Amz-Signature=0785399c523100cc555309ebc4d136f21eda1b1117231ae899780134b7bf4f9d"
+      "description": "Inventaire et cartographie des technologies, serveurs et logiciels du SI d'AG2R LA MONDIALE."
     },
     {
       "starts_at": { "day": 1, "month": 9, "year": 2019 },
       "ends_at": { "day": 30, "month": 9, "year": 2022 },
       "company": "AG2R LA MONDIALE",
       "company_linkedin_profile_url": "https://fr.linkedin.com/company/ag2r-la-mondiale",
-      "company_facebook_profile_url": null,
       "title": "Assistant SI",
-      "description": "Modernisation du site web intranet de la cartographie du SI grâce à Typescript, webpack et node.js.\nMaintenance de la plateforme de modélisation de la cartographie existante et des traitements\nd’extractions, imports ainsi que des API externes en VBScript et C#. Gestion, suivi et contribution\ntechnique au projet de montée de version de MEGA HOPEX.",
-      "location": "Malakoff",
-      "logo_url": "https://s3.us-west-000.backblazeb2.com/proxycurl/company/ag2r-la-mondiale/profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0004d7f56a0400b0000000001%2F20250130%2Fus-west-000%2Fs3%2Faws4_request&X-Amz-Date=20250130T141656Z&X-Amz-Expires=1800&X-Amz-SignedHeaders=host&X-Amz-Signature=0785399c523100cc555309ebc4d136f21eda1b1117231ae899780134b7bf4f9d"
+      "description": "Modernisation d'un intranet de cartographie du SI avec TypeScript, webpack et Node.js. Maintenance des traitements d'extraction et d'import, des API externes et de la plateforme de modélisation existante."
     },
     {
       "starts_at": { "day": 1, "month": 4, "year": 2019 },
       "ends_at": { "day": 31, "month": 7, "year": 2019 },
       "company": "ITALIC (Coding Forward)",
       "company_linkedin_profile_url": "https://fr.linkedin.com/company/eurl-italic",
-      "company_facebook_profile_url": null,
       "title": "Développeur",
-      "description": "Installation de serveurs web pour l’hébergement des sites web de clients. Automatisation des tâches\nde backup, déploiement, monitoring et création des serveurs. Conceptions d’outils internes pour\nl’automatisation des relevés bancaires (EBICS). Utilisation de Bash, Linux, PHP, Apache,\nMySQL/MariaDB.",
-      "location": "Région de Paris, France",
-      "logo_url": "https://s3.us-west-000.backblazeb2.com/proxycurl/company/eurl-italic/profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0004d7f56a0400b0000000001%2F20250130%2Fus-west-000%2Fs3%2Faws4_request&X-Amz-Date=20250130T141656Z&X-Amz-Expires=1800&X-Amz-SignedHeaders=host&X-Amz-Signature=d1b9e5387a542fa4bc065590c5c77743fdb3ddacfb45bfc6246e7634003cdbc4"
+      "description": "Installation de serveurs web, automatisation des sauvegardes, déploiements et opérations de supervision, et conception d'outils internes."
     }
   ],
   "education": [
@@ -67,11 +41,7 @@
       "degree_name": "Diplôme d'ingénieur",
       "school": "Conservatoire National des Arts et Métiers",
       "school_linkedin_profile_url": "https://fr.linkedin.com/school/conservatoire-national-des-arts-et-m%C3%A9tiers/",
-      "school_facebook_profile_url": null,
-      "description": "Ingénieur en informatique, spécialisé dans les systèmes d'information",
-      "logo_url": "https://media-exp1.licdn.com/dms/image/C4D0BAQGRQuv1v-KRxQ/company-logo_100_100/0/1604394648285?e=2147483647&v=beta&t=z4YApZd5-kc0PpOd5-PNm-GClfrgUPIFV2dVSa68LDc",
-      "grade": null,
-      "activities_and_societies": null
+      "description": "Ingénieur en informatique, spécialisé dans les systèmes d'information"
     },
     {
       "starts_at": { "day": 1, "month": 1, "year": 2017 },
@@ -80,128 +50,7 @@
       "degree_name": "Diplôme universitaire de technologie (DUT)",
       "school": "IUT Paris Descartes",
       "school_linkedin_profile_url": "https://fr.linkedin.com/school/iut-paris-rives-de-seine/",
-      "school_facebook_profile_url": null,
-      "description": null,
-      "logo_url": "https://s3.us-west-000.backblazeb2.com/proxycurl/company/iut-paris-rives-de-seine/profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0004d7f56a0400b0000000001%2F20250130%2Fus-west-000%2Fs3%2Faws4_request&X-Amz-Date=20250130T141656Z&X-Amz-Expires=1800&X-Amz-SignedHeaders=host&X-Amz-Signature=16085bcf31ca0420ed4e057480b0529ce6209e804738b048b6de852267fab5bb",
-      "grade": null,
-      "activities_and_societies": null
+      "description": ""
     }
-  ],
-  "languages": [],
-  "languages_and_proficiencies": [],
-  "accomplishment_organisations": [],
-  "accomplishment_publications": [],
-  "accomplishment_honors_awards": [],
-  "accomplishment_patents": [],
-  "accomplishment_courses": [],
-  "accomplishment_projects": [],
-  "accomplishment_test_scores": [],
-  "volunteer_work": [],
-  "certifications": [],
-  "connections": 178,
-  "people_also_viewed": [
-    {
-      "link": "https://www.linkedin.com/in/rezouane-marimouttou",
-      "name": "Rezouane MARIMOUTTOU",
-      "summary": "Recherche d’un poste de développeur junior",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/thomas-turbide-05051999",
-      "name": "Thomas Turbide",
-      "summary": "Computer engineer",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/julien-dias-82ab48173",
-      "name": "Julien DIAS",
-      "summary": "Développeur de tests chez ZENITY",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/sophguyen",
-      "name": "Sophie Nguyen",
-      "summary": "Software engineer @SFR",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/sarahbrood",
-      "name": "Sarah Brood",
-      "summary": "Computer Vision Engineer",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/lydielao",
-      "name": "Lydie LAO",
-      "summary": "Ingénieure Etudes et Développement",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/hatim-goulamhoussen",
-      "name": "Hatim Goulamhoussen",
-      "summary": "Étudiant en M2 Miage informatique pour la finance à Paris-Dauphine",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/hugo-rihet",
-      "name": "Hugo Rihet",
-      "summary": "Administrateur systèmes et réseaux à l'EFREI Paris en alternance",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/coline-feliciano",
-      "name": "Coline Feliciano",
-      "summary": "En recherche d'un poste en CDI en maîtrise d'ouvrage",
-      "location": null
-    },
-    {
-      "link": "https://www.linkedin.com/in/yohann-alves-ba6296156",
-      "name": "Yohann Alves",
-      "summary": "Master MIAGE spécialité Informatique pour la Finance - Paris Dauphine",
-      "location": null
-    }
-  ],
-  "recommendations": [],
-  "activities": [
-    {
-      "title": "Suis-je le seul à être fatigué des poseurs sur ce site ?",
-      "link": "https://fr.linkedin.com/posts/sachafroment_suis-je-le-seul-%C3%A0-%C3%AAtre-fatigu%C3%A9-des-poseurs-activity-6965641174896230403-PqVi",
-      "activity_status": "Publié par Sacha Froment"
-    },
-    {
-      "title": "⚙️⚙️⚙️ réflexion en cours ⚙️⚙️⚙️Résultat : si c'est vrai, c'est très grave !",
-      "link": "https://fr.linkedin.com/posts/sachafroment_r%C3%A9flexion-en-cours-r%C3%A9sultat-activity-6965640601950154752-bh5r",
-      "activity_status": "Partagé par Sacha Froment"
-    },
-    {
-      "title": "🍯 Tentez de gagner votre miel ;) 🍯 Nous sommes une association loi 1901 à but non lucratif et nous voulons faire connaître nos actions auprès du…",
-      "link": "https://fr.linkedin.com/posts/la-maison-des-abeilles-heureuses_apiculture-biodiversit%C3%A9-rse-activity-6958692302173134848-FPM_",
-      "activity_status": "Aimé par Sacha Froment"
-    }
-  ],
-  "similarly_named_profiles": [
-    {
-      "name": "Sacha FROMENT",
-      "link": "https://fr.linkedin.com/in/sacha-froment",
-      "summary": "senior backend developer at Ortto",
-      "location": "France"
-    },
-    {
-      "name": "Sacha FROMENT",
-      "link": "https://fr.linkedin.com/in/sacha-froment-715241b5",
-      "summary": "Responsable des activités",
-      "location": "Nîmes"
-    }
-  ],
-  "articles": [],
-  "groups": [],
-  "skills": [],
-  "inferred_salary": null,
-  "gender": null,
-  "birth_date": null,
-  "industry": null,
-  "extra": null,
-  "interests": [],
-  "personal_emails": [],
-  "personal_numbers": []
+  ]
 }

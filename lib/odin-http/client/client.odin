@@ -1,29 +1,60 @@
 // package provides a very simple (for now) HTTP/1.1 client.
 package client
 
+import "base:runtime"
 import "core:bufio"
 import "core:bytes"
 import "core:c"
 import "core:encoding/json"
 import "core:io"
 import "core:log"
+import "core:mem"
+import "core:nbio"
 import "core:net"
 import "core:strconv"
 import "core:strings"
+import "core:sync"
+import "core:thread"
+import "core:time"
 
 import http ".."
 import openssl "../openssl"
 
 Request :: struct {
-	method:  http.Method,
-	headers: http.Headers,
-	cookies: [dynamic]http.Cookie,
-	body:    bytes.Buffer,
+	method:          http.Method,
+	headers:         http.Headers,
+	cookies:         [dynamic]http.Cookie,
+	body:            bytes.Buffer,
+	connect_timeout: time.Duration,
+	read_timeout:    time.Duration,
+	write_timeout:   time.Duration,
+}
+
+DEFAULT_CONNECT_TIMEOUT :: 10 * time.Second
+DEFAULT_READ_TIMEOUT    :: 30 * time.Second
+DEFAULT_WRITE_TIMEOUT   :: 30 * time.Second
+
+tls_hostname :: proc(authority: string) -> string {
+	if len(authority) > 2 && authority[0] == '[' {
+		if bracket := strings.index_byte(authority, ']'); bracket > 1 {
+			return authority[1:bracket]
+		}
+	}
+
+	first_colon := strings.index_byte(authority, ':')
+	last_colon := strings.last_index_byte(authority, ':')
+	if first_colon > 0 && first_colon == last_colon {
+		return authority[:first_colon]
+	}
+	return authority
 }
 
 // Initializes the request with sane defaults using the given allocator.
 request_init :: proc(r: ^Request, method := http.Method.Get, allocator := context.allocator) {
 	r.method = method
+	r.connect_timeout = DEFAULT_CONNECT_TIMEOUT
+	r.read_timeout = DEFAULT_READ_TIMEOUT
+	r.write_timeout = DEFAULT_WRITE_TIMEOUT
 	http.headers_init(&r.headers, allocator)
 	r.cookies = make([dynamic]http.Cookie, allocator)
 	bytes.buffer_init_allocator(&r.body, 0, 0, allocator)
@@ -59,19 +90,158 @@ get :: proc(target: string, allocator := context.allocator) -> (Response, Error)
 Request_Error :: enum {
 	Ok,
 	Invalid_Response_HTTP_Version,
-	Invalid_Response_Method,
+	Invalid_Response_Status,
 	Invalid_Response_Header,
 	Invalid_Response_Cookie,
+	Unexpected_Response_EOF,
 }
 
 SSL_Error :: enum {
 	Ok,
-	Controlled_Shutdown,
-	Fatal_Shutdown,
+	Context_Init_Failed,
+	Trust_Roots_Unavailable,
+	SSL_Init_Failed,
+	Socket_Association_Failed,
+	SNI_Setup_Failed,
+	Hostname_Verification_Setup_Failed,
+	Handshake_Timed_Out,
+	Handshake_Failed,
+	Certificate_Verification_Failed,
+	SSL_Write_Timed_Out,
 	SSL_Write_Failed,
 }
 
-Error :: union #shared_nil {
+Deadline_Operation :: enum {
+	Connect,
+	Read,
+	Write,
+}
+
+Deadline_Error :: struct {
+	operation: Deadline_Operation,
+	cause:     net.Socket_Option_Error,
+}
+
+Dial_Job_State :: enum i32 {
+	Working,
+	Completed,
+	Abandoned,
+}
+
+Dial_Job :: struct {
+	state:     Dial_Job_State,
+	target:    string,
+	timeout:   time.Duration,
+	socket:    net.TCP_Socket,
+	socket_owned: bool,
+	err:       net.Network_Error,
+	allocator: mem.Allocator,
+}
+
+dial_job_destroy :: proc(job: ^Dial_Job, close_socket := false) {
+	if close_socket && job.socket_owned {
+		net.close(job.socket)
+	}
+	delete(job.target, job.allocator)
+	free(job, job.allocator)
+}
+
+dial_job_run :: proc(job: ^Dial_Job) {
+	_, endpoint, endpoint_err := parse_endpoint(job.target)
+	job.err = endpoint_err
+
+	if job.err == nil && sync.atomic_load_explicit(&job.state, .Acquire) == .Working {
+		if loop_err := nbio.acquire_thread_event_loop(); loop_err != nil {
+			job.err = net.Dial_Error.Unknown
+		} else {
+			nbio.dial_poly(
+				endpoint,
+				job,
+				proc(op: ^nbio.Operation, job: ^Dial_Job) {
+					job.socket = op.dial.socket
+					job.socket_owned = op.dial.err == nil
+					job.err = op.dial.err
+				},
+				timeout = job.timeout,
+			)
+			if loop_err := nbio.run(); loop_err != nil {
+				job.err = net.Dial_Error.Unknown
+			}
+			nbio.release_thread_event_loop()
+		}
+	}
+
+	_, completed := sync.atomic_compare_exchange_strong_explicit(
+		&job.state,
+		.Working,
+		.Completed,
+		.Release,
+		.Relaxed,
+	)
+	if !completed {
+		dial_job_destroy(job, close_socket = true)
+	}
+}
+
+dial_target_with_timeout :: proc(target: string, timeout: time.Duration) -> (socket: net.TCP_Socket, err: net.Network_Error) {
+	allocator := runtime.heap_allocator()
+	job, allocation_err := new(Dial_Job, allocator)
+	if allocation_err != .None {
+		return {}, net.Create_Socket_Error.Insufficient_Resources
+	}
+	job.allocator = allocator
+	job.timeout = timeout
+	job.target, allocation_err = strings.clone(target, allocator)
+	if allocation_err != .None {
+		free(job, allocator)
+		return {}, net.Create_Socket_Error.Insufficient_Resources
+	}
+
+	previous_allocator := context.allocator
+	context.allocator = allocator
+	dial_thread := thread.create_and_start_with_poly_data(job, dial_job_run, self_cleanup = true)
+	context.allocator = previous_allocator
+	if dial_thread == nil {
+		dial_job_destroy(job)
+		return {}, net.Create_Socket_Error.Insufficient_Resources
+	}
+
+	deadline := time.time_add(time.now(), timeout)
+	for {
+		state := sync.atomic_load_explicit(&job.state, .Acquire)
+		if state == .Completed {
+			socket, err = job.socket, job.err
+			if err != nil && job.socket_owned {
+				net.close(socket)
+			}
+			dial_job_destroy(job)
+			if err == nil {
+				if blocking_err := net.set_blocking(socket, true); blocking_err != nil {
+					net.close(socket)
+					return {}, net.Dial_Error.Unknown
+				}
+			}
+			return
+		}
+
+		if time.diff(time.now(), deadline) <= 0 {
+			_, abandoned := sync.atomic_compare_exchange_strong_explicit(
+				&job.state,
+				.Working,
+				.Abandoned,
+				.Acq_Rel,
+				.Acquire,
+			)
+			if abandoned {
+				return {}, net.Dial_Error.Timeout
+			}
+			continue
+		}
+		time.sleep(time.Millisecond)
+	}
+}
+
+Error :: union {
 	net.Dial_Error,
 	net.Parse_Endpoint_Error,
 	net.Network_Error,
@@ -79,10 +249,14 @@ Error :: union #shared_nil {
 	bufio.Scanner_Error,
 	Request_Error,
 	SSL_Error,
+	Deadline_Error,
 }
 
 request :: proc(request: ^Request, target: string, allocator := context.allocator) -> (res: Response, err: Error) {
-	url, endpoint := parse_endpoint(target) or_return
+	url := http.url_parse(target)
+	connect_timeout := request.connect_timeout if request.connect_timeout > 0 else DEFAULT_CONNECT_TIMEOUT
+	read_timeout := request.read_timeout if request.read_timeout > 0 else DEFAULT_READ_TIMEOUT
+	write_timeout := request.write_timeout if request.write_timeout > 0 else DEFAULT_WRITE_TIMEOUT
 
 	// NOTE: we don't support persistent connections yet.
 	http.headers_set_close(&request.headers)
@@ -90,47 +264,125 @@ request :: proc(request: ^Request, target: string, allocator := context.allocato
 	req_buf := format_request(url, request, allocator)
 	defer bytes.buffer_destroy(&req_buf)
 
-	socket := net.dial_tcp(endpoint) or_return
+	socket, dial_err := dial_target_with_timeout(target, connect_timeout)
+	if dial_err != nil {
+		err = dial_err
+		return
+	}
+	socket_owned := true
+	defer if socket_owned { net.close(socket) }
 
-	// HTTPS using openssl.
+	// The connect timeout also bounds the TLS handshake. Once connected, use the
+	// operation-specific deadlines for all subsequent network I/O.
+	if option_err := net.set_option(socket, .Receive_Timeout, connect_timeout); option_err != nil {
+		err = Deadline_Error{operation = .Connect, cause = option_err}
+		return
+	}
+	if option_err := net.set_option(socket, .Send_Timeout, connect_timeout); option_err != nil {
+		err = Deadline_Error{operation = .Connect, cause = option_err}
+		return
+	}
+
+	// HTTPS using OpenSSL.
 	if url.scheme == "https" {
 		ctx := openssl.SSL_CTX_new(openssl.TLS_client_method())
-		ssl := openssl.SSL_new(ctx)
-		openssl.SSL_set_fd(ssl, c.int(socket))
-
-		// For servers using SNI for SSL certs (like cloudflare), this needs to be set.
-		chostname := strings.clone_to_cstring(url.host, allocator)
-		defer delete(chostname, allocator)
-		openssl.SSL_set_tlsext_host_name(ssl, chostname)
-
-		switch openssl.SSL_connect(ssl) {
-		case 2:
-			err = SSL_Error.Controlled_Shutdown
+		if ctx == nil {
+			err = SSL_Error.Context_Init_Failed
 			return
-		case 1: // success
-		case:
-			err = SSL_Error.Fatal_Shutdown
+		}
+		ssl := cast(^openssl.SSL)(nil)
+		tls_owned := true
+		defer if tls_owned {
+			if ssl != nil { openssl.SSL_free(ssl) }
+			openssl.SSL_CTX_free(ctx)
+		}
+
+		if openssl.SSL_CTX_set_default_verify_paths(ctx) != 1 {
+			err = SSL_Error.Trust_Roots_Unavailable
+			return
+		}
+		openssl.SSL_CTX_set_verify(ctx, openssl.SSL_VERIFY_PEER, nil)
+
+		ssl = openssl.SSL_new(ctx)
+		if ssl == nil {
+			err = SSL_Error.SSL_Init_Failed
+			return
+		}
+		if openssl.SSL_set_fd(ssl, c.int(socket)) != 1 {
+			err = SSL_Error.Socket_Association_Failed
+			return
+		}
+
+		// Set SNI for DNS names and independently enforce the certificate identity.
+		hostname := tls_hostname(url.host)
+		chostname := strings.clone_to_cstring(hostname, allocator)
+		defer delete(chostname, allocator)
+		_, is_ip4 := net.parse_ip4_address(hostname)
+		_, is_ip6 := net.parse_ip6_address(hostname)
+		if !is_ip4 && !is_ip6 && openssl.SSL_set_tlsext_host_name(ssl, chostname) != 1 {
+			err = SSL_Error.SNI_Setup_Failed
+			return
+		}
+		identity_ok := openssl.X509_VERIFY_PARAM_set1_ip_asc(openssl.SSL_get0_param(ssl), chostname) if is_ip4 || is_ip6 else openssl.SSL_set1_host(ssl, chostname)
+		if identity_ok != 1 {
+			err = SSL_Error.Hostname_Verification_Setup_Failed
+			return
+		}
+
+		connect_result := openssl.SSL_connect(ssl)
+		if connect_result != 1 {
+			ssl_error := openssl.SSL_get_error(ssl, connect_result)
+			err = SSL_Error.Handshake_Timed_Out if ssl_error == 2 || ssl_error == 3 else SSL_Error.Handshake_Failed
+			return
+		}
+		if openssl.SSL_get_verify_result(ssl) != openssl.X509_V_OK {
+			err = SSL_Error.Certificate_Verification_Failed
+			return
+		}
+
+		if option_err := net.set_option(socket, .Receive_Timeout, read_timeout); option_err != nil {
+			err = Deadline_Error{operation = .Read, cause = option_err}
+			return
+		}
+		if option_err := net.set_option(socket, .Send_Timeout, write_timeout); option_err != nil {
+			err = Deadline_Error{operation = .Write, cause = option_err}
 			return
 		}
 
 		buf := bytes.buffer_to_bytes(&req_buf)
-		to_write := len(buf)
-		for to_write > 0 {
-			ret := openssl.SSL_write(ssl, raw_data(buf), c.int(to_write))
+		written := 0
+		for written < len(buf) {
+			ret := openssl.SSL_write(ssl, raw_data(buf[written:]), c.int(len(buf) - written))
 			if ret <= 0 {
-				err = SSL_Error.SSL_Write_Failed
+				ssl_error := openssl.SSL_get_error(ssl, ret)
+				err = SSL_Error.SSL_Write_Timed_Out if ssl_error == 2 || ssl_error == 3 else SSL_Error.SSL_Write_Failed
 				return
 			}
-
-			to_write -= int(ret)
+			written += int(ret)
 		}
 
-		return parse_response(SSL_Communication{ssl = ssl, ctx = ctx, socket = socket}, allocator)
+		res, err = parse_response(SSL_Communication{ssl = ssl, ctx = ctx, socket = socket}, allocator)
+		if err == nil {
+			tls_owned = false
+			socket_owned = false
+		}
+		return
+	}
+
+	if option_err := net.set_option(socket, .Receive_Timeout, read_timeout); option_err != nil {
+		err = Deadline_Error{operation = .Read, cause = option_err}
+		return
+	}
+	if option_err := net.set_option(socket, .Send_Timeout, write_timeout); option_err != nil {
+		err = Deadline_Error{operation = .Write, cause = option_err}
+		return
 	}
 
 	// HTTP, just send the request.
 	net.send_tcp(socket, bytes.buffer_to_bytes(&req_buf)) or_return
-	return parse_response(socket, allocator)
+	res, err = parse_response(socket, allocator)
+	if err == nil { socket_owned = false }
+	return
 }
 
 Response :: struct {
@@ -160,7 +412,7 @@ response_destroy :: proc(res: ^Response, body: Maybe(Body_Type) = nil, was_alloc
 	bufio.scanner_destroy(&res._body)
 
 	for cookie in res.cookies {
-		delete(cookie._raw)
+		delete(cookie._raw, res.cookies.allocator)
 	}
 	delete(res.cookies)
 
@@ -330,7 +582,7 @@ _response_till_close :: proc(_body: ^bufio.Scanner, max_length: int) -> (string,
 // Meant for internal usage, you should use `client.response_body`.
 _response_body_length :: proc(_body: ^bufio.Scanner, max_length: int, len: string) -> (string, Body_Error) {
 	ilen, lenok := strconv.parse_int(len, 10)
-	if !lenok {
+	if !lenok || ilen < 0 {
 		return "", .Invalid_Length
 	}
 
@@ -411,7 +663,7 @@ _response_body_chunked :: proc(
 		}
 
 		size, ok := strconv.parse_int(string(size_line), 16)
-		if !ok {
+		if !ok || size < 0 {
 			err = .Invalid_Chunk_Size
 			return
 		}
@@ -437,10 +689,9 @@ _response_body_chunked :: proc(
 		bytes.buffer_write(&body_buff, bufio.scanner_bytes(_body))
 
 		// Read empty line after chunk.
-		if !bufio.scanner_scan(_body) {
+		if !bufio.scanner_scan(_body) || bufio.scanner_text(_body) != "" {
 			return "", .Scan_Failed
 		}
-		assert(bufio.scanner_text(_body) == "")
 	}
 
 	// Read trailing empty line (after body, before trailing headers).

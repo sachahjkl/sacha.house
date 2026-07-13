@@ -113,9 +113,23 @@
         sachaHouse = pkgs.stdenv.mkDerivation {
           inherit pname;
           version = packageVersion;
-          src = lib.cleanSource ./.;
+          src = lib.cleanSourceWith {
+            src = ./.;
+            filter = path: type:
+              let
+                name = baseNameOf path;
+              in
+                lib.cleanSourceFilter path type
+                && name != "config.json"
+                && !(lib.hasPrefix "paste-secrets" name && lib.hasSuffix ".json" name);
+          };
+          npmDeps = pkgs.importNpmLock {
+            npmRoot = ./.;
+          };
           nativeBuildInputs = [
+            pkgs.nodejs
             pkgs.odin
+            pkgs.importNpmLock.hooks.npmConfigHook
           ];
           buildInputs = runtimeLibraries;
           LD_LIBRARY_PATH = runtimeLibraryPath;
@@ -125,6 +139,7 @@
             export HOME="$TMPDIR"
             odin build lib/temple/cli -o:speed -out:temple_cli
             ./temple_cli src lib/temple
+            npm run build:css
             odin build src \
               -out:sacha.house \
               -define:GIT_COMMIT_HASH="'${gitCommitHash}'" \
@@ -215,15 +230,30 @@
               pkgs.cacert
               pkgs.tzdata
             ] ++ runtimeLibraries;
+            extraCommands = ''
+              mkdir -p ./etc ./data/tmp
+              chmod 0755 ./etc
+              chmod 0700 ./data ./data/tmp
+              printf '%s\n' 'sacha-house:x:10001:10001:sacha.house:/data:/bin/false' > ./etc/passwd
+              printf '%s\n' 'sacha-house:x:10001:' > ./etc/group
+              chmod 0644 ./etc/passwd ./etc/group
+            '';
+            fakeRootCommands = ''
+              chown -R 10001:10001 ./data
+            '';
             config = {
               WorkingDir = "/data";
+              User = "10001:10001";
               Env = [
-                "CONFIG_PATH=/data/config.json"
+                "CONFIG_PATH=/config/config.json"
+                "HOME=/data"
+                "TMPDIR=/data/tmp"
                 "LD_LIBRARY_PATH=${runtimeLibraryPath}"
                 "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
               ];
               Volumes = {
                 "/data" = { };
+                "/run/secrets" = { };
               };
               ExposedPorts = {
                 "6969/tcp" = { };
@@ -264,8 +294,15 @@
 
             configFile = mkOption {
               type = types.path;
-              default = "${cfg.dataDir}/config.json";
+              default = "/etc/sacha.house/config.json";
               description = "Path to the sacha.house JSON config file.";
+            };
+
+            pasteSecretsFile = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              example = "/run/secrets/sacha-house-pastes.json";
+              description = "Optional paste secrets JSON path to grant read-only access; set the same path in PASTE_SECRETS_FILE inside config.json.";
             };
 
             openFirewall = mkOption {
@@ -276,6 +313,16 @@
           };
 
           config = mkIf cfg.enable {
+            assertions = [
+              {
+                assertion = !hasPrefix "/nix/store/" (toString cfg.configFile);
+                message = "services.sacha-house.configFile must be a runtime path, not a Nix store path";
+              }
+              {
+                assertion = cfg.pasteSecretsFile == null || !hasPrefix "/nix/store/" cfg.pasteSecretsFile;
+                message = "services.sacha-house.pasteSecretsFile must be a runtime path, not a Nix store path";
+              }
+            ];
             users.users.sacha-house = {
               isSystemUser = true;
               group = "sacha-house";
@@ -297,11 +344,24 @@
                 ExecStart = "${pkg}/bin/sacha.house";
                 Restart = "on-failure";
                 RestartSec = 5;
+                UMask = "0077";
                 NoNewPrivileges = true;
                 PrivateTmp = true;
                 ProtectHome = true;
                 ProtectSystem = "strict";
                 ReadWritePaths = [ cfg.dataDir ];
+                ReadOnlyPaths = optional (cfg.pasteSecretsFile != null) cfg.pasteSecretsFile;
+                PrivateDevices = true;
+                ProtectClock = true;
+                ProtectControlGroups = true;
+                ProtectKernelLogs = true;
+                ProtectKernelModules = true;
+                ProtectKernelTunables = true;
+                ProtectProc = "invisible";
+                RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
+                RestrictSUIDSGID = true;
+                LockPersonality = true;
+                SystemCallArchitectures = "native";
                 Environment = [
                   "CONFIG_PATH=${cfg.configFile}"
                   "PORT=${toString cfg.port}"

@@ -1,118 +1,93 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
 
-INSTALL_DIR="/opt/sacha.house"
-SERVICE_NAME="sacha.house.service"
-BINARY_NAME="sacha.house-linux-amd64"
-SERVICE_USER="sacha"
-SERVICE_GROUP="sacha"
-EMAIL_TO="admin"
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+readonly INSTALL_ROOT="/opt/sacha.house"
+readonly STATE_DIR="/var/lib/sacha.house"
+readonly DEPLOY_STATE_DIR="/var/lib/sacha.house-deploy"
+readonly CONFIG_DIR="/etc/sacha.house"
+readonly CONFIG_FILE="${CONFIG_DIR}/config.json"
+readonly SERVICE_NAME="sacha.house.service"
+readonly SERVICE_USER="sacha"
+readonly SERVICE_GROUP="sacha"
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"
 
-echo "=== sacha.house Setup Script ==="
-echo "Install directory: $INSTALL_DIR"
-echo ""
-
-if [ "$EUID" -ne 0 ]; then
-    echo "ERROR: This script must be run as root"
-    echo "Reason: Installs systemd service, creates directories in /opt, sets up crontab"
-    echo "Run with: sudo $0"
+if (( EUID != 0 )); then
+    printf 'setup must run as root\n' >&2
     exit 1
 fi
 
-echo "[1/8] Checking service user..."
-if id "$SERVICE_USER" &>/dev/null; then
-    echo "  User $SERVICE_USER exists ✓"
-else
-    echo "  ERROR: User $SERVICE_USER does not exist"
-    echo "  Please create the user first or change SERVICE_USER in this script"
-    exit 1
+for command in curl getent groupadd install jq realpath runuser sha256sum systemctl tar useradd; do
+    if ! command -v "$command" >/dev/null; then
+        printf 'required command not found: %s\n' "$command" >&2
+        exit 1
+    fi
+done
+
+if ! getent group "$SERVICE_GROUP" >/dev/null; then
+    groupadd --system "$SERVICE_GROUP"
+fi
+if ! getent passwd "$SERVICE_USER" >/dev/null; then
+    useradd --system \
+        --gid "$SERVICE_GROUP" \
+        --home-dir "$STATE_DIR" \
+        --shell /usr/sbin/nologin \
+        "$SERVICE_USER"
 fi
 
-echo "[2/8] Creating installation directory..."
-mkdir -p "$INSTALL_DIR"
-chown $SERVICE_USER:$SERVICE_USER "$INSTALL_DIR"
-
-echo "[3/8] Downloading latest binary..."
-cd "$INSTALL_DIR"
-RELEASE_DATA=$(curl -s "https://gitlab.com/api/v4/projects/sachahjkl%2Fsacha.house/releases")
-
-if [ -z "$RELEASE_DATA" ]; then
-    echo "  ERROR: Failed to fetch latest release from GitLab"
-    exit 1
+install -d -o root -g root -m 0755 "$INSTALL_ROOT" "$INSTALL_ROOT/releases"
+install -d -o root -g root -m 0700 "$DEPLOY_STATE_DIR"
+if [[ -e "$INSTALL_ROOT/update.sh" ]]; then
+    chown root:root "$INSTALL_ROOT/update.sh"
+    chmod 0755 "$INSTALL_ROOT/update.sh"
 fi
 
-DOWNLOAD_URL=$(echo "$RELEASE_DATA" | grep -o '"url":"[^"]*sacha.house-linux-amd64[^"]*"' | head -1 | cut -d'"' -f4)
+if command -v crontab >/dev/null; then
+    legacy_crontab="$(mktemp "${DEPLOY_STATE_DIR}/crontab.XXXXXXXX")"
+    trap 'rm -f -- "$legacy_crontab"' EXIT
+    crontab -l > "$legacy_crontab" 2>/dev/null || true
+    while IFS= read -r line; do
+        [[ "$line" == *"/opt/sacha.house/update.sh"* ]] || printf '%s\n' "$line"
+    done < "$legacy_crontab" | crontab -
+fi
+install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0700 "$STATE_DIR"
+install -d -o root -g "$SERVICE_GROUP" -m 0750 "$CONFIG_DIR"
 
-if [ -z "$DOWNLOAD_URL" ]; then
-    echo "  ERROR: Failed to find download URL in release"
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    printf 'runtime configuration is required at %s\n' "$CONFIG_FILE" >&2
     exit 1
 fi
+chown root:"$SERVICE_GROUP" "$CONFIG_FILE"
+chmod 0640 "$CONFIG_FILE"
 
-echo "  Downloading from: $DOWNLOAD_URL"
-curl -L -f "$DOWNLOAD_URL" -o sacha.house
-chmod +x sacha.house
-chown $SERVICE_USER:$SERVICE_GROUP sacha.house
-echo "  Binary installed"
+paste_secrets_file="$(jq -r '.PASTE_SECRETS_FILE // empty' "$CONFIG_FILE")"
+if jq -e '.PASTE_ENABLED == true' "$CONFIG_FILE" >/dev/null; then
+    if [[ -z "$paste_secrets_file" ]]; then
+        printf 'enabled paste storage requires PASTE_SECRETS_FILE in %s\n' "$CONFIG_FILE" >&2
+        exit 1
+    fi
+    if [[ ! -f "$paste_secrets_file" ]]; then
+        printf 'enabled paste storage requires runtime secrets at %s\n' "$paste_secrets_file" >&2
+        exit 1
+    fi
+fi
 
-echo "[4/7] Installing systemd service..."
-cp "$SCRIPT_DIR/sacha.house.service" /etc/systemd/system/
+if [[ -n "$paste_secrets_file" && -f "$paste_secrets_file" ]]; then
+    chown root:"$SERVICE_GROUP" "$paste_secrets_file"
+    chmod 0640 "$paste_secrets_file"
+fi
+
+install -d -o root -g root -m 0755 /usr/local/sbin
+install -o root -g root -m 0755 "$SCRIPT_DIR/update.sh" /usr/local/sbin/sacha-house-update
+install -o root -g root -m 0755 "$SCRIPT_DIR/rollback.sh" /usr/local/sbin/sacha-house-rollback
+install -o root -g root -m 0755 "$SCRIPT_DIR/backup.sh" /usr/local/sbin/sacha-house-backup
+install -o root -g root -m 0755 "$SCRIPT_DIR/restore.sh" /usr/local/sbin/sacha-house-restore
+install -o root -g root -m 0644 "$SCRIPT_DIR/sacha.house.service" /etc/systemd/system/sacha.house.service
+
 systemctl daemon-reload
 systemctl enable "$SERVICE_NAME"
-echo "  Service installed and enabled"
+/usr/local/sbin/sacha-house-update
+rm -f -- "$INSTALL_ROOT/update.sh" "$INSTALL_ROOT/sacha.house" "$INSTALL_ROOT/sacha.house.new" "$INSTALL_ROOT/sacha.house.bak"
+rm -f -- /var/log/sacha.house-update.log
 
-echo "[5/7] Installing update script..."
-cp "$SCRIPT_DIR/update.sh" "$INSTALL_DIR/"
-chmod +x "$INSTALL_DIR/update.sh"
-chown root:root "$INSTALL_DIR/update.sh"
-
-if [ "$EMAIL_TO" != "admin" ]; then
-    sed -i "s/EMAIL_TO=\"admin\"/EMAIL_TO=\"$EMAIL_TO\"/" "$INSTALL_DIR/update.sh"
-fi
-echo "  Update script installed"
-
-echo "[6/7] Setting up crontab for automatic updates..."
-CRON_LINE="0 0 * * * $INSTALL_DIR/update.sh >> /var/log/sacha.house-update.log 2>&1"
-
-if crontab -l 2>/dev/null | grep -q "$INSTALL_DIR/update.sh"; then
-    echo "  Crontab entry already exists"
-else
-    (crontab -l 2>/dev/null; echo "$CRON_LINE") | crontab -
-    echo "  Crontab entry added"
-fi
-
-echo "[7/7] Creating log file..."
-touch /var/log/sacha.house-update.log
-chmod 644 /var/log/sacha.house-update.log
-
-echo ""
-echo "=== Setup Complete ==="
-echo ""
-echo "Starting service..."
-systemctl start "$SERVICE_NAME"
-
-sleep 3
-
-if systemctl is-active --quiet "$SERVICE_NAME"; then
-    echo "✓ Service is running"
-    systemctl status "$SERVICE_NAME" --no-pager
-else
-    echo "✗ Service failed to start"
-    echo ""
-    echo "Check logs with:"
-    echo "  journalctl -u $SERVICE_NAME -n 50"
-    exit 1
-fi
-
-echo ""
-echo "Installation complete!"
-echo ""
-echo "Useful commands:"
-echo "  Status:  systemctl status $SERVICE_NAME"
-echo "  Logs:    journalctl -u $SERVICE_NAME -f"
-echo "  Update:  $INSTALL_DIR/update.sh"
-echo "  Stop:    systemctl stop $SERVICE_NAME"
-echo "  Start:   systemctl start $SERVICE_NAME"
-echo "  Restart: systemctl restart $SERVICE_NAME"
-
+printf 'sacha.house installed; runtime state is confined to %s\n' "$STATE_DIR"

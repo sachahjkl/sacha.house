@@ -217,6 +217,9 @@
   }
 }
 @layer utilities {
+  .invisible {
+    visibility: hidden;
+  }
   .fixed {
     position: fixed;
   }
@@ -273,6 +276,9 @@
   }
   .mx-auto {
     margin-inline: auto;
+  }
+  .\!my-2 {
+    margin-block: calc(var(--spacing) * 2) !important;
   }
   .my-4 {
     margin-block: calc(var(--spacing) * 4);
@@ -754,6 +760,12 @@
   }
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
+  }
+  .\!ml-0 {
+    margin-left: calc(var(--spacing) * 0) !important;
+  }
+  .ml-0 {
+    margin-left: calc(var(--spacing) * 0);
   }
   .ml-3 {
     margin-left: calc(var(--spacing) * 3);
@@ -1253,6 +1265,10 @@
     --tw-shadow: 0 -1px 0 1px var(--tw-shadow-color, #166534) inset, 0 0 0 1px var(--tw-shadow-color, #15803d) inset, 0 0.5px 0 1.5px var(--tw-shadow-color, #4ade80) inset;
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
+  .outline {
+    outline-style: var(--tw-outline-style);
+    outline-width: 1px;
+  }
   .blur {
     --tw-blur: blur(8px);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
@@ -1673,6 +1689,11 @@ html {
   inherits: false;
   initial-value: 0 0 #0000;
 }
+@property --tw-outline-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
 @property --tw-blur {
   syntax: "*";
   inherits: false;
@@ -1768,6 +1789,7 @@ html {
       --tw-ring-offset-width: 0px;
       --tw-ring-offset-color: #fff;
       --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-outline-style: solid;
       --tw-blur: initial;
       --tw-brightness: initial;
       --tw-contrast: initial;

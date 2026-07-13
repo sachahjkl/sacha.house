@@ -1,10 +1,11 @@
 {
   "id": "willkommen",
   "slug": "willkommen",
-  "title": "Bienvenu(e) sur mon nouveau site !",
+  "title": "Bienvenue sur mon nouveau site !",
   "status": "published",
   "publishedAt": "2022-10-16T14:31:35.14901+00:00",
   "updatedAt": "2022-10-19T08:22:56.703462+00:00",
   "createdAt": "2022-10-16T14:31:35.14901+00:00",
+  "language": "fr",
   "author": "Sacha FROMENT"
 }

@@ -147,6 +147,8 @@ serve :: proc(s: ^Server, h: Handler) -> (err: net.Network_Error) {
 		s.opts.thread_count = os.get_processor_core_count()
 	}
 
+	// Initialize shared response metadata before worker threads can accept requests.
+	server_date_start(s)
 	thread_count := max(1, s.opts.thread_count)
 	sync.wait_group_add(&s.threads_closed, thread_count)
 	s.threads = make([]Server_Thread, thread_count, s.conn_allocator)
@@ -154,8 +156,6 @@ serve :: proc(s: ^Server, h: Handler) -> (err: net.Network_Error) {
 		td.thread = thread.create_and_start_with_poly_data2(s, &td, _server_thread_init, context)
 	}
 
-	// Start keeping track of and caching the date for the required date header.
-	server_date_start(s)
 
 	_server_thread_init(s, &s.threads[0])
 
@@ -472,6 +472,48 @@ conn_handle_reqs :: proc(c: ^Connection) {
 	conn_handle_req(c, context.temp_allocator)
 }
 
+_expect_is_continue :: #force_inline proc(value: string) -> bool {
+	expected: string = "100-continue"
+	if len(value) != len(expected) { return false }
+	for i := 0; i < len(value); i += 1 {
+		c := value[i]
+		if c >= 'A' && c <= 'Z' { c += 'a' - 'A' }
+		if c != expected[i] { return false }
+	}
+	return true
+}
+
+_request_dispatch :: proc(l: ^Loop) {
+	rline := &l.req.line.(Requestline)
+	// An options request with the "*" is a no-op/ping request to
+	// check for server capabilities and should not be sent to handlers.
+	if rline.method == .Options && rline.target.(string) == "*" {
+		l.res.status = .OK
+		respond(&l.res)
+		return
+	}
+
+	// Give the handler this request as a GET, since the HTTP spec
+	// says a HEAD is identical to a GET but without a response body.
+	l.req.is_head = rline.method == .Head
+	if l.req.is_head && l.conn.server.opts.redirect_head_to_get {
+		rline.method = .Get
+	}
+
+	l.conn.server.handler.handle(&l.conn.server.handler, &l.req, &l.res)
+}
+
+_on_expect_continue_sent :: proc(op: ^nbio.Operation, l: ^Loop) {
+	context.temp_allocator = virtual.arena_allocator(&l.conn.temp_allocator)
+	if op.send.err != nil {
+		log.warnf("could not send 100 Continue response: %v", op.send.err)
+		clean_request_loop(l.conn, close = true)
+		return
+	}
+
+	_request_dispatch(l)
+}
+
 @(private)
 conn_handle_req :: proc(c: ^Connection, allocator := context.temp_allocator) {
 	on_rline1 :: proc(loop: rawptr, token: string, err: bufio.Scanner_Error) {
@@ -590,34 +632,17 @@ conn_handle_req :: proc(c: ^Connection, allocator := context.temp_allocator) {
 
 		l.conn.scanner.max_token_size = bufio.DEFAULT_MAX_SCAN_TOKEN_SIZE
 
-		// Automatically respond with a continue status when the client has the Expect: 100-continue header.
+		// Send the interim response without completing the request/response cycle.
+		// The final handler response is dispatched only after the client can send its body.
 		if expect, ok := headers_get_unsafe(l.req.headers, "expect");
-		   ok && expect == "100-continue" && l.conn.server.opts.auto_expect_continue {
-
-			l.res.status = .Continue
-
-			respond(&l.res)
+		   ok && _expect_is_continue(expect) && l.conn.server.opts.auto_expect_continue {
+			continue_response: string = "HTTP/1.1 100 Continue\r\n\r\n"
+			buf := transmute([]byte)continue_response
+			nbio.send_poly(l.conn.socket, {buf}, l, _on_expect_continue_sent)
 			return
 		}
 
-		rline := &l.req.line.(Requestline)
-		// An options request with the "*" is a no-op/ping request to
-		// check for server capabilities and should not be sent to handlers.
-		if rline.method == .Options && rline.target.(string) == "*" {
-			l.res.status = .OK
-			respond(&l.res)
-		} else {
-			// Give the handler this request as a GET, since the HTTP spec
-			// says a HEAD is identical to a GET but just without writing the body,
-			// handlers shouldn't have to worry about it.
-			is_head := rline.method == .Head
-			if is_head && l.conn.server.opts.redirect_head_to_get {
-				l.req.is_head = true
-				rline.method = .Get
-			}
-
-			l.conn.server.handler.handle(&l.conn.server.handler, &l.req, &l.res)
-		}
+		_request_dispatch(l)
 	}
 
 	c.loop.conn = c
@@ -635,6 +660,7 @@ conn_handle_req :: proc(c: ^Connection, allocator := context.temp_allocator) {
 Server_Date :: struct {
 	buf_backing: [DATE_LENGTH]byte,
 	buf:         bytes.Buffer,
+	mu:          sync.Mutex,
 }
 
 @(private)
@@ -650,11 +676,13 @@ server_date_update :: proc(_: ^nbio.Operation, s: ^Server) {
 
 	nbio.timeout_poly(time.Second, s, server_date_update)
 
+	sync.guard(&s.date.mu)
 	bytes.buffer_reset(&s.date.buf)
 	date_write(bytes.buffer_to_stream(&s.date.buf), time.now())
 }
 
 @(private)
-server_date :: proc(s: ^Server) -> string {
-	return string(s.date.buf_backing[:])
+server_date_write :: proc(b: ^bytes.Buffer, s: ^Server) {
+	sync.guard(&s.date.mu)
+	bytes.buffer_write(b, s.date.buf_backing[:])
 }

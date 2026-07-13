@@ -192,6 +192,7 @@ vite.config.ts.timestamp-*
 
 # config
 config.json
+paste-secrets*.json
 
 # Odin
 *.obj

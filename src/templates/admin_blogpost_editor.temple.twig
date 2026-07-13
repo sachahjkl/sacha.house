@@ -15,12 +15,13 @@
     {% end %}
 
     {% if this.Error != "" %}
-        <div class="mb-4 border-2 border-red-500 bg-red-100 p-3 text-red-800">{{ this.Error }}</div>
+        <div class="mb-4 border-2 border-red-500 bg-red-100 p-3 text-red-800" role="alert">{{ this.Error }}</div>
     {% end %}
 
-    <div id="blog-editor-status" class="mb-4 hidden border-2 border-blue-300 bg-blue-100 p-3 text-blue-800"></div>
+    <div id="blog-editor-status" class="mb-4 hidden border-2 border-blue-300 bg-blue-100 p-3 text-blue-800" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <form method="POST" action="{{ this.Form.FormAction }}" data-blog-editor class="flex flex-col gap-4">
+        <input id="admin-csrf-token" type="hidden" name="csrf_token" value="{{ this.Form.CsrfToken }}"/>
         <div class="grid gap-4 md:grid-cols-2">
             <label class="flex flex-col gap-1">
                 <span>Title</span>
@@ -46,6 +47,14 @@
                         <option value="published" class="bg-bgColor text-textColor">published</option>
                     </select>
                 {% end %}
+            </label>
+
+            <label class="flex flex-col gap-1">
+                <span>Language</span>
+                <select name="language" class="h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0">
+                    <option value="en" {% if this.Form.Language == "en" %}selected{% end %}>English</option>
+                    <option value="fr" {% if this.Form.Language == "fr" %}selected{% end %}>Français</option>
+                </select>
             </label>
 
             <label class="flex flex-col gap-1">

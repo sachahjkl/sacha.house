@@ -16,7 +16,7 @@ PermissionLevel :: enum {
 	Admin,
 }
 
-DEFAULT_NAV_ITEMS := []NavItem {
+DEFAULT_NAV_ITEMS :: [?]NavItem {
 	{
 		Title = "home",
 		Pathname = "/",
@@ -54,17 +54,16 @@ DEFAULT_NAV_ITEMS := []NavItem {
 		Pathname = "/admin",
 		Icon = "🔒",
 		IsActive = false,
-		PermissionLevel = .Public,
+		PermissionLevel = .Admin,
 		CanAccess = true,
 	},
 }
 
 
 compute_nav_items :: proc(active_pathname: string, is_admin := false) -> []NavItem {
-
-	// (temp allocator because the computed nav items are only used for the duration of the request)
-	nav_items := new_clone(DEFAULT_NAV_ITEMS, context.temp_allocator)
-
+	nav_items := make([]NavItem, len(DEFAULT_NAV_ITEMS), context.temp_allocator)
+	default_nav_items: [5]NavItem = DEFAULT_NAV_ITEMS
+	copy(nav_items, default_nav_items[:])
 	for &item in nav_items {
 		item.IsActive = false
 		if item.PermissionLevel == .Admin {
@@ -87,5 +86,5 @@ compute_nav_items :: proc(active_pathname: string, is_admin := false) -> []NavIt
 		nav_items[i].IsActive = matches
 	}
 
-	return nav_items^
+	return nav_items
 }

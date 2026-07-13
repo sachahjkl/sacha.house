@@ -8,6 +8,8 @@ Error_Type :: enum {
 	Filesystem,
 	Authorization,
 	Validation,
+	HTTP_Status,
+	GraphQL,
 	JSON_Marshal,
 	JSON_Unmarshal,
 	Database,
@@ -17,6 +19,7 @@ Error_Type :: enum {
 Error :: struct {
 	type: Error_Type,
 	msg:  string,
+	status: int,
 }
 
 error_string :: proc(e: Error) -> string {

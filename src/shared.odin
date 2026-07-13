@@ -3,10 +3,6 @@ package main
 import "core:fmt"
 import "core:strings"
 import "core:time"
-import "core:time/datetime"
-import "core:time/timezone"
-
-
 
 SEO_Data :: struct {
 	title:       string,
@@ -30,50 +26,49 @@ Footer_Data :: struct {
 }
 
 Base_Page_Data :: struct {
-	Title:    string,
-	SEO:      SEO_Data,
-	Footer:   Footer_Data,
-	NavItems: []NavItem,
-	StyleVersion: string,
-	HotReload:    bool,
+	Title:         string,
+	SEO:           SEO_Data,
+	Footer:        Footer_Data,
+	NavItems:      []NavItem,
+	StyleVersion:  string,
+	Language:      string,
+	CanonicalURL:  string,
+	LoadHTMX:      bool,
+	LoadAdminJS:   bool,
+	HotReload:     bool,
 }
 
-
-TITLE := ME.siteTitle
-DESCRIPTION := ME.siteTitle
-IMAGE := "/favicon_shadow.png"
-AUTHOR := ME.fullName
+DEFAULT_SEO_IMAGE :: "https://sacha.house/static/favicon_shadow.png"
 
 create_base_page_data :: proc(
+	app: ^App_State,
 	data: Maybe_SEO_Data,
 	active_pathname: string,
 	is_admin: bool = false,
+	language: string = "en",
 ) -> Base_Page_Data {
-	// check each field of the SEO_Data struct and assign a default value if it is nil
 	title := data.title
 	description := data.description
 	author := data.author
 	image := data.image
 
 	if title == nil {
-		title = TITLE
+		title = app.me.siteTitle
 	}
 	if description == nil {
-		description = DESCRIPTION
+		description = app.me.siteTitle
 	}
 	if author == nil {
-		author = AUTHOR
+		author = app.me.fullName
 	}
 	if image == nil {
-		image = IMAGE
+		image = DEFAULT_SEO_IMAGE
 	}
 
-	nav_items := compute_nav_items(active_pathname, is_admin)
 	style_version := GIT_COMMIT_HASH
 	when ODIN_DEBUG {
 		style_version = fmt.tprintf("%d", time.time_to_unix_nano(time.now()))
 	}
-
 
 	return Base_Page_Data {
 		Title = title.(string),
@@ -86,11 +81,15 @@ create_base_page_data :: proc(
 		Footer = Footer_Data {
 			year = time.year(time.now()),
 			commitHash = GIT_COMMIT_HASH,
-			gitRepoId = APP_CONFIG.GIT_REPO_ID,
+			gitRepoId = app.config.GIT_REPO_ID,
 			version = VERSION,
 		},
-		NavItems = nav_items,
+		NavItems = compute_nav_items(active_pathname, is_admin),
 		StyleVersion = style_version,
-		HotReload = HOT_RELOAD,
+		HotReload = app.options.hot_reload,
+		Language = language,
+		CanonicalURL = strings.concatenate({"https://sacha.house", active_pathname}, context.temp_allocator),
+		LoadHTMX = active_pathname == "/admin/login" || active_pathname == "/admin/webauthn",
+		LoadAdminJS = strings.has_prefix(active_pathname, "/admin"),
 	}
 }

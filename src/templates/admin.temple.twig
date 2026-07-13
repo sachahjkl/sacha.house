@@ -2,7 +2,8 @@
 <article class="prose mx-auto">
     <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
         <h1 class="h1 !mb-0 flex-1">admin</h1>
-        <form method="GET" action="/admin/logout" class="shrink-0">
+        <form method="POST" action="/admin/logout" class="shrink-0">
+            <input type="hidden" name="csrf_token" value="{{ this.CsrfToken }}"/>
             <button type="submit" class="h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800">
                 👋 Logout
             </button>
@@ -14,6 +15,19 @@
         <p>
             <a href="/admin/blogposts">Manage blogposts -&gt;</a>
         </p>
+    </section>
+    <div class="divider"></div>
+
+    <section>
+        <h2>Encrypted pastes</h2>
+        <p>
+            <a href="/admin/pastes">Manage encrypted pastes -&gt;</a>
+        </p>
+        {% if !this.PasteEnabled %}
+            <p class="text-sm opacity-70">
+                Disabled: set <code>PASTE_ENABLED</code> and <code>PASTE_SECRETS_FILE</code>.
+            </p>
+        {% end %}
     </section>
     <div class="divider"></div>
 
@@ -39,6 +53,7 @@ L'IP actuelle avec laquelle tu accèdes au panneau d'admin est
     <section>
         <h2>📁 Projets</h2>
         <form id="refresh-projects" method="POST" action="/admin/refresh-projects">
+            <input type="hidden" name="csrf_token" value="{{ this.CsrfToken }}"/>
             <style>
                 /* Hide the loading text when the button is not loading */
                 #refresh-projects:not(.htmx-request) .loading-text {
@@ -57,8 +72,8 @@ L'IP actuelle avec laquelle tu accèdes au panneau d'admin est
             </style>
             <button type="submit" class="h-8 select-none bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]">
 
-            <span class="loading-text">
-                <span class="animate-spin transition-all">⚙️</span>
+            <span class="loading-text" role="status" aria-live="polite">
+                <span class="animate-spin transition-all" aria-hidden="true">⚙️</span>
                 Rafraîchissement en cours...
             </span>
             <span class="default-text">
@@ -72,24 +87,8 @@ L'IP actuelle avec laquelle tu accèdes au panneau d'admin est
     <section>
         <h2>👔 Données du profil LinkedIn</h2>
         <p>
-            <s>Les données pour le profil LinkedIn proviennent de l'API <a href="https://nubela.co/proxycurl">ProxyCurl</a>.</s>
-            Les données pour le profil LinkedIn proviennent d'un fichier JSON historiquement hébergé sur GitHub Gist.
-            <br>
-            Ce fichier json est maintenant mis à jour manuellement et est intégré au code de l'application via le fichier <code class="rounded-sm p-1 px-2">linkedin_profile.json</code>.
+            Le profil public est construit depuis <code class="rounded-sm p-1 px-2">linkedin_profile.json</code>, intégré à l'application au moment du build.
         </p>
-        <p>
-            <s>Il reste <b>{{ int(this.CreditBalance) }} crédits</b> pour raffraichir ces données.</s>
-            <br>
-            Il n'y a plus de crédits à raffraichir ces données. (ProxyCurl a été arrêté)
-        </p>
-        <form method="POST" action="/admin/update-linkedin" disabled>
-            <button type="submit" class="h-8 select-none bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]">
-                <span class="animate-spin transition-all">⚙️</span>
-                <span class="hover:underline"> Rafraichir le profil </span>
-                (désactivé car ProxyCurl a été arrêté)
-            </button>
-        </form>
-
         <pre><code class="language-json">{{ this.ProfileData }}</code></pre>
     </section>
 </article>

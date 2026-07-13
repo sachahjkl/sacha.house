@@ -1,20 +1,43 @@
 [Unit]
 Description=Sacha House Web Server
-After=network.target
+After=network-online.target
+Wants=network-online.target
 StartLimitIntervalSec=0
 
 [Service]
 Type=simple
 User=sacha
 Group=sacha
-WorkingDirectory=/opt/sacha.house
-ExecStart=/opt/sacha.house/sacha.house
+WorkingDirectory=/var/lib/sacha.house
+Environment=CONFIG_PATH=/etc/sacha.house/config.json
+Environment=PORT=6969
+ExecStart=/opt/sacha.house/current/sacha.house
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
 StandardError=journal
 KillSignal=SIGINT
+UMask=0077
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+ReadOnlyPaths=/opt/sacha.house /etc/sacha.house
+ReadWritePaths=/var/lib/sacha.house
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=multi-user.target
-

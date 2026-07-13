@@ -141,14 +141,32 @@ parse_response :: proc(socket: Communication, allocator := context.allocator) ->
 	bufio.scanner_init(&scanner, stream_reader, allocator)
 
 	http.headers_init(&res.headers, allocator)
+	parsed := false
+	defer if !parsed {
+		for key, value in res.headers._kv {
+			delete(value, allocator)
+			delete(key, allocator)
+		}
+		delete(res.headers._kv)
+		for cookie in res.cookies {
+			delete(cookie._raw, allocator)
+		}
+		delete(res.cookies)
+		bufio.scanner_destroy(&scanner)
+	}
 
 	if !bufio.scanner_scan(&scanner) {
 		err = bufio.scanner_error(&scanner)
+		if err == nil { err = Request_Error.Unexpected_Response_EOF }
 		return
 	}
 
 	rline_str := bufio.scanner_text(&scanner)
 	si := strings.index_byte(rline_str, ' ')
+	if si <= 0 {
+		err = Request_Error.Invalid_Response_HTTP_Version
+		return
+	}
 
 	version, ok := http.version_parse(rline_str[:si])
 	if !ok {
@@ -164,7 +182,7 @@ parse_response :: proc(socket: Communication, allocator := context.allocator) ->
 
 	res.status, ok = http.status_from_string(rline_str[si + 1:])
 	if !ok {
-		err = Request_Error.Invalid_Response_Method
+		err = Request_Error.Invalid_Response_Status
 		return
 	}
 
@@ -173,6 +191,7 @@ parse_response :: proc(socket: Communication, allocator := context.allocator) ->
 	for {
 		if !bufio.scanner_scan(&scanner) {
 			err = bufio.scanner_error(&scanner)
+			if err == nil { err = Request_Error.Unexpected_Response_EOF }
 			return
 		}
 
@@ -210,6 +229,7 @@ parse_response :: proc(socket: Communication, allocator := context.allocator) ->
 	res.headers.readonly = true
 
 	res._body = scanner
+	parsed = true
 	return res, nil
 }
 
@@ -286,7 +306,7 @@ _socket_stream_proc :: proc(
 		case nil:
 			err = .None
 		case:
-			assert(false, "recv_tcp only returns TCP_Recv_Error or nil")
+			err = .Unknown
 		}
 	return
 }

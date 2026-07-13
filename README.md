@@ -4,20 +4,18 @@ The personal website of Sacha Froment, built with **Odin**.
 
 ## Overview
 
-This project is a custom web server written in the [Odin programming language](https://odin-lang.org/), featuring a handmade templating engine, a filesystem-backed blog CMS, and modern web technologies.
+The application is a self-contained Odin web server with an explicit `App_State` lifecycle, a filesystem-backed blog CMS, passkey/password administration, and compile-time embedded assets.
 
 ### Key Features
 
-*   **Odin Backend**: Built on top of `odin-http`, utilizing a custom router and middleware.
-*   **Temple**: A custom templating engine (`lib/temple`) that transpiles Twig-like syntax into native Odin code for type-safe, high-performance rendering.
-*   **Local Blog CMS**: Blog posts are stored on disk under `data/blog/`, rendered from markdown, and managed from the `/admin` panel.
-*   **Hot Reloading**: A custom-built development watcher (`tools/dev-watcher`) that monitors source files, recompiles the server, and hot-reloads the browser automatically. Supports both Windows and Linux.
-*   **Blog Migration Tooling**: Includes a migration script under `tools/blog-migrate/` for importing historical Hygraph content into the local blog store.
-*   **External APIs and Integrations**:
-    *   Fetches pinned repositories from **GitHub** and **GitLab**.
-    *   Loads user profile data from a **GitHub Gist**.
-*   **WebAuthn**: Implements Passkey authentication for the admin panel (`/admin`).
-*   **Tailwind CSS**: Styled with Tailwind, processed via Bun.
+* **Odin backend** built on the bundled `odin-http` router and middleware.
+* **Temple templates** transpiled from Twig-like source into escaped, typed Odin renderers.
+* **Local blog CMS** stored under `data/blog/` and managed from `/admin`.
+* **Encrypted Gist pastes** managed from `/admin/pastes`; plaintext is encrypted server-side with versioned XChaCha20-Poly1305 before it reaches GitHub.
+* **WebAuthn and password authentication** with bounded one-time challenges, server-side sessions, CSRF protection, and atomic credential storage.
+* **GitHub/GitLab project aggregation** over verified HTTPS with a last-good local cache.
+* **Hot reloading** through the custom `tools/dev-watcher` utility on Windows and Linux.
+* **Tailwind CSS** regenerated together with Temple bindings for local and Nix builds.
 
 ## Prerequisites
 
@@ -62,15 +60,51 @@ For Linux deployment, build on the target distro family instead of shipping a bi
 
 ## Configuration
 
-Configuration is loaded from `config.json` (looked for in `CONFIG_PATH` env var or default location) and environment variables.
+The application loads JSON configuration from `CONFIG_PATH`, or `config.json` by default. Start from `config.example.json`.
 
-See `config.example.json` for required fields:
+Important fields:
 
-*   `HYGRAPH_API_ENDPOINT`: URL for the blog CMS.
-*   `GITHUB_TOKEN`: For fetching repositories.
-*   `GITLAB_TOKEN`: For fetching repositories.
-*   `ADMIN_PASSWORD_HASH`: Argon2id password hash for admin login.
-*   `PASSWORD_SALT`: Secret pepper used when hashing/verifying the admin password.
+* `GITHUB_BEARER_TOKEN` and `GITLAB_BEARER_TOKEN`: optional repository-project API credentials.
+* `ADMIN_PASSWORD_HASH` and `PASSWORD_SALT`: Argon2id admin password verifier and secret pepper.
+* `WEBAUTHN_CREDENTIALS_FILE`, `WEBAUTHN_RP_ID`, and `WEBAUTHN_ORIGIN`: passkey persistence and relying-party identity.
+* `TRUST_PROXY_HTTPS`: emit HSTS and Secure cookies only when the trusted reverse proxy guarantees HTTPS.
+* `PASTE_ENABLED`, `PASTE_SECRETS_FILE`, `PASTE_MAX_BODY_BYTES`, and `PASTE_MAX_LIST_ITEMS`: encrypted Gist paste feature, secrets file, and bounds.
+
+### Encrypted Gist paste secrets
+
+When `PASTE_ENABLED` is `true`, `PASTE_SECRETS_FILE` in `config.json` must point to a read-only runtime file outside the repository, image, and Nix store:
+
+```json
+{
+  "github_gist_token": "github_pat_or_classic_token",
+  "active_key_id": "2026-07",
+  "keys": [
+    { "id": "2026-07", "key_hex": "64-lowercase-hex-characters" }
+  ]
+}
+```
+
+Generate a 32-byte key with `openssl rand -hex 32`. The GitHub token must have Gists read/write permission; a classic token needs the `gist` scope. Use a dedicated token rather than the project-fetching token.
+
+New pastes and edits use `active_key_id`. To rotate keys, add a new key, make it active, restart, then use the admin rotation action. Keep every old key until no paste reports that key ID. GitHub Gists marked secret are unlisted, not private: GitHub still exposes owner, timestamps, size, revisions, and ciphertext. Old ciphertext also remains in Gist revision history. The server sees plaintext while processing requests.
+
+Protect both the token and every encryption key with mode `0600`. Losing an old key makes Gists encrypted with it unrecoverable.
+
+## Deployment and recovery
+
+The hardened systemd unit runs as an unprivileged user, keeps releases root-owned under `/opt/sacha.house`, and writes runtime state only under `/var/lib/sacha.house`. Configuration and paste secrets are mounted read-only.
+
+For the NixOS module, set `services.sacha-house.configFile` to a runtime path and set `PASTE_SECRETS_FILE` inside that JSON config to the secret mount. The container uses UID/GID `10001`, `/data` for writable state, `/config/config.json` for configuration, and `/run/secrets/paste-secrets.json` for paste credentials.
+
+Operational scripts:
+
+```bash
+sudo deploy/backup.sh /secure-backups/sacha.house-state.tar.gz
+sudo deploy/restore.sh /secure-backups/sacha.house-state.tar.gz
+sudo deploy/rollback.sh
+```
+
+The state backup includes the blog, passkeys, and caches. It intentionally excludes `/etc/sacha.house/config.json`, the GitHub token, and paste encryption keys; back those secrets up separately in an encrypted secret store. Restore verifies the archive checksum and rolls data back if the health check fails. Release updates use hash-addressed directories and an atomic `current` symlink.
 
 ## Project Structure
 

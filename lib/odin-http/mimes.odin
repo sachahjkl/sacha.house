@@ -34,6 +34,7 @@ mime_from_extension :: proc(s: string) -> Mime_Type {
 	case ".ico":  return .Ico
 	case ".gif":  return .Gif
 	case ".jpeg": return .Jpeg
+	case ".jpg":  return .Jpeg
 	case ".png":  return .Png
 	case ".svg":  return .Svg
 	case ".wasm": return .Wasm

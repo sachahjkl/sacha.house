@@ -13,6 +13,10 @@ function getPasskeyLabel() {
   return input ? input.value.trim() : "";
 }
 
+function getAdminCsrfToken() {
+  return document.getElementById("admin-csrf-token")?.value || "";
+}
+
 function bytesToBase64(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes)));
 }
@@ -107,7 +111,7 @@ async function registerPasskey() {
 
     const verifyRes = await fetch("/admin/webauthn/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-CSRF-Token": getAdminCsrfToken() },
       body: JSON.stringify(credentialData),
     });
 
@@ -386,7 +390,7 @@ async function uploadPastedBlogImage(file, slug) {
   const base64 = await fileToBase64(file);
   const response = await fetch("/admin/blogposts/upload-image", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": getAdminCsrfToken() },
     body: JSON.stringify({
       slug,
       filename: file.name || "pasted-image.png",

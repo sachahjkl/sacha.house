@@ -4,17 +4,13 @@ Post :: struct {
 	slug:        string,
 	title:       string,
 	excerpt:     string,
+	language:     string,
 	publishedAt: string,
 	updatedAt:   string,
 	createdAt:   string,
 	author:      Post_Author,
 }
 
-Posts_Response :: struct {
-	data: struct {
-		posts: []Post,
-	},
-}
 
 Post_Author :: struct {
 	name: string,
@@ -23,6 +19,7 @@ Post_Author :: struct {
 Post_Detail :: struct {
 	slug:      string,
 	title:     string,
+	language:  string,
 	updatedAt: string,
 	createdAt: string,
 	author:    Post_Author,
@@ -32,15 +29,11 @@ Post_Detail :: struct {
 	},
 }
 
-Post_Response :: struct {
-	data: struct {
-		post: Post_Detail,
-	},
-}
 
 Template_Post_Detail :: struct {
 	slug:          string,
 	title:         string,
+	language:      string,
 	updatedAt:     string,
 	createdAt:     string,
 	updatedOn:     string,

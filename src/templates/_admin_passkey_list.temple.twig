@@ -12,6 +12,7 @@
                     </div>
                     <form method="POST" action="/admin/webauthn/remove" hx-post="/admin/webauthn/remove" hx-target="#passkey-list" hx-swap="outerHTML" class="shrink-0">
                         <input type="hidden" name="id" value="{{ passkey.Id }}"/>
+                        <input type="hidden" name="csrf_token" value="{{ this.CsrfToken }}"/>
                         <button type="submit" title="Unregister" aria-label="Unregister" class="h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800">
                             Unregister
                         </button>

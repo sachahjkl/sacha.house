@@ -10,6 +10,10 @@
         "when": "always"
       },
       {
+        "if": '$CI_PIPELINE_SOURCE == "merge_request_event"',
+        "when": "always"
+      },
+      {
         "when": "never"
       }
     ]
@@ -17,7 +21,6 @@
   "variables": {
     "ARTIFACT_NAME": "sacha.house-linux-amd64",
     "DOCKER_IMAGE_ARTIFACT": "sacha.house-docker-image.tar.gz",
-    "ODIN_NIGHTLY_URL": "",
     "NIX_CONFIG": "experimental-features = nix-command flakes\naccept-flake-config = true"
   },
   "build:linux:release": {
@@ -30,51 +33,19 @@
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
     ],
     "script": [
-      "export VERSION=$(tr -d '[:space:]' < VERSION)+${CI_COMMIT_SHORT_SHA}",
-      'echo "VERSION=$VERSION" >> build.env',
       "nix build .#default --out-link result-nix",
       "nix build .#linuxBinary --out-link result-linux",
+      "VERSION=$(result-nix/bin/sacha.house --version)",
+      "printf 'VERSION=%s\\nLINUX_JOB_ID=%s\\n' \"$VERSION\" \"$CI_JOB_ID\" > build.env",
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result-nix ./result-linux | cachix push sachahjkl; fi",
       "cp result-linux/${ARTIFACT_NAME} ${ARTIFACT_NAME}",
-      "chmod +x ${ARTIFACT_NAME}"
+      "chmod +x ${ARTIFACT_NAME}",
+      "sha256sum ${ARTIFACT_NAME} > ${ARTIFACT_NAME}.sha256"
     ],
     "artifacts": {
       "paths": [
-        "${ARTIFACT_NAME}"
-      ],
-      "reports": {
-        "dotenv": "build.env"
-      },
-      "expire_in": "1 week"
-    }
-  },
-  "build:linux:nightly": {
-    "stage": "build",
-    "image": "nixos/nix:2.32.8",
-    "rules": [
-      {
-        "if": '$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != ""',
-        "when": "on_success"
-      }
-    ],
-    "before_script": [
-      "nix profile add nixpkgs#cachix",
-      "export PATH=$HOME/.nix-profile/bin:$PATH",
-      "cachix use sachahjkl",
-      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
-    ],
-    "script": [
-      "export VERSION=$(tr -d '[:space:]' < VERSION)-nightly+${CI_COMMIT_SHORT_SHA}",
-      "echo VERSION=$VERSION >> build.env",
-      "nix build .#default --out-link result-nix",
-      "nix build .#linuxBinary --out-link result-linux",
-      "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result-nix ./result-linux | cachix push sachahjkl; fi",
-      "cp result-linux/${ARTIFACT_NAME} ${ARTIFACT_NAME}",
-      "chmod +x ${ARTIFACT_NAME}"
-    ],
-    "artifacts": {
-      "paths": [
-        "${ARTIFACT_NAME}"
+        "${ARTIFACT_NAME}",
+        "${ARTIFACT_NAME}.sha256"
       ],
       "reports": {
         "dotenv": "build.env"
@@ -92,8 +63,7 @@
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
     ],
     "script": [
-      "export VERSION=$(tr -d '[:space:]' < VERSION)+${CI_COMMIT_SHORT_SHA}",
-      "echo VERSION=$VERSION >> build.env",
+      "echo DOCKER_JOB_ID=$CI_JOB_ID > docker.env",
       "nix build .#dockerImage",
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result | cachix push sachahjkl; fi",
       "cp result ${DOCKER_IMAGE_ARTIFACT}"
@@ -103,14 +73,23 @@
         "${DOCKER_IMAGE_ARTIFACT}"
       ],
       "reports": {
-        "dotenv": "build.env"
+        "dotenv": "docker.env"
       },
       "expire_in": "1 week"
     }
   },
   "release:release": {
     "stage": "release",
-    "image": "registry.gitlab.com/gitlab-org/release-cli:latest",
+    "image": "registry.gitlab.com/gitlab-org/cli:latest",
+    "rules": [
+      {
+        "if": '$CI_COMMIT_BRANCH == "master"',
+        "when": "on_success"
+      },
+      {
+        "when": "never"
+      }
+    ],
     "needs": [
       {
         "job": "build:linux:release",
@@ -132,54 +111,17 @@
         "links": [
           {
             "name": "sacha.house Linux AMD64 Binary",
-            "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${ARTIFACT_NAME}?job=build:linux:release",
+            "url": "${CI_PROJECT_URL}/-/jobs/${LINUX_JOB_ID}/artifacts/raw/${ARTIFACT_NAME}",
+            "link_type": "package"
+          },
+          {
+            "name": "sacha.house Linux AMD64 SHA256",
+            "url": "${CI_PROJECT_URL}/-/jobs/${LINUX_JOB_ID}/artifacts/raw/${ARTIFACT_NAME}.sha256",
             "link_type": "package"
           },
           {
             "name": "sacha.house Docker Image",
-            "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${DOCKER_IMAGE_ARTIFACT}?job=build:docker:image",
-            "link_type": "package"
-          }
-        ]
-      }
-    }
-  },
-  "release:nightly": {
-    "stage": "release",
-    "image": "registry.gitlab.com/gitlab-org/release-cli:latest",
-    "rules": [
-      {
-        "if": '$ODIN_NIGHTLY_URL != null && $ODIN_NIGHTLY_URL != ""',
-        "when": "on_success"
-      }
-    ],
-    "needs": [
-      {
-        "job": "build:linux:nightly",
-        "artifacts": true
-      },
-      {
-        "job": "build:docker:image",
-        "artifacts": true
-      }
-    ],
-    "script": [
-      'echo Creating nightly release $VERSION for sacha.house'
-    ],
-    "release": {
-      "name": "sacha.house $VERSION",
-      "tag_name": "$VERSION",
-      "description": "sacha.house automated nightly release $VERSION",
-      "assets": {
-        "links": [
-          {
-            "name": "sacha.house Linux AMD64 Binary",
-            "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${ARTIFACT_NAME}?job=build:linux:nightly",
-            "link_type": "package"
-          },
-          {
-            "name": "sacha.house Docker Image",
-            "url": "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_REF_NAME}/raw/${DOCKER_IMAGE_ARTIFACT}?job=build:docker:image",
+            "url": "${CI_PROJECT_URL}/-/jobs/${DOCKER_JOB_ID}/artifacts/raw/${DOCKER_IMAGE_ARTIFACT}",
             "link_type": "package"
           }
         ]

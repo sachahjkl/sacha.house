@@ -1,50 +1,36 @@
 package main
 
 import "core:fmt"
-import "core:log"
 import "core:time"
 import "core:time/datetime"
 import "core:time/timezone"
 
-// NOTE(sachahjkl):
-// - This is a global variable that is used to store the timezone.
-// - It is initialized in the `init_timezone` function.
-// - Used for the whole duration of the program and released during shutdown.
-TIMEZONE: ^datetime.TZ_Region
-
-init_timezone :: proc() -> bool {
-	if tz, ok := timezone.region_load("Europe/Paris"); ok {
-		TIMEZONE = tz
-		return true
-	}
-	return false
+timezone_init :: proc(name: string) -> (^datetime.TZ_Region, bool) {
+	return timezone.region_load(name)
 }
 
-cleanup_timezone :: proc() {
-	if TIMEZONE != nil {
-		timezone.region_destroy(TIMEZONE)
-		TIMEZONE = nil
+timezone_destroy :: proc(region: ^datetime.TZ_Region) {
+	if region != nil {
+		timezone.region_destroy(region)
 	}
 }
 
-
-format_date :: proc(date: datetime.DateTime) -> string {
-	local_date := timezone.datetime_to_tz(date, TIMEZONE)
+format_date :: proc(region: ^datetime.TZ_Region, date: datetime.DateTime) -> string {
+	local_date := timezone.datetime_to_tz(date, region)
 
 	if local_date.year == 0 {
 		return "Present"
 	}
-	// format the date as DD/MM/YYYY
 	return fmt.tprintf("%02d/%02d/%04d", local_date.day, local_date.month, local_date.year)
 }
 
-get_local_year :: proc(date: datetime.DateTime) -> i64 {
-	local_date := timezone.datetime_to_tz(date, TIMEZONE)
+get_local_year :: proc(region: ^datetime.TZ_Region, date: datetime.DateTime) -> i64 {
+	local_date := timezone.datetime_to_tz(date, region)
 	return local_date.year
 }
 
-format_time :: proc(date: datetime.DateTime) -> string {
-	local_date := timezone.datetime_to_tz(date, TIMEZONE)
+format_time :: proc(region: ^datetime.TZ_Region, date: datetime.DateTime) -> string {
+	local_date := timezone.datetime_to_tz(date, region)
 	hour, minute, second := local_date.hour, local_date.minute, local_date.second
 
 	return fmt.tprintf("%02d:%02d:%02d", hour, minute, second)

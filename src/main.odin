@@ -7,45 +7,20 @@ import "core:os"
 
 import "core:debug/trace"
 
-
 LoggerOpts :: log.Options{.Level, .Time, .Short_File_Path, .Line, .Terminal_Color, .Thread_Id}
 
 TRACK_LEAKS :: #config(TRACK_LEAKS, true)
-HOT_RELOAD := false
-globals_cleaned_up := false
-
-cleanup_globals :: proc() {
-	if globals_cleaned_up {
-		return
-	}
-	globals_cleaned_up = true
-
-	// NOTE(sachahjkl):
-	// Cleanup global resources before exit
-	cleanup_timezone()
-	cleanup_static_files()
-	cleanup_me()
-
-	// Cleanup linkedin profile cache
-	if linkedin_profile_cache != nil {
-		free(linkedin_profile_cache)
-		linkedin_profile_cache = nil
-	}
-}
 
 main :: proc() {
 	level := log.Level.Debug when ODIN_DEBUG else log.Level.Info
 	context.logger = log.create_console_logger(level, LoggerOpts)
-	defer cleanup_globals()
+	original_allocator := context.allocator
+	defer context.allocator = original_allocator
 
 	when ODIN_DEBUG {
 		trace.init(&global_trace_ctx)
-		defer trace.destroy(&global_trace_ctx)
 		context.assertion_failure_proc = debug_trace_assertion_failure_proc
 	}
-
-	// NOTE(sachahjkl): What a mess.
-	init_random_generator()
 
 	when TRACK_LEAKS {
 		track: mem.Tracking_Allocator
@@ -53,28 +28,49 @@ main :: proc() {
 		context.allocator = mem.tracking_allocator(&track)
 	}
 
-	handle_cli_args()
-
-	if !init_timezone() {
-		log.error("Failed to initialize timezone, exiting...")
-		os.exit(1)
+	cli_options, action, args_ok := parse_cli_args(os.args[1:])
+	if !args_ok {
+		_ = run_cli_action(.Help, &cli_options, nil)
+		return
 	}
-	log.info("Timezone initialized.")
-
-	if !load_config() {
-		log.error("Failed to load config, exiting...")
-		os.exit(1)
+	if action == .Help || action == .Version {
+		_ = run_cli_action(action, &cli_options, nil)
+		return
 	}
-	log.info("Config loaded.")
 
-	// NOTE(sachahjkl): The order of initialization is important.
-	init_static_files()
-	init_me()
-	log.info("Static files and ME initialized.")
+	config, config_err := load_config(get_config_path(), context.allocator)
+	if config_err != .None {
+		log.errorf("Failed to load config: %v", config_err)
+		return
+	}
 
-	server_start()
+	if action == .Hash_Password {
+		exit_code := run_cli_action(action, &cli_options, &config)
+		config_destroy(&config, context.allocator)
+		if exit_code != 0 {
+			os.exit(exit_code)
+		}
+		return
+	}
 
-	cleanup_globals()
+	app: App_State
+	init_err := app_state_init(
+		&app,
+		config,
+		App_Options {
+			hot_reload = cli_options.hot_reload,
+			port = cli_options.port,
+		},
+		context.allocator,
+	)
+	if init_err != .None {
+		log.errorf("Failed to initialize application state: %v", init_err)
+		return
+	}
+	defer app_state_destroy(&app)
+
+	server_start(&app)
+	app_state_destroy(&app)
 
 	when TRACK_LEAKS {
 		for _, leak in track.allocation_map {

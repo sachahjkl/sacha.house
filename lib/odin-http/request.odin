@@ -41,6 +41,14 @@ headers_validate_for_server :: proc(headers: ^Headers) -> bool {
 	return headers_validate(headers)
 }
 
+_content_length_valid :: #force_inline proc(value: string) -> bool {
+	if len(value) == 0 { return false }
+	for c in value {
+		if c < '0' || c > '9' { return false }
+	}
+	return true
+}
+
 // Validates the headers, use `headers_validate_for_server` if these are request headers
 // that should be validated from the server side.
 headers_validate :: proc(headers: ^Headers) -> bool {
@@ -60,6 +68,11 @@ headers_validate :: proc(headers: ^Headers) -> bool {
 	// (Section 9.4) and ought to be handled as an error.
 	if headers_has_unsafe(headers^, "transfer-encoding") && headers_has_unsafe(headers^, "content-length") {
 		headers_delete_unsafe(headers, "content-length")
+	}
+
+	if content_length, ok := headers_get_unsafe(headers^, "content-length");
+	   ok && !_content_length_valid(content_length) {
+		return false
 	}
 
 	return true

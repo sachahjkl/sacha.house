@@ -1,87 +1,88 @@
 package main
 
+import "core:mem"
 import "core:os"
 import "core:strings"
 
 import http "lib:odin-http"
 
 Static_File :: struct {
-	data:      []u8,
-	mime_type: string,
+	data: []u8,
 }
 
-static_files: map[string]Static_File
+Static_Store :: struct {
+	files:     map[string]Static_File,
+	allocator: mem.Allocator,
+}
 
 STATIC_ASSETS := #load_directory("static")
 STATIC_ASSETS_CSS := #load_directory("static/css")
 STATIC_ASSETS_JS := #load_directory("static/js")
 STATIC_ASSETS_GIFS := #load_directory("static/gifs")
 STATIC_ASSETS_FONTS := #load_directory("static/fonts")
-STATIC_ASSETS_SHARE := #load_directory("static/share")
 
-init_static_files :: proc() {
-	static_files = make(map[string]Static_File, context.allocator)
-	for file in STATIC_ASSETS {
-		path, _ := os.replace_path_separators(file.name, '/', context.temp_allocator)
-		mime_type := get_mime_type(path)
-		static_files[strings.clone(path)] = Static_File{file.data, mime_type}
+static_store_add :: proc(store: ^Static_Store, prefix, name: string, data: []u8) -> mem.Allocator_Error {
+	path, _ := os.replace_path_separators(name, '/', context.temp_allocator)
+	full_path := path
+	if prefix != "" {
+		full_path = strings.concatenate({prefix, path}, context.temp_allocator)
 	}
-	css_prefix :: "css/"
-	for file in STATIC_ASSETS_CSS {
-		path, _ := os.replace_path_separators(file.name, '/', context.temp_allocator)
-		full_path := strings.concatenate({css_prefix, path})
-		defer delete(full_path)
-		mime_type := get_mime_type(full_path)
-		static_files[strings.clone(full_path)] = Static_File{file.data, mime_type}
-	}
-	js_prefix :: "js/"
-	for file in STATIC_ASSETS_JS {
-		path, _ := os.replace_path_separators(file.name, '/', context.temp_allocator)
-		full_path := strings.concatenate({js_prefix, path})
-		defer delete(full_path)
-		mime_type := get_mime_type(full_path)
-		static_files[strings.clone(full_path)] = Static_File{file.data, mime_type}
-	}
-	gifs_prefix :: "gifs/"
-	for file in STATIC_ASSETS_GIFS {
-		path, _ := os.replace_path_separators(file.name, '/', context.temp_allocator)
-		full_path := strings.concatenate({gifs_prefix, path})
-		defer delete(full_path)
-		mime_type := get_mime_type(full_path)
-		static_files[strings.clone(full_path)] = Static_File{file.data, mime_type}
-	}
-	fonts_prefix :: "fonts/"
-	for file in STATIC_ASSETS_FONTS {
-		path, _ := os.replace_path_separators(file.name, '/', context.temp_allocator)
-		full_path := strings.concatenate({fonts_prefix, path})
-		defer delete(full_path)
-		mime_type := get_mime_type(full_path)
-		static_files[strings.clone(full_path)] = Static_File{file.data, mime_type}
-	}
-	share_prefix :: "share/"
-	for file in STATIC_ASSETS_SHARE {
-		path, _ := os.replace_path_separators(file.name, '/', context.temp_allocator)
-		full_path := strings.concatenate({share_prefix, path})
-		defer delete(full_path)
-		mime_type := get_mime_type(full_path)
-		static_files[strings.clone(full_path)] = Static_File{file.data[:], mime_type}
-	}
+	owned_path := strings.clone(full_path, store.allocator) or_return
+	store.files[owned_path] = Static_File{data = data}
+	return .None
 }
 
-cleanup_static_files :: proc() {
-	if static_files == nil {
+static_store_init :: proc(store: ^Static_Store, allocator := context.allocator) -> mem.Allocator_Error {
+	store.allocator = allocator
+	store.files = make(map[string]Static_File, allocator)
+	for file in STATIC_ASSETS {
+		if err := static_store_add(store, "", file.name, file.data); err != .None {
+			static_store_destroy(store)
+			return err
+		}
+	}
+	for file in STATIC_ASSETS_CSS {
+		if err := static_store_add(store, "css/", file.name, file.data); err != .None {
+			static_store_destroy(store)
+			return err
+		}
+	}
+	for file in STATIC_ASSETS_JS {
+		if err := static_store_add(store, "js/", file.name, file.data); err != .None {
+			static_store_destroy(store)
+			return err
+		}
+	}
+	for file in STATIC_ASSETS_GIFS {
+		if err := static_store_add(store, "gifs/", file.name, file.data); err != .None {
+			static_store_destroy(store)
+			return err
+		}
+	}
+	for file in STATIC_ASSETS_FONTS {
+		if err := static_store_add(store, "fonts/", file.name, file.data); err != .None {
+			static_store_destroy(store)
+			return err
+		}
+	}
+	return .None
+}
+
+static_store_destroy :: proc(store: ^Static_Store) {
+	if store == nil || store.files == nil {
 		return
 	}
-	for path in static_files {
-		delete(path)
+	for path in store.files {
+		delete(path, store.allocator)
 	}
-	delete(static_files)
-	static_files = nil
+	delete(store.files)
+	store^ = {}
 }
 
-serve_static_file :: proc(req: ^http.Request, res: ^http.Response) {
+serve_static_file :: proc(handler: ^http.Handler, req: ^http.Request, res: ^http.Response) {
+	app := app_from_handler(handler)
 	path := req.url_params[0]
-	if file, ok := static_files[path]; ok {
+	if file, ok := app.static.files[path]; ok {
 		set_cache_header(res)
 		http.respond_file_content(res, path, file.data[:])
 	} else {
@@ -89,40 +90,3 @@ serve_static_file :: proc(req: ^http.Request, res: ^http.Response) {
 	}
 }
 
-get_mime_type :: proc(path: string) -> string {
-	ext := os.ext(path)
-	switch ext {
-	case ".html":
-		return "text/html"
-	case ".gpg":
-		return "application/pgp-keys"
-	case ".pub":
-		return "text/plain"
-	case ".css":
-		return "text/css"
-	case ".js":
-		return "application/javascript"
-	case ".png":
-		return "image/png"
-	case ".jpg", ".jpeg":
-		return "image/jpeg"
-	case ".gif":
-		return "image/gif"
-	case ".svg":
-		return "image/svg+xml"
-	case ".ico":
-		return "image/x-icon"
-	case ".webmanifest":
-		return "application/manifest+json"
-	case ".xml":
-		return "application/xml"
-	case ".pdf":
-		return "application/pdf"
-	case ".ttf":
-		return "font/ttf"
-	case ".exe":
-		return "application/octet-stream"
-	case:
-		return "text/plain"
-	}
-}

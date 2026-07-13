@@ -8,6 +8,7 @@
     </p>
 
     <h1 class="h1">manage passkeys</h1>
+    <input id="admin-csrf-token" type="hidden" value="{{ this.CsrfToken }}"/>
 
     <section>
         <h2>🔐 WebAuthn Passkeys</h2>
@@ -30,7 +31,7 @@
                     🧪 Test Passkey
                 </button>
             </div>
-            <div id="passkey-status" class="mt-4 hidden p-3"></div>
+            <div id="passkey-status" class="mt-4 hidden p-3" role="status" aria-live="polite" aria-atomic="true"></div>
 
             {% embed "_admin_passkey_list.temple.twig" with this.Passkeys %}
 
@@ -49,7 +50,7 @@
                     Debug YubiKey
                 </button>
             </form>
-            <pre id="passkey-debug-output" class="wrap-anywhere mt-3 hidden overflow-x-auto border border-current p-3 text-xs"></pre>
+            <pre id="passkey-debug-output" class="wrap-anywhere mt-3 hidden overflow-x-auto border border-current p-3 text-xs" role="status" aria-live="polite" aria-atomic="true"></pre>
         </div>
     </section>
 </article>

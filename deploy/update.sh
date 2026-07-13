@@ -1,96 +1,132 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+umask 077
 
-INSTALL_DIR="/opt/sacha.house"
-SERVICE_NAME="sacha.house.service"
-BINARY_NAME="sacha.house"
-GITLAB_PROJECT="sachahjkl%2Fsacha.house"
-GITLAB_URL="https://gitlab.com"
-EMAIL_TO="admin"
+readonly INSTALL_ROOT="/opt/sacha.house"
+readonly RELEASES_DIR="${INSTALL_ROOT}/releases"
+readonly CURRENT_LINK="${INSTALL_ROOT}/current"
+readonly PREVIOUS_LINK="${INSTALL_ROOT}/previous"
+readonly DEPLOY_STATE_DIR="/var/lib/sacha.house-deploy"
+readonly SERVICE_NAME="sacha.house.service"
+readonly ARTIFACT_NAME="sacha.house-linux-amd64"
+readonly RELEASE_API="https://gitlab.com/api/v4/projects/sachahjkl%2Fsacha.house/releases/permalink/latest"
+readonly HEALTH_URL="http://127.0.0.1:6969/ping"
 
-cd "$INSTALL_DIR"
-
-echo "Fetching latest release..."
-RELEASE_DATA=$(curl -s "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT}/releases" | head -1)
-
-if [ -z "$RELEASE_DATA" ]; then
-    echo "Failed to fetch latest release"
-    echo "Failed to fetch latest sacha.house release from GitLab" | mail -s "sacha.house Update Failed" "$EMAIL_TO"
+if (( EUID != 0 )); then
+    printf 'update must run as root\n' >&2
     exit 1
 fi
 
-DOWNLOAD_URL=$(echo "$RELEASE_DATA" | grep -o '"url":"[^"]*sacha.house-linux-amd64[^"]*"' | head -1 | cut -d'"' -f4)
+install -d -o root -g root -m 0755 "$INSTALL_ROOT" "$RELEASES_DIR"
+install -d -o root -g root -m 0700 "$DEPLOY_STATE_DIR"
+work_dir="$(mktemp -d "${DEPLOY_STATE_DIR}/update.XXXXXXXX")"
+current_temp="${CURRENT_LINK}.new.$$"
+previous_temp="${PREVIOUS_LINK}.new.$$"
+trap 'rm -rf -- "$work_dir"; rm -f -- "$current_temp" "$previous_temp"' EXIT
 
-if [ -z "$DOWNLOAD_URL" ]; then
-    echo "Failed to find download URL"
-    echo "Failed to find download URL in latest sacha.house release" | mail -s "sacha.house Update Failed" "$EMAIL_TO"
+curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 \
+    "$RELEASE_API" --output "$work_dir/release.json"
+
+binary_url="$(jq -er '.assets.links | first(.[] | select(.name == "sacha.house Linux AMD64 Binary")) | .direct_asset_url // .url' "$work_dir/release.json")"
+checksum_url="$(jq -er '.assets.links | first(.[] | select(.name == "sacha.house Linux AMD64 SHA256")) | .direct_asset_url // .url' "$work_dir/release.json")"
+release_version="$(jq -er '.tag_name' "$work_dir/release.json")"
+
+curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 \
+    "$binary_url" --output "$work_dir/$ARTIFACT_NAME"
+curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 \
+    "$checksum_url" --output "$work_dir/$ARTIFACT_NAME.sha256"
+
+read -r expected_hash expected_name < "$work_dir/$ARTIFACT_NAME.sha256"
+expected_name="${expected_name#\*}"
+if [[ ! "$expected_hash" =~ ^[0-9a-f]{64}$ ]] || [[ "$expected_name" != "$ARTIFACT_NAME" ]]; then
+    printf 'release checksum has an invalid format\n' >&2
+    exit 1
+fi
+actual_hash="$(sha256sum "$work_dir/$ARTIFACT_NAME")"
+actual_hash="${actual_hash%% *}"
+if [[ "$actual_hash" != "$expected_hash" ]]; then
+    printf 'release checksum verification failed\n' >&2
     exit 1
 fi
 
-echo "Downloading binary from $DOWNLOAD_URL..."
-curl -L -f "$DOWNLOAD_URL" -o "${BINARY_NAME}.new"
+chmod 0755 "$work_dir/$ARTIFACT_NAME"
+binary_version="$("$work_dir/$ARTIFACT_NAME" --version)"
+if [[ "$binary_version" != "$release_version" ]]; then
+    printf 'release tag does not match the binary version\n' >&2
+    exit 1
+fi
 
-chmod +x "${BINARY_NAME}.new"
+release_dir="${RELEASES_DIR}/${actual_hash}"
+if [[ -e "$release_dir" && ! -d "$release_dir" ]]; then
+    printf 'release path is not a directory: %s\n' "$release_dir" >&2
+    exit 1
+fi
+install -d -o root -g root -m 0755 "$release_dir"
+if [[ ! -f "$release_dir/sacha.house" ]]; then
+    install -o root -g root -m 0755 "$work_dir/$ARTIFACT_NAME" "$release_dir/sacha.house"
+fi
+installed_hash="$(sha256sum "$release_dir/sacha.house")"
+installed_hash="${installed_hash%% *}"
+if [[ "$installed_hash" != "$actual_hash" ]]; then
+    printf 'installed release failed checksum verification\n' >&2
+    exit 1
+fi
 
-# Check if the new binary is different from the current one
-if [ -f "$BINARY_NAME" ]; then
-    if cmp -s "$BINARY_NAME" "${BINARY_NAME}.new"; then
-        # Get version info from current binary
-        VERSION_INFO=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
-        echo "New binary is identical to current binary. No update needed - $VERSION_INFO"
-        rm "${BINARY_NAME}.new"
+atomic_switch() {
+    local link_path="$1"
+    local link_temp="$2"
+    local target="$3"
+    ln -s "$target" "$link_temp"
+    mv -Tf "$link_temp" "$link_path"
+}
+
+wait_until_healthy() {
+    local attempt
+    for attempt in {1..30}; do
+        if systemctl is-active --quiet "$SERVICE_NAME" && \
+           curl --fail --silent --show-error --max-time 2 "$HEALTH_URL" >/dev/null; then
+            return 0
+        fi
+        sleep 1
+    done
+    return 1
+}
+
+old_target=""
+if [[ -L "$CURRENT_LINK" ]]; then
+    old_target="$(readlink -f "$CURRENT_LINK")"
+fi
+if [[ "$old_target" == "$release_dir" ]]; then
+    if systemctl restart "$SERVICE_NAME" && wait_until_healthy; then
+        printf 'verified active release %s\n' "$actual_hash"
         exit 0
     fi
-fi
-
-# Get current version before updating
-CURRENT_VERSION=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
-
-echo "Binary is different, proceeding with update..."
-echo "Stopping service..."
-sudo systemctl stop "$SERVICE_NAME"
-
-if [ -f "$BINARY_NAME" ]; then
-    echo "Backing up current binary..."
-    cp "$BINARY_NAME" "${BINARY_NAME}.bak"
-fi
-
-mv "${BINARY_NAME}.new" "$BINARY_NAME"
-
-echo "Starting service..."
-sudo systemctl start "$SERVICE_NAME"
-
-sleep 5
-
-if ! sudo systemctl is-active --quiet "$SERVICE_NAME"; then
-    echo "Service failed to start, rolling back..."
-    
-    if [ -f "${BINARY_NAME}.bak" ]; then
-        mv "${BINARY_NAME}.bak" "$BINARY_NAME"
-        sudo systemctl start "$SERVICE_NAME"
-        
-        if sudo systemctl is-active --quiet "$SERVICE_NAME"; then
-            # Get version info from rolled back binary
-            ROLLBACK_VERSION=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
-            echo "Rollback successful: $NEW_VERSION -> $ROLLBACK_VERSION"
-            echo "Service failed to start with new binary. Rolled back from $NEW_VERSION to $ROLLBACK_VERSION" | mail -s "sacha.house Update Failed" "$EMAIL_TO"
-        else
-            echo "Rollback failed"
-            echo "Service failed to start even after rollback. Manual intervention required." | mail -s "sacha.house CRITICAL FAILURE" "$EMAIL_TO"
-        fi
-    else
-        echo "No backup available for rollback"
-        echo "Service failed to start and no backup available for rollback." | mail -s "sacha.house Update Failed" "$EMAIL_TO"
-    fi
+    printf 'active release failed its health check\n' >&2
     exit 1
 fi
 
-# Get version info from the updated binary
-NEW_VERSION=$("./$BINARY_NAME" --version 2>/dev/null || echo "Unknown version")
+atomic_switch "$CURRENT_LINK" "$current_temp" "$release_dir"
+if systemctl restart "$SERVICE_NAME" && wait_until_healthy; then
+    if [[ -n "$old_target" && -x "$old_target/sacha.house" ]]; then
+        atomic_switch "$PREVIOUS_LINK" "$previous_temp" "$old_target"
+    fi
+    printf 'activated verified release %s\n' "$actual_hash"
+    exit 0
+fi
 
-echo "Update successful: $CURRENT_VERSION -> $NEW_VERSION"
-echo "Successfully updated sacha.house from $CURRENT_VERSION to $NEW_VERSION" | mail -s "sacha.house Updated" "$EMAIL_TO"
-
-rm -f "${BINARY_NAME}.bak"
-
+printf 'new release failed its health check; rolling back\n' >&2
+if [[ -n "$old_target" && -x "$old_target/sacha.house" ]]; then
+    atomic_switch "$CURRENT_LINK" "$current_temp" "$old_target"
+    systemctl restart "$SERVICE_NAME"
+    if wait_until_healthy; then
+        printf 'rollback restored %s\n' "$old_target" >&2
+    else
+        printf 'rollback target failed its health check\n' >&2
+    fi
+else
+    rm -f -- "$CURRENT_LINK"
+    systemctl stop "$SERVICE_NAME" || true
+    printf 'no previous release was available\n' >&2
+fi
+exit 1

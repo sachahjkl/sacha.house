@@ -25,6 +25,7 @@ Response :: struct {
 	// connection (maybe a small buffer in this struct).
 	_buf:             bytes.Buffer,
 	_heading_written: bool,
+	_heading_length:  int,
 }
 
 response_init :: proc(r: ^Response, allocator := context.allocator) {
@@ -242,7 +243,7 @@ _response_write_heading :: proc(r: ^Response, content_length: int) {
 	// Per RFC 9910 6.6.1 a Date header must be added in 2xx, 3xx, 4xx responses.
 	if r.status >= .OK && r.status <= .Internal_Server_Error && !headers_has_unsafe(r.headers, "date") {
 		ws(b, "date: ")
-		ws(b, server_date(conn.server))
+		server_date_write(b, conn.server)
 		ws(b, "\r\n")
 	}
 
@@ -279,6 +280,7 @@ _response_write_heading :: proc(r: ^Response, content_length: int) {
 
 	// Empty line denotes end of headers and start of body.
 	ws(b, "\r\n")
+	r._heading_length = bytes.buffer_length(b)
 }
 
 // Sends the response over the connection.
@@ -334,6 +336,9 @@ response_send_got_body :: proc(r: ^Response, will_close: bool) {
 	}
 
 	buf := bytes.buffer_to_bytes(&r._buf)
+	if conn.loop.req.is_head {
+		buf = buf[:r._heading_length]
+	}
 	nbio.send_poly(conn.socket, {buf}, conn, on_response_sent)
 }
 

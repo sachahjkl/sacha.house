@@ -7,10 +7,10 @@
 	"migrate:blog": "bun run ./tools/blog-migrate/migrate-blogposts.ts"
   },
   "dependencies": {
-	"turndown": "^7.2.1",
-    "@tailwindcss/typography": "^0.5.16",
-    "tailwindcss": "^4.1.13",
-    "@tailwindcss/cli": "^4.1.13"
+	"turndown": "7.2.1",
+    "@tailwindcss/typography": "0.5.16",
+    "tailwindcss": "4.1.13",
+    "@tailwindcss/cli": "4.1.13"
   },
   "trustedDependencies": [
     "@parcel/watcher",

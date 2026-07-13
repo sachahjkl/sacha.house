@@ -66,14 +66,14 @@ generate_random_string :: proc(
 	return strings.to_string(builder)
 }
 
-generate_random_hsl_string :: proc(allocator := context.allocator) -> string {
-	hue := rand.int31_max(360)
+generate_random_hsl_string :: proc(generator: rand.Generator, allocator := context.allocator) -> string {
+	hue := rand.int31_max(360, generator)
 	sat_max: i32 = 100
 	sat_min: i32 = 70
 	light_max: i32 = 60
 	light_min: i32 = 40
-	saturation := rand.int31_max(sat_max - sat_min) + sat_min
-	lightness := rand.int31_max(light_max - light_min) + light_min
+	saturation := rand.int31_max(sat_max - sat_min, generator) + sat_min
+	lightness := rand.int31_max(light_max - light_min, generator) + light_min
 	return fmt.aprintf("hsl(%d, %d%%, %d%%)", hue, saturation, lightness, allocator = allocator)
 }
 

@@ -2,9 +2,10 @@
   "id": "gift-to-my-hard-workers",
   "slug": "gift-to-my-hard-workers",
   "title": "Gift to my hard workers",
-  "status": "published",
+  "status": "draft",
   "publishedAt": "2023-09-08T15:14:57.152298+00:00",
   "updatedAt": "2024-02-22T11:42:22.005098+00:00",
   "createdAt": "2023-09-08T15:14:57.152298+00:00",
+  "language": "en",
   "author": "Sacha FROMENT"
 }
