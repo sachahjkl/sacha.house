@@ -128,6 +128,8 @@ sudo deploy/rollback.sh
 
 The state backup includes the blog, passkeys, and caches. It intentionally excludes `/etc/sacha.house/config.json`, the GitHub token, and paste encryption keys; back those secrets up separately in an encrypted secret store. Restore verifies the archive checksum and rolls data back if the health check fails. Release updates use hash-addressed directories and an atomic `current` symlink.
 
+Blog metadata must include a `language` of `en` or `fr`. Older posts without the field are read as English for compatibility; set the correct language in their `post.json` metadata when migrating stored blog data.
+
 ## Project Structure
 
 *   `src/`: Main application source code.

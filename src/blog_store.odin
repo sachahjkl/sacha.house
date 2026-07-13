@@ -373,6 +373,10 @@ load_blog_post_metadata_by_slug_unlocked :: proc(store: ^Blog_Store, slug: strin
 	if meta.status != "draft" && meta.status != "published" {
 		return Blog_Post_Metadata{}, Error{type = .Validation, msg = "Blog metadata has an invalid status"}
 	}
+	// Language was added after the first on-disk blog format; migrate legacy posts explicitly.
+	if meta.language == "" {
+		meta.language = "en"
+	}
 	if meta.language != "en" && meta.language != "fr" {
 		return Blog_Post_Metadata{}, Error{type = .Validation, msg = "Blog metadata has an invalid language"}
 	}
