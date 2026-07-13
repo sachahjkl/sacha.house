@@ -10,6 +10,7 @@ Cli_Action :: enum {
 	Help,
 	Version,
 	Hash_Password,
+	Verify_Password,
 }
 
 Cli_Options :: struct {
@@ -43,6 +44,10 @@ parse_cli_args :: proc(args: []string) -> (Cli_Options, Cli_Action, bool) {
 			if action != .Serve do return {}, .Serve, false
 			action = .Hash_Password
 			options.password = arg[len("--hash-password="):]
+		} else if strings.has_prefix(arg, "--verify-password=") {
+			if action != .Serve do return {}, .Serve, false
+			action = .Verify_Password
+			options.password = arg[len("--verify-password="):]
 		} else {
 			fmt.eprintf("Error: Unknown argument '%s'\n\n", arg)
 			return {}, .Serve, false
@@ -69,6 +74,16 @@ run_cli_action :: proc(action: Cli_Action, options: ^Cli_Options, config: ^Confi
 			fmt.eprintln("Error: Failed to hash password")
 			return 1
 		}
+	case .Verify_Password:
+		if config == nil || !is_admin_password_configured(config) {
+			fmt.eprintln("Error: ADMIN_PASSWORD_HASH and PASSWORD_SALT must be set in config")
+			return 1
+		}
+		if !verify_password(config, options.password, config.ADMIN_PASSWORD_HASH) {
+			fmt.eprintln("Password does not match")
+			return 1
+		}
+		fmt.println("Password matches")
 	case .Serve:
 		return 1
 	}
@@ -92,6 +107,7 @@ print_help :: proc() {
 	fmt.println("  -v, --version           Show version")
 	fmt.println("  -dev                    Run in development mode (enables hot reload)")
 	fmt.println("  --hash-password=<pass>  Generate an argon2id hash using PASSWORD_SALT")
+	fmt.println("  --verify-password=<pass>  Verify a password against the configured admin hash")
 	fmt.println()
 	fmt.println("ENVIRONMENT VARIABLES:")
 	fmt.println("  CONFIG_PATH         Path to config file (default: config.json)")

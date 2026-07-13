@@ -275,7 +275,7 @@ atomic_write_file :: proc(generator: ^rand.Generator, path: string, data: []byte
 	}
 
 	dir_path := os.dir(path)
-	dir, dir_err := os.open(dir_path)
+	dir, dir_err := os.open(dir_path, os.O_RDONLY)
 	if dir_err != nil {
 		log.error("Failed to open WebAuthn credentials directory for synchronization")
 		return false

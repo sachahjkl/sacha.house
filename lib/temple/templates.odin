@@ -542,756 +542,6 @@ compiled :: proc($path: string, $T: typeid) -> Compiled(T) {
 			}, 
 			approx_bytes = 9679,
 		}
-	}else	when path == "templates/posts.temple.twig" {
-		return {
-			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
-				{ /* 1:1 in template embedding "_header.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
-					{ /* 3:2 in template embedding "_head.temple.twig" */
-						this := this
-						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
-						
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
-					for item, i in this.NavItems { /* 13:7 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
-						if item.CanAccess { /* 14:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
-							if item.IsActive { /* 16:46 in template */
-								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
-							}
-							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
-						if i != len(this.NavItems) - 1 { /* 22:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
-					for item, i in this.NavItems { /* 50:11 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
-						if item.IsActive { /* 53:13 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
-						if i != len(this.NavItems) - 1 { /* 58:12 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n\t<article class=\"blog-page\">\n\t\t<h1 class=\"h1 flex items-center gap-2\">\n\t\t\tblog\n\t\t\t<a href=\"/blog/rss.xml\" hx-boost=\"false\" target=\"_blank\" title=\"RSS Feed\" class=\"opacity-50 hover:opacity-100 \">\n\t\t\t\t<img src=\"/static/rss.svg\" alt=\"RSS Feed\" class=\"h-6 w-6\"/>\n\t\t\t</a>\n\t\t\t<a href=\"/blog/atom.xml\" hx-boost=\"false\" target=\"_blank\" title=\"Atom Feed\" class=\"opacity-50 hover:opacity-100\">\n\t\t\t\t<img src=\"/static/atom.svg\" alt=\"Atom Feed\" class=\"h-6 w-6\"/>\n\t\t\t</a>\n\t\t</h1>\n\n\n\t\t<h2 class=\"mb-2 font-bold\">\U0001f4f0 Available articles</h2>") or_return /* 1:49 in template */
-				if len(this.YearGroups) == 0 { /* 15:3 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t<p>No articles yet.</p>") or_return /* 15:37 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 17:12 in template */
-				for group in this.YearGroups { /* 18:3 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t<h3 class=\"text-xl font-bold mt-4 mb-2\">") or_return /* 18:37 in template */
-					__temple_n += __temple_io.write_int(__temple_w, int(group.year)) or_return /* 19:44 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "</h3>\n\t\t\t<ul class=\"list-inside list-[square]\">") or_return /* 19:65 in template */
-					for post in group.posts { /* 21:5 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"/blog/") or_return /* 21:34 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, post.slug) or_return /* 23:22 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\" ") or_return /* 23:37 in template */
-						if post.excerpt != "" { /* 23:39 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "aria-describedby=\"excerpt-") or_return /* 23:66 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, post.slug) or_return /* 23:92 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\"") or_return /* 23:107 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, ">\n\t\t\t\t\t\t\t") or_return /* 23:117 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, post.title) or_return /* 24:8 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t</a>") or_return /* 24:24 in template */
-						if post.excerpt != "" { /* 26:7 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<p id=\"excerpt-") or_return /* 26:34 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, post.slug) or_return /* 27:23 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"wrap-anywhere mb-3 mt-1 list-none text-sm opacity-70\">\n\t\t\t\t\t\t\t\t") or_return /* 27:38 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, post.excerpt) or_return /* 28:9 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</p>") or_return /* 28:27 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t</li>") or_return /* 30:16 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "</ul>") or_return /* 32:15 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "</article>") or_return /* 33:14 in template */
-				{ /* 34:4 in template embedding "_footer.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
-					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
-					if this.HotReload { /* 16:1 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 34:52 in template */
-				return
-			}, 
-			approx_bytes = 6100,
-		}
-	}else	when path == "templates/post.temple.twig" {
-		return {
-			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
-				{ /* 1:1 in template embedding "_header.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
-					{ /* 3:2 in template embedding "_head.temple.twig" */
-						this := this
-						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
-						
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
-					for item, i in this.NavItems { /* 13:7 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
-						if item.CanAccess { /* 14:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
-							if item.IsActive { /* 16:46 in template */
-								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
-							}
-							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
-						if i != len(this.NavItems) - 1 { /* 22:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
-					for item, i in this.NavItems { /* 50:11 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
-						if item.IsActive { /* 53:13 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
-						if i != len(this.NavItems) - 1 { /* 58:12 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n\t<p class=\"mb-4 text-sm\">\n\t\t<a href=\"/blog\" class=\"opacity-60 underline\">\n\t\t\t<span class=\"inline-block rotate-180\">\u279c</span>\n\t\t\tGo back to the articles list\n\t\t</a>\n\t</p>\n\t<hgroup class=\"mb-4\">\n\t\t<h1 class=\"h1 mb-0\">") or_return /* 1:49 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.title) or_return /* 9:23 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "</h1>\n\t\t<small class=\"text-textColor/50 text-sm\">\n\t\t\tcrea:\n\t\t\t<span title=\"created on ") or_return /* 9:44 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.createdOn) or_return /* 12:28 in template */
-				__temple_n += __temple_io.write_string(__temple_w, " at ") or_return /* 12:53 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.createdAtTime) or_return /* 12:57 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\">") or_return /* 12:86 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.createdOn) or_return /* 12:88 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "</span>\n\t\t\t/ upd:\n\t\t\t<span title=\"last updated on ") or_return /* 12:113 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.updatedOn) or_return /* 14:33 in template */
-				__temple_n += __temple_io.write_string(__temple_w, " at ") or_return /* 14:58 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.updatedAtTime) or_return /* 14:62 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\">") or_return /* 14:91 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.updatedOn) or_return /* 14:93 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "</span>\n\n\t\t</small>\n\t</hgroup>\n\t<article class=\"prose\">\n\t\t") or_return /* 14:118 in template */
-				__temple_n += __temple_io.write_string(__temple_w, this.Post.content.html) or_return /* 19:3 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\n\t</article>\n") or_return /* 19:37 in template */
-				{ /* 22:2 in template embedding "_footer.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
-					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
-					if this.HotReload { /* 16:1 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 22:50 in template */
-				return
-			}, 
-			approx_bytes = 5698,
-		}
-	}else	when path == "templates/admin_blogpost_editor.temple.twig" {
-		return {
-			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
-				{ /* 1:1 in template embedding "_header.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
-					{ /* 3:2 in template embedding "_head.temple.twig" */
-						this := this
-						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
-						
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
-					for item, i in this.NavItems { /* 13:7 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
-						if item.CanAccess { /* 14:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
-							if item.IsActive { /* 16:46 in template */
-								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
-							}
-							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
-						if i != len(this.NavItems) - 1 { /* 22:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
-					for item, i in this.NavItems { /* 50:11 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
-						if item.IsActive { /* 53:13 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
-						if i != len(this.NavItems) - 1 { /* 58:12 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"mx-auto max-w-5xl\">\n    <p class=\"mb-4 text-sm\">\n        <a href=\"/admin/blogposts\" class=\"opacity-60 underline\">\n            <span class=\"inline-block rotate-180\">\u279c</span>\n            Go back to the blogposts manager\n        </a>\n    </p>\n") or_return /* 1:49 in template */
-				if this.Form.IsNew { /* 10:5 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n        <h1 class=\"h1 mb-4\">new blogpost</h1>") or_return /* 10:29 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 12:14 in template */
-				if !this.Form.IsNew { /* 13:5 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n        <h1 class=\"h1 mb-4\">edit blogpost</h1>") or_return /* 13:30 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 15:14 in template */
-				if this.Error != "" { /* 17:5 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n        <div class=\"mb-4 border-2 border-red-500 bg-red-100 p-3 text-red-800\" role=\"alert\">") or_return /* 17:30 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Error) or_return /* 18:92 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "</div>") or_return /* 18:108 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n\n    <div id=\"blog-editor-status\" class=\"mb-4 hidden border-2 border-blue-300 bg-blue-100 p-3 text-blue-800\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n\n    <form method=\"POST\" action=\"") or_return /* 19:14 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.FormAction) or_return /* 23:33 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\" data-blog-editor class=\"flex flex-col gap-4\">\n        <input id=\"admin-csrf-token\" type=\"hidden\" name=\"csrf_token\" value=\"") or_return /* 23:59 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.CsrfToken) or_return /* 24:77 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\"/>\n        <div class=\"grid gap-4 md:grid-cols-2\">\n            <label class=\"flex flex-col gap-1\">\n                <span>Title</span>\n                <input id=\"blog-title\" type=\"text\" name=\"title\" value=\"") or_return /* 24:102 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.Title) or_return /* 28:72 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\" required class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Slug</span>\n                <input id=\"blog-slug\" type=\"text\" name=\"slug\" value=\"") or_return /* 28:93 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.Slug) or_return /* 33:70 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\" required class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Status</span>") or_return /* 33:90 in template */
-				if this.Form.Status == "published" { /* 38:17 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n                    <select name=\"status\" class=\"h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0\">\n                        <option value=\"draft\" class=\"bg-bgColor text-textColor\">draft</option>\n                        <option value=\"published\" selected class=\"bg-bgColor text-textColor\">published</option>\n                    </select>") or_return /* 38:57 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 43:26 in template */
-				if this.Form.Status != "published" { /* 44:17 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n                    <select name=\"status\" class=\"h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0\">\n                        <option value=\"draft\" selected class=\"bg-bgColor text-textColor\">draft</option>\n                        <option value=\"published\" class=\"bg-bgColor text-textColor\">published</option>\n                    </select>") or_return /* 44:57 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Language</span>\n                <select name=\"language\" class=\"h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0\">\n                    <option value=\"en") or_return /* 49:26 in template */
-				if this.Form.Language == "en" { /* 55:40 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "selected") or_return /* 55:75 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, ">English</option>\n                    <option value=\"fr") or_return /* 55:92 in template */
-				if this.Form.Language == "fr" { /* 56:40 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "selected") or_return /* 56:75 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, ">Français</option>\n                </select>\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Published At</span>\n                <div class=\"flex gap-2\">\n                    <input id=\"blog-published-at\" type=\"datetime-local\" name=\"publishedAt\" value=\"") or_return /* 56:92 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.PublishedAt) or_return /* 63:99 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\" class=\"h-10 min-w-0 flex-1 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n                    <button type=\"button\" id=\"blog-published-at-picker\" class=\"h-10 border-2 border-textColor px-3 leading-8\">\n                        pick\n                    </button>\n                </div>\n            </label>\n        </div>\n\n        <div>\n            <p class=\"mb-2 text-sm opacity-70\">\n                Paste an image directly into the markdown textarea with Ctrl+V and it will upload automatically.\n                Set the slug first so the image is stored under the correct post.\n            </p>\n            <label class=\"flex flex-col gap-1\">\n                <span>Markdown</span>\n                <textarea id=\"blog-markdown\" name=\"markdown\" rows=\"24\" class=\"min-h-[32rem] border-2 border-textColor bg-transparent p-3 font-mono text-sm text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\">") or_return /* 63:126 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.Markdown) or_return /* 78:228 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "</textarea>\n            </label>\n        </div>\n\n        <div class=\"flex flex-wrap gap-3\">\n            <button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center\">\n                Save blogpost\n            </button>\n") or_return /* 78:252 in template */
-				if this.Form.PublicUrl != "" { /* 87:13 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n                <a href=\"") or_return /* 87:47 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Form.PublicUrl) or_return /* 88:26 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\" class=\"inline-block h-10 border-2 border-textColor px-4 leading-10\">Open public page</a>") or_return /* 88:51 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n        </div>\n") or_return /* 89:22 in template */
-				if this.Form.CreatedAt != "" || this.Form.UpdatedAt != "" { /* 92:9 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n            <p class=\"text-sm opacity-70\">") or_return /* 92:72 in template */
-					if this.Form.CreatedAt != "" { /* 94:17 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "created ") or_return /* 94:51 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Form.CreatedAt) or_return /* 94:59 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 94:93 in template */
-					if this.Form.CreatedAt != "" && this.Form.UpdatedAt != "" { /* 95:17 in template */
-						__temple_n += __temple_io.write_string(__temple_w, " / ") or_return /* 95:80 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 95:92 in template */
-					if this.Form.UpdatedAt != "" { /* 96:17 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "updated ") or_return /* 96:51 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Form.UpdatedAt) or_return /* 96:59 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n            </p>") or_return /* 96:93 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n    </form>\n\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2 class=\"mb-4 text-2xl font-bold\">Preview</h2>\n        <article class=\"prose max-w-none\">\n            ") or_return /* 98:18 in template */
-				__temple_n += __temple_io.write_string(__temple_w, this.PreviewHtml) or_return /* 106:13 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\n        </article>\n    </section>\n</article>") or_return /* 106:41 in template */
-				{ /* 110:1 in template embedding "_footer.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
-					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
-					if this.HotReload { /* 16:1 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 110:49 in template */
-				return
-			}, 
-			approx_bytes = 10065,
-		}
-	}else	when path == "templates/admin_blogposts.temple.twig" {
-		return {
-			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
-				{ /* 1:1 in template embedding "_header.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
-					{ /* 3:2 in template embedding "_head.temple.twig" */
-						this := this
-						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
-						
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
-					for item, i in this.NavItems { /* 13:7 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
-						if item.CanAccess { /* 14:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
-							if item.IsActive { /* 16:46 in template */
-								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
-							}
-							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
-						if i != len(this.NavItems) - 1 { /* 22:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
-					for item, i in this.NavItems { /* 50:11 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
-						if item.IsActive { /* 53:13 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
-						if i != len(this.NavItems) - 1 { /* 58:12 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"prose mx-auto\">\n    <p class=\"mb-4 text-sm\">\n        <a href=\"/admin\" class=\"opacity-60 underline\">\n            <span class=\"inline-block rotate-180\">\u279c</span>\n            Go back to the admin page\n        </a>\n    </p>\n\n    <h1 class=\"h1\">manage blogposts</h1>\n\n    <p>\n        <a href=\"/admin/blogposts/new\">Create a new blogpost -&gt;</a>\n    </p>\n\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>All blogposts</h2>\n\n        <label class=\"mb-4 flex max-w-xl flex-col gap-1\">\n            <span>Filter</span>\n            <input id=\"blogposts-filter\" type=\"text\" placeholder=\"Filter by title, slug, or status\" class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n        </label>\n\n        <p id=\"blogposts-filter-empty\" class=\"mb-4 hidden text-sm opacity-70\" role=\"status\" aria-live=\"polite\">\n            No blogposts match this filter.\n        </p>\n") or_return /* 1:49 in template */
-				if len(this.Posts) == 0 { /* 30:9 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n            <p>No blogposts yet.</p>") or_return /* 30:38 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n\n        <ul id=\"blogposts-list\" class=\"list-none pl-0\">") or_return /* 32:18 in template */
-				for post in this.Posts { /* 35:13 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n                <li data-blogpost-item class=\"mb-4 border-2 border-textColor p-3\">\n                    <p class=\"!mb-1\">\n                        <a href=\"/admin/blogposts/") or_return /* 35:41 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 38:51 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">") or_return /* 38:66 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, post.Title) or_return /* 38:68 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "</a>\n                    </p>\n                    <p class=\"!mb-1 text-sm opacity-70\">\n                        <code>") or_return /* 38:84 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 41:31 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "</code>\n                        /\n                        ") or_return /* 41:46 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, post.Status) or_return /* 43:25 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n                        /\n                        updated ") or_return /* 43:42 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, post.UpdatedAt) or_return /* 45:33 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n                    </p>") or_return /* 45:53 in template */
-					if post.PublishedAt != "" { /* 47:21 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n                        <p class=\"!mb-1 text-sm opacity-70\">published ") or_return /* 47:52 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, post.PublishedAt) or_return /* 48:71 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "</p>") or_return /* 48:93 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n                    <p class=\"!mb-0\">\n                        <a href=\"/admin/blogposts/") or_return /* 49:30 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 51:51 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">edit</a>\n                        |\n                        <a href=\"/blog/") or_return /* 51:66 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 53:40 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">view public page</a>\n                    </p>\n                </li>") or_return /* 53:55 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n        </ul>\n    </section>\n</article>") or_return /* 56:22 in template */
-				{ /* 60:1 in template embedding "_footer.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
-					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
-					if this.HotReload { /* 16:1 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 60:49 in template */
-				return
-			}, 
-			approx_bytes = 7096,
-		}
-	}else	when path == "templates/admin_login.temple.twig" {
-		return {
-			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
-				{ /* 1:1 in template embedding "_header.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
-					{ /* 3:2 in template embedding "_head.temple.twig" */
-						this := this
-						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
-						
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
-					for item, i in this.NavItems { /* 13:7 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
-						if item.CanAccess { /* 14:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
-							if item.IsActive { /* 16:46 in template */
-								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
-							}
-							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
-						if i != len(this.NavItems) - 1 { /* 22:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
-					for item, i in this.NavItems { /* 50:11 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
-						if item.IsActive { /* 53:13 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
-						if i != len(this.NavItems) - 1 { /* 58:12 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"prose mx-auto\">\n    <h1 class=\"h1\">admin login</h1>\n    \n    <section>\n        <h2>\U0001f512 Login Required</h2>\n        <p>Enter your admin password or use a passkey:</p>\n        \n        <div id=\"login-form-container\">") or_return /* 1:49 in template */
-				{ /* 10:13 in template embedding "_login_form.temple.twig" */
-					this := this
-					if this.Error != "" { /* 1:1 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t<div class=\"status-error mb-4\" role=\"alert\">\n\n\n\t\t\u274c\n\t\t") or_return /* 1:26 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Error) or_return /* 6:3 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t</div>") or_return /* 6:19 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\n\t<!-- Password Form -->\n\t<form method=\"POST\" action=\"/admin/login\" hx-post=\"/admin/login\" hx-target=\"#login-form-container\" hx-swap=\"innerHTML\" class=\"mt-4 mb-6\">\n\t\t<div class=\"flex flex-col gap-3\">\n\t\t\t<label for=\"password\">Password</label>\n\n\t\t\t<input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Password\" autocomplete=\"current-password\" required minlength=\"1\" class=\"h-10 px-3 bg-transparent text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0 border-2 border-textColor\">\n\t\t\t<button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center\">\n\t\t\t\t\U0001f511 Login with Password\n\t\t\t</button>\n\t\t</div>\n\t</form>\n\n\t<!-- Passkey Login -->\n\t<div class=\"flex flex-col gap-3 mt-4\">\n\t\t<button onclick=\"loginWebAuthnPasskey()\" class=\"h-10 select-none bg-green-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#166534_inset,0_0_0_1px_#15803d_inset,0_0.5px_0_1.5px_#4ade80_inset] hover:bg-green-700 active:bg-green-800 text-center\">\n\t\t\t\U0001f510 Login with Passkey\n\t\t</button>\n\t</div>\n\t<div id=\"login-status\" class=\"mt-4 p-3 hidden\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n") or_return /* 8:11 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n        </div>\n    </section>\n</article>") or_return /* 10:60 in template */
-				{ /* 14:1 in template embedding "_footer.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
-					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
-					if this.HotReload { /* 16:1 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n\n") or_return /* 14:49 in template */
-				return
-			}, 
-			approx_bytes = 6822,
-		}
-	}else	when path == "templates/_login_form.temple.twig" {
-		return {
-			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
-				if this.Error != "" { /* 1:1 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t<div class=\"status-error mb-4\" role=\"alert\">\n\n\n\t\t\u274c\n\t\t") or_return /* 1:26 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Error) or_return /* 6:3 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t</div>") or_return /* 6:19 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n\n\t<!-- Password Form -->\n\t<form method=\"POST\" action=\"/admin/login\" hx-post=\"/admin/login\" hx-target=\"#login-form-container\" hx-swap=\"innerHTML\" class=\"mt-4 mb-6\">\n\t\t<div class=\"flex flex-col gap-3\">\n\t\t\t<label for=\"password\">Password</label>\n\n\t\t\t<input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Password\" autocomplete=\"current-password\" required minlength=\"1\" class=\"h-10 px-3 bg-transparent text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0 border-2 border-textColor\">\n\t\t\t<button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center\">\n\t\t\t\t\U0001f511 Login with Password\n\t\t\t</button>\n\t\t</div>\n\t</form>\n\n\t<!-- Passkey Login -->\n\t<div class=\"flex flex-col gap-3 mt-4\">\n\t\t<button onclick=\"loginWebAuthnPasskey()\" class=\"h-10 select-none bg-green-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#166534_inset,0_0_0_1px_#15803d_inset,0_0.5px_0_1.5px_#4ade80_inset] hover:bg-green-700 active:bg-green-800 text-center\">\n\t\t\t\U0001f510 Login with Passkey\n\t\t</button>\n\t</div>\n\t<div id=\"login-status\" class=\"mt-4 p-3 hidden\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n") or_return /* 8:11 in template */
-				return
-			}, 
-			approx_bytes = 1366,
-		}
-	}else	when path == "templates/admin.temple.twig" {
-		return {
-			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
-				{ /* 1:1 in template embedding "_header.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
-					{ /* 3:2 in template embedding "_head.temple.twig" */
-						this := this
-						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
-						
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
-					for item, i in this.NavItems { /* 13:7 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
-						if item.CanAccess { /* 14:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
-							if item.IsActive { /* 16:46 in template */
-								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
-							}
-							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
-							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
-						if i != len(this.NavItems) - 1 { /* 22:8 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
-					for item, i in this.NavItems { /* 50:11 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
-						if item.IsActive { /* 53:13 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
-						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
-						if i != len(this.NavItems) - 1 { /* 58:12 in template */
-							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
-						}
-						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"prose mx-auto\">\n    <div class=\"mb-4 flex flex-wrap items-start justify-between gap-3\">\n        <h1 class=\"h1 !mb-0 flex-1\">admin</h1>\n        <form method=\"POST\" action=\"/admin/logout\" class=\"shrink-0\">\n            <input type=\"hidden\" name=\"csrf_token\" value=\"") or_return /* 1:49 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.CsrfToken) or_return /* 6:59 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\"/>\n            <button type=\"submit\" class=\"h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800\">\n                \U0001f44b Logout\n            </button>\n        </form>\n    </div>\n\n    <section>\n        <h2>\U0001f4dd Blogposts</h2>\n        <p>\n            <a href=\"/admin/blogposts\">Manage blogposts -&gt;</a>\n        </p>\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>Encrypted pastes</h2>\n        <p>\n            <a href=\"/admin/pastes\">Manage encrypted pastes -&gt;</a>\n        </p>") or_return /* 6:79 in template */
-				if !this.PasteEnabled { /* 26:9 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n            <p class=\"text-sm opacity-70\">\n                Disabled: set <code>PASTE_ENABLED</code> and <code>PASTE_SECRETS_FILE</code>.\n            </p>") or_return /* 26:36 in template */
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>\U0001f510 WebAuthn Passkeys</h2>\n        <p>\n            <a href=\"/admin/webauthn\">Manage passkeys -&gt;</a>\n        </p>\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>\U0001f575\ufe0f Adresse IP</h2>\n        <p>\nL'IP actuelle avec laquelle tu accèdes au panneau d'admin est\n<code class=\"rounded-sm\">") or_return /* 30:18 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.IpAddress) or_return /* 46:26 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "</code>\n\n\n        </p>\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>\U0001f4c1 Projets</h2>\n        <form id=\"refresh-projects\" method=\"POST\" action=\"/admin/refresh-projects\">\n            <input type=\"hidden\" name=\"csrf_token\" value=\"") or_return /* 46:46 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.CsrfToken) or_return /* 56:59 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "\"/>\n            <style>\n                /* Hide the loading text when the button is not loading */\n                #refresh-projects:not(.htmx-request) .loading-text {\n                    display: none;\n                }\n                \n                /* Show the loading text when the button is loading */\n                #refresh-projects.htmx-request .loading-text {\n                    display: block;\n                }\n\n                /* Hide the default text when the button is loading */\n                #refresh-projects.htmx-request .default-text {\n                    display: none;\n                }\n            </style>\n            <button type=\"submit\" class=\"h-8 select-none bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]\">\n\n            <span class=\"loading-text\" role=\"status\" aria-live=\"polite\">\n                <span class=\"animate-spin transition-all\" aria-hidden=\"true\">\u2699\ufe0f</span>\n                Rafraîchissement en cours...\n            </span>\n            <span class=\"default-text\">\n                \U0001f680 Rafraîchir les projets\n            </span>\n                \n            </button>\n        </form>\n    </section>\n    <div class=\"divider\"></div>\n    <section>\n        <h2>\U0001f454 Données du profil LinkedIn</h2>\n        <p>\n            Le profil public est construit depuis <code class=\"rounded-sm p-1 px-2\">linkedin_profile.json</code>, intégré à l'application au moment du build.\n        </p>\n        <pre><code class=\"language-json\">") or_return /* 56:79 in template */
-				__temple_n += __temple_write_escaped_string(__temple_w, this.ProfileData) or_return /* 92:42 in template */
-				__temple_n += __temple_io.write_string(__temple_w, "</code></pre>\n    </section>\n</article>") or_return /* 92:64 in template */
-				{ /* 95:1 in template embedding "_footer.temple.twig" */
-					this := this.base
-					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
-					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
-					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
-					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
-					if this.HotReload { /* 16:1 in template */
-						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
-					}
-					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
-					
-				}
-				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 95:49 in template */
-				return
-			}, 
-			approx_bytes = 8712,
-		}
 	}else	when path == "templates/admin_paste_editor.temple.twig" {
 		return {
 			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
@@ -1773,6 +1023,232 @@ compiled :: proc($path: string, $T: typeid) -> Compiled(T) {
 			}, 
 			approx_bytes = 8300,
 		}
+	}else	when path == "templates/admin_login.temple.twig" {
+		return {
+			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
+				{ /* 1:1 in template embedding "_header.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
+					{ /* 3:2 in template embedding "_head.temple.twig" */
+						this := this
+						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
+						
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
+					for item, i in this.NavItems { /* 13:7 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
+						if item.CanAccess { /* 14:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
+							if item.IsActive { /* 16:46 in template */
+								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
+							}
+							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
+						if i != len(this.NavItems) - 1 { /* 22:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
+					for item, i in this.NavItems { /* 50:11 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
+						if item.IsActive { /* 53:13 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
+						if i != len(this.NavItems) - 1 { /* 58:12 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"prose mx-auto\">\n    <h1 class=\"h1\">admin login</h1>\n    \n    <section>\n        <h2>\U0001f512 Login Required</h2>\n        <p>Enter your admin password or use a passkey:</p>\n        \n        <div id=\"login-form-container\">") or_return /* 1:49 in template */
+				{ /* 10:13 in template embedding "_login_form.temple.twig" */
+					this := this
+					if this.Error != "" { /* 1:1 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t<div class=\"status-error mb-4\" role=\"alert\">\n\n\n\t\t\u274c\n\t\t") or_return /* 1:26 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Error) or_return /* 6:3 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t</div>") or_return /* 6:19 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\n\t<!-- Password Form -->\n\t<form method=\"POST\" action=\"/admin/login\" hx-post=\"/admin/login\" hx-target=\"#login-form-container\" hx-swap=\"innerHTML\" class=\"mt-4 mb-6\">\n\t\t<div class=\"flex flex-col gap-3\">\n\t\t\t<label for=\"password\">Password</label>\n\n\t\t\t<input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Password\" autocomplete=\"current-password\" required minlength=\"1\" class=\"h-10 px-3 bg-transparent text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0 border-2 border-textColor\">\n\t\t\t<button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center\">\n\t\t\t\t\U0001f511 Login with Password\n\t\t\t</button>\n\t\t</div>\n\t</form>\n\n\t<!-- Passkey Login -->\n\t<div class=\"flex flex-col gap-3 mt-4\">\n\t\t<button onclick=\"loginWebAuthnPasskey()\" class=\"h-10 select-none bg-green-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#166534_inset,0_0_0_1px_#15803d_inset,0_0.5px_0_1.5px_#4ade80_inset] hover:bg-green-700 active:bg-green-800 text-center\">\n\t\t\t\U0001f510 Login with Passkey\n\t\t</button>\n\t</div>\n\t<div id=\"login-status\" class=\"mt-4 p-3 hidden\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n") or_return /* 8:11 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n        </div>\n    </section>\n</article>") or_return /* 10:60 in template */
+				{ /* 14:1 in template embedding "_footer.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
+					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
+					if this.HotReload { /* 16:1 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n\n") or_return /* 14:49 in template */
+				return
+			}, 
+			approx_bytes = 6822,
+		}
+	}else	when path == "templates/_login_form.temple.twig" {
+		return {
+			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
+				if this.Error != "" { /* 1:1 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t<div class=\"status-error mb-4\" role=\"alert\">\n\n\n\t\t\u274c\n\t\t") or_return /* 1:26 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Error) or_return /* 6:3 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t</div>") or_return /* 6:19 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n\n\t<!-- Password Form -->\n\t<form method=\"POST\" action=\"/admin/login\" hx-post=\"/admin/login\" hx-target=\"#login-form-container\" hx-swap=\"innerHTML\" class=\"mt-4 mb-6\">\n\t\t<div class=\"flex flex-col gap-3\">\n\t\t\t<label for=\"password\">Password</label>\n\n\t\t\t<input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Password\" autocomplete=\"current-password\" required minlength=\"1\" class=\"h-10 px-3 bg-transparent text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0 border-2 border-textColor\">\n\t\t\t<button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center\">\n\t\t\t\t\U0001f511 Login with Password\n\t\t\t</button>\n\t\t</div>\n\t</form>\n\n\t<!-- Passkey Login -->\n\t<div class=\"flex flex-col gap-3 mt-4\">\n\t\t<button onclick=\"loginWebAuthnPasskey()\" class=\"h-10 select-none bg-green-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#166534_inset,0_0_0_1px_#15803d_inset,0_0.5px_0_1.5px_#4ade80_inset] hover:bg-green-700 active:bg-green-800 text-center\">\n\t\t\t\U0001f510 Login with Passkey\n\t\t</button>\n\t</div>\n\t<div id=\"login-status\" class=\"mt-4 p-3 hidden\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n") or_return /* 8:11 in template */
+				return
+			}, 
+			approx_bytes = 1366,
+		}
+	}else	when path == "templates/admin.temple.twig" {
+		return {
+			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
+				{ /* 1:1 in template embedding "_header.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
+					{ /* 3:2 in template embedding "_head.temple.twig" */
+						this := this
+						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
+						
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
+					for item, i in this.NavItems { /* 13:7 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
+						if item.CanAccess { /* 14:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
+							if item.IsActive { /* 16:46 in template */
+								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
+							}
+							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
+						if i != len(this.NavItems) - 1 { /* 22:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
+					for item, i in this.NavItems { /* 50:11 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
+						if item.IsActive { /* 53:13 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
+						if i != len(this.NavItems) - 1 { /* 58:12 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"prose mx-auto\">\n    <div class=\"mb-4 flex flex-wrap items-start justify-between gap-3\">\n        <h1 class=\"h1 !mb-0 flex-1\">admin</h1>\n        <form method=\"POST\" action=\"/admin/logout\" class=\"shrink-0\">\n            <input type=\"hidden\" name=\"csrf_token\" value=\"") or_return /* 1:49 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.CsrfToken) or_return /* 6:59 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\"/>\n            <button type=\"submit\" class=\"h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800\">\n                \U0001f44b Logout\n            </button>\n        </form>\n    </div>\n\n    <section>\n        <h2>\U0001f4dd Blogposts</h2>\n        <p>\n            <a href=\"/admin/blogposts\">Manage blogposts -&gt;</a>\n        </p>\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>Encrypted pastes</h2>\n        <p>\n            <a href=\"/admin/pastes\">Manage encrypted pastes -&gt;</a>\n        </p>") or_return /* 6:79 in template */
+				if !this.PasteEnabled { /* 26:9 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n            <p class=\"text-sm opacity-70\">\n                Disabled: set <code>PASTE_ENABLED</code> and <code>PASTE_SECRETS_FILE</code>.\n            </p>") or_return /* 26:36 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>\U0001f510 WebAuthn Passkeys</h2>\n        <p>\n            <a href=\"/admin/webauthn\">Manage passkeys -&gt;</a>\n        </p>\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>\U0001f575\ufe0f Adresse IP</h2>\n        <p>\nL'IP actuelle avec laquelle tu accèdes au panneau d'admin est\n<code class=\"rounded-sm\">") or_return /* 30:18 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.IpAddress) or_return /* 46:26 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "</code>\n\n\n        </p>\n    </section>\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>\U0001f4c1 Projets</h2>\n        <form id=\"refresh-projects\" method=\"POST\" action=\"/admin/refresh-projects\">\n            <input type=\"hidden\" name=\"csrf_token\" value=\"") or_return /* 46:46 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.CsrfToken) or_return /* 56:59 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\"/>\n            <style>\n                /* Hide the loading text when the button is not loading */\n                #refresh-projects:not(.htmx-request) .loading-text {\n                    display: none;\n                }\n                \n                /* Show the loading text when the button is loading */\n                #refresh-projects.htmx-request .loading-text {\n                    display: block;\n                }\n\n                /* Hide the default text when the button is loading */\n                #refresh-projects.htmx-request .default-text {\n                    display: none;\n                }\n            </style>\n            <button type=\"submit\" class=\"h-8 select-none bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]\">\n\n            <span class=\"loading-text\" role=\"status\" aria-live=\"polite\">\n                <span class=\"animate-spin transition-all\" aria-hidden=\"true\">\u2699\ufe0f</span>\n                Rafraîchissement en cours...\n            </span>\n            <span class=\"default-text\">\n                \U0001f680 Rafraîchir les projets\n            </span>\n                \n            </button>\n        </form>\n    </section>\n    <div class=\"divider\"></div>\n    <section>\n        <h2>\U0001f454 Données du profil LinkedIn</h2>\n        <p>\n            Le profil public est construit depuis <code class=\"rounded-sm p-1 px-2\">linkedin_profile.json</code>, intégré à l'application au moment du build.\n        </p>\n        <pre><code class=\"language-json\">") or_return /* 56:79 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.ProfileData) or_return /* 92:42 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "</code></pre>\n    </section>\n</article>") or_return /* 92:64 in template */
+				{ /* 95:1 in template embedding "_footer.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
+					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
+					if this.HotReload { /* 16:1 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 95:49 in template */
+				return
+			}, 
+			approx_bytes = 8712,
+		}
 	}else	when path == "templates/projects.temple.twig" {
 		return {
 			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
@@ -1941,6 +1417,530 @@ compiled :: proc($path: string, $T: typeid) -> Compiled(T) {
 				return
 			}, 
 			approx_bytes = 8597,
+		}
+	}else	when path == "templates/admin_blogpost_editor.temple.twig" {
+		return {
+			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
+				{ /* 1:1 in template embedding "_header.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
+					{ /* 3:2 in template embedding "_head.temple.twig" */
+						this := this
+						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
+						
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
+					for item, i in this.NavItems { /* 13:7 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
+						if item.CanAccess { /* 14:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
+							if item.IsActive { /* 16:46 in template */
+								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
+							}
+							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
+						if i != len(this.NavItems) - 1 { /* 22:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
+					for item, i in this.NavItems { /* 50:11 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
+						if item.IsActive { /* 53:13 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
+						if i != len(this.NavItems) - 1 { /* 58:12 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"mx-auto max-w-5xl\">\n    <p class=\"mb-4 text-sm\">\n        <a href=\"/admin/blogposts\" class=\"opacity-60 underline\">\n            <span class=\"inline-block rotate-180\">\u279c</span>\n            Go back to the blogposts manager\n        </a>\n    </p>\n") or_return /* 1:49 in template */
+				if this.Form.IsNew { /* 10:5 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n        <h1 class=\"h1 mb-4\">new blogpost</h1>") or_return /* 10:29 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 12:14 in template */
+				if !this.Form.IsNew { /* 13:5 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n        <h1 class=\"h1 mb-4\">edit blogpost</h1>") or_return /* 13:30 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 15:14 in template */
+				if this.Error != "" { /* 17:5 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n        <div class=\"mb-4 border-2 border-red-500 bg-red-100 p-3 text-red-800\" role=\"alert\">") or_return /* 17:30 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Error) or_return /* 18:92 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "</div>") or_return /* 18:108 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n\n    <div id=\"blog-editor-status\" class=\"mb-4 hidden border-2 border-blue-300 bg-blue-100 p-3 text-blue-800\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n\n    <form method=\"POST\" action=\"") or_return /* 19:14 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.FormAction) or_return /* 23:33 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\" data-blog-editor class=\"flex flex-col gap-4\">\n        <input id=\"admin-csrf-token\" type=\"hidden\" name=\"csrf_token\" value=\"") or_return /* 23:59 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.CsrfToken) or_return /* 24:77 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\"/>\n        <div class=\"grid gap-4 md:grid-cols-2\">\n            <label class=\"flex flex-col gap-1\">\n                <span>Title</span>\n                <input id=\"blog-title\" type=\"text\" name=\"title\" value=\"") or_return /* 24:102 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.Title) or_return /* 28:72 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\" required class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Slug</span>\n                <input id=\"blog-slug\" type=\"text\" name=\"slug\" value=\"") or_return /* 28:93 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.Slug) or_return /* 33:70 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\" required class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Status</span>") or_return /* 33:90 in template */
+				if this.Form.Status == "published" { /* 38:17 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n                    <select name=\"status\" class=\"h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0\">\n                        <option value=\"draft\" class=\"bg-bgColor text-textColor\">draft</option>\n                        <option value=\"published\" selected class=\"bg-bgColor text-textColor\">published</option>\n                    </select>") or_return /* 38:57 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 43:26 in template */
+				if this.Form.Status != "published" { /* 44:17 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n                    <select name=\"status\" class=\"h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0\">\n                        <option value=\"draft\" selected class=\"bg-bgColor text-textColor\">draft</option>\n                        <option value=\"published\" class=\"bg-bgColor text-textColor\">published</option>\n                    </select>") or_return /* 44:57 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Language</span>\n                <select name=\"language\" class=\"h-10 border-2 border-textColor bg-bgColor px-3 text-textColor focus:outline-none focus:ring-0\">\n                    <option value=\"en") or_return /* 49:26 in template */
+				if this.Form.Language == "en" { /* 55:40 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "selected") or_return /* 55:75 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, ">English</option>\n                    <option value=\"fr") or_return /* 55:92 in template */
+				if this.Form.Language == "fr" { /* 56:40 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "selected") or_return /* 56:75 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, ">Français</option>\n                </select>\n            </label>\n\n            <label class=\"flex flex-col gap-1\">\n                <span>Published At</span>\n                <div class=\"flex gap-2\">\n                    <input id=\"blog-published-at\" type=\"datetime-local\" name=\"publishedAt\" value=\"") or_return /* 56:92 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.PublishedAt) or_return /* 63:99 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\" class=\"h-10 min-w-0 flex-1 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n                    <button type=\"button\" id=\"blog-published-at-picker\" class=\"h-10 border-2 border-textColor px-3 leading-8\">\n                        pick\n                    </button>\n                </div>\n            </label>\n        </div>\n\n        <div>\n            <p class=\"mb-2 text-sm opacity-70\">\n                Paste an image directly into the markdown textarea with Ctrl+V and it will upload automatically.\n                Set the slug first so the image is stored under the correct post.\n            </p>\n            <label class=\"flex flex-col gap-1\">\n                <span>Markdown</span>\n                <textarea id=\"blog-markdown\" name=\"markdown\" rows=\"24\" class=\"min-h-[32rem] border-2 border-textColor bg-transparent p-3 font-mono text-sm text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\">") or_return /* 63:126 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Form.Markdown) or_return /* 78:228 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "</textarea>\n            </label>\n        </div>\n\n        <div class=\"flex flex-wrap gap-3\">\n            <button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 text-center\">\n                Save blogpost\n            </button>\n") or_return /* 78:252 in template */
+				if this.Form.PublicUrl != "" { /* 87:13 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n                <a href=\"") or_return /* 87:47 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Form.PublicUrl) or_return /* 88:26 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\" class=\"inline-block h-10 border-2 border-textColor px-4 leading-10\">Open public page</a>") or_return /* 88:51 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n        </div>\n") or_return /* 89:22 in template */
+				if this.Form.CreatedAt != "" || this.Form.UpdatedAt != "" { /* 92:9 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n            <p class=\"text-sm opacity-70\">") or_return /* 92:72 in template */
+					if this.Form.CreatedAt != "" { /* 94:17 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "created ") or_return /* 94:51 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Form.CreatedAt) or_return /* 94:59 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 94:93 in template */
+					if this.Form.CreatedAt != "" && this.Form.UpdatedAt != "" { /* 95:17 in template */
+						__temple_n += __temple_io.write_string(__temple_w, " / ") or_return /* 95:80 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 95:92 in template */
+					if this.Form.UpdatedAt != "" { /* 96:17 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "updated ") or_return /* 96:51 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Form.UpdatedAt) or_return /* 96:59 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n            </p>") or_return /* 96:93 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n    </form>\n\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2 class=\"mb-4 text-2xl font-bold\">Preview</h2>\n        <article class=\"prose max-w-none\">\n            ") or_return /* 98:18 in template */
+				__temple_n += __temple_io.write_string(__temple_w, this.PreviewHtml) or_return /* 106:13 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\n        </article>\n    </section>\n</article>") or_return /* 106:41 in template */
+				{ /* 110:1 in template embedding "_footer.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
+					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
+					if this.HotReload { /* 16:1 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 110:49 in template */
+				return
+			}, 
+			approx_bytes = 10065,
+		}
+	}else	when path == "templates/admin_blogposts.temple.twig" {
+		return {
+			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
+				{ /* 1:1 in template embedding "_header.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
+					{ /* 3:2 in template embedding "_head.temple.twig" */
+						this := this
+						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
+						
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
+					for item, i in this.NavItems { /* 13:7 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
+						if item.CanAccess { /* 14:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
+							if item.IsActive { /* 16:46 in template */
+								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
+							}
+							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
+						if i != len(this.NavItems) - 1 { /* 22:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
+					for item, i in this.NavItems { /* 50:11 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
+						if item.IsActive { /* 53:13 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
+						if i != len(this.NavItems) - 1 { /* 58:12 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n<article class=\"prose mx-auto\">\n    <p class=\"mb-4 text-sm\">\n        <a href=\"/admin\" class=\"opacity-60 underline\">\n            <span class=\"inline-block rotate-180\">\u279c</span>\n            Go back to the admin page\n        </a>\n    </p>\n\n    <h1 class=\"h1\">manage blogposts</h1>\n\n    <p>\n        <a href=\"/admin/blogposts/new\">Create a new blogpost -&gt;</a>\n    </p>\n\n    <div class=\"divider\"></div>\n\n    <section>\n        <h2>All blogposts</h2>\n\n        <label class=\"mb-4 flex max-w-xl flex-col gap-1\">\n            <span>Filter</span>\n            <input id=\"blogposts-filter\" type=\"text\" placeholder=\"Filter by title, slug, or status\" class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor placeholder-neutral-400 focus:outline-none focus:ring-0\"/>\n        </label>\n\n        <p id=\"blogposts-filter-empty\" class=\"mb-4 hidden text-sm opacity-70\" role=\"status\" aria-live=\"polite\">\n            No blogposts match this filter.\n        </p>\n") or_return /* 1:49 in template */
+				if len(this.Posts) == 0 { /* 30:9 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n            <p>No blogposts yet.</p>") or_return /* 30:38 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n\n        <ul id=\"blogposts-list\" class=\"list-none pl-0\">") or_return /* 32:18 in template */
+				for post in this.Posts { /* 35:13 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n                <li data-blogpost-item class=\"mb-4 border-2 border-textColor p-3\">\n                    <p class=\"!mb-1\">\n                        <a href=\"/admin/blogposts/") or_return /* 35:41 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 38:51 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">") or_return /* 38:66 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, post.Title) or_return /* 38:68 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "</a>\n                    </p>\n                    <p class=\"!mb-1 text-sm opacity-70\">\n                        <code>") or_return /* 38:84 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 41:31 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "</code>\n                        /\n                        ") or_return /* 41:46 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, post.Status) or_return /* 43:25 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n                        /\n                        updated ") or_return /* 43:42 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, post.UpdatedAt) or_return /* 45:33 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n                    </p>") or_return /* 45:53 in template */
+					if post.PublishedAt != "" { /* 47:21 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n                        <p class=\"!mb-1 text-sm opacity-70\">published ") or_return /* 47:52 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, post.PublishedAt) or_return /* 48:71 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "</p>") or_return /* 48:93 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n                    <p class=\"!mb-0\">\n                        <a href=\"/admin/blogposts/") or_return /* 49:30 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 51:51 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">edit</a>\n                        |\n                        <a href=\"/blog/") or_return /* 51:66 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, post.Slug) or_return /* 53:40 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">view public page</a>\n                    </p>\n                </li>") or_return /* 53:55 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n        </ul>\n    </section>\n</article>") or_return /* 56:22 in template */
+				{ /* 60:1 in template embedding "_footer.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
+					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
+					if this.HotReload { /* 16:1 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 60:49 in template */
+				return
+			}, 
+			approx_bytes = 7096,
+		}
+	}else	when path == "templates/posts.temple.twig" {
+		return {
+			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
+				{ /* 1:1 in template embedding "_header.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
+					{ /* 3:2 in template embedding "_head.temple.twig" */
+						this := this
+						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
+						
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
+					for item, i in this.NavItems { /* 13:7 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
+						if item.CanAccess { /* 14:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
+							if item.IsActive { /* 16:46 in template */
+								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
+							}
+							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
+						if i != len(this.NavItems) - 1 { /* 22:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
+					for item, i in this.NavItems { /* 50:11 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
+						if item.IsActive { /* 53:13 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
+						if i != len(this.NavItems) - 1 { /* 58:12 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n\t<article class=\"blog-page\">\n\t\t<h1 class=\"h1 flex items-center gap-2\">\n\t\t\tblog\n\t\t\t<a href=\"/blog/rss.xml\" hx-boost=\"false\" target=\"_blank\" title=\"RSS Feed\" class=\"opacity-50 hover:opacity-100 \">\n\t\t\t\t<img src=\"/static/rss.svg\" alt=\"RSS Feed\" class=\"h-6 w-6\"/>\n\t\t\t</a>\n\t\t\t<a href=\"/blog/atom.xml\" hx-boost=\"false\" target=\"_blank\" title=\"Atom Feed\" class=\"opacity-50 hover:opacity-100\">\n\t\t\t\t<img src=\"/static/atom.svg\" alt=\"Atom Feed\" class=\"h-6 w-6\"/>\n\t\t\t</a>\n\t\t</h1>\n\n\n\t\t<h2 class=\"mb-2 font-bold\">\U0001f4f0 Available articles</h2>") or_return /* 1:49 in template */
+				if len(this.YearGroups) == 0 { /* 15:3 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t<p>No articles yet.</p>") or_return /* 15:37 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 17:12 in template */
+				for group in this.YearGroups { /* 18:3 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t<h3 class=\"text-xl font-bold mt-4 mb-2\">") or_return /* 18:37 in template */
+					__temple_n += __temple_io.write_int(__temple_w, int(group.year)) or_return /* 19:44 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "</h3>\n\t\t\t<ul class=\"list-inside list-[square]\">") or_return /* 19:65 in template */
+					for post in group.posts { /* 21:5 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"/blog/") or_return /* 21:34 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, post.slug) or_return /* 23:22 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\" ") or_return /* 23:37 in template */
+						if post.excerpt != "" { /* 23:39 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "aria-describedby=\"excerpt-") or_return /* 23:66 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, post.slug) or_return /* 23:92 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\"") or_return /* 23:107 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, ">\n\t\t\t\t\t\t\t") or_return /* 23:117 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, post.title) or_return /* 24:8 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t</a>") or_return /* 24:24 in template */
+						if post.excerpt != "" { /* 26:7 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<p id=\"excerpt-") or_return /* 26:34 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, post.slug) or_return /* 27:23 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"wrap-anywhere mb-3 mt-1 list-none text-sm opacity-70\">\n\t\t\t\t\t\t\t\t") or_return /* 27:38 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, post.excerpt) or_return /* 28:9 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</p>") or_return /* 28:27 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t</li>") or_return /* 30:16 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "</ul>") or_return /* 32:15 in template */
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "</article>") or_return /* 33:14 in template */
+				{ /* 34:4 in template embedding "_footer.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
+					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
+					if this.HotReload { /* 16:1 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 34:52 in template */
+				return
+			}, 
+			approx_bytes = 6100,
+		}
+	}else	when path == "templates/post.temple.twig" {
+		return {
+			with = proc(__temple_w: __temple_io.Writer, this: T) -> (__temple_n: int, __temple_err: __temple_io.Error) {
+				{ /* 1:1 in template embedding "_header.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "<!doctype html>\n<html lang=\"en\">") or_return /* 1:1 in template */
+					{ /* 3:2 in template embedding "_head.temple.twig" */
+						this := this
+						__temple_n += __temple_io.write_string(__temple_w, "<head>\n\t<meta charset=\"UTF-8\"/>\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n\t<title>") or_return /* 1:1 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.Title) or_return /* 4:9 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "</title>\n\t<script src=\"/static/js/htmx.v2.0.7.min.js\"></script>\n\n    <script>\n        // htmx.config.responseHandling.push({\"code\":\"418\",\"swap\":true,\"error\":false});\n\n        document.addEventListener(\"DOMContentLoaded\", (event) => {\n            document.body.addEventListener('htmx:beforeSwap', function(evt) {\n                if (evt.detail.xhr.status === 418) {\n                    evt.detail.shouldSwap = true;\n                    evt.detail.isError = false;\n                }\n            });\n        });\n    </script>\n\n\n\t<link rel=\"icon\" href=\"/static/favicon_shadow.png\"/>\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"dns-prefetch\" href=\"https://fonts.gstatic.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap\" rel=\"stylesheet\"/>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap\" rel=\"stylesheet\"/>\n\n\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"preload\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\"/>\n\n\t<noscript>\n\t\t<link href=\"https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap\" rel=\"stylesheet\"/>\n\t</noscript>\n\n\t<link rel=\"mask-icon\" href=\"%sveltekit.assets%/maskable_icon_x512.png\" color=\"#000000\"/>\n\n\t<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/favicon-32x32.png\"/>\n\t<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/favicon-16x16.png\"/>\n\t<link rel=\"manifest\" href=\"/static/site.webmanifest\"/>\n\t<link rel=\"mask-icon\" href=\"/static/safari-pinned-tab.svg\" color=\"#000000\"/>\n\t<meta name=\"msapplication-TileColor\" content=\"#000000\"/>\n\t<meta name=\"theme-color\" content=\"#ffffff\"/>\n\n\n\t<link rel=\"stylesheet\" href=\"/static/css/style.css?v=") or_return /* 4:25 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 49:55 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"description\" content=\"") or_return /* 49:78 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 50:36 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"og:description\" content=\"") or_return /* 50:62 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 51:39 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:description\" content=\"") or_return /* 51:65 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.description) or_return /* 52:44 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"twitter:image\" content=\"") or_return /* 52:70 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 53:38 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta property=\"og:image\" content=\"") or_return /* 53:58 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.image) or_return /* 54:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\t<meta name=\"keywords\" content=\"Blog, Programmation, Programming, Portfolio, Personal, Personnel\"/>\n\t<meta name=\"generator\" content=\"Odin\"/>\n\t<meta property=\"og:locale\" content=\"fr_FR\"/>\n\t<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n\t<meta name=\"author\" content=\"") or_return /* 54:57 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.SEO.author) or_return /* 59:31 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"/>\n\n\t<script src=\"/static/js/admin.js?v=") or_return /* 59:52 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, this.StyleVersion) or_return /* 61:37 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\"></script>\n</head>\n") or_return /* 61:60 in template */
+						
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t<body hx-boost=\"true\" class=\"bg-bgColor text-textColor\">\n\t\t<header class=\"bg-bgColor sticky top-0 z-10 px-3\">\n\t\t\t<nav hx-indicator=\"#nav-spinner\">\n\t\t\t\t<fieldset class=\"border-textColor border-2 p-2 px-4\">\n\t\t\t\t\t<legend class=\"ml-3 px-2\">\n\t\t\t\t\t\tNavigation\n\t\t\t\t\t\t<span id=\"nav-spinner\" class=\"htmx-indicator animate-spin inline-block\">\u23f3</span>\n\t\t\t\t\t</legend>\n\t\t\t\t\t<ul class=\"hidden flex-wrap gap-3 whitespace-nowrap sm:flex\">") or_return /* 3:43 in template */
+					for item, i in this.NavItems { /* 13:7 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 13:41 in template */
+						if item.CanAccess { /* 14:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t<a href=\"") or_return /* 14:31 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 16:18 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\" class=\"") or_return /* 16:37 in template */
+							if item.IsActive { /* 16:46 in template */
+								__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 16:68 in template */
+							}
+							__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t") or_return /* 16:83 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 17:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t") or_return /* 17:25 in template */
+							__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 18:10 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>") or_return /* 18:26 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 21:17 in template */
+						if i != len(this.NavItems) - 1 { /* 22:8 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 22:44 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 24:18 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t\t\t<div class=\"block sm:hidden\">\n\t\t\t\t\t\t\t\t<details>\n\t\t\t\t\t\t\t\t\t<summary id=\"nav-summary\" class=\"mb-1\">closed</summary>\n\t\t\t\t\t\t\t\t\t<script>\n\t\t\t\t\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\n\t\t\t\t\t\t\t\t\t\t\tconst summary = document.getElementById('nav-summary');\n\n\t\t\t\t\t\t\t\t\t\t\tsummary.closest('details').addEventListener('toggle', () => {\n\t\t\t\t\t\t\t\t\t\t\t\tsummary.textContent = summary.closest('details').open ? 'open' : 'closed';\n\t\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t</script>\n\t\t\t\t\t\t\t\t\t<style>\n\t\t\t\t\t\t\t\t\t\t.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: none;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t.htmx-request .htmx-indicator,\n\t\t\t\t\t\t\t\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\t\t\t\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t</style>\n\t\t\t\t\t\t\t\t\t<ul class=\"flex flex-wrap gap-3 whitespace-nowrap\">") or_return /* 25:18 in template */
+					for item, i in this.NavItems { /* 50:11 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t<li class=\"flex-[100%] sm:flex-none\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"inline-block w-full ") or_return /* 50:45 in template */
+						if item.IsActive { /* 53:13 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "active") or_return /* 53:35 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "\" href=\"") or_return /* 53:50 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Pathname) or_return /* 53:58 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 53:77 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Icon) or_return /* 54:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t") or_return /* 54:29 in template */
+						__temple_n += __temple_write_escaped_string(__temple_w, item.Title) or_return /* 55:14 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t</li>") or_return /* 55:30 in template */
+						if i != len(this.NavItems) - 1 { /* 58:12 in template */
+							__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t\t<li class=\"border-textColor hidden border-r-2 sm:inline-block\"></li>") or_return /* 58:48 in template */
+						}
+						__temple_n += __temple_io.write_string(__temple_w, "") or_return /* 60:22 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</details>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</header>\n\t\t\t\t\t\t<main id=\"content\" class=\"m-auto max-w-5xl p-3 pb-16\">\n") or_return /* 61:22 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n\t<p class=\"mb-4 text-sm\">\n\t\t<a href=\"/blog\" class=\"opacity-60 underline\">\n\t\t\t<span class=\"inline-block rotate-180\">\u279c</span>\n\t\t\tGo back to the articles list\n\t\t</a>\n\t</p>\n\t<hgroup class=\"mb-4\">\n\t\t<h1 class=\"h1 mb-0\">") or_return /* 1:49 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.title) or_return /* 9:23 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "</h1>\n\t\t<small class=\"text-textColor/50 text-sm\">\n\t\t\tcrea:\n\t\t\t<span title=\"created on ") or_return /* 9:44 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.createdOn) or_return /* 12:28 in template */
+				__temple_n += __temple_io.write_string(__temple_w, " at ") or_return /* 12:53 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.createdAtTime) or_return /* 12:57 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\">") or_return /* 12:86 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.createdOn) or_return /* 12:88 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "</span>\n\t\t\t/ upd:\n\t\t\t<span title=\"last updated on ") or_return /* 12:113 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.updatedOn) or_return /* 14:33 in template */
+				__temple_n += __temple_io.write_string(__temple_w, " at ") or_return /* 14:58 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.updatedAtTime) or_return /* 14:62 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\">") or_return /* 14:91 in template */
+				__temple_n += __temple_write_escaped_string(__temple_w, this.Post.updatedOn) or_return /* 14:93 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "</span>\n\n\t\t</small>\n\t</hgroup>\n\t<article class=\"prose\">\n\t\t") or_return /* 14:118 in template */
+				__temple_n += __temple_io.write_string(__temple_w, this.Post.content.html) or_return /* 19:3 in template */
+				__temple_n += __temple_io.write_string(__temple_w, "\n\t</article>\n") or_return /* 19:37 in template */
+				{ /* 22:2 in template embedding "_footer.temple.twig" */
+					this := this.base
+					__temple_n += __temple_io.write_string(__temple_w, "</main>\n<footer class=\"bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm\">\n\n\n\t<div>\n\t\t<p>(C)\n\t\t\t") or_return /* 1:1 in template */
+					__temple_n += __temple_io.write_int(__temple_w, int(this.Footer.year)) or_return /* 7:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t\tsacha.house</p>\n\n\t</div>\n\t<div class=\"flex items-center gap-2\">\n\t\t<a class=\"underline\" href=\"https://gitlab.com/") or_return /* 7:31 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.gitRepoId) or_return /* 12:49 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "/-/commit/") or_return /* 12:76 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.commitHash) or_return /* 12:86 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\">\n\t\t\t") or_return /* 12:114 in template */
+					__temple_n += __temple_write_escaped_string(__temple_w, this.Footer.version) or_return /* 13:4 in template */
+					__temple_n += __temple_io.write_string(__temple_w, "\n\t\t</a>\n\t</div>") or_return /* 13:29 in template */
+					if this.HotReload { /* 16:1 in template */
+						__temple_n += __temple_io.write_string(__temple_w, "\n\t<script src=\"/static/js/hot-reload.js\"></script>") or_return /* 16:24 in template */
+					}
+					__temple_n += __temple_io.write_string(__temple_w, "\n\n\n\n</footer></body></html>\n\n") or_return /* 18:11 in template */
+					
+				}
+				__temple_n += __temple_io.write_string(__temple_w, "\n") or_return /* 22:50 in template */
+				return
+			}, 
+			approx_bytes = 5698,
 		}
 	} else {
 		#panic("undefined template \"" + path + "\" did you run the temple transpiler?")

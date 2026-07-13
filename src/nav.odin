@@ -54,7 +54,7 @@ DEFAULT_NAV_ITEMS :: [?]NavItem {
 		Pathname = "/admin",
 		Icon = "🔒",
 		IsActive = false,
-		PermissionLevel = .Admin,
+		PermissionLevel = .Public,
 		CanAccess = true,
 	},
 }

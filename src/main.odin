@@ -44,7 +44,7 @@ main :: proc() {
 		return
 	}
 
-	if action == .Hash_Password {
+	if action == .Hash_Password || action == .Verify_Password {
 		exit_code := run_cli_action(action, &cli_options, &config)
 		config_destroy(&config, context.allocator)
 		if exit_code != 0 {
