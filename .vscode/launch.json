@@ -1,28 +1,14 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug",
-      "type": "cppvsdbg",
+      "name": "Debug Go Server",
+      "type": "go",
       "request": "launch",
-      "preLaunchTask": "Build (Debug)",
-      "program": "${workspaceFolder}/bin/debug/x86_64/sacha.house.exe",
-      "args": [],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
-    },
-    {
-      "name": "Live Dev",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "Live Dev",
-      "program": "${workspaceFolder}/bin/debug/x86_64/dev_watcher.exe",
-      "args": [],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
+      "mode": "debug",
+      "program": "${workspaceFolder}/cmd/sacha-house",
+      "args": ["-dev"],
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "Launch Chrome",
@@ -35,7 +21,7 @@
   "compounds": [
     {
       "name": "Debug and Launch Chrome",
-      "configurations": ["Debug", "Launch Chrome"]
+      "configurations": ["Debug Go Server", "Launch Chrome"]
     }
   ]
 }

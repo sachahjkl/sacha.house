@@ -1,43 +1,63 @@
 # AGENTS
 
-## Repo Overview
+## Repository Overview
 
-- Main app code lives in `src/` and is written in Odin.
-- HTTP helpers and the template runtime/compiler live in `lib/`.
-- Templates are authored in `src/templates/*.temple.twig` and transpiled into `lib/temple/templates.odin`.
-- Tailwind source lives in `styles/app.css` and the generated stylesheet is `src/static/css/style.css`.
-- Static assets are embedded at compile time via `#load_directory`, so generated static files must be up to date before building.
+- The application is written in Go under `cmd/` and `internal/`.
+- HTTP routing and application assembly live in `internal/app/`.
+- templ components live in `internal/web/*.templ`.
+- Generated templ files use the `*_templ.go` suffix.
+- Datastar server integration lives in Go handlers.
+- Datastar browser code and other JavaScript live in `src/static/js/`.
+- Tailwind source lives in `styles/app.css`.
+- Generated CSS lives in `src/static/css/style.css`.
+- Static assets are embedded through `src/static/embed.go`.
 - Blog content is filesystem-backed under `data/blog/`.
+- Encrypted Gist paste code lives in `internal/paste/` and `internal/app/paste.go`.
 
 ## Common Commands
 
-- `just dev`: build and run the dev watcher.
-- `just build release`: regenerate templates/CSS and build the release binary.
-- `just templates`: rebuild Temple-generated template bindings.
-- `bun run build:css`: rebuild `src/static/css/style.css` from Tailwind.
-- `nix build .#dockerImage`: build the Docker image tarball via `dockerTools` on Linux.
+- `just dev`: watch source files, rebuild, and run the server with `-dev`.
+- `just build release`: regenerate templ and CSS, then build `bin/release/sacha.house`.
+- `just templates`: run `go tool templ generate`.
+- `just css`: rebuild Tailwind CSS with Bun.
+- `just test`: run `go test ./...`.
+- `just run`: build and run the debug binary.
+- `nix build .#dockerImage`: build the Linux container image.
 
 ## Build Notes
 
-- If you change anything in `src/templates/`, run `just templates` before considering the change done.
-- If you change anything in `styles/app.css` or Tailwind-using templates, run `bun run build:css`.
-- The committed `lib/temple/templates.odin` and `src/static/css/style.css` are build inputs, not throwaway artifacts.
-- The app embeds static files into the binary, so stale generated assets will ship stale output.
+- Run `just templates` after each templ change.
+- Run `just css` after each template, JavaScript, or Tailwind class change.
+- Keep generated `*_templ.go` files and `src/static/css/style.css` current.
+- The Go binary embeds static assets at build time.
+- Nix builds use `CGO_ENABLED=0` and inject version metadata with linker flags.
 
 ## Verification Notes
 
-- After changing templates or Tailwind classes, run `just build` and commit the regenerated `lib/temple/templates.odin` and `src/static/css/style.css` outputs.
-- If a change claims generated assets are up to date, verify with `git diff` after regeneration rather than trusting timestamps.
-- The Nix Docker image build is expected to regenerate templates and CSS inside the derivation; the committed generated files still matter for non-Nix builds.
+- Run `just build release` after template or static asset changes.
+- Run `go test ./...` after Go changes.
+- Run `nix build .#default` after Nix build changes.
+- Run `nix build .#dockerImage` after container changes.
+- Inspect generated-file changes after regeneration.
 
 ## WebAuthn Notes
 
-- WebAuthn storage is configured through `WEBAUTHN_CREDENTIALS_FILE` in `config.json`.
-- The passkey data file is expected to support in-place migration, so changes here should preserve older stored credentials when possible.
-- Admin WebAuthn flows are split between `src/server.odin`, `src/webauthn.odin`, `src/templates/admin.temple.twig`, and `src/static/js/admin.js`.
+- Configure passkey storage with `WEBAUTHN_CREDENTIALS_FILE`.
+- Configure the relying party with `WEBAUTHN_RP_ID` and `WEBAUTHN_RP_ORIGINS`.
+- Use `ADMIN_PASSWORD_PEPPER` for admin password hashing.
+- WebAuthn code lives in `internal/auth/`, `internal/app/`, and `internal/web/`.
+- Browser behavior lives in `src/static/js/admin.js`.
+
+## Paste Notes
+
+- Configure paste storage with `PASTE_ENABLED` and `PASTE_SECRETS_FILE`.
+- Keep the `paste-secrets.json` and encrypted Gist formats compatible with the Odin implementation.
+- Keep old encryption keys available until all pastes use the active key.
+- Test paste storage with an `httptest` GitHub API server.
 
 ## Deployment Notes
 
-- GitLab CI still publishes the Linux binary artifact.
-- Container images should be built from `flake.nix` via `dockerTools`, not from a handwritten Dockerfile.
-- Runtime config is expected under `/data/config.json` inside the container image.
+- GitLab CI publishes the static Linux binary and Docker image.
+- Build container images from `flake.nix` with `dockerTools`.
+- The container reads runtime configuration from `/data/config.json`.
+- The NixOS module remains available as `nixosModules.default`.

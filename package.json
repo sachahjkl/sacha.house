@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-	"build:css": "tailwindcss -i ./styles/app.css -o ./src/static/css/style.css",
-	"migrate:blog": "bun run ./tools/blog-migrate/migrate-blogposts.ts"
+    "templates": "go tool templ generate",
+    "build:css": "tailwindcss -i ./styles/app.css -o ./src/static/css/style.css",
+    "generate": "bun run templates && bun run build:css"
   },
   "dependencies": {
-	"turndown": "7.2.1",
-    "@tailwindcss/typography": "0.5.16",
-    "tailwindcss": "4.1.13",
-    "@tailwindcss/cli": "4.1.13"
+    "@tailwindcss/cli": "^4.1.13",
+    "@tailwindcss/typography": "^0.5.16",
+    "tailwindcss": "^4.1.13"
   },
   "trustedDependencies": [
     "@parcel/watcher",

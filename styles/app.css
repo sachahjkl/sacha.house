@@ -48,10 +48,6 @@
   scrollbar-color: var(--color-textColor) var(--color-bgColor);
 }
 
-@utility container {
-  margin-inline: auto;
-}
-
 @utility wrap-anywhere {
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -63,11 +59,6 @@ body {
 
 .h1 {
   @apply bg-textColor text-bgColor ps-4 text-2xl font-bold mb-4;
-}
-
-/* add a margin-bottom of 4rem to the h1 if it is not in a hgroup */
-hgroup .h1 {
-  @apply mb-0;
 }
 
 .h2 {
@@ -89,19 +80,8 @@ hgroup .h1 {
   }
 }
 
-:root {
-  --toastWidth: 30ch;
-  --toastBackground: hsla(var(--b2) / var(--tw-text-opacity, 1));
-  --toastColor: hsla(var(--bc) / var(--tw-bg-opacity, 1));
-  --toastBarBackground: hsl(var(--p));
-}
-
 html {
-  font-size: 14px
-}
-
-._toastMsg {
-  @apply overflow-hidden text-ellipsis;
+  font-size: 14px;
 }
 
 *::selection {
@@ -109,9 +89,30 @@ html {
   color: #131313;
 }
 
+:focus-visible {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 3px;
+}
+
+:is(input, select, textarea):user-invalid {
+  border-color: #dc2626;
+}
+
+:is(input, select, textarea):user-invalid:focus-visible {
+  outline-color: #dc2626 !important;
+}
+
 nav a:hover,
 nav a.active {
   @apply bg-textColor text-bgColor;
+}
+
+#nav-indicator {
+  display: none;
+}
+
+.datastar-request #nav-indicator {
+  display: inline;
 }
 
 .blog-page a {
@@ -135,11 +136,6 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-.ascii-logo-page {
-  text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-}
-
 .ascii-logo-wrap {
   width: 100%;
   container-type: inline-size;
@@ -153,20 +149,11 @@ html {
   padding-top: 10px;
 }
 
-.ascii-logo-wrap-debug {
-  width: 100%;
-  padding-inline: 32px;
-  margin: auto;
-  display: grid;
-  place-items: center;
-}
-
 .ascii-logo {
   font-family: "Fira Mono", "Courier New", monospace;
-  
   font-size: 1.5cqw;
   line-height: 1.7;
-  letter-spacing: -.1%;
+  letter-spacing: -0.001em;
   font-weight: 400;
   font-feature-settings: normal;
   font-variation-settings: normal;
@@ -176,14 +163,13 @@ html {
   line-height-trim: both;
   margin: 0;
   margin-inline: auto;
-  /*text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;*/
   color: var(--color-textColor);
 }
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .ascii-logo-fire {
     color: transparent;
+    background-color: var(--color-textColor);
     background-image: url("/static/gifs/fire-8bit-smoother.gif");
     background-size: 150% 150%;
     background-position: center 90%;
@@ -192,5 +178,21 @@ html {
     -webkit-background-clip: text;
     image-rendering: pixelated;
     filter: saturate(1.4) contrast(1.25) brightness(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .ascii-logo-fire {
+    background-image: none;
+    filter: none;
   }
 }

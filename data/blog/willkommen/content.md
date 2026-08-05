@@ -1,5 +1,29 @@
-Ce billet annonçait la refonte de 2022. La pile SvelteKit, GraphQL et Netlify décrite à l'origine n'est plus celle qui sert le site aujourd'hui.
+Je suis fier de vous présenter la nouvelle version de mon site, entièrement réécrite de zéro. Je suis passé d'une stack technologique purement statique à un stack entièrement dynamique et exploitant les dernières nouveautés. Mon ancien site est toujours disponible à [https://old.sacha.house](https://old.sacha.house "L'ancienne version de mon site") .
 
-La version actuelle repose sur un serveur écrit en [Odin](https://odin-lang.org/), des modèles HTML générés avec Temple, [Tailwind CSS](https://tailwindcss.com/) pour les styles et [Nix](https://nixos.org/) pour des builds et des déploiements reproductibles. Le site reste volontairement sobre : le HTML rendu côté serveur assure l'essentiel, et le JavaScript est réservé aux interfaces qui en ont besoin.
+L'ancienne stack comprenait :
 
-Cette évolution poursuit le même objectif qu'au départ : garder un espace personnel rapide, lisible et facile à faire évoluer.
+\- [Hugo](https://gohugo.io/ "https://gohugo.io/") (générateur de site statique).
+
+\- [CSS](https://developer.mozilla.org/fr/docs/Web/CSS "https://developer.mozilla.org/fr/docs/Web/CSS") construit à la main.
+
+\- [JavaScript](https://developer.mozilla.org/fr/docs/Web/JavaScript "https://developer.mozilla.org/fr/docs/Web/JavaScript") écrit à la main.
+
+\- [Gitlab Pages](https://docs.gitlab.com/ee/user/project/pages/ "https://docs.gitlab.com/ee/user/project/pages/") + [Gitlab CI/CD](https://docs.gitlab.com/ee/ci/ "https://docs.gitlab.com/ee/ci/") pour l'hébergement et le déploiement automatique.
+
+Ma nouvelle stack est à l'opposé polaire de l'ancienne en terme d'approche de conception :
+
+\- [SvelteKit](https://kit.svelte.dev/ "Meilleur framework") (framework web full stack bleeding edge).
+
+\- [Svelte](https://svelte.dev/ "Meilleure bibliothèque UI") bibliothèque/compilateur de composants UI web.
+
+\- [GraphQL](https://graphql.org/ "https://graphql.org/") pour les appels vers les différentes API externes (Github, Gitlab, ...) avec [graphql-request](https://github.com/prisma-labs/graphql-request "https://github.com/prisma-labs/graphql-request").
+
+\- [Netlify](https://www.netlify.com/ "https://www.netlify.com/") pour le déploiement du site web. Utilise les nouvelles [Edge Functions](https://docs.netlify.com/edge-functions/overview/ "https://docs.netlify.com/edge-functions/overview/") qui permettent de drastiquement améliorer la performance globale du site.
+
+\- [Typescript](https://www.typescriptlang.org/ "https://www.typescriptlang.org/") pour éviter d'écrire du code qui casse à chaque ligne.
+
+\- [TailwindCSS](https://tailwindcss.com/ "https://tailwindcss.com/"), framework CSS utility-first (sorte de CSS raccourci).
+
+\- [DaisyUI](https://daisyui.com/ "https://daisyui.com/"), une bibliothèque de composant reposant purement conçue avec TailwindCSS.
+
+N'hésitez pas à m'envoyer un mail si vous avez des remarques !

@@ -4,7 +4,7 @@ Hacker News pushed [`wthhyb.sacha.house`](https://wthhyb.sacha.house/ "https://w
 
 ![proof.png](/media/blog/top-post-hacker-news/assets/cmi5vijmhjkkk07w4qi5bctqo-1.png)
 
-I saw this image [https://x.com/codinghorror/status/347070841059692545](https://x.com/codinghorror/status/347070841059692545 "https://x.com/codinghorror/status/347070841059692545") on Twitter/X and couldn't help wanting to find the orignal website. Having done so and failed to find anything, I set on to simply : REMAKE IT FROM SCRATCH myself :D.
+I saw this image [https://x.com/codinghorror/status/347070841059692545](https://x.com/codinghorror/status/347070841059692545 "https://x.com/codinghorror/status/347070841059692545") on Twitter/X and couldn't help wanting to find the original website. Having done so and failed to find anything, I set on to simply : REMAKE IT FROM SCRATCH myself :D.
 
 I init'd a fresh bun/vite/react/tailwind project, dove into the newly created `App.tsx` and went to town. From 18h to arround 21h, and I was done !
 

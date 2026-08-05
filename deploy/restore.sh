@@ -4,6 +4,8 @@ set -Eeuo pipefail
 umask 077
 
 readonly STATE_DIR="/var/lib/sacha.house"
+readonly DEPLOY_STATE_DIR="/var/lib/sacha.house-deploy"
+readonly OPERATION_LOCK="${DEPLOY_STATE_DIR}/operation.lock"
 readonly SERVICE_USER="sacha"
 readonly SERVICE_GROUP="sacha"
 readonly SERVICE_NAME="sacha.house.service"
@@ -17,6 +19,10 @@ if (( $# < 1 || $# > 2 )); then
     printf 'usage: %s BACKUP_FILE.tar.gz [BACKUP_FILE.sha256]\n' "$0" >&2
     exit 2
 fi
+
+install -d -o root -g root -m 0700 "$DEPLOY_STATE_DIR"
+exec 9>"$OPERATION_LOCK"
+flock --exclusive 9
 
 archive="$(realpath -- "$1")"
 checksum="$(realpath -- "${2:-$1.sha256}")"
@@ -41,11 +47,21 @@ while IFS= read -r entry; do
             ;;
     esac
 done < <(tar --list --gzip --file "$archive")
+while IFS= read -r metadata; do
+    case "${metadata:0:1}" in
+        -|d)
+            ;;
+        *)
+            printf 'backup contains a link or special file\n' >&2
+            exit 1
+            ;;
+    esac
+done < <(tar --list --verbose --gzip --file "$archive")
 
 state_parent="$(dirname -- "$STATE_DIR")"
-staging="${state_parent}/.sacha.house.restore.$$"
+staging="$(mktemp -d "${state_parent}/.sacha.house.restore.XXXXXXXX")"
 old_state="${state_parent}/.sacha.house.pre-restore.$$"
-restore_failed="${state_parent}/.sacha.house.failed-restore.$$"
+failed_state="${state_parent}/.sacha.house.failed-restore.$$"
 was_active=false
 switched=false
 cleanup() {
@@ -56,10 +72,16 @@ cleanup() {
 }
 trap cleanup EXIT
 
-install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0700 "$staging"
-runuser --user "$SERVICE_USER" -- tar \
+tar \
     --extract --gzip --no-same-owner --no-same-permissions \
     --file "$archive" --directory "$staging"
+if [[ ! -f "$staging/config.json" || ! -d "$staging/data/blog" ]]; then
+    printf 'backup does not contain the required runtime state\n' >&2
+    exit 1
+fi
+chown -R "$SERVICE_USER:$SERVICE_GROUP" "$staging"
+chmod 0700 "$staging"
+chmod 0600 "$staging/config.json"
 
 if systemctl is-active --quiet "$SERVICE_NAME"; then
     was_active=true
@@ -82,7 +104,7 @@ wait_until_healthy() {
     return 1
 }
 
-if [[ "$was_active" == false ]] || (systemctl start "$SERVICE_NAME" && wait_until_healthy); then
+if systemctl start "$SERVICE_NAME" && wait_until_healthy; then
     rm -rf -- "$old_state"
     printf 'restored verified state from %s\n' "$archive"
     exit 0
@@ -90,9 +112,9 @@ fi
 
 printf 'restored state failed its health check; rolling back data\n' >&2
 systemctl stop "$SERVICE_NAME" || true
-mv -- "$STATE_DIR" "$restore_failed"
+mv -- "$STATE_DIR" "$failed_state"
 mv -- "$old_state" "$STATE_DIR"
-rm -rf -- "$restore_failed"
+rm -rf -- "$failed_state"
 if [[ "$was_active" == true ]]; then
     systemctl start "$SERVICE_NAME"
     wait_until_healthy || printf 'original state failed its health check after rollback\n' >&2

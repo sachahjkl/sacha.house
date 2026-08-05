@@ -1,11 +1,6 @@
 {
-	"id": "/",
-	"name": "sacha.house — Sacha Froment",
+	"name": "Le site web personnel de Sacha Froment",
 	"short_name": "sacha.house",
-	"description": "Software engineering projects and articles by Sacha Froment.",
-	"lang": "en",
-	"start_url": "/",
-	"scope": "/",
 	"icons": [
 		{
 			"src": "/static/android-chrome-192x192.png",
@@ -18,8 +13,7 @@
 			"type": "image/png"
 		}
 	],
-	"theme_color": "#000000",
+	"theme_color": "#ffffff",
 	"background_color": "#ffffff",
-	"display": "standalone",
-	"categories": ["portfolio", "technology"]
+	"display": "standalone"
 }

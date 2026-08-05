@@ -1,59 +1,34 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-ORIGINAL_LOG_DIR="/data/Docker/appdata/Nginx Proxy Manager/data/logs"
-SYMLINK_DIR="/var/log/nginx-proxy-manager"
+set -Eeuo pipefail
 
-echo "=== fail2ban Log Path Tester ==="
-echo ""
+readonly ORIGINAL_LOG_DIR="/data/Docker/appdata/Nginx Proxy Manager/data/logs"
+readonly SYMLINK_DIR="/var/log/npm-nginx"
+readonly FILTER_FILE="/etc/fail2ban/filter.d/sacha-house-teapot.conf"
 
-echo "1. Checking original directory..."
-if [ -d "$ORIGINAL_LOG_DIR" ]; then
-    echo "✓ Original directory exists: $ORIGINAL_LOG_DIR"
-else
-    echo "✗ Directory not found: $ORIGINAL_LOG_DIR"
+if [[ ! -d "$ORIGINAL_LOG_DIR" ]]; then
+    printf 'Nginx Proxy Manager log directory not found: %s\n' "$ORIGINAL_LOG_DIR" >&2
+    exit 1
+fi
+if [[ ! -L "$SYMLINK_DIR" ]]; then
+    printf 'log symlink not found: %s\n' "$SYMLINK_DIR" >&2
+    exit 1
+fi
+if [[ "$(readlink -f "$SYMLINK_DIR")" != "$(realpath "$ORIGINAL_LOG_DIR")" ]]; then
+    printf 'log symlink has the wrong target: %s\n' "$SYMLINK_DIR" >&2
+    exit 1
+fi
+if [[ ! -f "$FILTER_FILE" ]]; then
+    printf 'fail2ban filter not found: %s\n' "$FILTER_FILE" >&2
     exit 1
 fi
 
-echo ""
-echo "2. Checking/creating symlink..."
-if [ -L "$SYMLINK_DIR" ]; then
-    echo "✓ Symlink exists: $SYMLINK_DIR -> $(readlink $SYMLINK_DIR)"
-elif [ ! -e "$SYMLINK_DIR" ]; then
-    echo "Creating symlink..."
-    sudo ln -s "$ORIGINAL_LOG_DIR" "$SYMLINK_DIR"
-    echo "✓ Symlink created"
-else
-    echo "✗ $SYMLINK_DIR exists but is not a symlink"
+shopt -s nullglob
+logs=("$SYMLINK_DIR"/proxy-host-*_access.log)
+if (( ${#logs[@]} == 0 )); then
+    printf 'no Nginx Proxy Manager access logs found in %s\n' "$SYMLINK_DIR" >&2
     exit 1
 fi
 
-echo ""
-echo "3. Listing access log files via symlink..."
-ls -lh "$SYMLINK_DIR"/proxy-host-*_access.log 2>/dev/null || {
-    echo "✗ No proxy-host-*_access.log files found"
-    echo "Files in directory:"
-    ls -lh "$SYMLINK_DIR" | head -20
-    exit 1
-}
-
-echo ""
-echo "4. Testing filter against sample log lines..."
-SAMPLE_LOG=$(ls "$SYMLINK_DIR"/proxy-host-*_access.log 2>/dev/null | head -1)
-
-if [ -n "$SAMPLE_LOG" ]; then
-    echo "Using: $SAMPLE_LOG"
-    echo ""
-    echo "Lines containing '/teapot':"
-    grep "/teapot" "$SAMPLE_LOG" | head -5
-    
-    echo ""
-    echo "Testing fail2ban filter..."
-    fail2ban-regex "$SAMPLE_LOG" /etc/fail2ban/filter.d/sacha-house-teapot.conf || {
-        echo ""
-        echo "Filter test failed. Sample log line format:"
-        head -2 "$SAMPLE_LOG"
-    }
-else
-    echo "✗ No log file to test"
-fi
-
+printf 'testing %s with %s\n' "$FILTER_FILE" "${logs[0]}"
+fail2ban-regex "${logs[0]}" "$FILTER_FILE"

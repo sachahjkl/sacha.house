@@ -1,5 +1,5 @@
 {
-  description = "Development shell for sacha.house";
+  description = "sacha.house Go application";
 
   nixConfig = {
     extra-substituters = [
@@ -27,177 +27,48 @@
           else if self ? dirtyShortRev then self.dirtyShortRev
           else "dev";
         packageVersion = "${versionPrefix}+${gitCommitHash}";
-        stdcppLibbacktraceCompat = pkgs.runCommand "stdcxx-libbacktrace-compat"
-          {
-            nativeBuildInputs = [ pkgs.clang ];
-          } ''
-          mkdir -p "$out/lib"
-
-          cat > compat.c <<'EOF'
-          #include <backtrace.h>
-          #include <stdlib.h>
-
-          struct backtrace_state *__glibcxx_backtrace_create_state(
-            const char *filename,
-            int threaded,
-            void (*error_callback)(void *data, const char *msg, int errnum),
-            void *data
-          ) {
-            return backtrace_create_state(filename, threaded, error_callback, data);
-          }
-
-          int __glibcxx_backtrace_simple(
-            struct backtrace_state *state,
-            int skip,
-            int (*callback)(void *data, uintptr_t pc),
-            void (*error_callback)(void *data, const char *msg, int errnum),
-            void *data
-          ) {
-            return backtrace_simple(state, skip, callback, error_callback, data);
-          }
-
-          int __glibcxx_backtrace_pcinfo(
-            struct backtrace_state *state,
-            uintptr_t pc,
-            int (*callback)(void *data, uintptr_t pc, const char *filename, int lineno, const char *function),
-            void (*error_callback)(void *data, const char *msg, int errnum),
-            void *data
-          ) {
-            return backtrace_pcinfo(state, pc, callback, error_callback, data);
-          }
-
-          int __glibcxx_backtrace_syminfo(
-            struct backtrace_state *state,
-            uintptr_t addr,
-            void (*callback)(void *data, uintptr_t pc, const char *symname, uintptr_t symval, uintptr_t symsize),
-            void (*error_callback)(void *data, const char *msg, int errnum),
-            void *data
-          ) {
-            return backtrace_syminfo(state, addr, callback, error_callback, data);
-          }
-
-          void __glibcxx_backtrace_free(struct backtrace_state *state) {
-            free(state);
-          }
-          EOF
-
-          clang -shared -fPIC compat.c \
-            -I${pkgs.libbacktrace}/include \
-            -L${pkgs.libbacktrace}/lib -lbacktrace \
-            -o "$out/lib/libstdc++_libbacktrace.so"
-        '';
-        runtimeLibraries = [
-          pkgs.openssl
-          pkgs.cmark
-          pkgs.libbacktrace
-          pkgs.stdenv.cc.cc.lib
-          stdcppLibbacktraceCompat
-        ];
-        runtimeLibraryPath = lib.makeLibraryPath runtimeLibraries;
         linuxArch =
           if system == "x86_64-linux" then "amd64"
           else if system == "aarch64-linux" then "arm64"
           else system;
-        fhsDynamicLinker =
-          if system == "x86_64-linux" then "/lib64/ld-linux-x86-64.so.2"
-          else if system == "aarch64-linux" then "/lib/ld-linux-aarch64.so.1"
-          else null;
-        fhsLibraryPath = lib.concatStringsSep ":" [
-          "/usr/lib/${pkgs.stdenv.hostPlatform.config}"
-          "/lib/${pkgs.stdenv.hostPlatform.config}"
-          "/usr/lib64"
-          "/usr/lib"
-          "/lib64"
-          "/lib"
-        ];
-        sachaHouse = pkgs.stdenv.mkDerivation {
+        source = lib.cleanSource ./.;
+        sachaHouse = pkgs.buildGoModule {
           inherit pname;
           version = packageVersion;
-          src = lib.cleanSourceWith {
-            src = ./.;
-            filter = path: type:
-              let
-                name = baseNameOf path;
-              in
-                lib.cleanSourceFilter path type
-                && name != "config.json"
-                && !(lib.hasPrefix "paste-secrets" name && lib.hasSuffix ".json" name);
-          };
-          npmDeps = pkgs.importNpmLock {
-            npmRoot = ./.;
-          };
+          src = source;
+          vendorHash = "sha256-xE5teCK+yueLLGycyFl+EFtWhV/5zqBHw8Y3YpLp8LY=";
+          subPackages = [ "cmd/sacha-house" ];
           nativeBuildInputs = [
-            pkgs.nodejs
-            pkgs.odin
-            pkgs.importNpmLock.hooks.npmConfigHook
+            pkgs.tailwindcss_4
           ];
-          buildInputs = runtimeLibraries;
-          LD_LIBRARY_PATH = runtimeLibraryPath;
-          LIBRARY_PATH = runtimeLibraryPath;
-          buildPhase = ''
-            runHook preBuild
+          overrideModAttrs = _: { preBuild = null; };
+          env.CGO_ENABLED = 0;
+          ldflags = [
+            "-s"
+            "-w"
+            "-X main.version=${packageVersion}"
+            "-X main.commitHash=${gitCommitHash}"
+          ];
+          preBuild = ''
             export HOME="$TMPDIR"
-            odin build lib/temple/cli -o:speed -out:temple_cli
-            ./temple_cli src lib/temple
-            npm run build:css
-            odin build src \
-              -out:sacha.house \
-              -define:GIT_COMMIT_HASH="'${gitCommitHash}'" \
-              -define:VERSION="'${packageVersion}'" \
-              -collection:lib=lib \
-              -o:speed \
-              -define:TRACK_LEAKS=false \
-              -build-mode:exe
-            runHook postBuild
+            go tool templ generate
+            tailwindcss -i ./styles/app.css -o ./src/static/css/style.css
           '';
-          installPhase = ''
-            runHook preInstall
-            mkdir -p $out/bin
-            cp sacha.house $out/bin/sacha.house
-            runHook postInstall
+          postInstall = ''
+            mv "$out/bin/sacha-house" "$out/bin/sacha.house"
           '';
         };
-        linuxBinary = pkgs.runCommand "${pname}-linux-${linuxArch}"
-          {
-            nativeBuildInputs = [ pkgs.patchelf ];
-          } ''
+        linuxBinary = pkgs.runCommand "${pname}-linux-${linuxArch}" { } ''
           install -Dm755 ${sachaHouse}/bin/sacha.house "$out/${pname}-linux-${linuxArch}"
-          chmod u+w "$out/${pname}-linux-${linuxArch}"
-          patchelf \
-            --set-interpreter ${fhsDynamicLinker} \
-            --set-rpath ${lib.escapeShellArg fhsLibraryPath} \
-            "$out/${pname}-linux-${linuxArch}"
         '';
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             bun
+            go
             just
-            odin
-            clang
-            pkg-config
-            openssl
-            cmark
-            libbacktrace
-            stdenv.cc.cc.lib
+            watchexec
             git
-            stdcppLibbacktraceCompat
-          ];
-
-          LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-            pkgs.openssl
-            pkgs.cmark
-            pkgs.libbacktrace
-            pkgs.stdenv.cc.cc.lib
-            stdcppLibbacktraceCompat
-          ];
-
-          LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-            pkgs.openssl
-            pkgs.cmark
-            pkgs.libbacktrace
-            pkgs.stdenv.cc.cc.lib
-            stdcppLibbacktraceCompat
           ];
 
           shellHook = ''
@@ -229,31 +100,21 @@
               sachaHouse
               pkgs.cacert
               pkgs.tzdata
-            ] ++ runtimeLibraries;
-            extraCommands = ''
-              mkdir -p ./etc ./data/tmp
-              chmod 0755 ./etc
-              chmod 0700 ./data ./data/tmp
-              printf '%s\n' 'sacha-house:x:10001:10001:sacha.house:/data:/bin/false' > ./etc/passwd
-              printf '%s\n' 'sacha-house:x:10001:' > ./etc/group
-              chmod 0644 ./etc/passwd ./etc/group
-            '';
+            ];
             fakeRootCommands = ''
-              chown -R 10001:10001 ./data
+              mkdir -p ./data
+              chown 65532:65532 ./data
+              chmod 0700 ./data
             '';
             config = {
+              User = "65532:65532";
               WorkingDir = "/data";
-              User = "10001:10001";
               Env = [
-                "CONFIG_PATH=/config/config.json"
-                "HOME=/data"
-                "TMPDIR=/data/tmp"
-                "LD_LIBRARY_PATH=${runtimeLibraryPath}"
+                "CONFIG_PATH=/data/config.json"
                 "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
               ];
               Volumes = {
                 "/data" = { };
-                "/run/secrets" = { };
               };
               ExposedPorts = {
                 "6969/tcp" = { };
@@ -294,15 +155,8 @@
 
             configFile = mkOption {
               type = types.path;
-              default = "/etc/sacha.house/config.json";
+              default = "${cfg.dataDir}/config.json";
               description = "Path to the sacha.house JSON config file.";
-            };
-
-            pasteSecretsFile = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              example = "/run/secrets/sacha-house-pastes.json";
-              description = "Optional paste secrets JSON path to grant read-only access; set the same path in PASTE_SECRETS_FILE inside config.json.";
             };
 
             openFirewall = mkOption {
@@ -313,16 +167,6 @@
           };
 
           config = mkIf cfg.enable {
-            assertions = [
-              {
-                assertion = !hasPrefix "/nix/store/" (toString cfg.configFile);
-                message = "services.sacha-house.configFile must be a runtime path, not a Nix store path";
-              }
-              {
-                assertion = cfg.pasteSecretsFile == null || !hasPrefix "/nix/store/" cfg.pasteSecretsFile;
-                message = "services.sacha-house.pasteSecretsFile must be a runtime path, not a Nix store path";
-              }
-            ];
             users.users.sacha-house = {
               isSystemUser = true;
               group = "sacha-house";
@@ -344,24 +188,11 @@
                 ExecStart = "${pkg}/bin/sacha.house";
                 Restart = "on-failure";
                 RestartSec = 5;
-                UMask = "0077";
                 NoNewPrivileges = true;
                 PrivateTmp = true;
                 ProtectHome = true;
                 ProtectSystem = "strict";
                 ReadWritePaths = [ cfg.dataDir ];
-                ReadOnlyPaths = optional (cfg.pasteSecretsFile != null) cfg.pasteSecretsFile;
-                PrivateDevices = true;
-                ProtectClock = true;
-                ProtectControlGroups = true;
-                ProtectKernelLogs = true;
-                ProtectKernelModules = true;
-                ProtectKernelTunables = true;
-                ProtectProc = "invisible";
-                RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
-                RestrictSUIDSGID = true;
-                LockPersonality = true;
-                SystemCallArchitectures = "native";
                 Environment = [
                   "CONFIG_PATH=${cfg.configFile}"
                   "PORT=${toString cfg.port}"

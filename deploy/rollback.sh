@@ -4,6 +4,8 @@ set -Eeuo pipefail
 umask 077
 
 readonly INSTALL_ROOT="/opt/sacha.house"
+readonly DEPLOY_STATE_DIR="/var/lib/sacha.house-deploy"
+readonly OPERATION_LOCK="${DEPLOY_STATE_DIR}/operation.lock"
 readonly CURRENT_LINK="${INSTALL_ROOT}/current"
 readonly PREVIOUS_LINK="${INSTALL_ROOT}/previous"
 readonly SERVICE_NAME="sacha.house.service"
@@ -13,6 +15,11 @@ if (( EUID != 0 )); then
     printf 'rollback must run as root\n' >&2
     exit 1
 fi
+
+install -d -o root -g root -m 0700 "$DEPLOY_STATE_DIR"
+exec 9>"$OPERATION_LOCK"
+flock --exclusive 9
+
 if [[ ! -L "$CURRENT_LINK" || ! -L "$PREVIOUS_LINK" ]]; then
     printf 'both current and previous releases are required for rollback\n' >&2
     exit 1

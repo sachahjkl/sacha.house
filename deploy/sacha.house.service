@@ -9,7 +9,7 @@ Type=simple
 User=sacha
 Group=sacha
 WorkingDirectory=/var/lib/sacha.house
-Environment=CONFIG_PATH=/etc/sacha.house/config.json
+Environment=CONFIG_PATH=/var/lib/sacha.house/config.json
 Environment=PORT=6969
 ExecStart=/opt/sacha.house/current/sacha.house
 Restart=on-failure
@@ -30,7 +30,7 @@ ProtectKernelModules=true
 ProtectKernelTunables=true
 ProtectProc=invisible
 ProtectSystem=strict
-ReadOnlyPaths=/opt/sacha.house /etc/sacha.house
+ReadOnlyPaths=/opt/sacha.house
 ReadWritePaths=/var/lib/sacha.house
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 RestrictSUIDSGID=true

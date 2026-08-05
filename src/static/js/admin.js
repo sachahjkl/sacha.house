@@ -1,339 +1,203 @@
-// WebAuthn Admin Functions
-const ALGORITHM_MAP = {
-  ES256: -7,
-  RS256: -257,
-};
-const SUPPORTED_ALGORITHMS = [
-  { alg: ALGORITHM_MAP["ES256"], type: "public-key" },
-  { alg: ALGORITHM_MAP["RS256"], type: "public-key" },
-];
-
 function getPasskeyLabel() {
   const input = document.getElementById("passkey-label");
   return input ? input.value.trim() : "";
 }
 
-function getAdminCsrfToken() {
-  return document.getElementById("admin-csrf-token")?.value || "";
-}
-
-function bytesToBase64(bytes) {
-  return btoa(String.fromCharCode(...new Uint8Array(bytes)));
-}
-
-function bytesToHex(bytes) {
-  return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function parseAuthenticatorData(buffer) {
-  const bytes = new Uint8Array(buffer);
-  if (bytes.length < 37) {
-    return { byteLength: bytes.length, error: "authenticatorData is shorter than expected" };
+function base64UrlToArrayBuffer(value) {
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+  const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="));
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
   }
+  return bytes.buffer;
+}
 
-  const flags = bytes[32];
-  const signCountView = new DataView(bytes.buffer, bytes.byteOffset + 33, 4);
+function arrayBufferToBase64Url(value) {
+  const bytes = new Uint8Array(value);
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
+function decodeCreationOptions(options) {
   return {
-    byteLength: bytes.length,
-    rpIdHashHex: bytesToHex(bytes.slice(0, 32)),
-    flags: {
-      up: Boolean(flags & 0x01),
-      uv: Boolean(flags & 0x04),
-      be: Boolean(flags & 0x08),
-      bs: Boolean(flags & 0x10),
-      at: Boolean(flags & 0x40),
-      ed: Boolean(flags & 0x80),
-      rawHex: flags.toString(16).padStart(2, "0"),
+    ...options,
+    challenge: base64UrlToArrayBuffer(options.challenge),
+    user: {
+      ...options.user,
+      id: base64UrlToArrayBuffer(options.user.id),
     },
-    signCount: signCountView.getUint32(0, false),
+    excludeCredentials: (options.excludeCredentials || []).map((credential) => ({
+      ...credential,
+      id: base64UrlToArrayBuffer(credential.id),
+    })),
   };
 }
 
-function setPasskeyDebugOutput(data, isError = false) {
-  const outputEl = document.getElementById("passkey-debug-output");
-  if (!outputEl) return;
-
-  outputEl.classList.remove("hidden");
-  outputEl.classList.toggle("status-error", isError);
-  outputEl.textContent = JSON.stringify(data, null, 2);
+function decodeRequestOptions(options) {
+  return {
+    ...options,
+    challenge: base64UrlToArrayBuffer(options.challenge),
+    allowCredentials: (options.allowCredentials || []).map((credential) => ({
+      ...credential,
+      id: base64UrlToArrayBuffer(credential.id),
+    })),
+  };
 }
 
-async function registerPasskey() {
+async function fetchPublicKeyOptions(url, decode) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+  const payload = await response.json();
+  return decode(payload.publicKey);
+}
+
+async function requireJSONSuccess(response) {
+  if (!response.ok) throw new Error(await response.text());
+  if (!response.headers.get("Content-Type")?.includes("application/json")) {
+    throw new Error("The admin session expired.");
+  }
+  const payload = await response.json();
+  if (payload.ok !== true) throw new Error("The server rejected the WebAuthn operation.");
+}
+
+function credentialToJSON(credential) {
+  const response = {
+    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
+  };
+
+  if ("attestationObject" in credential.response) {
+    response.attestationObject = arrayBufferToBase64Url(credential.response.attestationObject);
+    if (typeof credential.response.getTransports === "function") {
+      response.transports = credential.response.getTransports();
+    }
+  } else {
+    response.authenticatorData = arrayBufferToBase64Url(credential.response.authenticatorData);
+    response.signature = arrayBufferToBase64Url(credential.response.signature);
+    response.userHandle = credential.response.userHandle
+      ? arrayBufferToBase64Url(credential.response.userHandle)
+      : null;
+  }
+
+  return {
+    id: credential.id,
+    rawId: arrayBufferToBase64Url(credential.rawId),
+    type: credential.type,
+    authenticatorAttachment: credential.authenticatorAttachment || null,
+    clientExtensionResults: credential.getClientExtensionResults(),
+    response,
+  };
+}
+
+async function registerPasskey(button) {
+  if (button?.disabled) return;
+  if (button) button.disabled = true;
   const statusEl = document.getElementById("passkey-status");
   statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
   statusEl.textContent = "⏳ Fetching registration challenge...";
   statusEl.classList.remove("hidden");
 
   try {
-    const challengeRes = await fetch("/admin/webauthn/register-challenge");
-    const challenge = await challengeRes.json();
-
-    const publicKeyCredentialCreationOptions = {
-      challenge: Uint8Array.from(atob(challenge.challenge), (c) => c.charCodeAt(0)),
-      rp: {
-        name: "sacha.house Admin",
-        id: challenge.rp_id,
-      },
-      user: {
-        id: Uint8Array.from(challenge.user_id, (c) => c.charCodeAt(0)),
-        name: "admin",
-        displayName: "Administrator",
-      },
-      pubKeyCredParams: SUPPORTED_ALGORITHMS,
-      authenticatorSelection: {
-        userVerification: "preferred",
-        requireResidentKey: true,
-        residentKey: "required",
-      },
-      timeout: 60000,
-      attestation: "none",
-    };
+    const label = getPasskeyLabel();
+    const url = `/admin/webauthn/register-challenge?label=${encodeURIComponent(label)}`;
+    const publicKey = await fetchPublicKeyOptions(url, decodeCreationOptions);
 
     statusEl.textContent = "🔐 Please complete the passkey creation on your device...";
-
-    const credential = await navigator.credentials.create({
-      publicKey: publicKeyCredentialCreationOptions,
-    });
+    const credential = await navigator.credentials.create({ publicKey });
 
     statusEl.textContent = "⏳ Verifying registration...";
 
-    const credentialData = {
-      id: credential.id,
-      label: getPasskeyLabel(),
-      rawId: btoa(String.fromCharCode(...new Uint8Array(credential.rawId))),
-      response: {
-        clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON))),
-        attestationObject: btoa(String.fromCharCode(...new Uint8Array(credential.response.attestationObject))),
-      },
-      type: credential.type,
-    };
-
     const verifyRes = await fetch("/admin/webauthn/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-CSRF-Token": getAdminCsrfToken() },
-      body: JSON.stringify(credentialData),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentialToJSON(credential)),
     });
 
-    if (verifyRes.ok) {
-      statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
-      statusEl.textContent = "✅ Passkey registered successfully!";
-      if (window.htmx) {
-        htmx.ajax("GET", "/admin/webauthn/passkeys", { target: "#passkey-list", swap: "outerHTML" });
-      }
-    } else {
-      const error = await verifyRes.text();
-      statusEl.className = "status-error mt-4";
-      statusEl.textContent = "❌ Registration failed: " + error;
-    }
+    await requireJSONSuccess(verifyRes);
+    statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
+    statusEl.textContent = "✅ Passkey registered successfully!";
+    document.getElementById("refresh-passkeys")?.click();
   } catch (error) {
     statusEl.className = "status-error mt-4";
     statusEl.textContent = "❌ Error: " + error.message;
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
-async function debugPasskey(event) {
-  event.preventDefault();
-
-  const statusEl = document.getElementById("passkey-status");
-  const userVerificationEl = document.getElementById("passkey-debug-user-verification");
-  const userVerification = userVerificationEl ? userVerificationEl.value : "preferred";
-
-  if (statusEl) {
-    statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
-    statusEl.textContent = "⏳ Fetching debug challenge...";
-    statusEl.classList.remove("hidden");
-  }
-
-  try {
-    const challengeRes = await fetch("/admin/webauthn/debug-challenge", {});
-    if (!challengeRes.ok) {
-      throw new Error(await challengeRes.text());
-    }
-
-    const challenge = await challengeRes.json();
-    const requestOptions = {
-      challenge: Uint8Array.from(atob(challenge.challenge), (c) => c.charCodeAt(0)),
-      timeout: 60000,
-      rpId: challenge.rp_id,
-      userVerification,
-    };
-
-    if (statusEl) {
-      statusEl.textContent = "🔐 Touch the authenticator to collect debug info...";
-    }
-
-    const assertion = await navigator.credentials.get({ publicKey: requestOptions });
-    const clientDataText = new TextDecoder().decode(assertion.response.clientDataJSON);
-    const capabilities = typeof PublicKeyCredential !== "undefined" && PublicKeyCredential.getClientCapabilities
-      ? await PublicKeyCredential.getClientCapabilities()
-      : null;
-
-    setPasskeyDebugOutput({
-      challenge,
-      requestOptions: {
-        rpId: requestOptions.rpId,
-        timeout: requestOptions.timeout,
-        userVerification: requestOptions.userVerification,
-        challengeByteLength: requestOptions.challenge.length,
-      },
-      browser: {
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        clientCapabilities: capabilities,
-      },
-      credential: {
-        id: assertion.id,
-        type: assertion.type,
-        authenticatorAttachment: assertion.authenticatorAttachment || null,
-        rawIdBase64: bytesToBase64(assertion.rawId),
-      },
-      response: {
-        clientDataJSONText: clientDataText,
-        authenticatorDataBase64: bytesToBase64(assertion.response.authenticatorData),
-        authenticatorData: parseAuthenticatorData(assertion.response.authenticatorData),
-        signatureBase64: bytesToBase64(assertion.response.signature),
-        signatureByteLength: new Uint8Array(assertion.response.signature).length,
-        userHandleBase64: assertion.response.userHandle ? bytesToBase64(assertion.response.userHandle) : null,
-      },
-    });
-
-    if (statusEl) {
-      statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
-      statusEl.textContent = "✅ Debug info captured below.";
-    }
-  } catch (error) {
-    setPasskeyDebugOutput({ error: error.message || String(error) }, true);
-    if (statusEl) {
-      statusEl.className = "status-error mt-4";
-      statusEl.textContent = "❌ Debug failed: " + (error.message || error);
-    }
-  }
-}
-
-async function testPasskey() {
+async function testPasskey(button) {
+  if (button?.disabled) return;
+  if (button) button.disabled = true;
   const statusEl = document.getElementById("passkey-status");
   statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
   statusEl.textContent = "⏳ Fetching authentication challenge...";
   statusEl.classList.remove("hidden");
 
   try {
-    const challengeRes = await fetch("/admin/webauthn/login-challenge", {});
-
-    if (!challengeRes.ok) {
-      throw new Error(await challengeRes.text());
-    }
-
-    const challenge = await challengeRes.json();
-
-    const publicKeyCredentialRequestOptions = {
-      challenge: Uint8Array.from(atob(challenge.challenge), (c) => c.charCodeAt(0)),
-      timeout: 60000,
-      rpId: challenge.rp_id,
-    };
+    const publicKey = await fetchPublicKeyOptions(
+      "/admin/webauthn/login-challenge",
+      decodeRequestOptions,
+    );
 
     statusEl.textContent = "🔐 Please complete the passkey verification on your device...";
-
-    const assertion = await navigator.credentials.get({
-      publicKey: publicKeyCredentialRequestOptions,
-    });
+    const assertion = await navigator.credentials.get({ publicKey });
 
     statusEl.textContent = "⏳ Verifying authentication...";
-
-    const assertionData = {
-      id: assertion.id,
-      rawId: btoa(String.fromCharCode(...new Uint8Array(assertion.rawId))),
-      response: {
-        clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON))),
-        authenticatorData: btoa(String.fromCharCode(...new Uint8Array(assertion.response.authenticatorData))),
-        signature: btoa(String.fromCharCode(...new Uint8Array(assertion.response.signature))),
-        userHandle: assertion.response.userHandle
-          ? btoa(String.fromCharCode(...new Uint8Array(assertion.response.userHandle)))
-          : null,
-      },
-      type: assertion.type,
-    };
 
     const verifyRes = await fetch("/admin/webauthn/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(assertionData),
+      body: JSON.stringify(credentialToJSON(assertion)),
     });
 
-    if (verifyRes.ok) {
-      statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
-      statusEl.textContent = "✅ Passkey authentication successful!";
-    } else {
-      const error = await verifyRes.text();
-      statusEl.className = "status-error mt-4";
-      statusEl.textContent = "❌ Authentication failed: " + error;
-    }
+    await requireJSONSuccess(verifyRes);
+    statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
+    statusEl.textContent = "✅ Passkey authentication successful!";
   } catch (error) {
     statusEl.className = "status-error mt-4";
     statusEl.textContent = "❌ Error: " + error.message;
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
-async function loginWebAuthnPasskey() {
+async function loginWebAuthnPasskey(button) {
+  if (button?.disabled) return;
+  if (button) button.disabled = true;
   const statusEl = document.getElementById("login-status");
   statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
   statusEl.textContent = "⏳ Fetching authentication challenge...";
   statusEl.classList.remove("hidden");
 
   try {
-    const challengeRes = await fetch("/admin/webauthn/login-challenge", {});
-    if (!challengeRes.ok) {
-      statusEl.className = "status-error mt-4";
-      statusEl.textContent = "❌ No passkeys registered yet";
-      return;
-    }
-
-    const challenge = await challengeRes.json();
-
-    const publicKeyCredentialRequestOptions = {
-      challenge: Uint8Array.from(atob(challenge.challenge), (c) => c.charCodeAt(0)),
-      timeout: 60000,
-      rpId: challenge.rp_id,
-    };
+    const publicKey = await fetchPublicKeyOptions(
+      "/admin/webauthn/login-challenge",
+      decodeRequestOptions,
+    );
 
     statusEl.textContent = "🔐 Please complete the passkey verification on your device...";
-
-    const assertion = await navigator.credentials.get({
-      publicKey: publicKeyCredentialRequestOptions,
-    });
+    const assertion = await navigator.credentials.get({ publicKey });
 
     statusEl.textContent = "⏳ Verifying authentication...";
-
-    const assertionData = {
-      id: assertion.id,
-      rawId: btoa(String.fromCharCode(...new Uint8Array(assertion.rawId))),
-      response: {
-        clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON))),
-        authenticatorData: btoa(String.fromCharCode(...new Uint8Array(assertion.response.authenticatorData))),
-        signature: btoa(String.fromCharCode(...new Uint8Array(assertion.response.signature))),
-        userHandle: assertion.response.userHandle
-          ? btoa(String.fromCharCode(...new Uint8Array(assertion.response.userHandle)))
-          : null,
-      },
-      type: assertion.type,
-    };
 
     const verifyRes = await fetch("/admin/webauthn/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(assertionData),
+      body: JSON.stringify(credentialToJSON(assertion)),
     });
 
-    if (verifyRes.ok) {
-      window.location.href = "/admin";
-    } else {
-      const error = await verifyRes.text();
-      statusEl.className = "status-error mt-4";
-      statusEl.textContent = "❌ Authentication failed: " + error;
-    }
+    await requireJSONSuccess(verifyRes);
+    window.location.assign("/admin");
   } catch (error) {
     statusEl.className = "status-error mt-4";
     statusEl.textContent = "❌ Error: " + error.message;
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
@@ -390,7 +254,7 @@ async function uploadPastedBlogImage(file, slug) {
   const base64 = await fileToBase64(file);
   const response = await fetch("/admin/blogposts/upload-image", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-CSRF-Token": getAdminCsrfToken() },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       slug,
       filename: file.name || "pasted-image.png",
@@ -419,6 +283,19 @@ function initBlogEditor() {
   if (!titleInput || !slugInput || !markdownInput) return;
 
   let slugWasManual = slugInput.value.trim() !== "";
+  let pendingUploads = 0;
+  let slugLocked = false;
+  const submitButtons = Array.from(form.querySelectorAll('button[type="submit"]'));
+  const updateUploadState = () => {
+    slugInput.readOnly = slugLocked || pendingUploads > 0;
+    for (const button of submitButtons) button.disabled = pendingUploads > 0;
+  };
+
+  form.addEventListener("submit", (event) => {
+    if (pendingUploads === 0) return;
+    event.preventDefault();
+    setBlogEditorStatus("Wait for the image upload to finish before saving.", "error");
+  });
 
   titleInput.addEventListener("input", () => {
     if (!slugWasManual) {
@@ -457,13 +334,19 @@ function initBlogEditor() {
     if (!file) return;
 
     event.preventDefault();
+    pendingUploads += 1;
+    updateUploadState();
     try {
       setBlogEditorStatus("Uploading pasted image...", "info");
       const upload = await uploadPastedBlogImage(file, slug);
       insertTextAtCursor(markdownInput, `${upload.markdown}\n`);
+      slugLocked = true;
       setBlogEditorStatus("Image uploaded and inserted into markdown.", "success");
     } catch (error) {
       setBlogEditorStatus(`Upload failed: ${error.message}`, "error");
+    } finally {
+      pendingUploads -= 1;
+      updateUploadState();
     }
   });
 }
@@ -499,11 +382,14 @@ function initBlogpostsFilter() {
 function initAdminPageEnhancements() {
   initBlogEditor();
   initBlogpostsFilter();
-  if (document.body && !document.body.dataset.adminEnhancementsReady) {
-    document.body.dataset.adminEnhancementsReady = "1";
-    document.body.addEventListener("htmx:afterSwap", () => {
-      initBlogEditor();
-      initBlogpostsFilter();
+  if (!document.documentElement.dataset.adminEnhancementsReady) {
+    document.documentElement.dataset.adminEnhancementsReady = "1";
+    document.addEventListener("datastar-fetch", (event) => {
+      if (event.detail?.type !== "datastar-patch-elements") return;
+      queueMicrotask(() => {
+        initBlogEditor();
+        initBlogpostsFilter();
+      });
     });
   }
 }

@@ -1,5 +1,6 @@
 {
   "stages": [
+    "test",
     "build",
     "release"
   ],
@@ -7,10 +8,6 @@
     "rules": [
       {
         "if": '$CI_COMMIT_BRANCH == "master"',
-        "when": "always"
-      },
-      {
-        "if": '$CI_PIPELINE_SOURCE == "merge_request_event"',
         "when": "always"
       },
       {
@@ -22,6 +19,13 @@
     "ARTIFACT_NAME": "sacha.house-linux-amd64",
     "DOCKER_IMAGE_ARTIFACT": "sacha.house-docker-image.tar.gz",
     "NIX_CONFIG": "experimental-features = nix-command flakes\naccept-flake-config = true"
+  },
+  "test:go": {
+    "stage": "test",
+    "image": "nixos/nix:2.32.8",
+    "script": [
+      "nix shell nixpkgs#go -c env CGO_ENABLED=0 go test ./..."
+    ]
   },
   "build:linux:release": {
     "stage": "build",
@@ -35,12 +39,15 @@
     "script": [
       "nix build .#default --out-link result-nix",
       "nix build .#linuxBinary --out-link result-linux",
-      "VERSION=$(result-nix/bin/sacha.house --version)",
-      "printf 'VERSION=%s\\nLINUX_JOB_ID=%s\\n' \"$VERSION\" \"$CI_JOB_ID\" > build.env",
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result-nix ./result-linux | cachix push sachahjkl; fi",
       "cp result-linux/${ARTIFACT_NAME} ${ARTIFACT_NAME}",
       "chmod +x ${ARTIFACT_NAME}",
-      "sha256sum ${ARTIFACT_NAME} > ${ARTIFACT_NAME}.sha256"
+      "export VERSION=$(./${ARTIFACT_NAME} --version)",
+      'echo "VERSION=$VERSION" >> build.env',
+      "sha256sum ${ARTIFACT_NAME} > ${ARTIFACT_NAME}.sha256",
+      "export PACKAGE_URL=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/sacha.house/${VERSION}",
+      "nix shell nixpkgs#curl -c curl --fail --show-error --header \"JOB-TOKEN: ${CI_JOB_TOKEN}\" --upload-file ${ARTIFACT_NAME} ${PACKAGE_URL}/${ARTIFACT_NAME}",
+      "nix shell nixpkgs#curl -c curl --fail --show-error --header \"JOB-TOKEN: ${CI_JOB_TOKEN}\" --upload-file ${ARTIFACT_NAME}.sha256 ${PACKAGE_URL}/${ARTIFACT_NAME}.sha256"
     ],
     "artifacts": {
       "paths": [
@@ -63,33 +70,23 @@
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then cachix authtoken \"$CACHIX_AUTH_TOKEN\"; fi"
     ],
     "script": [
-      "echo DOCKER_JOB_ID=$CI_JOB_ID > docker.env",
       "nix build .#dockerImage",
       "if [ -n \"$CACHIX_AUTH_TOKEN\" ]; then nix path-info --recursive ./result | cachix push sachahjkl; fi",
-      "cp result ${DOCKER_IMAGE_ARTIFACT}"
+      "cp result ${DOCKER_IMAGE_ARTIFACT}",
+      "export VERSION=$(nix eval --raw .#default.version)",
+      "export PACKAGE_URL=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/sacha.house/${VERSION}",
+      "nix shell nixpkgs#curl -c curl --fail --show-error --header \"JOB-TOKEN: ${CI_JOB_TOKEN}\" --upload-file ${DOCKER_IMAGE_ARTIFACT} ${PACKAGE_URL}/${DOCKER_IMAGE_ARTIFACT}"
     ],
     "artifacts": {
       "paths": [
         "${DOCKER_IMAGE_ARTIFACT}"
       ],
-      "reports": {
-        "dotenv": "docker.env"
-      },
       "expire_in": "1 week"
     }
   },
   "release:release": {
     "stage": "release",
-    "image": "registry.gitlab.com/gitlab-org/cli:latest",
-    "rules": [
-      {
-        "if": '$CI_COMMIT_BRANCH == "master"',
-        "when": "on_success"
-      },
-      {
-        "when": "never"
-      }
-    ],
+    "image": "registry.gitlab.com/gitlab-org/release-cli:latest",
     "needs": [
       {
         "job": "build:linux:release",
@@ -111,17 +108,17 @@
         "links": [
           {
             "name": "sacha.house Linux AMD64 Binary",
-            "url": "${CI_PROJECT_URL}/-/jobs/${LINUX_JOB_ID}/artifacts/raw/${ARTIFACT_NAME}",
+            "url": "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/sacha.house/${VERSION}/${ARTIFACT_NAME}",
             "link_type": "package"
           },
           {
             "name": "sacha.house Linux AMD64 SHA256",
-            "url": "${CI_PROJECT_URL}/-/jobs/${LINUX_JOB_ID}/artifacts/raw/${ARTIFACT_NAME}.sha256",
+            "url": "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/sacha.house/${VERSION}/${ARTIFACT_NAME}.sha256",
             "link_type": "package"
           },
           {
             "name": "sacha.house Docker Image",
-            "url": "${CI_PROJECT_URL}/-/jobs/${DOCKER_JOB_ID}/artifacts/raw/${DOCKER_IMAGE_ARTIFACT}",
+            "url": "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/sacha.house/${VERSION}/${DOCKER_IMAGE_ARTIFACT}",
             "link_type": "package"
           }
         ]

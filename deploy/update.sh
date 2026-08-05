@@ -8,6 +8,7 @@ readonly RELEASES_DIR="${INSTALL_ROOT}/releases"
 readonly CURRENT_LINK="${INSTALL_ROOT}/current"
 readonly PREVIOUS_LINK="${INSTALL_ROOT}/previous"
 readonly DEPLOY_STATE_DIR="/var/lib/sacha.house-deploy"
+readonly OPERATION_LOCK="${DEPLOY_STATE_DIR}/operation.lock"
 readonly SERVICE_NAME="sacha.house.service"
 readonly ARTIFACT_NAME="sacha.house-linux-amd64"
 readonly RELEASE_API="https://gitlab.com/api/v4/projects/sachahjkl%2Fsacha.house/releases/permalink/latest"
@@ -20,6 +21,8 @@ fi
 
 install -d -o root -g root -m 0755 "$INSTALL_ROOT" "$RELEASES_DIR"
 install -d -o root -g root -m 0700 "$DEPLOY_STATE_DIR"
+exec 9>"$OPERATION_LOCK"
+flock --exclusive 9
 work_dir="$(mktemp -d "${DEPLOY_STATE_DIR}/update.XXXXXXXX")"
 current_temp="${CURRENT_LINK}.new.$$"
 previous_temp="${PREVIOUS_LINK}.new.$$"
@@ -99,7 +102,7 @@ if [[ -L "$CURRENT_LINK" ]]; then
 fi
 if [[ "$old_target" == "$release_dir" ]]; then
     if systemctl restart "$SERVICE_NAME" && wait_until_healthy; then
-        printf 'verified active release %s\n' "$actual_hash"
+        printf 'verified active release %s\n' "$release_version"
         exit 0
     fi
     printf 'active release failed its health check\n' >&2
@@ -111,7 +114,7 @@ if systemctl restart "$SERVICE_NAME" && wait_until_healthy; then
     if [[ -n "$old_target" && -x "$old_target/sacha.house" ]]; then
         atomic_switch "$PREVIOUS_LINK" "$previous_temp" "$old_target"
     fi
-    printf 'activated verified release %s\n' "$actual_hash"
+    printf 'activated verified release %s\n' "$release_version"
     exit 0
 fi
 

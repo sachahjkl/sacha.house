@@ -13,13 +13,8 @@
 			"**/.DS_Store": true,
 			"**/Thumbs.db": true,
 			"**/node_modules": true,
-			"**/.svelte-kit": true,
-			"**/$houdini": true,
-			"**/.netlify": true,
-			"**/build": true,
-			"**/dev-dist": true
-		},
-		"typescript.tsdk": "node_modules\\typescript\\lib"
+			"**/build": true
+		}
 	},
 	"launch": {
 		"version": "0.2.0",
