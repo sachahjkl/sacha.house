@@ -663,7 +663,8 @@ func TestAdminPasteCRUDRotationAndProtection(t *testing.T) {
 	editResponse := httptest.NewRecorder()
 	application.ServeHTTP(editResponse, edit)
 	if editResponse.Code != http.StatusOK || !strings.Contains(editResponse.Body.String(), "plain secret") ||
-		!strings.Contains(editResponse.Body.String(), `action="/admin/pastes/abcdef"`) || editResponse.Header().Get("Cache-Control") != "no-store" {
+		!strings.Contains(editResponse.Body.String(), `action="/admin/pastes/abcdef"`) ||
+		!strings.Contains(editResponse.Body.String(), `formaction="/admin/pastes/abcdef/rotate"`) || editResponse.Header().Get("Cache-Control") != "no-store" {
 		t.Fatalf("edit = %d: %s", editResponse.Code, editResponse.Body.String())
 	}
 

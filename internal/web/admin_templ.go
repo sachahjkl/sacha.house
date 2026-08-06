@@ -131,7 +131,7 @@ func AdminPasskeyList(passkeys []PasskeyView) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"><button type=\"submit\" title=\"Unregister\" aria-label=\"Unregister\" class=\"h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800\">Unregister</button></form></li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"><button type=\"submit\" formaction=\"/admin/webauthn/remove\" title=\"Unregister\" aria-label=\"Unregister\" class=\"h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800\">Unregister</button></form></li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1381,69 +1381,108 @@ func AdminPasteEditorContent(data AdminPasteEditorPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "</textarea></label><div class=\"flex flex-wrap gap-3\"><button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800\">Save encrypted paste</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "</textarea></label><div class=\"flex flex-wrap gap-3\"><button type=\"submit\" formaction=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var63 string
+		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.SafeURL(data.Form.FormAction))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 248, Col: 107}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800\">Save encrypted paste</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !data.Form.IsNew && data.Form.Revision != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "<section class=\"mt-8 space-y-3 border-t-2 border-textColor pt-6\" aria-labelledby=\"paste-rotation-heading\"><h2 id=\"paste-rotation-heading\" class=\"text-xl font-bold\">Encryption rotation</h2><p>Re-encrypt the current plaintext with the active key without changing its semantic timestamps.</p><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "<section class=\"mt-8 space-y-3 border-t-2 border-textColor pt-6\" aria-labelledby=\"paste-rotation-heading\"><h2 id=\"paste-rotation-heading\" class=\"text-xl font-bold\">Encryption rotation</h2><p>Re-encrypt the current plaintext with the active key without changing its semantic timestamps.</p><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var63 templ.SafeURL
-			templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/admin/pastes/" + data.Form.GistID + "/rotate"))
+			var templ_7745c5c3_Var64 templ.SafeURL
+			templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/admin/pastes/" + data.Form.GistID + "/rotate"))
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 251, Col: 383}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var63))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "\" class=\"pt-1\"><input type=\"hidden\" name=\"revision\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "\" class=\"pt-1\"><input type=\"hidden\" name=\"revision\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var64 string
-			templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Form.Revision)
+			var templ_7745c5c3_Var65 string
+			templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Form.Revision)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 251, Col: 462}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var64)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var65)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "\"><button type=\"submit\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]\">Re-encrypt with active key</button></form></section><section class=\"mt-8 space-y-3 border-t-2 border-red-600 pt-6\" aria-labelledby=\"paste-delete-heading\"><h2 id=\"paste-delete-heading\" class=\"text-xl font-bold text-red-500\">Delete encrypted paste</h2><p>This permanently deletes the Gist. Provider revision history may remain subject to GitHub's retention policy.</p><form method=\"POST\" action=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var65 templ.SafeURL
-			templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/admin/pastes/" + data.Form.GistID + "/delete"))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 252, Col: 408}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\" class=\"flex flex-col gap-4 pt-1\" data-no-boost><input type=\"hidden\" name=\"revision\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\"><button type=\"submit\" formaction=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var66 string
-			templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Form.Revision)
+			templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.SafeURL("/admin/pastes/" + data.Form.GistID + "/rotate"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 252, Col: 521}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 251, Col: 563}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var66)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\"><label class=\"flex max-w-md flex-col gap-2\" for=\"paste-delete-confirmation\"><span>Type DELETE to confirm</span><input id=\"paste-delete-confirmation\" type=\"text\" name=\"confirmation\" required pattern=\"DELETE\" autocomplete=\"off\" class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor\"></label><div><button type=\"submit\" class=\"h-10 select-none border-2 border-red-600 bg-transparent px-4 text-base leading-9 text-red-500 hover:bg-red-600 hover:text-white\">Delete encrypted paste</button></div></form></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\" class=\"h-10 select-none bg-blue-600 px-4 text-base leading-10 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]\">Re-encrypt with active key</button></form></section><section class=\"mt-8 space-y-3 border-t-2 border-red-600 pt-6\" aria-labelledby=\"paste-delete-heading\"><h2 id=\"paste-delete-heading\" class=\"text-xl font-bold text-red-500\">Delete encrypted paste</h2><p>This permanently deletes the Gist. Provider revision history may remain subject to GitHub's retention policy.</p><form method=\"POST\" action=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var67 templ.SafeURL
+			templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/admin/pastes/" + data.Form.GistID + "/delete"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 252, Col: 408}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var67))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "\" class=\"flex flex-col gap-4 pt-1\" data-no-boost><input type=\"hidden\" name=\"revision\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var68 string
+			templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Form.Revision)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 252, Col: 521}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var68)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\"><label class=\"flex max-w-md flex-col gap-2\" for=\"paste-delete-confirmation\"><span>Type DELETE to confirm</span><input id=\"paste-delete-confirmation\" type=\"text\" name=\"confirmation\" required pattern=\"DELETE\" autocomplete=\"off\" class=\"h-10 border-2 border-textColor bg-transparent px-3 text-textColor\"></label><div><button type=\"submit\" formaction=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var69 string
+			templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.SafeURL("/admin/pastes/" + data.Form.GistID + "/delete"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/admin.templ`, Line: 252, Col: 936}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var69)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "\" class=\"h-10 select-none border-2 border-red-600 bg-transparent px-4 text-base leading-9 text-red-500 hover:bg-red-600 hover:text-white\">Delete encrypted paste</button></div></form></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "</article>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "</article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

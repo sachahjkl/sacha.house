@@ -150,6 +150,11 @@ func (app *App) pasteRevisionMutation(writer http.ResponseWriter, request *http.
 		}
 		setPasteRetryAfter(writer, err)
 		form := web.PasteForm{GistID: gistID, Revision: revision, FormAction: "/admin/pastes/" + gistID}
+		if !deletePaste {
+			if loaded, loadErr := app.pastes.Get(request.Context(), gistID); loadErr == nil {
+				form = pasteForm(loaded)
+			}
+		}
 		app.renderPasteEditor(writer, request, form, err.Error(), "", pasteStatus(err, false))
 		return
 	}
