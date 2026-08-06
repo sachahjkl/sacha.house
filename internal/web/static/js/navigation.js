@@ -64,12 +64,6 @@ function focusValidationError() {
   target.scrollIntoView({ block: "center" });
 }
 
-function syncHiddenInputs() {
-  for (const input of document.querySelectorAll('input[type="hidden"]')) {
-    input.value = input.getAttribute("value") || "";
-  }
-}
-
 function fullNavigation(job) {
   if (job.popstate) {
     location.replace(job.url);
@@ -136,7 +130,6 @@ async function navigate(job) {
     await pending;
 
     if (controller.signal.aborted || id !== requestId) return;
-    syncHiddenInputs();
     const marker = document.getElementById(MARKER);
     const markerStatus = Number(marker?.dataset.status || 200);
     status ||= Number.isFinite(markerStatus) ? markerStatus : 500;
