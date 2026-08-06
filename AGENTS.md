@@ -7,10 +7,10 @@
 - templ components live in `internal/web/*.templ`.
 - Generated templ files use the `*_templ.go` suffix.
 - Datastar server integration lives in Go handlers.
-- Datastar browser code and other JavaScript live in `src/static/js/`.
+- Datastar browser code and other JavaScript live in `internal/web/static/js/`.
 - Tailwind source lives in `styles/app.css`.
-- Generated CSS lives in `src/static/css/style.css`.
-- Static assets are embedded through `src/static/embed.go`.
+- Generated CSS lives in `internal/web/static/css/style.css`.
+- Static assets are embedded through `internal/web/static/embed.go`.
 - Blog content is filesystem-backed under `data/blog/`.
 - Encrypted Gist paste code lives in `internal/paste/` and `internal/app/paste.go`.
 
@@ -28,7 +28,7 @@
 
 - Run `just templates` after each templ change.
 - Run `just css` after each template, JavaScript, or Tailwind class change.
-- Keep generated `*_templ.go` files and `src/static/css/style.css` current.
+- Keep generated `*_templ.go` files and `internal/web/static/css/style.css` current.
 - The Go binary embeds static assets at build time.
 - Nix builds use `CGO_ENABLED=0` and inject version metadata with linker flags.
 
@@ -46,7 +46,7 @@
 - Configure the relying party with `WEBAUTHN_RP_ID` and `WEBAUTHN_RP_ORIGINS`.
 - Use `ADMIN_PASSWORD_PEPPER` for admin password hashing.
 - WebAuthn code lives in `internal/auth/`, `internal/app/`, and `internal/web/`.
-- Browser behavior lives in `src/static/js/admin.js`.
+- Browser behavior lives in `internal/web/static/js/admin.js`.
 
 ## Paste Notes
 

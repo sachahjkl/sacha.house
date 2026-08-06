@@ -15,7 +15,7 @@ import (
 	"sacha.house/internal/paste"
 	"sacha.house/internal/projects"
 	"sacha.house/internal/web"
-	staticassets "sacha.house/src/static"
+	staticassets "sacha.house/internal/web/static"
 )
 
 const (

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "templates": "go tool templ generate",
-    "build:css": "tailwindcss -i ./styles/app.css -o ./src/static/css/style.css",
+    "build:css": "tailwindcss -i ./styles/app.css -o ./internal/web/static/css/style.css",
     "generate": "bun run templates && bun run build:css"
   },
   "dependencies": {

@@ -8,7 +8,7 @@ Personal website and filesystem-backed blog, built with Go, templ, Datastar, and
 - `internal/app/` contains HTTP routes and application assembly.
 - `internal/web/` contains templ components and generated `*_templ.go` files.
 - `internal/auth/`, `internal/blog/`, `internal/paste/`, and `internal/projects/` contain domain services.
-- `src/static/` contains embedded static assets and Datastar browser code.
+- `internal/web/static/` contains embedded static assets and Datastar browser code.
 - `styles/app.css` is the Tailwind source.
 - `data/blog/` contains blog posts and media.
 

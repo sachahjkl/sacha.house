@@ -27,7 +27,7 @@ _dev-run: build
   ./{{ bin_root }}/debug/sacha.house -dev
 
 dev:
-  watchexec --restart --exts go,templ,js,css --ignore 'internal/**/*_templ.go' --ignore 'src/static/css/**' --watch cmd --watch internal --watch src/static/js --watch styles -- just _dev-run
+  watchexec --restart --exts go,templ,js,css --ignore 'internal/**/*_templ.go' --ignore 'internal/web/static/css/**' --watch cmd --watch internal --watch internal/web/static/js --watch styles -- just _dev-run
 
 clean:
   rm -rf {{ bin_root }}

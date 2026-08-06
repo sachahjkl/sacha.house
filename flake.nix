@@ -52,7 +52,7 @@
           preBuild = ''
             export HOME="$TMPDIR"
             go tool templ generate
-            tailwindcss -i ./styles/app.css -o ./src/static/css/style.css
+            tailwindcss -i ./styles/app.css -o ./internal/web/static/css/style.css
           '';
           postInstall = ''
             mv "$out/bin/sacha-house" "$out/bin/sacha.house"
