@@ -155,9 +155,13 @@ func NewPasskeyStore(config PasskeyConfig) (*PasskeyStore, error) {
 		return nil, err
 	}
 	if len(store.user.handle) == 0 {
-		store.user.handle = make([]byte, 32)
-		if _, err = io.ReadFull(store.random, store.user.handle); err != nil {
-			return nil, fmt.Errorf("auth: generate WebAuthn user handle: %w", err)
+		if migrated && len(store.user.passkeys) > 0 {
+			store.user.handle = []byte("admin")
+		} else {
+			store.user.handle = make([]byte, 32)
+			if _, err = io.ReadFull(store.random, store.user.handle); err != nil {
+				return nil, fmt.Errorf("auth: generate WebAuthn user handle: %w", err)
+			}
 		}
 		migrated = true
 	}

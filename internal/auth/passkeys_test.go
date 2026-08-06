@@ -128,7 +128,7 @@ func TestPasskeyStoreMigratesV1AttestationCBOR(t *testing.T) {
 	if err = json.Unmarshal(data, &file); err != nil {
 		t.Fatal(err)
 	}
-	if file.Version != 3 || len(file.UserHandle) != 32 {
+	if file.Version != 3 || !bytes.Equal(file.UserHandle, []byte("admin")) {
 		t.Fatalf("migrated file header = version %d, handle %x", file.Version, file.UserHandle)
 	}
 }
@@ -167,7 +167,7 @@ func TestPasskeyStoreMigratesV2COSEPublicKey(t *testing.T) {
 	if err = json.Unmarshal(data, &file); err != nil {
 		t.Fatal(err)
 	}
-	if file.Version != 3 || file.Credentials[0].FlagsKnown {
+	if file.Version != 3 || !bytes.Equal(file.UserHandle, []byte("admin")) || file.Credentials[0].FlagsKnown {
 		t.Fatalf("migrated file = %#v", file)
 	}
 }
