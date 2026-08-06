@@ -213,7 +213,7 @@ func (app *App) routes() http.Handler {
 	mux.Handle("GET /admin/pastes/new", app.requireAdmin(http.HandlerFunc(app.adminNewPaste)))
 	mux.Handle("POST /admin/pastes/new", app.requireAdmin(http.HandlerFunc(app.adminCreatePaste)))
 	mux.Handle("GET /admin/pastes/{id}", app.requireAdmin(http.HandlerFunc(app.adminEditPaste)))
-	mux.Handle("POST /admin/pastes/{id}/save", app.requireAdmin(http.HandlerFunc(app.adminSavePaste)))
+	mux.Handle("POST /admin/pastes/{id}", app.requireAdmin(http.HandlerFunc(app.adminSavePaste)))
 	mux.Handle("POST /admin/pastes/{id}/rotate", app.requireAdmin(http.HandlerFunc(app.adminRotatePaste)))
 	mux.Handle("POST /admin/pastes/{id}/delete", app.requireAdmin(http.HandlerFunc(app.adminDeletePaste)))
 	mux.Handle("GET /admin/webauthn", app.requireAdmin(http.HandlerFunc(app.adminWebAuthn)))

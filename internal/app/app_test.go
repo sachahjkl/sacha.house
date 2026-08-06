@@ -662,11 +662,12 @@ func TestAdminPasteCRUDRotationAndProtection(t *testing.T) {
 	edit.AddCookie(cookie)
 	editResponse := httptest.NewRecorder()
 	application.ServeHTTP(editResponse, edit)
-	if editResponse.Code != http.StatusOK || !strings.Contains(editResponse.Body.String(), "plain secret") || editResponse.Header().Get("Cache-Control") != "no-store" {
+	if editResponse.Code != http.StatusOK || !strings.Contains(editResponse.Body.String(), "plain secret") ||
+		!strings.Contains(editResponse.Body.String(), `action="/admin/pastes/abcdef"`) || editResponse.Header().Get("Cache-Control") != "no-store" {
 		t.Fatalf("edit = %d: %s", editResponse.Code, editResponse.Body.String())
 	}
 
-	conflict := httptest.NewRequest(http.MethodPost, "/admin/pastes/abcdef/save", strings.NewReader(url.Values{"revision": {"ff"}, "title": {"Changed"}, "body": {"changed"}}.Encode()))
+	conflict := httptest.NewRequest(http.MethodPost, "/admin/pastes/abcdef", strings.NewReader(url.Values{"revision": {"ff"}, "title": {"Changed"}, "body": {"changed"}}.Encode()))
 	conflict.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	conflict.AddCookie(cookie)
 	conflictResponse := httptest.NewRecorder()
@@ -675,7 +676,7 @@ func TestAdminPasteCRUDRotationAndProtection(t *testing.T) {
 		t.Fatalf("conflict = %d: %s", conflictResponse.Code, conflictResponse.Body.String())
 	}
 
-	save := httptest.NewRequest(http.MethodPost, "/admin/pastes/abcdef/save", strings.NewReader(url.Values{"revision": {"01"}, "title": {"Changed"}, "body": {"changed"}}.Encode()))
+	save := httptest.NewRequest(http.MethodPost, "/admin/pastes/abcdef", strings.NewReader(url.Values{"revision": {"01"}, "title": {"Changed"}, "body": {"changed"}}.Encode()))
 	save.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	save.AddCookie(cookie)
 	saveResponse := httptest.NewRecorder()

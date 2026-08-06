@@ -58,7 +58,7 @@ func (app *App) adminEditPaste(writer http.ResponseWriter, request *http.Request
 			return
 		}
 		setPasteRetryAfter(writer, err)
-		form := web.PasteForm{GistID: request.PathValue("id"), FormAction: "/admin/pastes/" + request.PathValue("id") + "/save"}
+		form := web.PasteForm{GistID: request.PathValue("id"), FormAction: "/admin/pastes/" + request.PathValue("id")}
 		app.renderPasteEditor(writer, request, form, err.Error(), "", pasteStatus(err, false))
 		return
 	}
@@ -149,7 +149,7 @@ func (app *App) pasteRevisionMutation(writer http.ResponseWriter, request *http.
 			return
 		}
 		setPasteRetryAfter(writer, err)
-		form := web.PasteForm{GistID: gistID, Revision: revision, FormAction: "/admin/pastes/" + gistID + "/save"}
+		form := web.PasteForm{GistID: gistID, Revision: revision, FormAction: "/admin/pastes/" + gistID}
 		app.renderPasteEditor(writer, request, form, err.Error(), "", pasteStatus(err, false))
 		return
 	}
@@ -190,7 +190,7 @@ func (app *App) renderPasteEditor(writer http.ResponseWriter, request *http.Requ
 func pasteForm(loaded paste.Loaded) web.PasteForm {
 	return web.PasteForm{
 		GistID: loaded.GistID, Revision: loaded.Revision, Title: loaded.Document.Title, Body: loaded.Document.Body,
-		KeyID: loaded.KeyID, FormAction: "/admin/pastes/" + loaded.GistID + "/save", NeedsRotation: loaded.NeedsRotation,
+		KeyID: loaded.KeyID, FormAction: "/admin/pastes/" + loaded.GistID, NeedsRotation: loaded.NeedsRotation,
 	}
 }
 
