@@ -61,7 +61,7 @@
 - GitLab CI publishes the static Linux binary and Docker image.
 - Build container images from `flake.nix` with `dockerTools`.
 - The container reads runtime configuration from `/data/config.json`.
-- The NixOS module remains available as `nixosModules.default`.
+- The homelab consumes the application through a generic modular service declared in `nixconfig`.
 - SecretSpec declarations live in `secretspec.toml`.
 - Encrypted production values live in `secrets/sacha-house/production.yaml`.
 - The NixOS service passes the age identity through a systemd credential.

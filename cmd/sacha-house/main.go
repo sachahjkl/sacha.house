@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -77,8 +79,9 @@ func run(arguments []string) error {
 		return err
 	}
 
+	address := net.JoinHostPort(app.Host(), strconv.Itoa(app.Port()))
 	server := &http.Server{
-		Addr:              fmt.Sprintf(":%d", app.Port()),
+		Addr:              address,
 		Handler:           application,
 		ReadHeaderTimeout: 10 * time.Second,
 		ReadTimeout:       30 * time.Second,
@@ -90,7 +93,7 @@ func run(arguments []string) error {
 
 	serverError := make(chan error, 1)
 	go func() { serverError <- server.ListenAndServe() }()
-	fmt.Printf("Listening on http://localhost:%d\n", app.Port())
+	fmt.Printf("Listening on http://%s\n", address)
 
 	select {
 	case err := <-serverError:
@@ -144,6 +147,7 @@ OPTIONS:
 
 ENVIRONMENT VARIABLES:
   CONFIG_PATH   Path to config file (default: config.json)
+  HOST          Host address to bind (default: 127.0.0.1)
   PORT          Port to listen on (default: 6969)
 `, version)
 }

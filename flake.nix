@@ -116,6 +116,7 @@
               WorkingDir = "/data";
               Env = [
                 "CONFIG_PATH=/data/config.json"
+                "HOST=0.0.0.0"
                 "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
               ];
               Volumes = {
@@ -128,107 +129,5 @@
             };
           };
         };
-      })
-    // {
-      nixosModules.default = { config, lib, pkgs, ... }:
-        with lib;
-        let
-          cfg = config.services.sacha-house;
-          pkg = cfg.package;
-          secretspec = self.packages.${pkgs.stdenv.hostPlatform.system}.secretspec;
-          secretExec = pkgs.writeShellScript "sacha-house-with-secrets" ''
-            export SOPS_AGE_KEY_FILE="$CREDENTIALS_DIRECTORY/sops-age-key"
-            exec ${secretspec}/bin/secretspec \
-              --file ${self}/secretspec.toml \
-              --reason "Start sacha.house service" \
-              run --profile production --scope runtime -- ${pkg}/bin/sacha.house
-          '';
-        in {
-          options.services.sacha-house = {
-            enable = mkEnableOption "sacha.house web service";
-
-            package = mkOption {
-              type = types.package;
-              default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
-              defaultText = literalExpression "sacha-house.packages.\${pkgs.stdenv.hostPlatform.system}.default";
-              description = "Package to run for the sacha.house service.";
-            };
-
-            port = mkOption {
-              type = types.port;
-              default = 6969;
-              description = "Port to listen on.";
-            };
-
-            dataDir = mkOption {
-              type = types.path;
-              default = "/var/lib/sacha.house";
-              description = "Writable directory for runtime data and caches.";
-            };
-
-            configFile = mkOption {
-              type = types.path;
-              default = "${cfg.dataDir}/config.json";
-              description = "Path to the sacha.house JSON config file.";
-            };
-
-            openFirewall = mkOption {
-              type = types.bool;
-              default = false;
-              description = "Open the configured port in the firewall.";
-            };
-
-            secrets = {
-              enable = mkEnableOption "SecretSpec SOPS secret injection";
-
-              ageKeyFile = mkOption {
-                type = types.str;
-                example = "/var/lib/sops-nix/key.txt";
-                description = "Root-readable age identity passed to the service as a systemd credential.";
-              };
-            };
-          };
-
-          config = mkIf cfg.enable {
-            users.users.sacha-house = {
-              isSystemUser = true;
-              group = "sacha-house";
-              home = cfg.dataDir;
-              createHome = true;
-            };
-            users.groups.sacha-house = { };
-
-            systemd.services.sacha-house = {
-              description = "sacha.house web service";
-              after = [ "network.target" ];
-              wantedBy = [ "multi-user.target" ];
-
-              path = optionals cfg.secrets.enable [ pkgs.sops ];
-
-              serviceConfig = {
-                Type = "simple";
-                User = "sacha-house";
-                Group = "sacha-house";
-                WorkingDirectory = cfg.dataDir;
-                ExecStart = if cfg.secrets.enable then secretExec else "${pkg}/bin/sacha.house";
-                Restart = "on-failure";
-                RestartSec = 5;
-                NoNewPrivileges = true;
-                PrivateTmp = true;
-                ProtectHome = true;
-                ProtectSystem = "strict";
-                ReadWritePaths = [ cfg.dataDir ];
-                Environment = [
-                  "CONFIG_PATH=${cfg.configFile}"
-                  "PORT=${toString cfg.port}"
-                ];
-              } // optionalAttrs cfg.secrets.enable {
-                LoadCredential = [ "sops-age-key:${cfg.secrets.ageKeyFile}" ];
-              };
-            };
-
-            networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.port ];
-          };
-        };
-    };
+      });
 }

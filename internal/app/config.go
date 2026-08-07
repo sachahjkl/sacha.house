@@ -6,11 +6,15 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 
 	"sacha.house/internal/paste"
 )
 
-const DefaultPort = 6969
+const (
+	DefaultHost = "127.0.0.1"
+	DefaultPort = 6969
+)
 
 // Config keeps the deployed JSON field names.
 type Config struct {
@@ -61,6 +65,13 @@ func ConfigPath() string {
 		return path
 	}
 	return "config.json"
+}
+
+func Host() string {
+	if host := strings.TrimSpace(os.Getenv("HOST")); host != "" {
+		return host
+	}
+	return DefaultHost
 }
 
 func Port() int {
