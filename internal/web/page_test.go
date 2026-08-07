@@ -11,6 +11,8 @@ func TestNavItemsActivePath(t *testing.T) {
 		{name: "root", path: "/", activeItem: "home"},
 		{name: "section", path: "/projects", activeItem: "projects"},
 		{name: "nested route", path: "/blog/an-article", activeItem: "blog"},
+		{name: "resume", path: "/resume", activeItem: "résumé"},
+		{name: "full CV", path: "/cv", activeItem: "résumé"},
 	}
 
 	for _, test := range tests {

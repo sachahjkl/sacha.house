@@ -5,7 +5,6 @@ import "net/http"
 var rootStaticAssets = map[string]struct{}{
 	"/apple-touch-icon.png": {},
 	"/browserconfig.xml":    {},
-	"/cv.html":              {},
 	"/favicon-16x16.png":    {},
 	"/favicon-32x32.png":    {},
 	"/favicon.ico":          {},

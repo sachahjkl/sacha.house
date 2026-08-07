@@ -16,7 +16,7 @@ templ HomeContent(data HomePageData) {
 			<h2 class="h2">Quick links</h2>
 			<ul>
 				<li><a href="/about">➜ about me</a></li>
-				<li>📄 my <a href={ templ.SafeURL(data.CV) } target="_blank" rel="noopener noreferrer">curriculum vitae</a> and <a href={ templ.SafeURL(data.CV) } target="_blank" rel="noopener noreferrer">résumé</a></li>
+				<li>📄 my <a href={ templ.SafeURL(data.CV) }>curriculum vitae</a> and <a href={ templ.SafeURL(data.Resume) }>résumé</a></li>
 				<li><a href={ templ.SafeURL("mailto:" + data.Mail) }>📧 shoot me an email (will reply asap)</a></li>
 				<li><a href="/sachahjkl.pub" target="_blank" rel="noopener noreferrer">🔐 my ssh public key</a></li>
 			</ul>

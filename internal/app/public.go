@@ -27,9 +27,39 @@ func (app *App) page(pathname, title, description string) web.PageData {
 func (app *App) home(writer http.ResponseWriter, request *http.Request) {
 	data := web.HomePageData{
 		PageData: app.page(request.URL.Path, "home / sacha.house", web.Me.FullName+"'s personal website."),
-		Mail:     web.Me.Mail, CV: web.Me.CurriculumVitae,
+		Mail:     web.Me.Mail, CV: web.Me.CurriculumVitae, Resume: "/resume",
 	}
 	app.renderPage(writer, request, web.HomePage(data, navigation(request, http.StatusOK)), http.StatusOK)
+}
+
+func (app *App) careerPage(writer http.ResponseWriter, request *http.Request, full bool) {
+	language := "fr"
+	if request.URL.Query().Get("lang") == "en" {
+		language = "en"
+	}
+	profile := web.Career(language)
+	documentName := profile.ResumeLabel
+	if full {
+		documentName = profile.CVLabel
+	}
+	page := app.page(request.URL.Path, documentName+" · "+web.Me.FullName, profile.Summary)
+	page.Language = language
+	data := web.CareerPageData{
+		PageData: page, Identity: web.Me, Age: web.Me.AgeAt(app.options.Now()), Full: full, Profile: profile,
+	}
+	app.renderPage(writer, request, web.CareerPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+}
+
+func (app *App) resume(writer http.ResponseWriter, request *http.Request) {
+	app.careerPage(writer, request, false)
+}
+
+func (app *App) curriculumVitae(writer http.ResponseWriter, request *http.Request) {
+	app.careerPage(writer, request, true)
+}
+
+func (app *App) legacyCurriculumVitae(writer http.ResponseWriter, request *http.Request) {
+	http.Redirect(writer, request, "/cv", http.StatusMovedPermanently)
 }
 
 func (app *App) about(writer http.ResponseWriter, request *http.Request) {

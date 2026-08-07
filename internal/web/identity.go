@@ -10,6 +10,7 @@ type Identity struct {
 	Username        string
 	BirthDate       time.Time
 	PlaceOfLiving   string
+	Nationality     string
 	GitHub          string
 	GitLab          string
 	LinkedIn        string
@@ -29,12 +30,13 @@ var Me = Identity{
 	SiteTitle:       "Le site web personnel de Sacha Froment",
 	Username:        "sachahjkl",
 	BirthDate:       time.Date(1999, time.May, 25, 0, 0, 0, 0, time.Local),
-	PlaceOfLiving:   "le Mans",
+	PlaceOfLiving:   "Marigné-Laillé",
+	Nationality:     "Française",
 	GitHub:          "https://github.com/sachahjkl",
 	GitLab:          "https://gitlab.com/sachahjkl",
 	LinkedIn:        "https://www.linkedin.com/in/sachafroment/",
 	Mail:            "sacha@sacha.house",
-	CurriculumVitae: "/cv.html",
+	CurriculumVitae: "/cv",
 	ETHAddress:      "0xDfB091f812ea27Ca58e8f556B252f245660cba87",
 	GPGFingerprint:  "21D64EBC463D12DFE373AE4F1EFE264F809A2118",
 	MoneroAddress:   "49ETBPrD54iCKeecWjPt2hfjciSRgptXzJc29Hd8FS97AQHzThdoxE1aE4NigAf8xYDxok1iaaGKD8a6EmUwUgkgTstDaFJ",

@@ -17,6 +17,7 @@ var defaultNavItems = [...]NavItem{
 	{Title: "projects", Pathname: "/projects", Icon: "📁"},
 	{Title: "blog", Pathname: "/blog", Icon: "📝"},
 	{Title: "about", Pathname: "/about", Icon: "📜"},
+	{Title: "résumé", Pathname: "/resume", Icon: "📄"},
 	{Title: "admin", Pathname: "/admin", Icon: "🔒"},
 }
 
@@ -27,6 +28,8 @@ func NavItems(activePathname string) []NavItem {
 	for i := range items {
 		if items[i].Pathname == "/" {
 			items[i].IsActive = activePathname == "/"
+		} else if items[i].Pathname == "/resume" {
+			items[i].IsActive = strings.HasPrefix(activePathname, "/resume") || strings.HasPrefix(activePathname, "/cv")
 		} else {
 			items[i].IsActive = strings.HasPrefix(activePathname, items[i].Pathname)
 		}
@@ -120,8 +123,9 @@ func NewPageData(options PageOptions) PageData {
 
 type HomePageData struct {
 	PageData
-	Mail string
-	CV   string
+	Mail   string
+	CV     string
+	Resume string
 }
 
 type AboutPageData struct {

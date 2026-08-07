@@ -1,0 +1,182 @@
+package web
+
+import "fmt"
+
+templ CareerPage(data CareerPageData, navigation Navigation) {
+	<!doctype html>
+	<html lang={ data.Profile.Language }>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" href="/static/css/cv.css"/>
+			<title id="page-title">{ data.PageData.Title }</title>
+			<meta name="description" content={ data.PageData.SEO.Description }/>
+		</head>
+		<body id="page-body">
+			@CareerContent(data)
+			@NavigationMarker(navigation)
+		</body>
+	</html>
+}
+
+templ CareerContent(data CareerPageData) {
+	<main id="main" class={ "page", templ.KV("cv-full", data.Full), templ.KV("cv-resume", !data.Full) }>
+		<nav class="document-controls no-print" aria-label="Document controls">
+			<div>
+				<a href={ templ.SafeURL(careerPath(false, data.Profile.Language)) } class={ templ.KV("active", !data.Full) }>{ data.Profile.ResumeLabel }</a>
+				<a href={ templ.SafeURL(careerPath(true, data.Profile.Language)) } class={ templ.KV("active", data.Full) }>{ data.Profile.CVLabel }</a>
+			</div>
+			<div>
+				<a href={ templ.SafeURL(careerPath(data.Full, data.Profile.OtherLanguage)) } lang={ data.Profile.OtherLanguage }>{ data.Profile.OtherLanguageLabel }</a>
+				<button type="button" onclick="window.print()">{ data.Profile.PrintLabel }</button>
+			</div>
+		</nav>
+		<section id="intro">
+			if data.Profile.Language == "fr" {
+				if data.Full {
+					<h1>CV de { data.FullName }</h1>
+				} else {
+					<h1>CV de { data.FullName }</h1>
+				}
+			} else {
+				if data.Full {
+					<h1>CV of { data.FullName }</h1>
+				} else {
+					<h1>Résumé — { data.FullName }</h1>
+				}
+			}
+			<div id="intro-text">
+				<img src="/static/me-portrait.jpg" height="100" width="100" alt={ data.FullName } class="photo"/>
+				<section id="quick-facts">
+					if data.Profile.Language == "fr" {
+						<p>Localisation : { data.Profile.LocationLabel }</p>
+						<p>Âge : { fmt.Sprintf("%d %s", data.Age, data.Profile.AgeLabel) }</p>
+						<p>Nationalité : { data.Profile.Nationality }</p>
+						<p>Adresse électronique : <a href={ templ.SafeURL("mailto:" + data.Mail) }>{ data.Mail }</a></p>
+					} else {
+						<p>Location: { data.Profile.LocationLabel }</p>
+						<p>Age: { fmt.Sprintf("%d %s", data.Age, data.Profile.AgeLabel) }</p>
+						<p>Nationality: { data.Profile.Nationality }</p>
+						<p>Email: <a href={ templ.SafeURL("mailto:" + data.Mail) }>{ data.Mail }</a></p>
+					}
+				</section>
+			</div>
+		</section>
+
+		<section id="profile">
+			<h2>{ data.Profile.ProfileLabel }</h2>
+			<p>{ data.Profile.Summary }</p>
+		</section>
+
+		<section>
+			<h2>{ data.Profile.ExperienceLabel }</h2>
+			<ul class="cv-list">
+				for _, experience := range data.Profile.Experiences {
+					if data.Full || !experience.FullOnly {
+						<li class="career-entry">
+							<strong>{ experience.Company }</strong> ({ experience.Period })
+							<ul>
+								<li>{ experience.Role }
+									if experience.Context != "" {
+										<span> ({ experience.Context })</span>
+									}
+									<div class="experience-description">
+										<p>{ experience.Summary }</p>
+										if data.Full {
+											for _, detail := range experience.Details {
+												<h3>{ detail.Title }</h3>
+												<p>{ detail.Text }</p>
+											}
+											if experience.Environment != "" {
+												<p class="cv-meta"><strong>{ data.Profile.EnvironmentLabel } :</strong> { experience.Environment }</p>
+											}
+										}
+									</div>
+								</li>
+							</ul>
+						</li>
+					}
+				}
+			</ul>
+		</section>
+
+		<section>
+			<h2>{ data.Profile.SkillsLabel }</h2>
+			if data.Full {
+				for _, group := range data.Profile.Skills {
+					<h3>{ group.Title }</h3>
+					for _, item := range group.Items {
+						<p>{ item }</p>
+					}
+				}
+			} else {
+				for _, skill := range data.Profile.ResumeSkills {
+					<p>{ skill }</p>
+				}
+			}
+		</section>
+
+		<section>
+			<h2>{ data.Profile.EducationLabel }</h2>
+			<ul class="cv-list">
+				for _, education := range data.Profile.Education {
+					if data.Full || !education.FullOnly {
+						<li>
+							<strong>{ education.School }</strong> ({ education.Period })
+							<p>{ education.Degree }</p>
+							if data.Full {
+								<p>{ education.Description }</p>
+							}
+						</li>
+					}
+				}
+			</ul>
+		</section>
+
+		<section>
+			<h2>{ data.Profile.LanguagesLabel }</h2>
+			<ul class="cv-list">
+				for _, language := range data.Profile.Languages {
+					<li>{ language }</li>
+				}
+			</ul>
+		</section>
+
+		<section>
+			<h2>{ data.Profile.ProjectsLabel }</h2>
+			for index, project := range data.Profile.Projects {
+				if data.Full || index < 2 {
+					<h3><a href={ templ.SafeURL(project.URL) }>{ project.Name }</a></h3>
+					if data.Full {
+						<p>{ project.Description }</p>
+					} else {
+						<p>{ project.Summary }</p>
+					}
+					if data.Full && project.Stack != "" {
+						<p class="cv-meta">{ project.Stack }</p>
+					}
+				}
+			}
+			<p><a href="https://sacha.house/projects">https://sacha.house/projects</a></p>
+		</section>
+
+		if data.Full {
+			<section>
+				<h2>{ data.Profile.CatalogLabel }</h2>
+				for _, group := range data.Profile.Catalog {
+					<h3>{ group.Title }</h3>
+					<p>{ joinCareerItems(group.Items) }</p>
+				}
+			</section>
+
+			<section>
+				<h2>{ data.Profile.PublicationsLabel }</h2>
+				<ul class="cv-list">
+					for _, publication := range data.Profile.Publications {
+						<li>{ publication.Date } · <a href={ templ.SafeURL(publication.URL) }>{ publication.Title }</a></li>
+					}
+				</ul>
+			</section>
+		}
+	</main>
+}

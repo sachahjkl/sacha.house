@@ -1,0 +1,233 @@
+@font-face {
+  font-family: "CMU Sans Serif";
+  font-style: normal;
+  font-weight: 500;
+  src: url("/static/fonts/cmu-sans-serif/cmunss.woff") format("woff");
+}
+
+@font-face {
+  font-family: "CMU Sans Serif";
+  font-style: italic;
+  font-weight: 500;
+  src: url("/static/fonts/cmu-sans-serif/cmunsi.woff") format("woff");
+}
+
+@font-face {
+  font-family: "CMU Sans Serif";
+  font-style: normal;
+  font-weight: 700;
+  src: url("/static/fonts/cmu-sans-serif/cmunsx.woff") format("woff");
+}
+
+@font-face {
+  font-family: "CMU Sans Serif";
+  font-style: italic;
+  font-weight: 700;
+  src: url("/static/fonts/cmu-sans-serif/cmunso.woff") format("woff");
+}
+
+body {
+  font-family: "CMU Sans Serif", sans-serif;
+  line-height: 1.4;
+  color: #333;
+  background: #e9e9e9;
+  margin: 0;
+  padding: 1.5rem;
+  font-size: 10pt;
+}
+
+.page {
+  width: 100%;
+  max-width: 210mm;
+  margin: 0 auto;
+  min-height: 297mm;
+  padding: 2rem;
+  border: 1px solid #c8c8c8;
+  background: white;
+  box-shadow: 0 5px 20px rgb(0 0 0 / 0.16);
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  .page {
+    min-height: 0;
+    padding: 1rem;
+  }
+}
+
+h1 {
+  font-size: 14pt;
+  margin: 0 0 0.7rem;
+}
+
+h2 {
+  font-size: 12pt;
+  margin: 1rem 0 0.35rem;
+}
+
+h3 {
+  font-size: 10pt;
+  margin: 0.6rem 0 0;
+}
+
+.experience-description h3 {
+  margin-top: 0.9rem;
+}
+
+.experience-description h3 + p {
+  margin-top: 0.2rem;
+}
+
+p {
+  font-size: 10pt;
+  margin: 0.35rem 0;
+}
+
+#quick-facts p {
+  margin: 0;
+  padding: 0;
+}
+
+#quick-facts {
+  margin-bottom: 1rem;
+}
+
+ul {
+  margin: 0.35rem 0;
+  padding-left: 1rem;
+}
+
+ul ul {
+  padding-left: 1.5rem;
+}
+
+.date-and-location,
+.cv-meta {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
+
+.photo {
+  max-height: 110px;
+  border: 2px solid black;
+  box-shadow: 2px 2px rgb(0 0 0 / 0.2);
+  float: left;
+  object-fit: cover;
+}
+
+#intro-text {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  min-width: fit-content;
+}
+
+.document-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ccc;
+  font-size: 9pt;
+}
+
+.document-controls div {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.document-controls .active {
+  font-weight: bold;
+}
+
+.document-controls button {
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.document-controls a {
+  color: inherit;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body {
+    padding: 0;
+    background: white;
+  }
+
+  .page {
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .cv-resume,
+  .cv-resume p {
+    font-size: 9.3pt;
+    line-height: 1.3;
+  }
+
+  .cv-resume h1 {
+    margin-bottom: 0.45rem;
+  }
+
+  .cv-resume h2 {
+    margin: 0.65rem 0 0.2rem;
+  }
+
+  .cv-resume h3 {
+    margin-top: 0.35rem;
+  }
+
+  .cv-resume ul,
+  .cv-resume p {
+    margin-block: 0.2rem;
+  }
+
+  .cv-resume .photo {
+    width: 90px;
+    height: 90px;
+  }
+
+  .no-print {
+    display: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid-page;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+}

@@ -53,7 +53,6 @@ func newTestApp(t *testing.T) *App {
 	assets := fstest.MapFS{
 		"linkedin_profile.json": &fstest.MapFile{Data: []byte(`{"experiences":[],"education":[]}`)},
 		"hello.txt":             &fstest.MapFile{Data: []byte("static")},
-		"cv.html":               &fstest.MapFile{Data: []byte("curriculum vitae")},
 		"js/navigation.js":      &fstest.MapFile{Data: []byte("if (!patched) throw error('failed')")},
 	}
 	hash, err := auth.HashPassword("test-password", []byte("test-pepper"))
@@ -92,6 +91,10 @@ func TestPublicRoutes(t *testing.T) {
 		{path: "/blog/rss.xml", status: 200, contentType: "application/rss+xml", contains: "Hello &amp; Go"},
 		{path: "/blog/atom.xml", status: 200, contentType: "application/atom+xml", contains: "Hello &amp; Go"},
 		{path: "/about", status: 200, contentType: "text/html", contains: "Professional Details"},
+		{path: "/resume", status: 200, contentType: "text/html", contains: "CV de Sacha Froment"},
+		{path: "/resume?lang=en", status: 200, contentType: "text/html", contains: "Résumé — Sacha Froment"},
+		{path: "/cv", status: 200, contentType: "text/html", contains: "Catalogue de projets"},
+		{path: "/cv?lang=en", status: 200, contentType: "text/html", contains: "Project catalog"},
 		{path: "/projects", status: 200, contentType: "text/html", contains: "GitLab"},
 		{path: "/teapot", status: 200, contentType: "text/html", contains: "nice cup"},
 		{path: "/teapot?drink=coffee", status: 418, contentType: "text/html", contains: "418 I'm a teapot"},
@@ -99,7 +102,6 @@ func TestPublicRoutes(t *testing.T) {
 		{path: "/ip", status: 200, contentType: "text/plain", contains: "192.0.2.1"},
 		{path: "/api/ip", status: 200, contentType: "text/plain", contains: "192.0.2.1"},
 		{path: "/static/hello.txt", status: 200, contentType: "text/plain", contains: "static"},
-		{path: "/cv.html", status: 200, contentType: "text/html", contains: "curriculum vitae"},
 		{path: "/media/blog/hello/assets/image.txt", status: 200, contentType: "text/plain", contains: "media"},
 		{path: "/linkedin_profile.json", status: 404, contentType: "text/plain", contains: "404 page not found"},
 		{path: "/unknown", status: 404, contentType: "text/plain", contains: "404 page not found"},
@@ -127,6 +129,12 @@ func TestPublicRoutes(t *testing.T) {
 	application.ServeHTTP(response, request)
 	if response.Code != http.StatusFound || response.Header().Get("Location") != "/static/Patricia_et_Sacha_Invitation.pdf" {
 		t.Fatalf("mariage redirect = %d %q", response.Code, response.Header().Get("Location"))
+	}
+
+	legacyCV := httptest.NewRecorder()
+	application.ServeHTTP(legacyCV, httptest.NewRequest(http.MethodGet, "/cv.html", nil))
+	if legacyCV.Code != http.StatusMovedPermanently || legacyCV.Header().Get("Location") != "/cv" {
+		t.Fatalf("legacy CV redirect = %d %q", legacyCV.Code, legacyCV.Header().Get("Location"))
 	}
 }
 
