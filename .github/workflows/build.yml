@@ -40,18 +40,18 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
-      - uses: cachix/cachix-action@02b16339eddcf6ea27126a830c7f1992855cae13 # v17
-        with:
-          name: sachahjkl
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build package and release binary
         run: |
-          nix build .#default --no-link
+          nix build .#default --out-link result-package
           nix build .#linuxBinary --out-link result-binary
           cp result-binary/sacha.house-linux-amd64 sacha.house-linux-amd64
           sha256sum sacha.house-linux-amd64 > sacha.house-linux-amd64.sha256
       - name: Build container image
         run: nix build .#dockerImage --out-link result-image
+      - name: Push build outputs to Cachix
+        env:
+          CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        run: cachix push sachahjkl result-package result-binary result-image
       - name: Push container image
         if: github.event_name == 'push'
         env:
