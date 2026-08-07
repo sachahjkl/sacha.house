@@ -157,6 +157,53 @@ func TestProjectMetadataRejectsInvalidYAMLAndEncodesImagePath(t *testing.T) {
 	}
 }
 
+func TestProjectMetadataAcceptsCompleteSchema(t *testing.T) {
+	metadata := `name: "sacha.house"
+description: "https://sacha.house - Site personnel."
+topics:
+  - "CI/CD"
+  - "odin"
+  - "self-hosted"
+homepage: ""
+source:
+  provider: gitlab
+  namespace: "sachahjkl"
+  path: "sachahjkl/sacha.house"
+`
+	entries := []projectEntry{{Name: "project.yaml", Type: "blob"}}
+	entries[0].Object.Text = &metadata
+	project := newProject("Repository Name", "https://github.com/sachahjkl/sacha.house", "Repository description", "")
+
+	if err := applyProjectFiles(&project, "sachahjkl/sacha.house", "commit", entries); err != nil {
+		t.Fatal(err)
+	}
+	if project.Name != "sacha.house" || project.DescriptionHTML != "https://sacha.house - Site personnel." {
+		t.Fatalf("metadata project = %#v", project)
+	}
+	if project.URL != "https://github.com/sachahjkl/sacha.house" {
+		t.Fatalf("URL = %q", project.URL)
+	}
+
+	metadata = "homepage: https://example.com/project\n"
+	if err := applyProjectFiles(&project, "sachahjkl/sacha.house", "commit", entries); err != nil {
+		t.Fatal(err)
+	}
+	if project.URL != "https://github.com/sachahjkl/sacha.house" {
+		t.Fatalf("URL after homepage metadata = %q", project.URL)
+	}
+}
+
+func TestProjectMetadataRejectsUnknownField(t *testing.T) {
+	metadata := "name: valid\nunknown: rejected\n"
+	entries := []projectEntry{{Name: "project.yaml", Type: "blob"}}
+	entries[0].Object.Text = &metadata
+
+	err := applyProjectFiles(&Project{}, "owner/repository", "commit", entries)
+	if err == nil || !strings.Contains(err.Error(), "field unknown not found") {
+		t.Fatalf("unknown field error = %v", err)
+	}
+}
+
 type staticFetcher struct {
 	cache Cache
 }

@@ -284,8 +284,15 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 }
 
 type projectMetadata struct {
-	Name        string `yaml:"name"`
-	Description string `yaml:"description"`
+	Name        string   `yaml:"name"`
+	Description string   `yaml:"description"`
+	Topics      []string `yaml:"topics"`
+	Homepage    string   `yaml:"homepage"`
+	Source      struct {
+		Provider  string `yaml:"provider"`
+		Namespace string `yaml:"namespace"`
+		Path      string `yaml:"path"`
+	} `yaml:"source"`
 }
 
 func applyProjectFiles(project *Project, nameWithOwner, commitOID string, entries []projectEntry) error {
