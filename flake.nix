@@ -12,13 +12,15 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs-secretspec.url = "github:NixOS/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, nixpkgs-secretspec, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        secretspec = nixpkgs-secretspec.legacyPackages.${system}.secretspec;
         lib = pkgs.lib;
         pname = "sacha.house";
         versionPrefix = lib.strings.trim (builtins.readFile ./VERSION);
@@ -67,6 +69,8 @@
             bun
             go
             just
+            sops
+            secretspec
             watchexec
             git
           ];
@@ -91,6 +95,7 @@
 
         packages = {
           default = sachaHouse;
+          inherit secretspec;
         } // lib.optionalAttrs pkgs.stdenv.isLinux {
           inherit linuxBinary;
           dockerImage = pkgs.dockerTools.buildLayeredImage {
@@ -130,6 +135,14 @@
         let
           cfg = config.services.sacha-house;
           pkg = cfg.package;
+          secretspec = self.packages.${pkgs.stdenv.hostPlatform.system}.secretspec;
+          secretExec = pkgs.writeShellScript "sacha-house-with-secrets" ''
+            export SOPS_AGE_KEY_FILE="$CREDENTIALS_DIRECTORY/sops-age-key"
+            exec ${secretspec}/bin/secretspec \
+              --file ${self}/secretspec.toml \
+              --reason "Start sacha.house service" \
+              run --profile production --scope runtime -- ${pkg}/bin/sacha.house
+          '';
         in {
           options.services.sacha-house = {
             enable = mkEnableOption "sacha.house web service";
@@ -164,6 +177,16 @@
               default = false;
               description = "Open the configured port in the firewall.";
             };
+
+            secrets = {
+              enable = mkEnableOption "SecretSpec SOPS secret injection";
+
+              ageKeyFile = mkOption {
+                type = types.str;
+                example = "/var/lib/sops-nix/key.txt";
+                description = "Root-readable age identity passed to the service as a systemd credential.";
+              };
+            };
           };
 
           config = mkIf cfg.enable {
@@ -180,12 +203,14 @@
               after = [ "network.target" ];
               wantedBy = [ "multi-user.target" ];
 
+              path = optionals cfg.secrets.enable [ pkgs.sops ];
+
               serviceConfig = {
                 Type = "simple";
                 User = "sacha-house";
                 Group = "sacha-house";
                 WorkingDirectory = cfg.dataDir;
-                ExecStart = "${pkg}/bin/sacha.house";
+                ExecStart = if cfg.secrets.enable then secretExec else "${pkg}/bin/sacha.house";
                 Restart = "on-failure";
                 RestartSec = 5;
                 NoNewPrivileges = true;
@@ -197,6 +222,8 @@
                   "CONFIG_PATH=${cfg.configFile}"
                   "PORT=${toString cfg.port}"
                 ];
+              } // optionalAttrs cfg.secrets.enable {
+                LoadCredential = [ "sops-age-key:${cfg.secrets.ageKeyFile}" ];
               };
             };
 

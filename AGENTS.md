@@ -21,6 +21,7 @@
 - `just templates`: run `go tool templ generate`.
 - `just css`: rebuild Tailwind CSS with Bun.
 - `just test`: run `go test ./...`.
+- `just secrets-check`: validate the encrypted production secrets without printing their values.
 - `just run`: build and run the debug binary.
 - `nix build .#dockerImage`: build the Linux container image.
 
@@ -61,3 +62,6 @@
 - Build container images from `flake.nix` with `dockerTools`.
 - The container reads runtime configuration from `/data/config.json`.
 - The NixOS module remains available as `nixosModules.default`.
+- SecretSpec declarations live in `secretspec.toml`.
+- Encrypted production values live in `secrets/sacha-house/production.yaml`.
+- The NixOS service passes the age identity through a systemd credential.

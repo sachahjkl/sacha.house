@@ -53,6 +53,25 @@ sudo install -o root -g root -m 0600 /secure/path/paste-secrets.json /var/lib/sa
 
 Never commit `config.json`, `webauthn_credentials.json`, or `paste-secrets.json`. Never put real secrets in deployment scripts.
 
+The NixOS module can resolve production secrets from `secrets/sacha-house/production.yaml` with SecretSpec 0.18. Enable this mode with:
+
+```nix
+services.sacha-house.secrets = {
+  enable = true;
+  ageKeyFile = "/persist/var/lib/sops-nix/key.txt";
+};
+```
+
+The module passes the age identity through a systemd credential. SecretSpec injects tokens and administrator credentials as environment variables.
+
+SecretSpec materializes `PASTE_SECRETS_FILE` inside the service's private temporary directory. Keep WebAuthn credentials in the mutable state directory.
+
+Validate the encrypted production values from a development shell:
+
+```bash
+just secrets-check
+```
+
 Copy existing blog data to `/var/lib/sacha.house/data/blog`. Copy existing cache and credential files to the state directory.
 
 ## Installation

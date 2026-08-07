@@ -574,6 +574,28 @@ func TestLoadConfigRejectsUnknownFields(t *testing.T) {
 	}
 }
 
+func TestLoadConfigAppliesSecretEnvironment(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.json")
+	if err := os.WriteFile(path, []byte(`{"ADMIN_PASSWORD_HASH":"file-hash","ADMIN_PASSWORD_PEPPER":"file-pepper","PASTE_SECRETS_FILE":"file.json"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("GITLAB_BEARER_TOKEN", "gitlab-env")
+	t.Setenv("GITHUB_BEARER_TOKEN", "github-env")
+	t.Setenv("ADMIN_PASSWORD_HASH", "env-hash")
+	t.Setenv("ADMIN_PASSWORD_PEPPER", "env-pepper")
+	t.Setenv("PASTE_SECRETS_FILE", "/run/secrets/paste.json")
+
+	config, err := LoadConfig(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if config.GitLabBearerToken != "gitlab-env" || config.GitHubBearerToken != "github-env" ||
+		config.AdminPasswordHash != "env-hash" || config.AdminPasswordPepper != "env-pepper" ||
+		config.PasteSecretsFile != "/run/secrets/paste.json" {
+		t.Fatalf("secret environment was not applied: %#v", config)
+	}
+}
+
 var _ fs.FS = fstest.MapFS{}
 
 type appPasteAPI struct {

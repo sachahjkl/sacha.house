@@ -16,4 +16,5 @@ node_modules/
 # Build and test output
 bin/
 coverage/
+/result
 *.log

@@ -23,6 +23,12 @@ test:
 run: build
   ./{{ bin_root }}/debug/sacha.house
 
+secrets-check:
+  secretspec --reason "Validate production secrets" check --profile production --scope runtime --no-prompt
+
+run-secrets: build
+  secretspec --reason "Run sacha.house locally" run --profile production --scope runtime -- ./{{ bin_root }}/debug/sacha.house
+
 _dev-run: build
   ./{{ bin_root }}/debug/sacha.house -dev
 

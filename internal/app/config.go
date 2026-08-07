@@ -90,7 +90,26 @@ func LoadConfig(path string) (Config, error) {
 	if err := decoder.Decode(&struct{}{}); err != io.EOF {
 		return Config{}, fmt.Errorf("decode config: trailing JSON data")
 	}
+	applySecretEnvironment(&decoded.Config)
 	return normalizeConfig(decoded.Config)
+}
+
+func applySecretEnvironment(config *Config) {
+	overrides := []struct {
+		name   string
+		target *string
+	}{
+		{name: "GITLAB_BEARER_TOKEN", target: &config.GitLabBearerToken},
+		{name: "GITHUB_BEARER_TOKEN", target: &config.GitHubBearerToken},
+		{name: "ADMIN_PASSWORD_HASH", target: &config.AdminPasswordHash},
+		{name: "ADMIN_PASSWORD_PEPPER", target: &config.AdminPasswordPepper},
+		{name: "PASTE_SECRETS_FILE", target: &config.PasteSecretsFile},
+	}
+	for _, override := range overrides {
+		if value, exists := os.LookupEnv(override.name); exists {
+			*override.target = value
+		}
+	}
 }
 
 func normalizeConfig(config Config) (Config, error) {
