@@ -58,7 +58,7 @@
 
 ## Deployment Notes
 
-- GitLab CI publishes the static Linux binary and Docker image.
+- GitHub Actions builds the application, static Linux binary, and Docker image.
 - Build container images from `flake.nix` with `dockerTools`.
 - The container reads runtime configuration from `/data/config.json`.
 - The homelab consumes the application through a generic modular service declared in `nixconfig`.

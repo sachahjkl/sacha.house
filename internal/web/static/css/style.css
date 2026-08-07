@@ -225,9 +225,6 @@
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
-  .right-1 {
-    right: calc(var(--spacing) * 1);
-  }
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
   }
@@ -1090,6 +1087,9 @@
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
   }
+  .pb-1 {
+    padding-bottom: calc(var(--spacing) * 1);
+  }
   .pb-16 {
     padding-bottom: calc(var(--spacing) * 16);
   }
@@ -1204,6 +1204,12 @@
     color: color-mix(in srgb, #000000 50%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--color-textColor) 50%, transparent);
+    }
+  }
+  .text-textColor\/60 {
+    color: color-mix(in srgb, #000000 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-textColor) 60%, transparent);
     }
   }
   .text-transparent {

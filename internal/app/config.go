@@ -19,9 +19,7 @@ const (
 // Config keeps the deployed JSON field names.
 type Config struct {
 	GitHubRESTAPIEndpoint    string   `json:"GITHUB_REST_API_ENDPOINT"`
-	GitLabAPIEndpoint        string   `json:"GITLAB_API_ENDPOINT"`
 	GitHubGraphQLAPIEndpoint string   `json:"GITHUB_GRAPHQL_API_ENDPOINT"`
-	GitLabBearerToken        string   `json:"GITLAB_BEARER_TOKEN"`
 	GitHubBearerToken        string   `json:"GITHUB_BEARER_TOKEN"`
 	GitRepoID                string   `json:"GIT_REPO_ID"`
 	AdminPasswordHash        string   `json:"ADMIN_PASSWORD_HASH"`
@@ -51,7 +49,6 @@ type configFile struct {
 func DefaultConfig() Config {
 	return Config{
 		GitHubRESTAPIEndpoint:    "https://api.github.com",
-		GitLabAPIEndpoint:        "https://gitlab.com/api/graphql",
 		GitHubGraphQLAPIEndpoint: "https://api.github.com/graphql",
 		WebAuthnCredentialsFile:  "webauthn_credentials.json",
 		PasteSecretsFile:         "paste-secrets.json",
@@ -110,7 +107,6 @@ func applySecretEnvironment(config *Config) {
 		name   string
 		target *string
 	}{
-		{name: "GITLAB_BEARER_TOKEN", target: &config.GitLabBearerToken},
 		{name: "GITHUB_BEARER_TOKEN", target: &config.GitHubBearerToken},
 		{name: "ADMIN_PASSWORD_HASH", target: &config.AdminPasswordHash},
 		{name: "ADMIN_PASSWORD_PEPPER", target: &config.AdminPasswordPepper},
@@ -127,9 +123,6 @@ func normalizeConfig(config Config) (Config, error) {
 	defaults := DefaultConfig()
 	if config.GitHubRESTAPIEndpoint == "" {
 		config.GitHubRESTAPIEndpoint = defaults.GitHubRESTAPIEndpoint
-	}
-	if config.GitLabAPIEndpoint == "" {
-		config.GitLabAPIEndpoint = defaults.GitLabAPIEndpoint
 	}
 	if config.GitHubGraphQLAPIEndpoint == "" {
 		config.GitHubGraphQLAPIEndpoint = defaults.GitHubGraphQLAPIEndpoint

@@ -23,6 +23,7 @@ const (
 	defaultProjectsPath = "projects_cache.json"
 	publicCache         = "public, max-age=86400"
 	feedCache           = "public, max-age=600"
+	projectsCacheMaxAge = 24 * time.Hour
 )
 
 type Options struct {
@@ -87,24 +88,24 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 	fetcher := options.ProjectsFetcher
 	if fetcher == nil {
 		fetcher = projects.NewClient(&http.Client{Timeout: 20 * time.Second}, projects.ClientConfig{
-			GitLabEndpoint: config.GitLabAPIEndpoint,
 			GitHubEndpoint: config.GitHubGraphQLAPIEndpoint,
-			GitLabToken:    config.GitLabBearerToken,
 			GitHubToken:    config.GitHubBearerToken,
 			Username:       web.Me.Username,
 		})
 	}
 	projectStore := projects.NewStore(options.ProjectsPath, fetcher)
-	if err := projectStore.Load(); err != nil {
-		if !errors.Is(err, fs.ErrNotExist) {
-			slog.Warn("projects cache is invalid", "error", err)
-		}
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		err = projectStore.Refresh(ctx)
-		cancel()
-		if err != nil {
-			slog.Warn("projects cache is unavailable", "error", err)
-		}
+	loadErr := projectStore.Load()
+	if loadErr != nil && !errors.Is(loadErr, fs.ErrNotExist) {
+		slog.Warn("projects cache is invalid", "error", loadErr)
+	}
+	if loadErr != nil || projectStore.Stale(options.Now(), projectsCacheMaxAge) {
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancel()
+			if err := projectStore.Refresh(ctx); err != nil {
+				slog.Warn("projects cache refresh failed", "error", err)
+			}
+		}()
 	}
 
 	profile, err := (web.FSLinkedInProfileLoader{FS: options.StaticFS, Path: "linkedin_profile.json"}).Load()

@@ -7,44 +7,60 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"gopkg.in/yaml.v3"
 )
 
-const maxResponseSize = 8 << 20
+const (
+	maxResponseSize = 8 << 20
+	cacheVersion    = 1
+	cacheSource     = "github"
+	maxRetries      = 2
+	maxRetryDelay   = 30 * time.Second
+)
 
 // Project keeps the field names used by projects_cache.json and the templates.
 type Project struct {
-	Name            string `json:"name"`
-	URL             string `json:"url"`
-	DescriptionHTML string `json:"descriptionHtml"`
-	AvatarURL       string `json:"avatarUrl"`
-	FirstLetter     string `json:"first_letter"`
-	HSLColor        string `json:"hslColor"`
-	HasAvatar       bool   `json:"hasAvatar"`
+	Name            string    `json:"name"`
+	URL             string    `json:"url"`
+	DescriptionHTML string    `json:"descriptionHtml"`
+	AvatarURL       string    `json:"avatarUrl"`
+	FirstLetter     string    `json:"first_letter"`
+	HSLColor        string    `json:"hslColor"`
+	HasAvatar       bool      `json:"hasAvatar"`
+	LastCommitDate  time.Time `json:"lastCommitDate"`
+	LastCommitHash  string    `json:"lastCommitHash"`
+	LastCommitURL   string    `json:"lastCommitUrl"`
 }
 
 // Cache is the on-disk projects_cache.json format.
 type Cache struct {
-	GitLab []Project `json:"gitlab"`
-	GitHub []Project `json:"github"`
+	Version     int       `json:"version"`
+	Source      string    `json:"source"`
+	RefreshedAt time.Time `json:"refreshedAt"`
+	Projects    []Project `json:"projects"`
 }
 
 type ClientConfig struct {
-	GitLabEndpoint string
 	GitHubEndpoint string
-	GitLabToken    string
 	GitHubToken    string
 	Username       string
 }
 
-// Client fetches projects from the GitLab and GitHub GraphQL APIs.
+// Client fetches projects from the GitHub GraphQL API.
 type Client struct {
 	httpClient *http.Client
 	config     ClientConfig
@@ -58,26 +74,28 @@ func NewClient(httpClient *http.Client, config ClientConfig) *Client {
 }
 
 func (c *Client) Fetch(ctx context.Context) (Cache, error) {
-	gitlab, err := c.fetchGitLab(ctx)
-	if err != nil {
-		return Cache{}, fmt.Errorf("fetch GitLab projects: %w", err)
-	}
-
-	github, err := c.fetchGitHub(ctx)
+	projects, err := c.fetchGitHub(ctx)
 	if err != nil {
 		return Cache{}, fmt.Errorf("fetch GitHub projects: %w", err)
 	}
-
-	return Cache{GitLab: gitlab, GitHub: github}, nil
+	return Cache{Version: cacheVersion, Source: cacheSource, RefreshedAt: time.Now().UTC(), Projects: projects}, nil
 }
 
 type graphQLRequest struct {
-	Query     string            `json:"query"`
-	Variables map[string]string `json:"variables"`
+	Query     string         `json:"query"`
+	Variables map[string]any `json:"variables"`
 }
 
 type graphQLError struct {
 	Message string `json:"message"`
+}
+
+type projectEntry struct {
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Object struct {
+		Text *string `json:"text"`
+	} `json:"object"`
 }
 
 func (c *Client) request(ctx context.Context, endpoint, token string, request graphQLRequest, response any) error {
@@ -88,149 +106,244 @@ func (c *Client) request(ctx context.Context, endpoint, token string, request gr
 		return errors.New("bearer token is not set")
 	}
 
-	var body strings.Builder
-	if err := json.NewEncoder(&body).Encode(request); err != nil {
+	body, err := json.Marshal(request)
+	if err != nil {
 		return fmt.Errorf("encode GraphQL request: %w", err)
 	}
+	for attempt := 0; ; attempt++ {
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(string(body)))
+		if err != nil {
+			return fmt.Errorf("create GraphQL request: %w", err)
+		}
+		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Accept", "application/vnd.github+json")
+		req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(body.String()))
-	if err != nil {
-		return fmt.Errorf("create GraphQL request: %w", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
+		res, requestErr := c.httpClient.Do(req)
+		if requestErr != nil {
+			if attempt < maxRetries && ctx.Err() == nil {
+				if err := waitForRetry(ctx, time.Duration(1<<attempt)*250*time.Millisecond); err != nil {
+					return fmt.Errorf("send GraphQL request: %w", err)
+				}
+				continue
+			}
+			return fmt.Errorf("send GraphQL request: %w", requestErr)
+		}
 
-	res, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("send GraphQL request: %w", err)
-	}
-	defer res.Body.Close()
+		data, readErr := io.ReadAll(io.LimitReader(res.Body, maxResponseSize+1))
+		res.Body.Close()
+		if readErr != nil {
+			return fmt.Errorf("read GraphQL response: %w", readErr)
+		}
+		if len(data) > maxResponseSize {
+			return errors.New("GraphQL response exceeds 8 MiB")
+		}
+		if retryableGitHubResponse(res) && attempt < maxRetries {
+			if err := waitForRetry(ctx, githubRetryDelay(res.Header, attempt)); err != nil {
+				return fmt.Errorf("wait to retry GraphQL request: %w", err)
+			}
+			continue
+		}
+		if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusMultipleChoices {
+			return fmt.Errorf("GraphQL response status %s: %s", res.Status, strings.TrimSpace(string(data)))
+		}
 
-	limited := io.LimitReader(res.Body, maxResponseSize+1)
-	data, err := io.ReadAll(limited)
-	if err != nil {
-		return fmt.Errorf("read GraphQL response: %w", err)
+		var envelope struct {
+			Errors []graphQLError `json:"errors"`
+		}
+		if err := json.Unmarshal(data, &envelope); err != nil {
+			return fmt.Errorf("decode GraphQL response: %w", err)
+		}
+		if len(envelope.Errors) != 0 {
+			return fmt.Errorf("GraphQL error: %s", envelope.Errors[0].Message)
+		}
+		if err := json.Unmarshal(data, response); err != nil {
+			return fmt.Errorf("decode GraphQL response: %w", err)
+		}
+		return nil
 	}
-	if len(data) > maxResponseSize {
-		return errors.New("GraphQL response exceeds 8 MiB")
+}
+
+func retryableGitHubResponse(response *http.Response) bool {
+	if response.StatusCode == http.StatusTooManyRequests || response.StatusCode == http.StatusBadGateway ||
+		response.StatusCode == http.StatusServiceUnavailable || response.StatusCode == http.StatusGatewayTimeout {
+		return true
 	}
-	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusMultipleChoices {
-		return fmt.Errorf("GraphQL response status %s: %s", res.Status, strings.TrimSpace(string(data)))
+	return response.StatusCode == http.StatusForbidden &&
+		(response.Header.Get("X-RateLimit-Remaining") == "0" || response.Header.Get("Retry-After") != "")
+}
+
+func githubRetryDelay(header http.Header, attempt int) time.Duration {
+	if seconds, err := strconv.ParseInt(header.Get("Retry-After"), 10, 64); err == nil && seconds >= 0 {
+		return min(time.Duration(seconds)*time.Second, maxRetryDelay)
+	}
+	if reset, err := strconv.ParseInt(header.Get("X-RateLimit-Reset"), 10, 64); err == nil {
+		return min(max(time.Until(time.Unix(reset, 0)), 0), maxRetryDelay)
+	}
+	return time.Duration(1<<attempt) * 250 * time.Millisecond
+}
+
+func waitForRetry(ctx context.Context, delay time.Duration) error {
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
+	const query = `query GET_PROJECTS_GITHUB($username: String!, $cursor: String) {
+			user(login: $username) {
+				projects: repositories(first: 50, after: $cursor) {
+					pageInfo { hasNextPage endCursor }
+					nodes {
+						name nameWithOwner url descriptionHtml: descriptionHTML visibility
+						owner { avatarUrl }
+						defaultBranchRef { target { ... on Commit { committedDate abbreviatedOid oid url } } }
+						project: object(expression: "HEAD:.project") {
+							... on Tree { entries { name type object { ... on Blob { text } } } }
+						}
+					}
+				}
+			}
+		}`
+	type repository struct {
+		Name            string `json:"name"`
+		NameWithOwner   string `json:"nameWithOwner"`
+		URL             string `json:"url"`
+		DescriptionHTML string `json:"descriptionHtml"`
+		Visibility      string `json:"visibility"`
+		Owner           struct {
+			AvatarURL string `json:"avatarUrl"`
+		} `json:"owner"`
+		DefaultBranchRef struct {
+			Target struct {
+				CommittedDate  time.Time `json:"committedDate"`
+				AbbreviatedOID string    `json:"abbreviatedOid"`
+				OID            string    `json:"oid"`
+				URL            string    `json:"url"`
+			} `json:"target"`
+		} `json:"defaultBranchRef"`
+		Project struct {
+			Entries []projectEntry `json:"entries"`
+		} `json:"project"`
 	}
 
-	var envelope struct {
-		Errors []graphQLError `json:"errors"`
+	var projects []Project
+	var cursor any
+	previousCursor := ""
+	for {
+		var response struct {
+			Data struct {
+				User struct {
+					Projects struct {
+						Nodes    []repository `json:"nodes"`
+						PageInfo struct {
+							HasNextPage bool   `json:"hasNextPage"`
+							EndCursor   string `json:"endCursor"`
+						} `json:"pageInfo"`
+					} `json:"projects"`
+				} `json:"user"`
+			} `json:"data"`
+		}
+		request := graphQLRequest{Query: query, Variables: map[string]any{"username": c.config.Username, "cursor": cursor}}
+		if err := c.request(ctx, c.config.GitHubEndpoint, c.config.GitHubToken, request, &response); err != nil {
+			return nil, err
+		}
+		for _, raw := range response.Data.User.Projects.Nodes {
+			if !strings.EqualFold(raw.Visibility, "public") {
+				continue
+			}
+			project := newProject(raw.Name, raw.URL, raw.DescriptionHTML, raw.Owner.AvatarURL)
+			if err := applyProjectFiles(&project, raw.NameWithOwner, raw.DefaultBranchRef.Target.OID, raw.Project.Entries); err != nil {
+				return nil, fmt.Errorf("read metadata for %s: %w", raw.NameWithOwner, err)
+			}
+			project.LastCommitDate = raw.DefaultBranchRef.Target.CommittedDate
+			project.LastCommitHash = raw.DefaultBranchRef.Target.AbbreviatedOID
+			project.LastCommitURL = raw.DefaultBranchRef.Target.URL
+			projects = append(projects, project)
+		}
+		if !response.Data.User.Projects.PageInfo.HasNextPage {
+			break
+		}
+		nextCursor := response.Data.User.Projects.PageInfo.EndCursor
+		if nextCursor == "" || nextCursor == previousCursor {
+			return nil, errors.New("GitHub pagination returned no new cursor")
+		}
+		previousCursor = nextCursor
+		cursor = nextCursor
 	}
-	if err := json.Unmarshal(data, &envelope); err != nil {
-		return fmt.Errorf("decode GraphQL response: %w", err)
+	sort.SliceStable(projects, func(i, j int) bool {
+		return projects[i].LastCommitDate.After(projects[j].LastCommitDate)
+	})
+	return projects, nil
+}
+
+type projectMetadata struct {
+	Name        string `yaml:"name"`
+	Description string `yaml:"description"`
+}
+
+func applyProjectFiles(project *Project, nameWithOwner, commitOID string, entries []projectEntry) error {
+	for _, entry := range entries {
+		if entry.Name == "project.yaml" && entry.Object.Text != nil {
+			var metadata projectMetadata
+			decoder := yaml.NewDecoder(strings.NewReader(*entry.Object.Text))
+			decoder.KnownFields(true)
+			if err := decoder.Decode(&metadata); err != nil {
+				return fmt.Errorf("invalid .project/project.yaml: %w", err)
+			}
+			if err := decoder.Decode(&struct{}{}); err != io.EOF {
+				if err == nil {
+					err = errors.New("multiple YAML documents are not allowed")
+				}
+				return fmt.Errorf("invalid .project/project.yaml: %w", err)
+			}
+			if metadata.Name != "" {
+				project.Name = metadata.Name
+				project.FirstLetter = firstLetter(metadata.Name)
+			}
+			if metadata.Description != "" {
+				project.DescriptionHTML = html.EscapeString(metadata.Description)
+			}
+		}
 	}
-	if len(envelope.Errors) != 0 {
-		return fmt.Errorf("GraphQL error: %s", envelope.Errors[0].Message)
-	}
-	if err := json.Unmarshal(data, response); err != nil {
-		return fmt.Errorf("decode GraphQL response: %w", err)
+	for _, entry := range entries {
+		if entry.Type == "blob" && strings.HasPrefix(entry.Name, "image.") && commitOID != "" {
+			owner, repository, ok := strings.Cut(nameWithOwner, "/")
+			if !ok || owner == "" || repository == "" || strings.Contains(repository, "/") {
+				return errors.New("invalid GitHub repository name")
+			}
+			project.AvatarURL = fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/.project/%s",
+				url.PathEscape(owner), url.PathEscape(repository), url.PathEscape(commitOID), url.PathEscape(entry.Name))
+			project.HasAvatar = true
+			break
+		}
 	}
 	return nil
 }
 
-func (c *Client) fetchGitLab(ctx context.Context) ([]Project, error) {
-	var response struct {
-		Data struct {
-			Projects struct {
-				Nodes []struct {
-					Name            string `json:"name"`
-					URL             string `json:"url"`
-					DescriptionHTML string `json:"descriptionHtml"`
-					AvatarURL       string `json:"avatarUrl"`
-					Visibility      string `json:"visibility"`
-				} `json:"nodes"`
-			} `json:"projects"`
-		} `json:"data"`
-	}
-
-	request := graphQLRequest{
-		Query: `query GET_PROJECTS_GITLAB($username: ID!) {
-			projects(namespacePath: $username) {
-				nodes { name url: webUrl avatarUrl description descriptionHtml visibility }
-			}
-		}`,
-		Variables: map[string]string{"username": c.config.Username},
-	}
-	if err := c.request(ctx, c.config.GitLabEndpoint, c.config.GitLabToken, request, &response); err != nil {
-		return nil, err
-	}
-
-	projects := make([]Project, 0, len(response.Data.Projects.Nodes))
-	for _, raw := range response.Data.Projects.Nodes {
-		if !strings.EqualFold(raw.Visibility, "public") {
-			continue
-		}
-		projects = append(projects, newProject(raw.Name, raw.URL, raw.DescriptionHTML, raw.AvatarURL))
-	}
-	return projects, nil
-}
-
-func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
-	var response struct {
-		Data struct {
-			User struct {
-				Projects struct {
-					Nodes []struct {
-						Name            string `json:"name"`
-						URL             string `json:"url"`
-						DescriptionHTML string `json:"descriptionHtml"`
-						Visibility      string `json:"visibility"`
-						Owner           struct {
-							AvatarURL string `json:"avatarUrl"`
-						} `json:"owner"`
-					} `json:"nodes"`
-				} `json:"projects"`
-			} `json:"user"`
-		} `json:"data"`
-	}
-
-	request := graphQLRequest{
-		Query: `query GET_PROJECTS_GITHUB($username: String!) {
-			user(login: $username) {
-				projects: repositories(first: 50) {
-					nodes { name url description descriptionHtml: descriptionHTML visibility owner { avatarUrl } }
-				}
-			}
-		}`,
-		Variables: map[string]string{"username": c.config.Username},
-	}
-	if err := c.request(ctx, c.config.GitHubEndpoint, c.config.GitHubToken, request, &response); err != nil {
-		return nil, err
-	}
-
-	projects := make([]Project, 0, len(response.Data.User.Projects.Nodes))
-	for _, raw := range response.Data.User.Projects.Nodes {
-		if !strings.EqualFold(raw.Visibility, "public") {
-			continue
-		}
-		projects = append(projects, newProject(raw.Name, raw.URL, raw.DescriptionHTML, raw.Owner.AvatarURL))
-	}
-	for left, right := 0, len(projects)-1; left < right; left, right = left+1, right-1 {
-		projects[left], projects[right] = projects[right], projects[left]
-	}
-	return projects, nil
-}
-
 func newProject(name, url, descriptionHTML, avatarURL string) Project {
-	first := ""
-	if r, _ := utf8.DecodeRuneInString(name); r != utf8.RuneError || name != "" {
-		first = string(unicode.ToUpper(r))
-	}
 	return Project{
 		Name:            name,
 		URL:             url,
 		DescriptionHTML: descriptionHTML,
 		AvatarURL:       avatarURL,
-		FirstLetter:     first,
+		FirstLetter:     firstLetter(name),
 		HSLColor:        randomColor(),
 		HasAvatar:       avatarURL != "",
 	}
+}
+
+func firstLetter(name string) string {
+	if r, _ := utf8.DecodeRuneInString(name); r != utf8.RuneError || name != "" {
+		return string(unicode.ToUpper(r))
+	}
+	return ""
 }
 
 func randomColor() string {
@@ -276,11 +389,21 @@ func (s *Store) Load() error {
 	if err := decoder.Decode(&cache); err != nil {
 		return fmt.Errorf("decode projects cache: %w", err)
 	}
+	if cache.Version != cacheVersion || cache.Source != cacheSource || cache.RefreshedAt.IsZero() {
+		return errors.New("projects cache uses an obsolete format")
+	}
 
 	s.mu.Lock()
 	s.cache = cloneCache(cache)
 	s.mu.Unlock()
 	return nil
+}
+
+// Stale reports whether the current cache must be refreshed.
+func (s *Store) Stale(now time.Time, maxAge time.Duration) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.cache.RefreshedAt.IsZero() || now.Sub(s.cache.RefreshedAt) >= maxAge
 }
 
 // Get returns a snapshot that callers can modify safely.
@@ -301,6 +424,11 @@ func (s *Store) Refresh(ctx context.Context) error {
 	cache, err := s.fetcher.Fetch(ctx)
 	if err != nil {
 		return err
+	}
+	cache.Version = cacheVersion
+	cache.Source = cacheSource
+	if cache.RefreshedAt.IsZero() {
+		cache.RefreshedAt = time.Now().UTC()
 	}
 	s.mu.RLock()
 	preserveColors(&cache, s.cache)
@@ -327,8 +455,7 @@ func preserveColors(next *Cache, current Cache) {
 			}
 		}
 	}
-	preserve(next.GitLab, current.GitLab)
-	preserve(next.GitHub, current.GitHub)
+	preserve(next.Projects, current.Projects)
 }
 
 func writeCache(path string, cache Cache) error {
@@ -369,7 +496,7 @@ func writeCache(path string, cache Cache) error {
 
 func cloneCache(cache Cache) Cache {
 	return Cache{
-		GitLab: append([]Project(nil), cache.GitLab...),
-		GitHub: append([]Project(nil), cache.GitHub...),
+		Version: cache.Version, Source: cache.Source, RefreshedAt: cache.RefreshedAt,
+		Projects: append([]Project(nil), cache.Projects...),
 	}
 }

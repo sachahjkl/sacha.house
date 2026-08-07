@@ -144,13 +144,16 @@ type ProjectView struct {
 	HasAvatar       bool
 	HSLColor        string
 	FirstLetter     string
+	LastCommitDate  string
+	LastCommitTime  string
+	LastCommitHash  string
+	LastCommitURL   string
 }
 
 type ProjectsPageData struct {
 	PageData
 	Identity
-	GitLabProjects []ProjectView
-	GitHubProjects []ProjectView
+	Projects []ProjectView
 }
 
 type PostView struct {

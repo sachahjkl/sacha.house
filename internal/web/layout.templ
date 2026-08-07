@@ -111,7 +111,7 @@ templ Header(data PageData) {
 templ SiteFooter(data PageData) {
 	<footer class="bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm">
 		<div><p>(C) { fmt.Sprintf("%d", data.Footer.Year) } sacha.house</p></div>
-		<div class="flex items-center gap-2"><a class="underline" href={ templ.SafeURL("https://gitlab.com/" + data.Footer.GitRepoID + "/-/commit/" + data.Footer.CommitHash) }>{ data.Footer.Version }</a></div>
+		<div class="flex items-center gap-2"><a class="underline" href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/commit/" + data.Footer.CommitHash) }>{ data.Footer.Version }</a></div>
 		if data.HotReload {
 			<script src="/static/js/hot-reload.js"></script>
 		}

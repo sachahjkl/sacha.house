@@ -88,7 +88,7 @@ templ AboutContent(data AboutPageData) {
 				<li>GitLab Profile: <a href={ templ.SafeURL(data.GitLab) }>{ data.GitLab }</a></li>
 			</ul>
 		</section>
-		<section id="project-build-status"><h2 class="h2">🏗️ Project Build Status</h2><a href={ templ.SafeURL("https://gitlab.com/" + data.Footer.GitRepoID + "/-/commit/" + data.Footer.CommitHash) }><img width="300" src={ templ.SafeURL("https://gitlab.com/" + data.Footer.GitRepoID + "/badges/master/pipeline.svg") } loading="lazy" decoding="async" alt="Deploy Status Badge"/></a></section>
+		<section id="project-build-status"><h2 class="h2">🏗️ Project Build Status</h2><a href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/commit/" + data.Footer.CommitHash) }><img width="300" src={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/actions/workflows/build.yml/badge.svg?branch=master") } loading="lazy" decoding="async" alt="Build Status Badge"/></a></section>
 	</article>
 }
 
@@ -100,31 +100,34 @@ templ ProjectsContent(data ProjectsPageData) {
 	<article class="mx-auto">
 		<h1 class="h1">projects</h1>
 		<section class="mb-8"><p>A collection of my work, including both completed and ongoing projects. These repositories were created to:</p>
-			<ul class="ms-4 list-inside list-[square]"><li>Explore new technologies</li><li>Practice project management, design, and software architecture</li><li>Collaborate on personal projects (<a href={ templ.SafeURL(data.HayekFR) }>website example</a> and its <a href={ templ.SafeURL(data.HayekFRRepo) }>repository</a>, task automation, etc.)</li><li>Organize academic work</li><li>Store personal environment files (e.g., <a href={ templ.SafeURL(data.Dotfiles) }>dotfiles</a>)</li></ul>
-			<p>Most of my work is hosted on <b>GitLab</b>, with some minor projects on <b>GitHub</b>.</p>
+			<ul class="ms-4 list-inside list-[square]"><li>Explore new technologies</li><li>Practice project management, design, and software architecture</li><li>Collaborate on personal projects</li><li>Organize academic work</li><li>Store personal environment files</li></ul>
+			<p>My public projects are hosted on <b>GitHub</b>.</p>
 		</section>
-		<section class="mb-8"><h2 class="h2"><img class="m-0 mr-2 inline-block w-[1.2em] align-middle" width="15" src="/static/gitlab.png" alt=""/> GitLab / @{ data.Username }</h2>@ProjectList(data.GitLabProjects)</section>
-		<section class="mb-8"><h2 class="h2 mb-0"><img class="m-0 mr-2 inline-block w-[1.2em] align-middle" src="/static/github.png" alt=""/> GitHub / @{ data.Username }</h2>@ProjectList(data.GitHubProjects)</section>
+		<section class="mb-8"><h2 class="h2 mb-0"><img class="m-0 mr-2 inline-block w-[1.2em] align-middle" src="/static/github.png" alt=""/> GitHub / @{ data.Username }</h2>@ProjectList(data.Projects)</section>
 	</article>
 }
 
 templ ProjectList(projects []ProjectView) {
 	<ul class="scrollbar-thin border-textColor mx-4 flex max-h-[540px] snap-y snap-mandatory list-none flex-col gap-4 overflow-y-scroll border-y-4 p-0">
 		for _, project := range projects {
-			<li class="snap-start"><a href={ templ.SafeURL(project.URL) }><div class="border-bgColor bg-bgColor text-textColor hover:border-textColor flex overflow-hidden border-4">
+			<li class="snap-start"><div class="border-bgColor bg-bgColor text-textColor hover:border-textColor flex overflow-hidden border-4">
 				if project.HasAvatar {
 					<div class="grid shrink-0 place-content-center"><img class="aspect-square max-w-fit size-16 sm:size-32" loading="lazy" src={ templ.SafeURL(project.AvatarURL) } alt=""/></div>
 				} else {
 					<div style={ "background-color: " + project.HSLColor + ";" } class="grid aspect-square size-16 shrink-0 place-content-center sm:size-32" aria-hidden="true"><span class="shadow-sm flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-center text-3xl text-neutral-100">{ project.FirstLetter }</span></div>
 				}
-				<div class="text-textColor w-full overflow-hidden p-0 text-sm sm:text-base"><h2 class="bg-textColor text-bgColor ps-2 font-bold">{ project.Name }</h2><div class="line-clamp-2 ps-2 pt-2">
+				<div class="text-textColor flex w-full min-w-0 flex-col overflow-hidden p-0 text-sm sm:text-base"><h2 class="bg-textColor text-bgColor ps-2 font-bold"><a class="block" href={ templ.SafeURL(project.URL) }>{ project.Name }</a></h2><div class="line-clamp-2 flex-1 ps-2 pt-2">
 					if project.DescriptionHTML != "" {
 						@templ.Raw(project.DescriptionHTML)
 					} else {
 						😞 Unfortunately, no description is available (I was probs lazy ahh).
 					}
-				</div></div>
-			</div></a></li>
+				</div>
+				if project.LastCommitURL != "" {
+					<small class="text-textColor/60 px-2 pb-1"><time datetime={ project.LastCommitTime }>{ project.LastCommitDate }</time> · <a class="underline" href={ templ.SafeURL(project.LastCommitURL) }>{ project.LastCommitHash }</a></small>
+				}
+				</div>
+			</div></li>
 		}
 	</ul>
 }

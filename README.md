@@ -73,6 +73,7 @@ Use `config.example.json` as the base configuration. Important fields include:
 
 - `ADMIN_PASSWORD_HASH`: Argon2id admin password hash.
 - `ADMIN_PASSWORD_PEPPER`: Secret value used for password hashing and verification.
+- `GITHUB_BEARER_TOKEN`: GitHub token used to read public repositories, project metadata, and default-branch commits.
 - `WEBAUTHN_CREDENTIALS_FILE`: Writable passkey storage path.
 - `WEBAUTHN_RP_ID`: WebAuthn relying-party identifier.
 - `WEBAUTHN_RP_ORIGINS`: Allowed WebAuthn origins.

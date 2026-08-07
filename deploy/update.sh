@@ -11,7 +11,7 @@ readonly DEPLOY_STATE_DIR="/var/lib/sacha.house-deploy"
 readonly OPERATION_LOCK="${DEPLOY_STATE_DIR}/operation.lock"
 readonly SERVICE_NAME="sacha.house.service"
 readonly ARTIFACT_NAME="sacha.house-linux-amd64"
-readonly RELEASE_API="https://gitlab.com/api/v4/projects/sachahjkl%2Fsacha.house/releases/permalink/latest"
+readonly RELEASE_API="https://api.github.com/repos/sachahjkl/sacha.house/releases/latest"
 readonly HEALTH_URL="http://127.0.0.1:6969/ping"
 
 if (( EUID != 0 )); then
@@ -28,16 +28,19 @@ current_temp="${CURRENT_LINK}.new.$$"
 previous_temp="${PREVIOUS_LINK}.new.$$"
 trap 'rm -rf -- "$work_dir"; rm -f -- "$current_temp" "$previous_temp"' EXIT
 
-curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 \
+curl --fail --silent --show-error --location --retry 5 --retry-all-errors --retry-delay 2 \
+    --proto '=https' --proto-redir '=https' --tlsv1.2 --header 'Accept: application/vnd.github+json' \
+    --header 'X-GitHub-Api-Version: 2022-11-28' --user-agent 'sacha.house-deploy/1.0' \
     "$RELEASE_API" --output "$work_dir/release.json"
 
-binary_url="$(jq -er '.assets.links | first(.[] | select(.name == "sacha.house Linux AMD64 Binary")) | .direct_asset_url // .url' "$work_dir/release.json")"
-checksum_url="$(jq -er '.assets.links | first(.[] | select(.name == "sacha.house Linux AMD64 SHA256")) | .direct_asset_url // .url' "$work_dir/release.json")"
+binary_url="$(jq -er '.assets | first(.[] | select(.name == "sacha.house-linux-amd64")) | .browser_download_url' "$work_dir/release.json")"
+checksum_url="$(jq -er '.assets | first(.[] | select(.name == "sacha.house-linux-amd64.sha256")) | .browser_download_url' "$work_dir/release.json")"
 release_version="$(jq -er '.tag_name' "$work_dir/release.json")"
+release_version="${release_version#v}"
 
-curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 \
+curl --fail --silent --show-error --location --retry 5 --retry-all-errors --retry-delay 2 --proto '=https' --proto-redir '=https' --tlsv1.2 \
     "$binary_url" --output "$work_dir/$ARTIFACT_NAME"
-curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 \
+curl --fail --silent --show-error --location --retry 5 --retry-all-errors --retry-delay 2 --proto '=https' --proto-redir '=https' --tlsv1.2 \
     "$checksum_url" --output "$work_dir/$ARTIFACT_NAME.sha256"
 
 read -r expected_hash expected_name < "$work_dir/$ARTIFACT_NAME.sha256"

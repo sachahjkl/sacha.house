@@ -38,7 +38,7 @@
           inherit pname;
           version = packageVersion;
           src = source;
-          vendorHash = "sha256-xE5teCK+yueLLGycyFl+EFtWhV/5zqBHw8Y3YpLp8LY=";
+          vendorHash = "sha256-BxDWT8ZYH9+/vYFLqYlx/Z6ZjdfbgRnhNxv+gGxqv8s=";
           subPackages = [ "cmd/sacha-house" ];
           nativeBuildInputs = [
             pkgs.tailwindcss_4

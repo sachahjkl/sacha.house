@@ -25,10 +25,14 @@ import (
 type testProjectsFetcher struct{}
 
 func (testProjectsFetcher) Fetch(context.Context) (projects.Cache, error) {
-	return projects.Cache{GitHub: []projects.Project{{Name: "Refreshed", URL: "https://example.com/refreshed"}}}, nil
+	return projects.Cache{Projects: []projects.Project{{Name: "Refreshed", URL: "https://example.com/refreshed"}}}, nil
 }
 
 func newTestApp(t *testing.T) *App {
+	return newTestAppWithFetcher(t, testProjectsFetcher{}, false)
+}
+
+func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *App {
 	t.Helper()
 	root := t.TempDir()
 	blogRoot := filepath.Join(root, "blog")
@@ -47,7 +51,12 @@ func newTestApp(t *testing.T) *App {
 		t.Fatal(err)
 	}
 	projectsPath := filepath.Join(root, "projects.json")
-	if err := os.WriteFile(projectsPath, []byte(`{"gitlab":[],"github":[]}`), 0o644); err != nil {
+	refreshedAt := "2026-01-01T00:00:00Z"
+	if stale {
+		refreshedAt = "2025-12-30T00:00:00Z"
+	}
+	cache := fmt.Sprintf(`{"version":1,"source":"github","refreshedAt":%q,"projects":[]}`, refreshedAt)
+	if err := os.WriteFile(projectsPath, []byte(cache), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	assets := fstest.MapFS{
@@ -65,7 +74,7 @@ func newTestApp(t *testing.T) *App {
 	}
 	application, err := NewWithOptions(config, Options{
 		BlogRoot: blogRoot, ProjectsPath: projectsPath, StaticFS: assets,
-		ProjectsFetcher: testProjectsFetcher{}, Development: true,
+		ProjectsFetcher: fetcher, Development: true,
 		Version: "test", CommitHash: "abc123", Now: func() time.Time {
 			return time.Date(2026, time.January, 1, 0, 0, 0, 0, time.UTC)
 		},
@@ -74,6 +83,40 @@ func newTestApp(t *testing.T) *App {
 		t.Fatal(err)
 	}
 	return application
+}
+
+type blockingProjectsFetcher struct {
+	started chan struct{}
+	release chan struct{}
+}
+
+func (fetcher blockingProjectsFetcher) Fetch(context.Context) (projects.Cache, error) {
+	close(fetcher.started)
+	<-fetcher.release
+	return projects.Cache{Projects: []projects.Project{{Name: "Background refresh complete"}}}, nil
+}
+
+func TestStaleProjectsCacheRefreshDoesNotBlockStartup(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+	begin := time.Now()
+	application := newTestAppWithFetcher(t, blockingProjectsFetcher{started: started, release: release}, true)
+	if elapsed := time.Since(begin); elapsed > time.Second {
+		t.Fatalf("application startup took %s", elapsed)
+	}
+	select {
+	case <-started:
+	case <-time.After(time.Second):
+		t.Fatal("stale projects cache was not refreshed")
+	}
+	close(release)
+	deadline := time.Now().Add(time.Second)
+	for len(application.projects.Get().Projects) == 0 && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	if len(application.projects.Get().Projects) == 0 {
+		t.Fatal("background projects refresh did not complete")
+	}
 }
 
 func TestPublicRoutes(t *testing.T) {
@@ -95,7 +138,7 @@ func TestPublicRoutes(t *testing.T) {
 		{path: "/resume?lang=en", status: 200, contentType: "text/html", contains: "Résumé — Sacha Froment"},
 		{path: "/cv", status: 200, contentType: "text/html", contains: "Catalogue de projets"},
 		{path: "/cv?lang=en", status: 200, contentType: "text/html", contains: "Project catalog"},
-		{path: "/projects", status: 200, contentType: "text/html", contains: "GitLab"},
+		{path: "/projects", status: 200, contentType: "text/html", contains: "GitHub"},
 		{path: "/teapot", status: 200, contentType: "text/html", contains: "nice cup"},
 		{path: "/teapot?drink=coffee", status: 418, contentType: "text/html", contains: "418 I'm a teapot"},
 		{path: "/ping", status: 200, contentType: "text/plain", contains: "pong"},
@@ -484,7 +527,7 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	refresh.AddCookie(cookie)
 	refreshResponse := httptest.NewRecorder()
 	application.ServeHTTP(refreshResponse, refresh)
-	if refreshResponse.Code != http.StatusSeeOther || application.projects.Get().GitHub[0].Name != "Refreshed" {
+	if refreshResponse.Code != http.StatusSeeOther || application.projects.Get().Projects[0].Name != "Refreshed" {
 		t.Fatalf("refresh = %d, cache = %#v", refreshResponse.Code, application.projects.Get())
 	}
 }
@@ -579,7 +622,6 @@ func TestLoadConfigAppliesSecretEnvironment(t *testing.T) {
 	if err := os.WriteFile(path, []byte(`{"ADMIN_PASSWORD_HASH":"file-hash","ADMIN_PASSWORD_PEPPER":"file-pepper","PASTE_SECRETS_FILE":"file.json"}`), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("GITLAB_BEARER_TOKEN", "gitlab-env")
 	t.Setenv("GITHUB_BEARER_TOKEN", "github-env")
 	t.Setenv("ADMIN_PASSWORD_HASH", "env-hash")
 	t.Setenv("ADMIN_PASSWORD_PEPPER", "env-pepper")
@@ -589,7 +631,7 @@ func TestLoadConfigAppliesSecretEnvironment(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if config.GitLabBearerToken != "gitlab-env" || config.GitHubBearerToken != "github-env" ||
+	if config.GitHubBearerToken != "github-env" ||
 		config.AdminPasswordHash != "env-hash" || config.AdminPasswordPepper != "env-pepper" ||
 		config.PasteSecretsFile != "/run/secrets/paste.json" {
 		t.Fatalf("secret environment was not applied: %#v", config)

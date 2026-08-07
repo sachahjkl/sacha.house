@@ -16,10 +16,12 @@ The last three files can be absent until their features create or require them.
 
 Install `curl`, `jq`, `tar`, `coreutils`, `util-linux`, and `systemd`. The setup script creates the `sacha` system user and group.
 
-The GitLab release must provide these links:
+The GitHub release must provide these assets:
 
-- `sacha.house Linux AMD64 Binary`
-- `sacha.house Linux AMD64 SHA256`
+- `sacha.house-linux-amd64`
+- `sacha.house-linux-amd64.sha256`
+
+Create a tag named `v<binary-version>`. The GitHub workflow rejects a tag that does not match the binary version.
 
 ## Configuration
 
@@ -87,7 +89,7 @@ Setup performs these operations:
 
 ## Operations
 
-Update to the latest verified GitLab release:
+Update to the latest verified GitHub release:
 
 ```bash
 sudo sacha-house-update

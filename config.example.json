@@ -1,8 +1,6 @@
 {
   "GITHUB_REST_API_ENDPOINT": "https://api.github.com",
-  "GITLAB_API_ENDPOINT": "https://gitlab.com/api/graphql",
   "GITHUB_GRAPHQL_API_ENDPOINT": "https://api.github.com/graphql",
-  "GITLAB_BEARER_TOKEN": "",
   "GITHUB_BEARER_TOKEN": "",
   "GIT_REPO_ID": "sachahjkl/sacha.house",
   "ADMIN_PASSWORD_HASH": "",

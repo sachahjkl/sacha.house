@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"sacha.house/internal/projects"
 	"sacha.house/internal/web"
@@ -76,7 +77,7 @@ func (app *App) projectsPage(writer http.ResponseWriter, request *http.Request) 
 	cache := app.projects.Get()
 	data := web.ProjectsPageData{
 		PageData: app.page(request.URL.Path, "projects / sacha.house", "My personal projects."),
-		Identity: web.Me, GitLabProjects: projectViews(cache.GitLab), GitHubProjects: projectViews(cache.GitHub),
+		Identity: web.Me, Projects: projectViews(cache.Projects),
 	}
 	app.renderPage(writer, request, web.ProjectsPage(data, navigation(request, http.StatusOK)), http.StatusOK)
 }
@@ -88,6 +89,9 @@ func projectViews(input []projects.Project) []web.ProjectView {
 			Name: project.Name, URL: project.URL, DescriptionHTML: project.DescriptionHTML,
 			AvatarURL: project.AvatarURL, HasAvatar: project.HasAvatar,
 			HSLColor: project.HSLColor, FirstLetter: project.FirstLetter,
+			LastCommitDate: project.LastCommitDate.Format("2006-01-02"),
+			LastCommitTime: project.LastCommitDate.Format(time.RFC3339),
+			LastCommitHash: project.LastCommitHash, LastCommitURL: project.LastCommitURL,
 		}
 	}
 	return views
