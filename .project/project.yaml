@@ -1,0 +1,11 @@
+name: "sacha.house"
+description: "https://sacha.house - Site personnel."
+topics:
+  - "CI/CD"
+  - "odin"
+  - "self-hosted"
+homepage: ""
+source:
+  provider: gitlab
+  namespace: "sachahjkl"
+  path: "sachahjkl/sacha.house"
