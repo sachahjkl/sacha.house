@@ -200,7 +200,7 @@ func careerFR() CareerProfile {
 			{Title: "Outils et systèmes", Items: []string{"nixconfig", "dotfiles", "jav", "dw", "MEGA_CLI", "subtitles-translater", "one_piece_dl_scan", "mrtg-autoinstall", "epicmousemover", "electrorustogram"}},
 			{Title: "Expérimentations", Items: []string{"Achetétéper", "htmx.sacha.house", "Rust Testground", "Win32 Trainer", "Rudimentary File Explorer", "JS Canvas Speed Experiment", "odd_or_even", "prime", "Template Ts Gql Express", "chaussures-api", "pixels"}},
 			{Title: "Projets académiques", Items: []string{"Portefeuille Ethereum Android en Kotlin", "Musées du monde en RDF/SPARQL et Symfony", "Prototype REST hypermédia contre GraphQL en Svelte", "Bibliothèque JSP", "services web dynamiques", "simulation de propagation virale", "emploi du temps web", "algorithmes de sac à dos", "messagerie Java", "Sudoku C#"}},
-			{Title: "Thèmes, configurations et archives", Items: []string{"Grind Brother Grind", "hugo_theme_hjkl.it", "sachahjkl.gitlab.io", "kickstart.nvim", "wofi-arc-dark", "dwm", "st", "dotfiles_old", "basex_chocolatey", "kelio-rewrite", "wackssenger"}},
+			{Title: "Thèmes, configurations et archives", Items: []string{"Grind Brother Grind", "hugo_theme_hjkl.it", "sachahjkl.github.io", "kickstart.nvim", "wofi-arc-dark", "dwm", "st", "dotfiles_old", "basex_chocolatey", "kelio-rewrite", "wackssenger"}},
 		},
 		Publications: []CareerPublication{
 			{Date: "Novembre 2025", Title: "Design draft for chat.sacha.house", URL: "/blog/rust-rewrite-xmaybex"},
