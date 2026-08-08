@@ -37,6 +37,10 @@ templ AdminPage(data AdminPageData, navigation Navigation) {
 	@Document(data.PageData, navigation, AdminContent(data))
 }
 
+templ ProjectRefreshStatus(message string) {
+	<p id="project-refresh-status" class="mt-3 border-2 border-green-300 bg-green-100 p-3 text-sm text-green-800" role="status" aria-live="polite">{ message }</p>
+}
+
 templ AdminContent(data AdminPageData) {
 	<article class="prose mx-auto">
 		<div class="mb-4 flex flex-wrap items-start justify-between gap-3"><h1 class="h1 !mb-0 flex-1">admin</h1><form method="POST" action="/admin/logout" class="shrink-0"><button type="submit" formaction="/admin/logout" class="h-8 select-none bg-red-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#991b1b_inset,0_0_0_1px_#dc2626_inset,0_0.5px_0_1.5px_#f87171_inset] hover:bg-red-700 active:bg-red-800">👋 Logout</button></form></div>
@@ -51,7 +55,7 @@ templ AdminContent(data AdminPageData) {
 		</section>
 		<section><h2>🔐 WebAuthn Passkeys</h2><p><a href="/admin/webauthn">Manage passkeys -&gt;</a></p></section>
 		<section><h2>🕵️ Adresse IP</h2><p>L'IP actuelle avec laquelle tu accèdes au panneau d'admin est <code class="rounded-sm">{ data.IPAddress }</code></p></section>
-		<section><h2>📁 Projets</h2><form id="refresh-projects" method="POST" action="/admin/refresh-projects"><button type="submit" formaction="/admin/refresh-projects" class="h-8 select-none bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset]"><span class="default-text">🚀 Rafraîchir les projets</span></button></form></section>
+		<section><h2>📁 Projets</h2><form id="refresh-projects" method="POST" action="/admin/refresh-projects" data-on:submit__prevent="@post('/admin/refresh-projects')" data-indicator:refreshing><button type="submit" formaction="/admin/refresh-projects" data-attr:disabled="$refreshing" class="h-8 select-none bg-blue-600 px-3 text-sm leading-8 text-zinc-50 shadow-[0_-1px_0_1px_#1e3a8a_inset,0_0_0_1px_#1d4ed8_inset,0_0.5px_0_1.5px_#60a5fa_inset] hover:bg-blue-700 active:bg-blue-800 active:shadow-[-1px_0px_1px_0px_rgba(0,0,0,.2)_inset,1px_0px_1px_0px_rgba(0,0,0,.2)_inset,0px_0.125rem_0px_0px_rgba(0,0,0,.6)_inset] disabled:cursor-wait disabled:opacity-60"><span data-show="!$refreshing">🚀 Rafraîchir les projets</span><span data-show="$refreshing">⏳ Lancement...</span></button></form><p id="project-refresh-status" class="hidden" role="status" aria-live="polite"></p></section>
 	</article>
 }
 

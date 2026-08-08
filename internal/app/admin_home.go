@@ -22,7 +22,15 @@ func (app *App) renderAdminPage(writer http.ResponseWriter, request *http.Reques
 }
 
 func (app *App) adminRefreshProjects(writer http.ResponseWriter, request *http.Request) {
-	app.startProjectsRefresh()
+	started := app.startProjectsRefresh()
+	if isDatastarRequest(request) {
+		message := "Project refresh is already running."
+		if started {
+			message = "Project refresh started."
+		}
+		app.renderPage(writer, request, web.ProjectRefreshStatus(message), http.StatusOK)
+		return
+	}
 	http.Redirect(writer, request, "/admin", http.StatusSeeOther)
 }
 

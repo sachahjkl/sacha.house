@@ -537,6 +537,15 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	if len(application.projects.Get().Projects) == 0 || application.projects.Get().Projects[0].Name != "Refreshed" {
 		t.Fatalf("refresh = %d, cache = %#v", refreshResponse.Code, application.projects.Get())
 	}
+
+	datastarRefresh := httptest.NewRequest(http.MethodPost, "/admin/refresh-projects", nil)
+	datastarRefresh.Header.Set("Datastar-Request", "true")
+	datastarRefresh.AddCookie(cookie)
+	datastarResponse := httptest.NewRecorder()
+	application.ServeHTTP(datastarResponse, datastarRefresh)
+	if datastarResponse.Code != http.StatusOK || !strings.Contains(datastarResponse.Body.String(), "datastar-patch-elements") || !strings.Contains(datastarResponse.Body.String(), "project-refresh-status") {
+		t.Fatalf("Datastar refresh = %d: %s", datastarResponse.Code, datastarResponse.Body.String())
+	}
 }
 
 func TestAdminWebAuthnChallengeConfigAndPasskeyFragment(t *testing.T) {
