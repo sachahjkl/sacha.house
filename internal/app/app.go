@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -39,18 +38,19 @@ type Options struct {
 }
 
 type App struct {
-	handler        http.Handler
-	auth           *auth.Store
-	blog           *blog.Store
-	passkeys       *auth.PasskeyStore
-	pastes         *paste.Store
-	projects       *projects.Store
-	profile        web.LinkedInProfile
-	static         fs.FS
-	config         Config
-	options        Options
-	passwordChecks chan struct{}
-	bootID         string
+	handler         http.Handler
+	auth            *auth.Store
+	blog            *blog.Store
+	passkeys        *auth.PasskeyStore
+	pastes          *paste.Store
+	projects        *projects.Store
+	profile         web.LinkedInProfile
+	static          fs.FS
+	config          Config
+	options         Options
+	passwordChecks  chan struct{}
+	projectsRefresh chan struct{}
+	bootID          string
 }
 
 func NewWithOptions(config Config, options Options) (*App, error) {
@@ -98,15 +98,7 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 	if loadErr != nil && !errors.Is(loadErr, fs.ErrNotExist) {
 		slog.Warn("projects cache is invalid", "error", loadErr)
 	}
-	if loadErr != nil || projectStore.Stale(options.Now(), projectsCacheMaxAge) {
-		go func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-			defer cancel()
-			if err := projectStore.Refresh(ctx); err != nil {
-				slog.Warn("projects cache refresh failed", "error", err)
-			}
-		}()
-	}
+	refreshProjects := loadErr != nil || projectStore.Stale(options.Now(), projectsCacheMaxAge)
 
 	profile, err := (web.FSLinkedInProfileLoader{FS: options.StaticFS, Path: "linkedin_profile.json"}).Load()
 	if err != nil {
@@ -170,10 +162,14 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 	application := &App{
 		auth: authStore, blog: blogStore, passkeys: passkeys, pastes: pasteStore, projects: projectStore,
 		profile: profile, static: options.StaticFS, config: config, options: options,
-		passwordChecks: make(chan struct{}, 2),
-		bootID:         fmt.Sprintf("%d", options.Now().UnixNano()),
+		passwordChecks:  make(chan struct{}, 2),
+		projectsRefresh: make(chan struct{}, 1),
+		bootID:          fmt.Sprintf("%d", options.Now().UnixNano()),
 	}
 	application.handler = application.routes()
+	if refreshProjects {
+		application.startProjectsRefresh()
+	}
 	return application, nil
 }
 

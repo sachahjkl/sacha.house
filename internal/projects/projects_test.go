@@ -48,13 +48,13 @@ func TestClientFetchesMetadataCommitsAndSortsProjects(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(cache.Projects) != 2 || cache.Projects[0].Name != "Metadata Name" || cache.Projects[1].Name != "First" {
+	if len(cache.Projects) != 2 || cache.Projects[0].Name != "Fallback" || cache.Projects[1].Name != "First" {
 		t.Fatalf("projects = %#v", cache.Projects)
 	}
-	if cache.Projects[0].DescriptionHTML != "A &lt;safe&gt; description" || cache.Projects[0].FirstLetter != "M" || !strings.Contains(cache.Projects[0].AvatarURL, "/333333333333/.project/image.webp") {
+	if cache.Projects[0].DescriptionHTML != "three" || cache.Projects[0].FirstLetter != "F" || !strings.Contains(cache.Projects[0].AvatarURL, "/333333333333/.project/image.webp") {
 		t.Errorf("metadata project = %#v", cache.Projects[0])
 	}
-	if !cache.Projects[1].HasAvatar || cache.Projects[1].FirstLetter != "F" || cache.Projects[1].LastCommitHash != "1111111" {
+	if !cache.Projects[1].HasAvatar || !strings.HasPrefix(cache.Projects[1].AvatarURL, "data:image/png;base64,") || cache.Projects[1].FirstLetter != "F" || cache.Projects[1].LastCommitHash != "1111111" {
 		t.Errorf("standardized project = %#v", cache.Projects[1])
 	}
 	if !strings.HasPrefix(cache.Projects[0].HSLColor, "hsl(") {
@@ -177,7 +177,7 @@ source:
 	if err := applyProjectFiles(&project, "sachahjkl/sacha.house", "commit", entries); err != nil {
 		t.Fatal(err)
 	}
-	if project.Name != "sacha.house" || project.DescriptionHTML != "https://sacha.house - Site personnel." {
+	if project.Name != "Repository Name" || project.DescriptionHTML != "Repository description" {
 		t.Fatalf("metadata project = %#v", project)
 	}
 	if project.URL != "https://github.com/sachahjkl/sacha.house" {
@@ -190,6 +190,42 @@ source:
 	}
 	if project.URL != "https://github.com/sachahjkl/sacha.house" {
 		t.Fatalf("URL after homepage metadata = %q", project.URL)
+	}
+
+	project = newProject("", "https://github.com/sachahjkl/sacha.house", "", "")
+	metadata = `name: Fallback Name
+description: A <safe> fallback
+topics:
+  - go
+homepage: https://example.com
+source:
+  provider: gitlab
+  namespace: sachahjkl
+  path: sachahjkl/sacha.house
+`
+	if err := applyProjectFiles(&project, "sachahjkl/sacha.house", "commit", entries); err != nil {
+		t.Fatal(err)
+	}
+	if project.Name != "Fallback Name" || project.DescriptionHTML != "A &lt;safe&gt; fallback" {
+		t.Fatalf("fallback metadata project = %#v", project)
+	}
+}
+
+func TestIdenticonURLIsDeterministic(t *testing.T) {
+	first, err := identiconURL("owner/project")
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := identiconURL("owner/project")
+	if err != nil {
+		t.Fatal(err)
+	}
+	other, err := identiconURL("owner/other")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first != second || first == other || !strings.HasPrefix(first, "data:image/png;base64,") {
+		t.Fatalf("identicons are not deterministic or distinct")
 	}
 }
 
@@ -215,7 +251,7 @@ func (f staticFetcher) Fetch(context.Context) (Cache, error) {
 func TestStoreLoadsRefreshesAndPreservesColors(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "projects_cache.json")
-	historical := `{"version":1,"source":"github","refreshedAt":"2026-01-01T00:00:00Z","projects":[{"name":"Hub","url":"https://hub/1","descriptionHtml":"old","avatarUrl":"","first_letter":"H","hslColor":"hsl(1, 70%, 40%)","hasAvatar":false}]}`
+	historical := `{"version":2,"source":"github","refreshedAt":"2026-01-01T00:00:00Z","projects":[{"name":"Hub","url":"https://hub/1","descriptionHtml":"old","avatarUrl":"","first_letter":"H","hslColor":"hsl(1, 70%, 40%)","hasAvatar":false}]}`
 	if err := os.WriteFile(path, []byte(historical), 0o600); err != nil {
 		t.Fatal(err)
 	}

@@ -55,7 +55,7 @@ func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *
 	if stale {
 		refreshedAt = "2025-12-30T00:00:00Z"
 	}
-	cache := fmt.Sprintf(`{"version":1,"source":"github","refreshedAt":%q,"projects":[]}`, refreshedAt)
+	cache := fmt.Sprintf(`{"version":2,"source":"github","refreshedAt":%q,"projects":[]}`, refreshedAt)
 	if err := os.WriteFile(projectsPath, []byte(cache), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -527,7 +527,14 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	refresh.AddCookie(cookie)
 	refreshResponse := httptest.NewRecorder()
 	application.ServeHTTP(refreshResponse, refresh)
-	if refreshResponse.Code != http.StatusSeeOther || application.projects.Get().Projects[0].Name != "Refreshed" {
+	if refreshResponse.Code != http.StatusSeeOther {
+		t.Fatalf("refresh = %d", refreshResponse.Code)
+	}
+	deadline := time.Now().Add(time.Second)
+	for len(application.projects.Get().Projects) == 0 && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	if len(application.projects.Get().Projects) == 0 || application.projects.Get().Projects[0].Name != "Refreshed" {
 		t.Fatalf("refresh = %d, cache = %#v", refreshResponse.Code, application.projects.Get())
 	}
 }

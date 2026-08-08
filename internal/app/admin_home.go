@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -21,11 +22,23 @@ func (app *App) renderAdminPage(writer http.ResponseWriter, request *http.Reques
 }
 
 func (app *App) adminRefreshProjects(writer http.ResponseWriter, request *http.Request) {
-	ctx, cancel := context.WithTimeout(request.Context(), 30*time.Second)
-	defer cancel()
-	if err := app.projects.Refresh(ctx); err != nil {
-		app.renderAdminPage(writer, request, "Failed to refresh projects.", http.StatusUnprocessableEntity)
-		return
-	}
+	app.startProjectsRefresh()
 	http.Redirect(writer, request, "/admin", http.StatusSeeOther)
+}
+
+func (app *App) startProjectsRefresh() bool {
+	select {
+	case app.projectsRefresh <- struct{}{}:
+		go func() {
+			defer func() { <-app.projectsRefresh }()
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+			defer cancel()
+			if err := app.projects.Refresh(ctx); err != nil {
+				slog.Warn("projects cache refresh failed", "error", err)
+			}
+		}()
+		return true
+	default:
+		return false
+	}
 }

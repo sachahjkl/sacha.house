@@ -1,13 +1,16 @@
 package projects
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"html"
+	"image/png"
 	"io"
 	"net/http"
 	"net/url"
@@ -21,12 +24,13 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/issue9/identicon/v2"
 	"gopkg.in/yaml.v3"
 )
 
 const (
 	maxResponseSize = 8 << 20
-	cacheVersion    = 1
+	cacheVersion    = 2
 	cacheSource     = "github"
 	maxRetries      = 2
 	maxRetryDelay   = 30 * time.Second
@@ -202,7 +206,6 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 					pageInfo { hasNextPage endCursor }
 					nodes {
 						name nameWithOwner url descriptionHtml: descriptionHTML visibility
-						owner { avatarUrl }
 						defaultBranchRef { target { ... on Commit { committedDate abbreviatedOid oid url } } }
 						project: object(expression: "HEAD:.project") {
 							... on Tree { entries { name type object { ... on Blob { text } } } }
@@ -212,14 +215,11 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 			}
 		}`
 	type repository struct {
-		Name            string `json:"name"`
-		NameWithOwner   string `json:"nameWithOwner"`
-		URL             string `json:"url"`
-		DescriptionHTML string `json:"descriptionHtml"`
-		Visibility      string `json:"visibility"`
-		Owner           struct {
-			AvatarURL string `json:"avatarUrl"`
-		} `json:"owner"`
+		Name             string `json:"name"`
+		NameWithOwner    string `json:"nameWithOwner"`
+		URL              string `json:"url"`
+		DescriptionHTML  string `json:"descriptionHtml"`
+		Visibility       string `json:"visibility"`
 		DefaultBranchRef struct {
 			Target struct {
 				CommittedDate  time.Time `json:"committedDate"`
@@ -258,9 +258,17 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 			if !strings.EqualFold(raw.Visibility, "public") {
 				continue
 			}
-			project := newProject(raw.Name, raw.URL, raw.DescriptionHTML, raw.Owner.AvatarURL)
+			project := newProject(raw.Name, raw.URL, raw.DescriptionHTML, "")
 			if err := applyProjectFiles(&project, raw.NameWithOwner, raw.DefaultBranchRef.Target.OID, raw.Project.Entries); err != nil {
 				return nil, fmt.Errorf("read metadata for %s: %w", raw.NameWithOwner, err)
+			}
+			if !project.HasAvatar {
+				avatarURL, err := identiconURL(raw.NameWithOwner)
+				if err != nil {
+					return nil, fmt.Errorf("generate identicon for %s: %w", raw.NameWithOwner, err)
+				}
+				project.AvatarURL = avatarURL
+				project.HasAvatar = true
 			}
 			project.LastCommitDate = raw.DefaultBranchRef.Target.CommittedDate
 			project.LastCommitHash = raw.DefaultBranchRef.Target.AbbreviatedOID
@@ -296,8 +304,11 @@ type projectMetadata struct {
 }
 
 func applyProjectFiles(project *Project, nameWithOwner, commitOID string, entries []projectEntry) error {
-	for _, entry := range entries {
-		if entry.Name == "project.yaml" && entry.Object.Text != nil {
+	if project.Name == "" || project.DescriptionHTML == "" {
+		for _, entry := range entries {
+			if entry.Name != "project.yaml" || entry.Object.Text == nil {
+				continue
+			}
 			var metadata projectMetadata
 			decoder := yaml.NewDecoder(strings.NewReader(*entry.Object.Text))
 			decoder.KnownFields(true)
@@ -310,13 +321,14 @@ func applyProjectFiles(project *Project, nameWithOwner, commitOID string, entrie
 				}
 				return fmt.Errorf("invalid .project/project.yaml: %w", err)
 			}
-			if metadata.Name != "" {
+			if project.Name == "" && metadata.Name != "" {
 				project.Name = metadata.Name
 				project.FirstLetter = firstLetter(metadata.Name)
 			}
-			if metadata.Description != "" {
+			if project.DescriptionHTML == "" && metadata.Description != "" {
 				project.DescriptionHTML = html.EscapeString(metadata.Description)
 			}
+			break
 		}
 	}
 	for _, entry := range entries {
@@ -332,6 +344,14 @@ func applyProjectFiles(project *Project, nameWithOwner, commitOID string, entrie
 		}
 	}
 	return nil
+}
+
+func identiconURL(seed string) (string, error) {
+	var data bytes.Buffer
+	if err := png.Encode(&data, identicon.S2(128).Make([]byte(seed))); err != nil {
+		return "", err
+	}
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(data.Bytes()), nil
 }
 
 func newProject(name, url, descriptionHTML, avatarURL string) Project {

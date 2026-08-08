@@ -5,6 +5,7 @@ go 1.26
 require (
 	github.com/a-h/templ v0.3.1020
 	github.com/go-webauthn/webauthn v0.17.4
+	github.com/issue9/identicon/v2 v2.1.2
 	github.com/starfederation/datastar-go v1.2.2
 	github.com/yuin/goldmark v1.8.5
 	golang.org/x/crypto v0.54.0
