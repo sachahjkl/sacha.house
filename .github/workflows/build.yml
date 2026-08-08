@@ -35,7 +35,6 @@ jobs:
     runs-on: [self-hosted, nixos]
     permissions:
       contents: write
-      packages: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -46,28 +45,10 @@ jobs:
           nix build .#linuxBinary --out-link result-binary
           cp result-binary/sacha.house-linux-amd64 sacha.house-linux-amd64
           sha256sum sacha.house-linux-amd64 > sacha.house-linux-amd64.sha256
-      - name: Build container image
-        run: nix build .#dockerImage --out-link result-image
       - name: Push build outputs to Cachix
         env:
           CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        run: cachix push sachahjkl result-package result-binary result-image
-      - name: Push container image
-        if: github.event_name == 'push'
-        env:
-          GHCR_TOKEN: ${{ github.token }}
-        run: |
-          image="ghcr.io/${GITHUB_REPOSITORY,,}"
-          nix run nixpkgs#skopeo -- copy --insecure-policy \
-            --dest-creds "${GITHUB_ACTOR}:${GHCR_TOKEN}" \
-            docker-archive:result-image \
-            "docker://${image}:${GITHUB_SHA}"
-          if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
-            nix run nixpkgs#skopeo -- copy --insecure-policy \
-              --dest-creds "${GITHUB_ACTOR}:${GHCR_TOKEN}" \
-              docker-archive:result-image \
-              "docker://${image}:latest"
-          fi
+        run: cachix push sachahjkl result-package result-binary
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
