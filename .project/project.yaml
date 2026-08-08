@@ -4,8 +4,8 @@ topics:
   - "CI/CD"
   - "odin"
   - "self-hosted"
-homepage: ""
+homepage: "https://sacha.house"
 source:
-  provider: gitlab
+  provider: github
   namespace: "sachahjkl"
   path: "sachahjkl/sacha.house"

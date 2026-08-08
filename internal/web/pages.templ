@@ -85,7 +85,6 @@ templ AboutContent(data AboutPageData) {
 				<li>GPG Public key: <a href="/sachahjkl.gpg">{ data.GPGFingerprint }</a></li>
 				<li>LinkedIn Profile: <a href={ templ.SafeURL(data.LinkedIn) }>{ data.LinkedIn }</a></li>
 				<li>GitHub Profile: <a href={ templ.SafeURL(data.GitHub) }>{ data.GitHub }</a></li>
-				<li>GitLab Profile: <a href={ templ.SafeURL(data.GitLab) }>{ data.GitLab }</a></li>
 			</ul>
 		</section>
 		<section id="project-build-status"><h2 class="h2">🏗️ Project Build Status</h2><a href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/commit/" + data.Footer.CommitHash) }><img width="300" src={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/actions/workflows/build.yml/badge.svg?branch=master") } loading="lazy" decoding="async" alt="Build Status Badge"/></a></section>

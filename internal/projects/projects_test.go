@@ -166,7 +166,7 @@ topics:
   - "self-hosted"
 homepage: ""
 source:
-  provider: gitlab
+  provider: github
   namespace: "sachahjkl"
   path: "sachahjkl/sacha.house"
 `
@@ -199,7 +199,7 @@ topics:
   - go
 homepage: https://example.com
 source:
-  provider: gitlab
+  provider: github
   namespace: sachahjkl
   path: sachahjkl/sacha.house
 `
