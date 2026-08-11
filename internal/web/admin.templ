@@ -33,8 +33,8 @@ templ AdminPasskeyList(passkeys []PasskeyView) {
 	</div>
 }
 
-templ AdminPage(data AdminPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AdminContent(data))
+templ AdminPage(data AdminPageData) {
+	@Document(data.PageData, AdminContent(data))
 }
 
 templ ProjectRefreshStatus(message string) {
@@ -59,16 +59,16 @@ templ AdminContent(data AdminPageData) {
 	</article>
 }
 
-templ AdminLoginPage(data AdminLoginPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AdminLoginContent(data))
+templ AdminLoginPage(data AdminLoginPageData) {
+	@Document(data.PageData, AdminLoginContent(data))
 }
 
 templ AdminLoginContent(data AdminLoginPageData) {
 	<article class="prose mx-auto"><h1 class="h1">admin login</h1><section><h2>🔒 Login Required</h2><p>Enter your admin password or use a passkey:</p><div id="login-form-container">@LoginForm(data.LoginFormData)</div></section></article>
 }
 
-templ AdminBlogPostsPage(data AdminBlogPostsPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AdminBlogPostsContent(data))
+templ AdminBlogPostsPage(data AdminBlogPostsPageData) {
+	@Document(data.PageData, AdminBlogPostsContent(data))
 }
 
 templ AdminBlogPostsContent(data AdminBlogPostsPageData) {
@@ -92,8 +92,8 @@ templ AdminBlogPostsContent(data AdminBlogPostsPageData) {
 	</article>
 }
 
-templ AdminBlogPostEditorPage(data AdminBlogPostEditorPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AdminBlogPostEditorContent(data))
+templ AdminBlogPostEditorPage(data AdminBlogPostEditorPageData) {
+	@Document(data.PageData, AdminBlogPostEditorContent(data))
 }
 
 templ AdminBlogPostEditorContent(data AdminBlogPostEditorPageData) {
@@ -152,8 +152,8 @@ templ AdminBlogPostEditorContent(data AdminBlogPostEditorPageData) {
 	</article>
 }
 
-templ AdminWebAuthnPage(data AdminWebAuthnPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AdminWebAuthnContent(data))
+templ AdminWebAuthnPage(data AdminWebAuthnPageData) {
+	@Document(data.PageData, AdminWebAuthnContent(data))
 }
 
 templ AdminWebAuthnContent(data AdminWebAuthnPageData) {
@@ -170,8 +170,8 @@ templ AdminWebAuthnContent(data AdminWebAuthnPageData) {
 	</article>
 }
 
-templ AdminPastesPage(data AdminPastesPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AdminPastesContent(data))
+templ AdminPastesPage(data AdminPastesPageData) {
+	@Document(data.PageData, AdminPastesContent(data))
 }
 
 templ AdminPastesContent(data AdminPastesPageData) {
@@ -219,8 +219,8 @@ templ AdminPastesContent(data AdminPastesPageData) {
 	</article>
 }
 
-templ AdminPasteEditorPage(data AdminPasteEditorPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AdminPasteEditorContent(data))
+templ AdminPasteEditorPage(data AdminPasteEditorPageData) {
+	@Document(data.PageData, AdminPasteEditorContent(data))
 }
 
 templ AdminPasteEditorContent(data AdminPasteEditorPageData) {

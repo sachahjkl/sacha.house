@@ -149,7 +149,7 @@ func AdminPasskeyList(passkeys []PasskeyView) templ.Component {
 	})
 }
 
-func AdminPage(data AdminPageData, navigation Navigation) templ.Component {
+func AdminPage(data AdminPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -170,7 +170,7 @@ func AdminPage(data AdminPageData, navigation Navigation) templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AdminContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AdminContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -295,7 +295,7 @@ func AdminContent(data AdminPageData) templ.Component {
 	})
 }
 
-func AdminLoginPage(data AdminLoginPageData, navigation Navigation) templ.Component {
+func AdminLoginPage(data AdminLoginPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -316,7 +316,7 @@ func AdminLoginPage(data AdminLoginPageData, navigation Navigation) templ.Compon
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AdminLoginContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AdminLoginContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -361,7 +361,7 @@ func AdminLoginContent(data AdminLoginPageData) templ.Component {
 	})
 }
 
-func AdminBlogPostsPage(data AdminBlogPostsPageData, navigation Navigation) templ.Component {
+func AdminBlogPostsPage(data AdminBlogPostsPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -382,7 +382,7 @@ func AdminBlogPostsPage(data AdminBlogPostsPageData, navigation Navigation) temp
 			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AdminBlogPostsContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AdminBlogPostsContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -553,7 +553,7 @@ func AdminBlogPostsContent(data AdminBlogPostsPageData) templ.Component {
 	})
 }
 
-func AdminBlogPostEditorPage(data AdminBlogPostEditorPageData, navigation Navigation) templ.Component {
+func AdminBlogPostEditorPage(data AdminBlogPostEditorPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -574,7 +574,7 @@ func AdminBlogPostEditorPage(data AdminBlogPostEditorPageData, navigation Naviga
 			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AdminBlogPostEditorContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AdminBlogPostEditorContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -830,7 +830,7 @@ func AdminBlogPostEditorContent(data AdminBlogPostEditorPageData) templ.Componen
 	})
 }
 
-func AdminWebAuthnPage(data AdminWebAuthnPageData, navigation Navigation) templ.Component {
+func AdminWebAuthnPage(data AdminWebAuthnPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -851,7 +851,7 @@ func AdminWebAuthnPage(data AdminWebAuthnPageData, navigation Navigation) templ.
 			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AdminWebAuthnContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AdminWebAuthnContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -919,7 +919,7 @@ func AdminWebAuthnContent(data AdminWebAuthnPageData) templ.Component {
 	})
 }
 
-func AdminPastesPage(data AdminPastesPageData, navigation Navigation) templ.Component {
+func AdminPastesPage(data AdminPastesPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -940,7 +940,7 @@ func AdminPastesPage(data AdminPastesPageData, navigation Navigation) templ.Comp
 			templ_7745c5c3_Var40 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AdminPastesContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AdminPastesContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1233,7 +1233,7 @@ func AdminPastesContent(data AdminPastesPageData) templ.Component {
 	})
 }
 
-func AdminPasteEditorPage(data AdminPasteEditorPageData, navigation Navigation) templ.Component {
+func AdminPasteEditorPage(data AdminPasteEditorPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1254,7 +1254,7 @@ func AdminPasteEditorPage(data AdminPasteEditorPageData, navigation Navigation) 
 			templ_7745c5c3_Var56 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AdminPasteEditorContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AdminPasteEditorContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

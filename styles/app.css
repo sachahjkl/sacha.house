@@ -107,14 +107,6 @@ nav a.active {
   @apply bg-textColor text-bgColor;
 }
 
-#nav-indicator {
-  display: none;
-}
-
-.datastar-request #nav-indicator {
-  display: inline;
-}
-
 .blog-page a {
   @apply underline;
 }

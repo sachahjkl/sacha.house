@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/starfederation/datastar-go/datastar"
+
 	"sacha.house/internal/web"
 )
 
@@ -18,7 +20,7 @@ func (app *App) renderAdminPage(writer http.ResponseWriter, request *http.Reques
 		PageData:  app.page(request.URL.Path, "admin / sacha.house", "Administration panel."),
 		IPAddress: app.requestIP(request), Error: message, PasteEnabled: app.pastes != nil,
 	}
-	app.renderPage(writer, request, web.AdminPage(data, navigation(request, status)), status)
+	renderHTML(writer, request, web.AdminPage(data), status)
 }
 
 func (app *App) adminRefreshProjects(writer http.ResponseWriter, request *http.Request) {
@@ -28,7 +30,11 @@ func (app *App) adminRefreshProjects(writer http.ResponseWriter, request *http.R
 		if started {
 			message = "Project refresh started."
 		}
-		app.renderPage(writer, request, web.ProjectRefreshStatus(message), http.StatusOK)
+		writer.Header().Add("Vary", "Accept")
+		writer.Header().Add("Vary", "Datastar-Request")
+		writer.Header().Add("Vary", "Accept-Encoding")
+		sse := datastar.NewSSE(writer, request, datastar.WithCompression())
+		_ = sse.PatchElementTempl(web.ProjectRefreshStatus(message))
 		return
 	}
 	http.Redirect(writer, request, "/admin", http.StatusSeeOther)

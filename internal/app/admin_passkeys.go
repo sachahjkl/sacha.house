@@ -22,7 +22,7 @@ func (app *App) renderAdminWebAuthn(writer http.ResponseWriter, request *http.Re
 		PageData: app.page(request.URL.Path, "passkeys / admin / sacha.house", "Manage admin passkeys."),
 		Passkeys: app.passkeyViews(), Error: message,
 	}
-	app.renderPage(writer, request, web.AdminWebAuthnPage(data, navigation(request, status)), status)
+	renderHTML(writer, request, web.AdminWebAuthnPage(data), status)
 }
 
 func (app *App) adminPasskeys(writer http.ResponseWriter, request *http.Request) {

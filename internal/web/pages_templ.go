@@ -12,7 +12,7 @@ import (
 	"fmt"
 )
 
-func HomePage(data HomePageData, navigation Navigation) templ.Component {
+func HomePage(data HomePageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -33,7 +33,7 @@ func HomePage(data HomePageData, navigation Navigation) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, HomeContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, HomeContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -117,7 +117,7 @@ func HomeContent(data HomePageData) templ.Component {
 	})
 }
 
-func AboutPage(data AboutPageData, navigation Navigation) templ.Component {
+func AboutPage(data AboutPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -138,7 +138,7 @@ func AboutPage(data AboutPageData, navigation Navigation) templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, AboutContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, AboutContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -617,7 +617,7 @@ func AboutContent(data AboutPageData) templ.Component {
 	})
 }
 
-func ProjectsPage(data ProjectsPageData, navigation Navigation) templ.Component {
+func ProjectsPage(data ProjectsPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -638,7 +638,7 @@ func ProjectsPage(data ProjectsPageData, navigation Navigation) templ.Component 
 			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, ProjectsContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, ProjectsContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -892,7 +892,7 @@ func ProjectList(projects []ProjectView) templ.Component {
 	})
 }
 
-func BlogPage(data BlogPageData, navigation Navigation) templ.Component {
+func BlogPage(data BlogPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -913,7 +913,7 @@ func BlogPage(data BlogPageData, navigation Navigation) templ.Component {
 			templ_7745c5c3_Var50 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, BlogContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, BlogContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1074,7 +1074,7 @@ func BlogContent(data BlogPageData) templ.Component {
 	})
 }
 
-func PostPage(data PostPageData, navigation Navigation) templ.Component {
+func PostPage(data PostPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1095,7 +1095,7 @@ func PostPage(data PostPageData, navigation Navigation) templ.Component {
 			templ_7745c5c3_Var58 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Document(data.PageData, navigation, PostContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Document(data.PageData, PostContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1205,7 +1205,7 @@ func PostContent(data PostPageData) templ.Component {
 	})
 }
 
-func TeapotPage(data TeapotPageData, navigation Navigation) templ.Component {
+func TeapotPage(data TeapotPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1226,7 +1226,7 @@ func TeapotPage(data TeapotPageData, navigation Navigation) templ.Component {
 			templ_7745c5c3_Var65 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = BareDocument(data.PageData, navigation, TeapotContent(data)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = BareDocument(data.PageData, TeapotContent(data)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

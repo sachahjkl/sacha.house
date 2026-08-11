@@ -1,13 +1,5 @@
 package web
 
-// Navigation describes the marker used by enhanced Datastar navigation.
-type Navigation struct {
-	Enabled bool
-	URL     string
-	Status  int
-	History string
-}
-
 type BrewMessage struct {
 	Text  string
 	Emoji string

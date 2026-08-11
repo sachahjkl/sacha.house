@@ -30,7 +30,7 @@ func (app *App) home(writer http.ResponseWriter, request *http.Request) {
 		PageData: app.page(request.URL.Path, "home / sacha.house", web.Me.FullName+"'s personal website."),
 		Mail:     web.Me.Mail, CV: web.Me.CurriculumVitae, Resume: "/resume",
 	}
-	app.renderPage(writer, request, web.HomePage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.HomePage(data), http.StatusOK)
 }
 
 func (app *App) careerPage(writer http.ResponseWriter, request *http.Request, full bool) {
@@ -48,7 +48,7 @@ func (app *App) careerPage(writer http.ResponseWriter, request *http.Request, fu
 	data := web.CareerPageData{
 		PageData: page, Identity: web.Me, Age: web.Me.AgeAt(app.options.Now()), Full: full, Profile: profile,
 	}
-	app.renderPage(writer, request, web.CareerPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.CareerPage(data), http.StatusOK)
 }
 
 func (app *App) resume(writer http.ResponseWriter, request *http.Request) {
@@ -70,7 +70,7 @@ func (app *App) about(writer http.ResponseWriter, request *http.Request) {
 		Identity: identity, Age: identity.AgeAt(app.options.Now()),
 		LinkedInExperiences: app.profile.Experiences, LinkedInEducation: app.profile.Education,
 	}
-	app.renderPage(writer, request, web.AboutPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.AboutPage(data), http.StatusOK)
 }
 
 func (app *App) projectsPage(writer http.ResponseWriter, request *http.Request) {
@@ -79,7 +79,7 @@ func (app *App) projectsPage(writer http.ResponseWriter, request *http.Request) 
 		PageData: app.page(request.URL.Path, "projects / sacha.house", "My personal projects."),
 		Identity: web.Me, Projects: projectViews(cache.Projects),
 	}
-	app.renderPage(writer, request, web.ProjectsPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.ProjectsPage(data), http.StatusOK)
 }
 
 func projectViews(input []projects.Project) []web.ProjectView {
@@ -111,7 +111,7 @@ func (app *App) teapot(writer http.ResponseWriter, request *http.Request) {
 	default:
 		data.BrewMessage = web.BrewMessage{Text: fmt.Sprintf("What kind of a drink is %q ???", request.URL.Query().Get("drink")), Emoji: "🤮"}
 	}
-	app.renderPage(writer, request, web.TeapotPage(data, navigation(request, status)), status)
+	renderHTML(writer, request, web.TeapotPage(data), status)
 }
 
 func randomString(length int) string {

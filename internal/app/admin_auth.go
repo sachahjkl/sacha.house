@@ -81,7 +81,7 @@ func (app *App) renderAdminLogin(writer http.ResponseWriter, request *http.Reque
 		PageData:      app.page("/admin/login", "admin login / sacha.house", "Admin login."),
 		LoginFormData: web.LoginFormData{Error: message},
 	}
-	app.renderPage(writer, request, web.AdminLoginPage(data, navigation(request, status)), status)
+	renderHTML(writer, request, web.AdminLoginPage(data), status)
 }
 
 func (app *App) adminLogout(writer http.ResponseWriter, request *http.Request) {

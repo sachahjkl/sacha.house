@@ -4,8 +4,8 @@ import (
 	"fmt"
 )
 
-templ HomePage(data HomePageData, navigation Navigation) {
-	@Document(data.PageData, navigation, HomeContent(data))
+templ HomePage(data HomePageData) {
+	@Document(data.PageData, HomeContent(data))
 }
 
 templ HomeContent(data HomePageData) {
@@ -25,8 +25,8 @@ templ HomeContent(data HomePageData) {
 	</article>
 }
 
-templ AboutPage(data AboutPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, AboutContent(data))
+templ AboutPage(data AboutPageData) {
+	@Document(data.PageData, AboutContent(data))
 }
 
 templ AboutContent(data AboutPageData) {
@@ -92,8 +92,8 @@ templ AboutContent(data AboutPageData) {
 	</article>
 }
 
-templ ProjectsPage(data ProjectsPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, ProjectsContent(data))
+templ ProjectsPage(data ProjectsPageData) {
+	@Document(data.PageData, ProjectsContent(data))
 }
 
 templ ProjectsContent(data ProjectsPageData) {
@@ -132,8 +132,8 @@ templ ProjectList(projects []ProjectView) {
 	</ul>
 }
 
-templ BlogPage(data BlogPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, BlogContent(data))
+templ BlogPage(data BlogPageData) {
+	@Document(data.PageData, BlogContent(data))
 }
 
 templ BlogContent(data BlogPageData) {
@@ -157,8 +157,8 @@ templ BlogContent(data BlogPageData) {
 	</article>
 }
 
-templ PostPage(data PostPageData, navigation Navigation) {
-	@Document(data.PageData, navigation, PostContent(data))
+templ PostPage(data PostPageData) {
+	@Document(data.PageData, PostContent(data))
 }
 
 templ PostContent(data PostPageData) {
@@ -167,8 +167,8 @@ templ PostContent(data PostPageData) {
 	<article class="prose">@templ.Raw(data.Post.HTML)</article>
 }
 
-templ TeapotPage(data TeapotPageData, navigation Navigation) {
-	@BareDocument(data.PageData, navigation, TeapotContent(data))
+templ TeapotPage(data TeapotPageData) {
+	@BareDocument(data.PageData, TeapotContent(data))
 }
 
 templ TeapotContent(data TeapotPageData) {

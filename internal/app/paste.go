@@ -16,7 +16,7 @@ func (app *App) adminPastes(writer http.ResponseWriter, request *http.Request) {
 	}
 	if app.pastes == nil {
 		data.Error = "Encrypted pastes are disabled. Set PASTE_ENABLED and PASTE_SECRETS_FILE."
-		app.renderPage(writer, request, web.AdminPastesPage(data, navigation(request, http.StatusServiceUnavailable)), http.StatusServiceUnavailable)
+		renderHTML(writer, request, web.AdminPastesPage(data), http.StatusServiceUnavailable)
 		return
 	}
 	summaries, truncated, err := app.pastes.List(request.Context())
@@ -35,7 +35,7 @@ func (app *App) adminPastes(writer http.ResponseWriter, request *http.Request) {
 		data.Truncated = true
 		setPasteRetryAfter(writer, err)
 	}
-	app.renderPage(writer, request, web.AdminPastesPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.AdminPastesPage(data), http.StatusOK)
 }
 
 func (app *App) adminNewPaste(writer http.ResponseWriter, request *http.Request) {
@@ -189,7 +189,7 @@ func (app *App) renderPasteEditor(writer http.ResponseWriter, request *http.Requ
 		PageData: app.page(request.URL.Path, "encrypted paste editor / admin / sacha.house", "Admin encrypted paste editor."),
 		Form:     form, Error: message, Notice: notice,
 	}
-	app.renderPage(writer, request, web.AdminPasteEditorPage(data, navigation(request, status)), status)
+	renderHTML(writer, request, web.AdminPasteEditorPage(data), status)
 }
 
 func pasteForm(loaded paste.Loaded) web.PasteForm {

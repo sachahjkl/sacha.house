@@ -69,3 +69,15 @@ func renderHTML(writer http.ResponseWriter, request *http.Request, component tem
 	writer.WriteHeader(status)
 	_, _ = writer.Write(output.Bytes())
 }
+
+func isDatastarRequest(request *http.Request) bool {
+	if strings.EqualFold(strings.TrimSpace(request.Header.Get("Datastar-Request")), "true") {
+		return true
+	}
+	for _, value := range strings.Split(request.Header.Get("Accept"), ",") {
+		if strings.TrimSpace(strings.SplitN(value, ";", 2)[0]) == "text/event-stream" {
+			return true
+		}
+	}
+	return false
+}

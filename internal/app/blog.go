@@ -34,7 +34,7 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 		PageData:   app.page(request.URL.Path, "blog / sacha.house", "My blog about subjects often related to computer science."),
 		YearGroups: groups,
 	}
-	app.renderPage(writer, request, web.BlogPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.BlogPage(data), http.StatusOK)
 }
 
 func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
@@ -55,7 +55,7 @@ func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 		Post:     view,
 	}
 	data.PageData.Language = document.Metadata.Language
-	app.renderPage(writer, request, web.PostPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.PostPage(data), http.StatusOK)
 }
 
 func postView(document blog.Document) web.PostView {

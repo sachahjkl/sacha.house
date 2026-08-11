@@ -39,21 +39,10 @@ templ Head(data PageData) {
 		if data.AdminScripts {
 			<script defer src={ templ.SafeURL("/static/js/admin.js?v=" + data.StyleVersion) }></script>
 		}
-		<script type="module" src={ templ.SafeURL("/static/js/navigation.js?v=" + data.StyleVersion) }></script>
 	</head>
 }
 
-templ NavigationMarker(navigation Navigation) {
-	if navigation.Enabled {
-		if navigation.History != "" {
-			<div id="datastar-navigation" hidden data-url={ navigation.URL } data-status={ fmt.Sprintf("%d", navigation.Status) } data-history={ navigation.History }></div>
-		} else {
-			<div id="datastar-navigation" hidden data-url={ navigation.URL } data-status={ fmt.Sprintf("%d", navigation.Status) }></div>
-		}
-	}
-}
-
-templ Document(data PageData, navigation Navigation, body templ.Component) {
+templ Document(data PageData, body templ.Component) {
 	<!doctype html>
 	<html lang={ data.Language }>
 		@Head(data)
@@ -61,18 +50,16 @@ templ Document(data PageData, navigation Navigation, body templ.Component) {
 			@Header(data)
 			<main id="main" class="m-auto max-w-5xl p-3 pb-16">@body</main>
 			@SiteFooter(data)
-			@NavigationMarker(navigation)
 		</body>
 	</html>
 }
 
-templ BareDocument(data PageData, navigation Navigation, body templ.Component) {
+templ BareDocument(data PageData, body templ.Component) {
 	<!doctype html>
 	<html lang={ data.Language }>
 		@Head(data)
 		<body id="page-body" class="bg-bgColor text-textColor">
 			@body
-			@NavigationMarker(navigation)
 		</body>
 	</html>
 }
@@ -81,7 +68,7 @@ templ Header(data PageData) {
 	<header class="bg-bgColor sticky top-0 z-10 px-3">
 		<nav>
 			<fieldset class="border-textColor border-2 p-2 px-4">
-					<legend class="ml-3 px-2">Navigation <span id="nav-indicator" role="status" aria-live="polite">loading...</span></legend>
+					<legend class="ml-3 px-2">Navigation</legend>
 				<ul class="hidden flex-wrap gap-3 whitespace-nowrap sm:flex">
 					for index, item := range data.NavItems {
 						<li class="flex-[100%] sm:flex-none"><a href={ templ.SafeURL(item.Pathname) } class={ templ.KV("active", item.IsActive) } if item.IsActive { aria-current="page" }>{ item.Icon } { item.Title }</a></li>

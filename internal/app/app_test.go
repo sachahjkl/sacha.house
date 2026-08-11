@@ -62,7 +62,6 @@ func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *
 	assets := fstest.MapFS{
 		"linkedin_profile.json": &fstest.MapFile{Data: []byte(`{"experiences":[],"education":[]}`)},
 		"hello.txt":             &fstest.MapFile{Data: []byte("static")},
-		"js/navigation.js":      &fstest.MapFile{Data: []byte("if (!patched) throw error('failed')")},
 	}
 	hash, err := auth.HashPassword("test-password", []byte("test-pepper"))
 	if err != nil {
@@ -289,38 +288,6 @@ func TestMediaRejectsNonAssetPaths(t *testing.T) {
 	}
 }
 
-func TestDatastarNavigationSendsOneDocumentPatch(t *testing.T) {
-	application := newTestApp(t)
-	request := httptest.NewRequest(http.MethodGet, "/about?from=home&datastar=%7B%7D", nil)
-	request.Header.Set("Datastar-Request", "true")
-	request.Header.Set("Datastar-History", "replace")
-	response := httptest.NewRecorder()
-	application.ServeHTTP(response, request)
-
-	body := response.Body.String()
-	if response.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", response.Code)
-	}
-	if response.Header().Get("Content-Type") != "text/event-stream" {
-		t.Fatalf("Content-Type = %q", response.Header().Get("Content-Type"))
-	}
-	if count := strings.Count(body, "event: datastar-patch-elements"); count != 1 {
-		t.Fatalf("patch event count = %d, want 1", count)
-	}
-	for _, value := range []string{
-		`id="page-title"`,
-		`id="page-body"`,
-		`id="datastar-navigation" hidden`,
-		`data-url="/about?from=home"`,
-		`data-history="replace"`,
-		`data-status="200"`,
-	} {
-		if !strings.Contains(body, value) {
-			t.Errorf("SSE body does not contain %q", value)
-		}
-	}
-}
-
 func TestHomePreservesASCIILogoLines(t *testing.T) {
 	application := newTestApp(t)
 	response := httptest.NewRecorder()
@@ -342,48 +309,6 @@ func TestAdminScriptLoadsOnlyOnAdminPages(t *testing.T) {
 	application.ServeHTTP(login, httptest.NewRequest(http.MethodGet, "/admin/login", nil))
 	if !strings.Contains(login.Body.String(), "/static/js/admin.js") {
 		t.Fatal("admin page does not load admin JavaScript")
-	}
-}
-
-func TestDatastarTeapotKeepsLogicalStatus(t *testing.T) {
-	application := newTestApp(t)
-	request := httptest.NewRequest(http.MethodGet, "/teapot?drink=coffee", nil)
-	request.Header.Set("Accept", "text/event-stream")
-	response := httptest.NewRecorder()
-	application.ServeHTTP(response, request)
-	if response.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", response.Code)
-	}
-	if !strings.Contains(response.Body.String(), `data-status="418"`) {
-		t.Fatalf("SSE body lacks logical 418 status: %s", response.Body.String())
-	}
-}
-
-func TestDatastarNavigationNegotiatesCompression(t *testing.T) {
-	application := newTestApp(t)
-	request := httptest.NewRequest(http.MethodGet, "/about", nil)
-	request.Header.Set("Datastar-Request", "true")
-	request.Header.Set("Accept-Encoding", "gzip, deflate, br, zstd")
-	response := httptest.NewRecorder()
-	application.ServeHTTP(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", response.Code)
-	}
-	if encoding := response.Header().Get("Content-Encoding"); encoding != "br" {
-		t.Fatalf("Content-Encoding = %q, want %q", encoding, "br")
-	}
-}
-
-func TestNavigationControllerAcceptsPatchedErrorPage(t *testing.T) {
-	application := newTestApp(t)
-	response := httptest.NewRecorder()
-	application.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/static/js/navigation.js", nil))
-	if response.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", response.Code)
-	}
-	if !strings.Contains(response.Body.String(), "if (!patched)") {
-		t.Fatalf("navigation controller rejects patched error pages: %s", response.Body.String())
 	}
 }
 
@@ -453,18 +378,18 @@ func TestAdminResponsesDisableCaching(t *testing.T) {
 	}
 }
 
-func TestAdminDatastarFormErrorUsesLogical422(t *testing.T) {
+func TestAdminLoginFormErrorUsesLogical422(t *testing.T) {
 	application := newTestApp(t)
 	request := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader("password=wrong"))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Set("Datastar-Request", "true")
 	response := httptest.NewRecorder()
 	application.ServeHTTP(response, request)
-	if response.Code != http.StatusOK || response.Header().Get("Content-Type") != "text/event-stream" {
-		t.Fatalf("enhanced error = %d %q", response.Code, response.Header().Get("Content-Type"))
+	if response.Code != http.StatusUnprocessableEntity || response.Header().Get("Content-Type") != "text/html; charset=utf-8" {
+		t.Fatalf("login error = %d %q", response.Code, response.Header().Get("Content-Type"))
 	}
-	if !strings.Contains(response.Body.String(), `data-status="422"`) || !strings.Contains(response.Body.String(), "Invalid password") {
-		t.Fatalf("enhanced error body = %s", response.Body.String())
+	if !strings.Contains(response.Body.String(), "Invalid password") {
+		t.Fatalf("login error body = %s", response.Body.String())
 	}
 }
 

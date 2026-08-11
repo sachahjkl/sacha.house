@@ -1491,12 +1491,6 @@ nav a:hover, nav a.active {
   background-color: var(--color-textColor);
   color: var(--color-bgColor);
 }
-#nav-indicator {
-  display: none;
-}
-.datastar-request #nav-indicator {
-  display: inline;
-}
 .blog-page a {
   text-decoration-line: underline;
 }

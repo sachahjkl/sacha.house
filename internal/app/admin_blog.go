@@ -27,7 +27,7 @@ func (app *App) adminBlogPosts(writer http.ResponseWriter, request *http.Request
 		PageData: app.page(request.URL.Path, "blogposts / admin / sacha.house", "Manage blogposts."),
 		Posts:    views,
 	}
-	app.renderPage(writer, request, web.AdminBlogPostsPage(data, navigation(request, http.StatusOK)), http.StatusOK)
+	renderHTML(writer, request, web.AdminBlogPostsPage(data), http.StatusOK)
 }
 
 func (app *App) adminNewBlogPost(writer http.ResponseWriter, request *http.Request) {
@@ -122,7 +122,7 @@ func (app *App) renderBlogEditor(writer http.ResponseWriter, request *http.Reque
 		PageData: app.page(request.URL.Path, title, "Edit a blogpost."),
 		Form:     form, Error: message, PreviewHTML: preview,
 	}
-	app.renderPage(writer, request, web.AdminBlogPostEditorPage(data, navigation(request, status)), status)
+	renderHTML(writer, request, web.AdminBlogPostEditorPage(data), status)
 }
 
 func (app *App) adminUploadBlogImage(writer http.ResponseWriter, request *http.Request) {

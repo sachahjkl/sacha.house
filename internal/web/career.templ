@@ -2,7 +2,7 @@ package web
 
 import "fmt"
 
-templ CareerPage(data CareerPageData, navigation Navigation) {
+templ CareerPage(data CareerPageData) {
 	<!doctype html>
 	<html lang={ data.Profile.Language }>
 		<head>
@@ -14,7 +14,6 @@ templ CareerPage(data CareerPageData, navigation Navigation) {
 		</head>
 		<body id="page-body">
 			@CareerContent(data)
-			@NavigationMarker(navigation)
 		</body>
 	</html>
 }
