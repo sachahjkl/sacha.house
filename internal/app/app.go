@@ -168,7 +168,7 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 	}
 	application.handler = application.routes()
 	if refreshProjects {
-		application.startProjectsRefresh()
+		_, _ = application.startProjectsRefresh()
 	}
 	return application, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
@@ -26,6 +27,12 @@ type testProjectsFetcher struct{}
 
 func (testProjectsFetcher) Fetch(context.Context) (projects.Cache, error) {
 	return projects.Cache{Projects: []projects.Project{{Name: "Refreshed", URL: "https://example.com/refreshed"}}}, nil
+}
+
+type failingProjectsFetcher struct{}
+
+func (failingProjectsFetcher) Fetch(context.Context) (projects.Cache, error) {
+	return projects.Cache{}, errors.New("refresh failed")
 }
 
 func newTestApp(t *testing.T) *App {
@@ -468,8 +475,34 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	datastarRefresh.AddCookie(cookie)
 	datastarResponse := httptest.NewRecorder()
 	application.ServeHTTP(datastarResponse, datastarRefresh)
-	if datastarResponse.Code != http.StatusOK || !strings.Contains(datastarResponse.Body.String(), "datastar-patch-elements") || !strings.Contains(datastarResponse.Body.String(), "project-refresh-status") {
+	if datastarResponse.Code != http.StatusOK || !strings.Contains(datastarResponse.Body.String(), "datastar-patch-elements") ||
+		!strings.Contains(datastarResponse.Body.String(), "Rafraîchissement des projets en cours") ||
+		!strings.Contains(datastarResponse.Body.String(), "Projets rafraîchis avec succès") {
 		t.Fatalf("Datastar refresh = %d: %s", datastarResponse.Code, datastarResponse.Body.String())
+	}
+	deadline = time.Now().Add(time.Second)
+	for len(application.projectsRefresh) != 0 && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	if len(application.projectsRefresh) != 0 {
+		t.Fatal("Datastar project refresh did not finish")
+	}
+}
+
+func TestAdminProjectRefreshReportsFailure(t *testing.T) {
+	application := newTestAppWithFetcher(t, failingProjectsFetcher{}, false)
+	request := httptest.NewRequest(http.MethodPost, "/admin/refresh-projects", nil)
+	request.Header.Set("Datastar-Request", "true")
+	request.AddCookie(adminCookie(t, application))
+	response := httptest.NewRecorder()
+
+	application.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK ||
+		!strings.Contains(response.Body.String(), "Rafraîchissement des projets en cours") ||
+		!strings.Contains(response.Body.String(), "Échec du rafraîchissement des projets") ||
+		!strings.Contains(response.Body.String(), "border-red-300") {
+		t.Fatalf("Datastar refresh failure = %d: %s", response.Code, response.Body.String())
 	}
 }
 
