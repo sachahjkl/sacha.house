@@ -322,13 +322,16 @@ func TestAdminScriptLoadsOnlyOnAdminPages(t *testing.T) {
 	application := newTestApp(t)
 	home := httptest.NewRecorder()
 	application.ServeHTTP(home, httptest.NewRequest(http.MethodGet, "/", nil))
-	if strings.Contains(home.Body.String(), "/static/js/admin.js") {
+	if strings.Contains(home.Body.String(), "/static/js/admin.js") || strings.Contains(home.Body.String(), "/static/js/datastar.js") {
 		t.Fatal("public page loads admin JavaScript")
 	}
 	login := httptest.NewRecorder()
 	application.ServeHTTP(login, httptest.NewRequest(http.MethodGet, "/admin/login", nil))
 	if !strings.Contains(login.Body.String(), "/static/js/admin.js") {
 		t.Fatal("admin page does not load admin JavaScript")
+	}
+	if !strings.Contains(login.Body.String(), "/static/js/datastar.js") {
+		t.Fatal("admin page does not load Datastar")
 	}
 }
 

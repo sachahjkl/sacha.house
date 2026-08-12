@@ -37,6 +37,7 @@ templ Head(data PageData) {
 		<meta name="twitter:card" content="summary_large_image"/>
 		<meta name="author" content={ data.SEO.Author }/>
 		if data.AdminScripts {
+			<script type="module" src={ templ.SafeURL("/static/js/datastar.js?v=" + data.StyleVersion) }></script>
 			<script defer src={ templ.SafeURL("/static/js/admin.js?v=" + data.StyleVersion) }></script>
 		}
 	</head>
