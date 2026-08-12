@@ -162,7 +162,7 @@ func careerFR() CareerProfile {
 				Summary: "Rôle temporaire consacré à l'inventaire et à la cartographie des technologies, serveurs et logiciels du système d'information, dans la continuité du travail mené sur la plateforme HOPEX.",
 			},
 			{
-				Period: "Avril – août 2019", Role: "Administrateur systèmes stagiaire", Company: "Italic",
+				Period: "Avril – août 2019", Role: "Administrateur systèmes stagiaire", Company: "Italic", FullOnly: true,
 				Summary: "Administration de 5 à 10 VPS OVH sous Linux pour l'hébergement de sites clients. Automatisation en Bash de la configuration, des sauvegardes, des déploiements et de la supervision d'une infrastructure LAMP.",
 				Details: []CareerDetail{
 					{Title: "Automatisation et exploitation", Text: "Des scripts Bash ont automatisé la configuration des serveurs, les sauvegardes, les déploiements et la supervision. L'exploitation reposait sur Apache, PHP, MySQL ou MariaDB, SSH et rsync. Une étude complémentaire a exploré l'automatisation de relevés bancaires par EBICS avec Ruby."},
@@ -275,7 +275,7 @@ func careerEN() CareerProfile {
 			Environment: "TypeScript, Webpack 5, Babel, Sass, PowerShell, C#, VBScript, XML, JSON, SOAP, REST, MEGA HOPEX, IIS, SAML2, SQL Server",
 		},
 		{Period: "June – October 2022", Role: "Product Owner", Company: "AG2R La Mondiale", FullOnly: true, Summary: "Temporary role focused on the inventory and mapping of information-system technologies, servers, and software, extending the work performed on the HOPEX platform."},
-		{Period: "April – August 2019", Role: "Systems administration intern", Company: "Italic", Summary: "Administered 5 to 10 Linux VPS instances hosting customer websites. Bash automation covered configuration, backups, deployments, and monitoring for the LAMP infrastructure.", Details: []CareerDetail{{Title: "Automation and operations", Text: "Bash scripts automated server configuration, backups, deployments, and monitoring. Operations relied on Apache, PHP, MySQL or MariaDB, SSH, and rsync. Additional research explored Ruby-based automation of EBICS banking statements."}}, Environment: "Linux, Bash, Apache, PHP, MySQL/MariaDB, SSH, rsync, OVH, Ruby, EBICS"},
+		{Period: "April – August 2019", Role: "Systems administration intern", Company: "Italic", FullOnly: true, Summary: "Administered 5 to 10 Linux VPS instances hosting customer websites. Bash automation covered configuration, backups, deployments, and monitoring for the LAMP infrastructure.", Details: []CareerDetail{{Title: "Automation and operations", Text: "Bash scripts automated server configuration, backups, deployments, and monitoring. Operations relied on Apache, PHP, MySQL or MariaDB, SSH, and rsync. Additional research explored Ruby-based automation of EBICS banking statements."}}, Environment: "Linux, Bash, Apache, PHP, MySQL/MariaDB, SSH, rsync, OVH, Ruby, EBICS"},
 	}
 	profile.Education = []CareerEducation{
 		{Period: "2019 – 2022", Degree: "Engineering degree in computer science, information systems", School: "Conservatoire national des arts et métiers", Description: "My thesis covered obsolescence management, project scoping, change management, and the production migration to MEGA HOPEX V5. I acted as joint technical project lead."},

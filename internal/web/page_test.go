@@ -43,3 +43,22 @@ func TestNewPageDataDefaultsLanguageToEnglish(t *testing.T) {
 		t.Fatalf("Language = %q, want en", data.Language)
 	}
 }
+
+func TestItalicExperienceIsFullCVOnly(t *testing.T) {
+	for _, language := range []string{"fr", "en"} {
+		profile := Career(language)
+		found := false
+		for _, experience := range profile.Experiences {
+			if experience.Company != "Italic" {
+				continue
+			}
+			found = true
+			if !experience.FullOnly {
+				t.Fatalf("Italic experience is not full CV only for %q", language)
+			}
+		}
+		if !found {
+			t.Fatalf("Italic experience is missing for %q", language)
+		}
+	}
+}
