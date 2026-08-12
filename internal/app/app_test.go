@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -94,6 +95,18 @@ func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *
 type blockingProjectsFetcher struct {
 	started chan struct{}
 	release chan struct{}
+}
+
+type resultProjectsFetcher struct {
+	started chan struct{}
+	release chan struct{}
+	err     error
+}
+
+func (fetcher resultProjectsFetcher) Fetch(context.Context) (projects.Cache, error) {
+	close(fetcher.started)
+	<-fetcher.release
+	return projects.Cache{Projects: []projects.Project{{Name: "Streamed"}}}, fetcher.err
 }
 
 func (fetcher blockingProjectsFetcher) Fetch(context.Context) (projects.Cache, error) {
@@ -504,6 +517,60 @@ func TestAdminProjectRefreshReportsFailure(t *testing.T) {
 		!strings.Contains(response.Body.String(), "border-red-300") {
 		t.Fatalf("Datastar refresh failure = %d: %s", response.Code, response.Body.String())
 	}
+}
+
+func TestAdminProjectRefreshStreamsProgressBeforeCompletion(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+	application := newTestAppWithFetcher(t, resultProjectsFetcher{started: started, release: release}, false)
+	server := httptest.NewServer(application)
+	t.Cleanup(server.Close)
+
+	request, err := http.NewRequest(http.MethodPost, server.URL+"/admin/refresh-projects", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Datastar-Request", "true")
+	request.AddCookie(adminCookie(t, application))
+	response, err := server.Client().Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer response.Body.Close()
+	if got := response.Header.Get("X-Accel-Buffering"); got != "no" {
+		t.Fatalf("X-Accel-Buffering = %q, want no", got)
+	}
+	if got := response.Header.Get("Content-Encoding"); got != "" {
+		t.Fatalf("Content-Encoding = %q, want no compression", got)
+	}
+
+	reader := bufio.NewReader(response.Body)
+	firstEvent := make(chan string, 1)
+	go func() {
+		var event strings.Builder
+		for {
+			line, readErr := reader.ReadString('\n')
+			if readErr != nil {
+				firstEvent <- ""
+				return
+			}
+			event.WriteString(line)
+			if line == "\n" {
+				firstEvent <- event.String()
+				return
+			}
+		}
+	}()
+
+	select {
+	case event := <-firstEvent:
+		if !strings.Contains(event, "Rafraîchissement des projets en cours") {
+			t.Fatalf("first SSE event = %q", event)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("progress event was not streamed before refresh completion")
+	}
+	close(release)
 }
 
 func TestAdminWebAuthnChallengeConfigAndPasskeyFragment(t *testing.T) {

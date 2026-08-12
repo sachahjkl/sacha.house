@@ -32,8 +32,8 @@ func (app *App) adminRefreshProjects(writer http.ResponseWriter, request *http.R
 
 	writer.Header().Add("Vary", "Accept")
 	writer.Header().Add("Vary", "Datastar-Request")
-	writer.Header().Add("Vary", "Accept-Encoding")
-	sse := datastar.NewSSE(writer, request, datastar.WithCompression())
+	writer.Header().Set("X-Accel-Buffering", "no")
+	sse := datastar.NewSSE(writer, request)
 	if !started {
 		_ = sse.PatchElementTempl(web.ProjectRefreshStatus("Un rafraîchissement est déjà en cours.", false))
 		return
