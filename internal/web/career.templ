@@ -20,13 +20,13 @@ templ CareerPage(data CareerPageData) {
 
 templ CareerContent(data CareerPageData) {
 	<main id="main" class={ "page", templ.KV("cv-full", data.Full), templ.KV("cv-resume", !data.Full) }>
-		<a class="back-link no-print" href="/">← retour à sacha.house</a>
 		<nav class="document-controls no-print" aria-label="Document controls">
 			<div>
 				<a href={ templ.SafeURL(careerPath(false, data.Profile.Language)) } class={ templ.KV("active", !data.Full) }>{ data.Profile.ResumeLabel }</a>
 				<a href={ templ.SafeURL(careerPath(true, data.Profile.Language)) } class={ templ.KV("active", data.Full) }>{ data.Profile.CVLabel }</a>
 			</div>
 			<div>
+				<a href="/">← retour à sacha.house</a>
 				<a href={ templ.SafeURL(careerPath(data.Full, data.Profile.OtherLanguage)) } lang={ data.Profile.OtherLanguage }>{ data.Profile.OtherLanguageLabel }</a>
 				<button type="button" onclick="window.print()">{ data.Profile.PrintLabel }</button>
 			</div>
