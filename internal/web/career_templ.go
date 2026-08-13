@@ -125,7 +125,7 @@ func CareerContent(data CareerPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"><nav class=\"document-controls no-print\" aria-label=\"Document controls\"><div><a href=\"/\">← retour à sacha.house</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"><a class=\"back-link no-print\" href=\"/\">← retour à sacha.house</a><nav class=\"document-controls no-print\" aria-label=\"Document controls\"><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
