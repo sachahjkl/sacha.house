@@ -21,13 +21,11 @@ permissions:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nixos]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - name: Run actionlint
-        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
-      - name: Run Go tests
-        run: go test ./...
+      - name: Validate flake
+        run: nix flake check --print-build-logs
 
   build:
     needs: validate

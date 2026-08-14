@@ -17,12 +17,16 @@
   };
 
   outputs = { self, nixpkgs, nixpkgs-secretspec, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+    flake-utils.lib.eachSystem [
+      "x86_64-linux"
+      "aarch64-linux"
+    ] (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         secretspec = nixpkgs-secretspec.legacyPackages.${system}.secretspec;
         lib = pkgs.lib;
         pname = "sacha.house";
+        vendorHash = "sha256-iHJ7Hl7GVWU9kdjuostzgdSdq1Fo+AINCuH5bTHUpY8=";
         versionPrefix = lib.strings.trim (builtins.readFile ./VERSION);
         gitCommitHash =
           if self ? shortRev then self.shortRev
@@ -38,7 +42,7 @@
           inherit pname;
           version = packageVersion;
           src = source;
-          vendorHash = "sha256-iHJ7Hl7GVWU9kdjuostzgdSdq1Fo+AINCuH5bTHUpY8=";
+          inherit vendorHash;
           subPackages = [ "cmd/sacha-house" ];
           nativeBuildInputs = [
             pkgs.tailwindcss_4
@@ -62,6 +66,62 @@
         };
         linuxBinary = pkgs.runCommand "${pname}-linux-${linuxArch}" { } ''
           install -Dm755 ${sachaHouse}/bin/sacha.house "$out/${pname}-linux-${linuxArch}"
+        '';
+        dockerImage = pkgs.dockerTools.buildLayeredImage {
+          name = "sacha.house";
+          tag = gitCommitHash;
+          contents = [
+            sachaHouse
+            pkgs.cacert
+            pkgs.tzdata
+          ];
+          fakeRootCommands = ''
+            mkdir -p ./data
+            chown 65532:65532 ./data
+            chmod 0700 ./data
+          '';
+          config = {
+            User = "65532:65532";
+            WorkingDir = "/data";
+            Env = [
+              "CONFIG_PATH=/data/config.json"
+              "HOST=0.0.0.0"
+              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+            ];
+            Volumes = {
+              "/data" = { };
+            };
+            ExposedPorts = {
+              "6969/tcp" = { };
+            };
+            Cmd = [ "/bin/sacha.house" ];
+          };
+        };
+        goTests = pkgs.buildGoModule {
+          pname = "${pname}-go-tests";
+          version = packageVersion;
+          src = source;
+          inherit vendorHash;
+          overrideModAttrs = _: { preBuild = null; };
+          env.CGO_ENABLED = 0;
+          doCheck = false;
+          buildPhase = ''
+            runHook preBuild
+            go test ./...
+            runHook postBuild
+          '';
+          installPhase = ''
+            runHook preInstall
+            touch "$out"
+            runHook postInstall
+          '';
+        };
+        actionlintCheck = pkgs.runCommand "actionlint" {
+          nativeBuildInputs = [ pkgs.actionlint ];
+        } ''
+          cd ${source}
+          actionlint -config-file .github/actionlint.yaml .github/workflows/*.yml
+          touch "$out"
         '';
       in {
         devShells.default = pkgs.mkShell {
@@ -97,37 +157,15 @@
           default = sachaHouse;
           inherit secretspec;
         } // lib.optionalAttrs pkgs.stdenv.isLinux {
-          inherit linuxBinary;
-          dockerImage = pkgs.dockerTools.buildLayeredImage {
-            name = "sacha.house";
-            tag = gitCommitHash;
-            contents = [
-              sachaHouse
-              pkgs.cacert
-              pkgs.tzdata
-            ];
-            fakeRootCommands = ''
-              mkdir -p ./data
-              chown 65532:65532 ./data
-              chmod 0700 ./data
-            '';
-            config = {
-              User = "65532:65532";
-              WorkingDir = "/data";
-              Env = [
-                "CONFIG_PATH=/data/config.json"
-                "HOST=0.0.0.0"
-                "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-              ];
-              Volumes = {
-                "/data" = { };
-              };
-              ExposedPorts = {
-                "6969/tcp" = { };
-              };
-              Cmd = [ "/bin/sacha.house" ];
-            };
-          };
+          inherit linuxBinary dockerImage;
+        };
+
+        checks = {
+          actionlint = actionlintCheck;
+          go-tests = goTests;
+          package = sachaHouse;
+        } // lib.optionalAttrs pkgs.stdenv.isLinux {
+          inherit linuxBinary dockerImage;
         };
       });
 }
