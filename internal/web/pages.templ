@@ -102,7 +102,7 @@ templ ProjectsContent(data ProjectsPageData) {
 			<ul class="ms-4 list-inside list-[square]"><li>Explore new technologies</li><li>Practice project management, design, and software architecture</li><li>Collaborate on personal projects</li><li>Organize academic work</li><li>Store personal environment files</li></ul>
 			<p>My public projects are hosted on <b>GitHub</b>.</p>
 		</section>
-		<section class="mb-8"><h2 class="h2 mb-0"><img class="m-0 mr-2 inline-block w-[1.2em] align-middle" src="/static/github.png" alt=""/> GitHub / @{ data.Username }</h2>@ProjectList(data.Projects)</section>
+		<section class="mb-8"><h2 class="h2 mb-0"><img class="m-0 mr-2 inline-block w-[1.2em] align-middle" src="/static/github.png" alt=""/> <a class="no-underline hover:underline" href={ templ.SafeURL(data.GitHub) }>GitHub / @{ data.Username }</a></h2>@ProjectList(data.Projects)</section>
 	</article>
 }
 
