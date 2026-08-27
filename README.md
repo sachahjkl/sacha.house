@@ -1,3 +1,5 @@
+[English](README.md) | [Français](README.fr.md)
+
 # sacha.house
 
 Personal website and filesystem-backed blog, built with Go, templ, Datastar, and Tailwind CSS.
