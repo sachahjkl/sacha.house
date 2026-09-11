@@ -3,9 +3,11 @@
 
   nixConfig = {
     extra-substituters = [
+      "https://nix-community.cachix.org"
       "https://sachahjkl.cachix.org"
     ];
     extra-trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "sachahjkl.cachix.org-1:cepX7PCUV88hCchnh9prZM5V72wRkCf6oSJL6JfgWs0="
     ];
   };
@@ -85,6 +87,7 @@
         tag = gitCommitHash;
         contents = [
           sachaHouse
+          pkgs.busybox
           pkgs.cacert
           pkgs.tzdata
         ];
@@ -161,6 +164,8 @@
         };
       };
     in {
+      formatter = pkgs.alejandra;
+
       devShells.default = pkgs.mkShell {
         packages =
           preCommitCheck.enabledPackages

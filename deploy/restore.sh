@@ -3,120 +3,95 @@
 set -Eeuo pipefail
 umask 077
 
-readonly STATE_DIR="/var/lib/sacha.house"
-readonly DEPLOY_STATE_DIR="/var/lib/sacha.house-deploy"
-readonly OPERATION_LOCK="${DEPLOY_STATE_DIR}/operation.lock"
-readonly SERVICE_USER="sacha"
-readonly SERVICE_GROUP="sacha"
-readonly SERVICE_NAME="sacha.house.service"
-readonly HEALTH_URL="http://127.0.0.1:6969/ping"
-
 if (( EUID != 0 )); then
-    printf 'restore must run as root\n' >&2
-    exit 1
+  printf 'restore must run as root\n' >&2
+  exit 1
 fi
-if (( $# < 1 || $# > 2 )); then
-    printf 'usage: %s BACKUP_FILE.tar.gz [BACKUP_FILE.sha256]\n' "$0" >&2
-    exit 2
+if (( $# < 2 || $# > 3 )); then
+  printf 'usage: %s {staging|production} BACKUP_FILE.tar.gz [BACKUP_FILE.sha256]\n' "$0" >&2
+  exit 2
+fi
+if [[ "$1" != "staging" && "$1" != "production" ]]; then
+  printf 'namespace must be staging or production\n' >&2
+  exit 2
 fi
 
-install -d -o root -g root -m 0700 "$DEPLOY_STATE_DIR"
-exec 9>"$OPERATION_LOCK"
-flock --exclusive 9
+namespace="$1"
+archive="$(realpath -- "$2")"
+checksum="$(realpath -- "${3:-$2.sha256}")"
+volume_name="sacha-house-${namespace}-data"
 
-archive="$(realpath -- "$1")"
-checksum="$(realpath -- "${2:-$1.sha256}")"
-read -r expected_hash expected_name < "$checksum"
+read -r expected_hash expected_name <"$checksum"
 expected_name="${expected_name#\*}"
 if [[ ! "$expected_hash" =~ ^[0-9a-f]{64}$ ]] || [[ "$expected_name" != "$(basename -- "$archive")" ]]; then
-    printf 'backup checksum has an invalid format\n' >&2
-    exit 1
+  printf 'backup checksum has an invalid format\n' >&2
+  exit 1
 fi
 actual_hash="$(sha256sum "$archive")"
-actual_hash="${actual_hash%% *}"
-if [[ "$actual_hash" != "$expected_hash" ]]; then
-    printf 'backup checksum verification failed\n' >&2
-    exit 1
+if [[ "${actual_hash%% *}" != "$expected_hash" ]]; then
+  printf 'backup checksum verification failed\n' >&2
+  exit 1
 fi
 
 while IFS= read -r entry; do
-    case "$entry" in
-        /*|../*|*/../*|*/..)
-            printf 'backup contains an unsafe path\n' >&2
-            exit 1
-            ;;
-    esac
+  case "$entry" in
+    /*|../*|*/../*|*/..)
+      printf 'backup contains an unsafe path\n' >&2
+      exit 1
+      ;;
+  esac
 done < <(tar --list --gzip --file "$archive")
 while IFS= read -r metadata; do
-    case "${metadata:0:1}" in
-        -|d)
-            ;;
-        *)
-            printf 'backup contains a link or special file\n' >&2
-            exit 1
-            ;;
-    esac
+  case "${metadata:0:1}" in
+    -|d) ;;
+    *)
+      printf 'backup contains a link or special file\n' >&2
+      exit 1
+      ;;
+  esac
 done < <(tar --list --verbose --gzip --file "$archive")
 
-state_parent="$(dirname -- "$STATE_DIR")"
-staging="$(mktemp -d "${state_parent}/.sacha.house.restore.XXXXXXXX")"
-old_state="${state_parent}/.sacha.house.pre-restore.$$"
-failed_state="${state_parent}/.sacha.house.failed-restore.$$"
-was_active=false
-switched=false
+job_status="$(nomad job status -namespace "$namespace" -json sacha-house 2>/dev/null | jq -r '.[0].Status' || true)"
+if [[ -n "$job_status" && "$job_status" != "dead" ]]; then
+  printf 'stop the %s sacha-house Nomad job before restoration\n' "$namespace" >&2
+  exit 1
+fi
+
+volume_path="$(nomad volume status -namespace "$namespace" -json "$volume_name" | jq -r .HostPath)"
+case "$volume_path" in
+  /data/Services/nomad/volumes/*) ;;
+  *)
+    printf 'Nomad returned an unexpected volume path\n' >&2
+    exit 1
+    ;;
+esac
+
+install -d -o root -g root -m 0700 /run/lock
+exec 9>"/run/lock/sacha-house-${namespace}.lock"
+flock --exclusive 9
+
+staging="$(mktemp -d "$(dirname -- "$volume_path")/.sacha-house-restore.XXXXXXXX")"
+rollback="$(mktemp -d "$(dirname -- "$volume_path")/.sacha-house-rollback.XXXXXXXX")"
 cleanup() {
-    rm -rf -- "$staging"
-    if [[ "$switched" == false && "$was_active" == true ]]; then
-        systemctl start "$SERVICE_NAME"
-    fi
+  rm -rf -- "$staging" "$rollback"
 }
 trap cleanup EXIT
 
-tar \
-    --extract --gzip --no-same-owner --no-same-permissions \
-    --file "$archive" --directory "$staging"
-if [[ ! -f "$staging/config.json" || ! -d "$staging/data/blog" ]]; then
-    printf 'backup does not contain the required runtime state\n' >&2
-    exit 1
-fi
-chown -R "$SERVICE_USER:$SERVICE_GROUP" "$staging"
-chmod 0700 "$staging"
-chmod 0600 "$staging/config.json"
-
-if systemctl is-active --quiet "$SERVICE_NAME"; then
-    was_active=true
-    systemctl stop "$SERVICE_NAME"
+tar --extract --gzip --no-same-owner --no-same-permissions --file "$archive" --directory "$staging"
+if [[ ! -d "$staging/data/blog" ]]; then
+  printf 'backup does not contain the required blog data\n' >&2
+  exit 1
 fi
 
-mv -- "$STATE_DIR" "$old_state"
-mv -- "$staging" "$STATE_DIR"
-switched=true
-
-wait_until_healthy() {
-    local attempt
-    for attempt in {1..30}; do
-        if systemctl is-active --quiet "$SERVICE_NAME" && \
-           curl --fail --silent --show-error --max-time 2 "$HEALTH_URL" >/dev/null; then
-            return 0
-        fi
-        sleep 1
-    done
-    return 1
-}
-
-if systemctl start "$SERVICE_NAME" && wait_until_healthy; then
-    rm -rf -- "$old_state"
-    printf 'restored verified state from %s\n' "$archive"
-    exit 0
+cp -a -- "$volume_path/." "$rollback/"
+find "$volume_path" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+if ! cp -a -- "$staging/." "$volume_path/"; then
+  find "$volume_path" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+  cp -a -- "$rollback/." "$volume_path/"
+  printf 'restore failed and the previous state was restored\n' >&2
+  exit 1
 fi
+chown -R 65532:65532 "$volume_path"
+chmod 0700 "$volume_path"
 
-printf 'restored state failed its health check; rolling back data\n' >&2
-systemctl stop "$SERVICE_NAME" || true
-mv -- "$STATE_DIR" "$failed_state"
-mv -- "$old_state" "$STATE_DIR"
-rm -rf -- "$failed_state"
-if [[ "$was_active" == true ]]; then
-    systemctl start "$SERVICE_NAME"
-    wait_until_healthy || printf 'original state failed its health check after rollback\n' >&2
-fi
-exit 1
+printf 'restored %s from %s; deploy the validated image to check application health\n' "$volume_name" "$archive"

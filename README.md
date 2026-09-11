@@ -110,6 +110,24 @@ Keep old keys until no paste reports their key ID. Losing a key makes its encryp
 
 GitHub secret Gists are unlisted, not private. GitHub retains ciphertext and can retain old revisions.
 
+## Deployment
+
+GitHub Actions checks pull requests and accepted `master` commits on `ubuntu-latest`.
+
+An accepted commit publishes one signed OCI image and deploys its digest to staging.
+
+The production workflow promotes the exact staging digest after environment approval.
+
+Nomad stores application data in separate staging and production dynamic host volumes.
+
+The production job creates a state archive before each replacement allocation starts.
+
+Run `deploy/backup.sh` on the Nomad host to create an additional checked archive.
+
+Stop the selected Nomad job before you run `deploy/restore.sh`.
+
+Deploy the validated image after restoration. Then check `/ping` and the public site.
+
 Keep the secrets file outside the repository and image. Restrict it to the server account with mode `0600`.
 
 ## License
