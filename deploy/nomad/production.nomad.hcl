@@ -49,9 +49,7 @@ job "sacha-house" {
       mode = "host"
 
       port "http" {
-        static       = 9072
-        to           = 6969
-        host_network = "loopback"
+        to = 6969
       }
     }
 
