@@ -160,7 +160,7 @@ EOH
         port     = "http"
         tags = [
           "traefik.enable=true",
-          "traefik.http.routers.sacha-house-production.entrypoints=nomad",
+          "traefik.http.routers.sacha-house-production.entrypoints=websecure",
           "traefik.http.routers.sacha-house-production.rule=Host(`sacha.house`)",
         ]
 

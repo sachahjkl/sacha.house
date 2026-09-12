@@ -133,7 +133,7 @@ EOH
         port     = "http"
         tags = [
           "traefik.enable=true",
-          "traefik.http.routers.sacha-house-staging.entrypoints=nomad",
+          "traefik.http.routers.sacha-house-staging.entrypoints=websecure",
           "traefik.http.routers.sacha-house-staging.middlewares=sacha-house-staging-noindex",
           "traefik.http.routers.sacha-house-staging.rule=Host(`staging.sacha.house`)",
           "traefik.http.routers.sacha-house-staging.tls.domains[0].main=staging.sacha.house",
