@@ -146,7 +146,6 @@
           end-of-file-fixer = {
             enable = true;
             excludes = [
-              "^deploy/fail2ban-.*\\.conf$"
               "^internal/web/static/(atom|rss)\\.svg$"
               "^internal/web/static/(robots\\.txt|sachahjkl\\.gpg)$"
             ];

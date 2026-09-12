@@ -122,11 +122,8 @@ Nomad stores application data in separate staging and production dynamic host vo
 
 The production job creates a state archive before each replacement allocation starts.
 
-Run `deploy/backup.sh` on the Nomad host to create an additional checked archive.
 
-Stop the selected Nomad job before you run `deploy/restore.sh`.
 
-Deploy the validated image after restoration. Then check `/ping` and the public site.
 
 Keep the secrets file outside the repository and image. Restrict it to the server account with mode `0600`.
 
