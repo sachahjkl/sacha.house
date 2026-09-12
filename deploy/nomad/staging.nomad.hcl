@@ -133,6 +133,13 @@ EOH
         name     = "sacha-house-staging"
         provider = "nomad"
         port     = "http"
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.sacha-house-staging.entrypoints=nomad",
+          "traefik.http.routers.sacha-house-staging.middlewares=sacha-house-staging-noindex",
+          "traefik.http.routers.sacha-house-staging.rule=Host(`staging.sacha.house`)",
+          "traefik.http.middlewares.sacha-house-staging-noindex.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow",
+        ]
 
         check {
           name     = "HTTP health"

@@ -160,6 +160,11 @@ EOH
         name     = "sacha-house-production"
         provider = "nomad"
         port     = "http"
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.sacha-house-production.entrypoints=nomad",
+          "traefik.http.routers.sacha-house-production.rule=Host(`sacha.house`)",
+        ]
 
         check {
           name     = "HTTP health"
