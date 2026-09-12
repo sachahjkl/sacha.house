@@ -3,9 +3,24 @@ application:
   port: 6969
   healthPath: /ping
 
-domain:
-  production: sacha.house
-  staging: staging.sacha.house
+environments:
+  staging:
+    domain: staging.sacha.house
+    noIndex: true
+    modules:
+      task:
+        - deploy/task-staging.hcl
+  production:
+    domain: sacha.house
 
+    modules:
+      group:
+        - deploy/group-production.hcl
+      task:
+        - deploy/task-production.hcl
 volume:
   mountPath: /data
+
+resources:
+  cpu: 300
+  memory: 256
