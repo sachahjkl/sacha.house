@@ -574,6 +574,13 @@ func TestAdminProjectRefreshStreamsProgressBeforeCompletion(t *testing.T) {
 		t.Fatal("progress event was not streamed before refresh completion")
 	}
 	close(release)
+	deadline := time.Now().Add(time.Second)
+	for len(application.projectsRefresh) != 0 && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	if len(application.projectsRefresh) != 0 {
+		t.Fatal("project refresh did not finish")
+	}
 }
 
 func TestAdminWebAuthnChallengeConfigAndPasskeyFragment(t *testing.T) {
