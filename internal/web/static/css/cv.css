@@ -66,6 +66,16 @@ h1 {
   margin: 0 0 0.7rem;
 }
 
+.cv-title {
+  font-size: 11pt;
+  font-weight: 700;
+  margin: -0.4rem 0 0.7rem;
+}
+
+.cv-highlights li {
+  margin: 0.1rem 0;
+}
+
 h2 {
   font-size: 12pt;
   margin: 1rem 0 0.35rem;

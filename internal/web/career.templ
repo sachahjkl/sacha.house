@@ -45,6 +45,7 @@ templ CareerContent(data CareerPageData) {
 					<h1>Résumé — { data.FullName }</h1>
 				}
 			}
+			<p class="cv-title">{ data.Profile.Title }</p>
 			<div id="intro-text">
 				<img src="/static/me-portrait.jpg" height="100" width="100" alt={ data.FullName } class="photo"/>
 				<section id="quick-facts">
@@ -82,6 +83,13 @@ templ CareerContent(data CareerPageData) {
 									}
 									<div class="experience-description">
 										<p>{ experience.Summary }</p>
+										if !data.Full && len(experience.Highlights) > 0 {
+											<ul class="cv-highlights">
+												for _, highlight := range experience.Highlights {
+													<li>{ highlight }</li>
+												}
+											</ul>
+										}
 										if data.Full {
 											for _, detail := range experience.Details {
 												<h3>{ detail.Title }</h3>
