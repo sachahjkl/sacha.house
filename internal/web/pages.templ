@@ -123,7 +123,11 @@ templ ProjectList(projects []ProjectView) {
 					}
 				</div>
 				if project.LastCommitURL != "" {
-					<small class="text-textColor/60 px-2 pb-1"><time datetime={ project.LastCommitTime }>{ project.LastCommitDate }</time> · <a class="underline" href={ templ.SafeURL(project.LastCommitURL) }>{ project.LastCommitHash }</a></small>
+					<small class="text-textColor/60 px-2 pb-1"><time datetime={ project.LastCommitTime }>{ project.LastCommitDate }</time> · <a class="underline" href={ templ.SafeURL(project.LastCommitURL) }>{ project.LastCommitHash }</a>
+						if project.LicenseLabel != "" {
+							<span class="ms-2 border border-textColor/40 px-1"><a class="no-underline hover:underline" href={ templ.SafeURL(project.LicenseURL) }>{ project.LicenseLabel }</a></span>
+						}
+					</small>
 				}
 				</div>
 			</div></li>

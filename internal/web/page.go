@@ -148,6 +148,8 @@ type ProjectView struct {
 	LastCommitTime  string
 	LastCommitHash  string
 	LastCommitURL   string
+	LicenseLabel    string
+	LicenseURL      string
 }
 
 type ProjectsPageData struct {

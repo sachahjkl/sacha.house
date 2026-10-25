@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -48,6 +49,10 @@ type Project struct {
 	LastCommitDate  time.Time `json:"lastCommitDate"`
 	LastCommitHash  string    `json:"lastCommitHash"`
 	LastCommitURL   string    `json:"lastCommitUrl"`
+	LicenseSPDXID   string    `json:"licenseSpdxId"`
+	LicenseName     string    `json:"licenseName"`
+	LicenseTitle    string    `json:"licenseTitle"`
+	LicenseURL      string    `json:"licenseUrl"`
 }
 
 // Cache is the on-disk projects_cache.json format.
@@ -206,7 +211,9 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 					pageInfo { hasNextPage endCursor }
 					nodes {
 						name nameWithOwner url descriptionHtml: descriptionHTML visibility
-						defaultBranchRef { target { ... on Commit { committedDate abbreviatedOid oid url } } }
+						defaultBranchRef { name target { ... on Commit { committedDate abbreviatedOid oid url } } }
+						licenseInfo { spdxId name }
+						licenseFile: object(expression: "HEAD:LICENSE") { ... on Blob { text } }
 						project: object(expression: "HEAD:.project") {
 							... on Tree { entries { name type object { ... on Blob { text } } } }
 						}
@@ -215,12 +222,20 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 			}
 		}`
 	type repository struct {
-		Name             string `json:"name"`
-		NameWithOwner    string `json:"nameWithOwner"`
-		URL              string `json:"url"`
-		DescriptionHTML  string `json:"descriptionHtml"`
-		Visibility       string `json:"visibility"`
+		Name            string `json:"name"`
+		NameWithOwner   string `json:"nameWithOwner"`
+		URL             string `json:"url"`
+		DescriptionHTML string `json:"descriptionHtml"`
+		Visibility      string `json:"visibility"`
+		LicenseInfo     *struct {
+			SPDXID string `json:"spdxId"`
+			Name   string `json:"name"`
+		} `json:"licenseInfo"`
+		LicenseFile *struct {
+			Text *string `json:"text"`
+		} `json:"licenseFile"`
 		DefaultBranchRef struct {
+			Name   string `json:"name"`
 			Target struct {
 				CommittedDate  time.Time `json:"committedDate"`
 				AbbreviatedOID string    `json:"abbreviatedOid"`
@@ -273,6 +288,19 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 			project.LastCommitDate = raw.DefaultBranchRef.Target.CommittedDate
 			project.LastCommitHash = raw.DefaultBranchRef.Target.AbbreviatedOID
 			project.LastCommitURL = raw.DefaultBranchRef.Target.URL
+			if raw.LicenseInfo != nil {
+				project.LicenseSPDXID = raw.LicenseInfo.SPDXID
+				project.LicenseName = raw.LicenseInfo.Name
+			}
+			if !recognisedLicence(project.LicenseSPDXID) && raw.LicenseFile != nil && raw.LicenseFile.Text != nil {
+				project.LicenseTitle = licenseTitle(truncateLicenseText(*raw.LicenseFile.Text))
+			}
+			if project.LicenseSPDXID != "" || project.LicenseName != "" || project.LicenseTitle != "" {
+				project.LicenseURL = raw.URL + "/blob/" + raw.DefaultBranchRef.Name + "/LICENSE"
+				if raw.DefaultBranchRef.Name == "" {
+					project.LicenseURL = raw.URL
+				}
+			}
 			projects = append(projects, project)
 		}
 		if !response.Data.User.Projects.PageInfo.HasNextPage {
@@ -369,6 +397,63 @@ func newProject(name, url, descriptionHTML, avatarURL string) Project {
 func firstLetter(name string) string {
 	if r, _ := utf8.DecodeRuneInString(name); r != utf8.RuneError || name != "" {
 		return string(unicode.ToUpper(r))
+	}
+	return ""
+}
+
+// LicenseLabel returns the licence shown on a project card, or "" when the repository has no licence.
+func LicenseLabel(spdxID, name, title string) string {
+	switch {
+	case recognisedLicence(spdxID):
+		return spdxID
+	case title != "":
+		return title
+	case name != "" && name != "Other":
+		return name
+	case spdxID == "" && name == "":
+		return ""
+	default:
+		return "Custom licence"
+	}
+}
+
+func recognisedLicence(spdxID string) bool {
+	return spdxID != "" && spdxID != "NOASSERTION"
+}
+
+const licenseTextLimit = 2000
+
+func truncateLicenseText(text string) string {
+	if len(text) > licenseTextLimit {
+		text = text[:licenseTextLimit]
+	}
+	return strings.ToValidUTF8(text, "")
+}
+
+var polyFormPattern = regexp.MustCompile(`PolyForm ([A-Za-z]+(?: [A-Za-z]+)?) License(?: \d+(?:\.\d+)*)?`)
+
+const licenseTitleLimit = 32
+
+// licenseTitle derives a short label from the opening of a LICENSE file.
+func licenseTitle(text string) string {
+	if match := polyFormPattern.FindStringSubmatch(text); match != nil {
+		return "PolyForm " + match[1]
+	}
+	for _, line := range strings.Split(text, "\n") {
+		line = strings.Trim(line, "# \t\r")
+		if line == "" || strings.HasPrefix(line, "Required Notice") || strings.HasPrefix(line, "Copyright") || strings.HasPrefix(line, "Version") {
+			continue
+		}
+		if i := strings.Index(line, " / "); i >= 0 {
+			line = line[:i]
+		}
+		if trimmed := strings.TrimSpace(strings.TrimSuffix(strings.TrimSuffix(line, " License"), " Licence")); trimmed != "" {
+			line = trimmed
+		}
+		if runes := []rune(line); len(runes) > licenseTitleLimit {
+			line = strings.TrimSpace(string(runes[:licenseTitleLimit]))
+		}
+		return line
 	}
 	return ""
 }
