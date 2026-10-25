@@ -222,12 +222,12 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 			}
 		}`
 	type repository struct {
-		Name             string `json:"name"`
-		NameWithOwner    string `json:"nameWithOwner"`
-		URL              string `json:"url"`
-		DescriptionHTML  string `json:"descriptionHtml"`
-		Visibility       string `json:"visibility"`
-		LicenseInfo      *struct {
+		Name            string `json:"name"`
+		NameWithOwner   string `json:"nameWithOwner"`
+		URL             string `json:"url"`
+		DescriptionHTML string `json:"descriptionHtml"`
+		Visibility      string `json:"visibility"`
+		LicenseInfo     *struct {
 			SPDXID string `json:"spdxId"`
 			Name   string `json:"name"`
 		} `json:"licenseInfo"`
