@@ -213,9 +213,6 @@
   .fixed {
     position: fixed;
   }
-  .relative {
-    position: relative;
-  }
   .static {
     position: static;
   }
@@ -278,6 +275,9 @@
   }
   .ms-0 {
     margin-inline-start: calc(var(--spacing) * 0);
+  }
+  .ms-2 {
+    margin-inline-start: calc(var(--spacing) * 2);
   }
   .ms-4 {
     margin-inline-start: calc(var(--spacing) * 4);
@@ -1009,6 +1009,12 @@
   .border-textColor {
     border-color: var(--color-textColor);
   }
+  .border-textColor\/40 {
+    border-color: color-mix(in srgb, #000000 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-textColor) 40%, transparent);
+    }
+  }
   .bg-bgColor {
     background-color: var(--color-bgColor);
   }
@@ -1056,6 +1062,9 @@
   }
   .p-4 {
     padding: calc(var(--spacing) * 4);
+  }
+  .px-1 {
+    padding-inline: calc(var(--spacing) * 1);
   }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);

@@ -34,7 +34,7 @@ func TestClientFetchesMetadataCommitsAndSortsProjects(t *testing.T) {
 		if !strings.Contains(request.Query, `object(expression: "HEAD:.project")`) {
 			t.Errorf("query does not request project metadata: %s", request.Query)
 		}
-		_, _ = w.Write([]byte(`{"data":{"user":{"projects":{"pageInfo":{"hasNextPage":false},"nodes":[{"name":"First","nameWithOwner":"sacha/first","url":"https://hub/1","descriptionHtml":"one","visibility":"PUBLIC","owner":{"avatarUrl":"avatar"},"defaultBranchRef":{"target":{"committedDate":"2026-01-01T00:00:00Z","abbreviatedOid":"1111111","oid":"111111111111","url":"https://hub/1/commit/1111111"}},"project":{"entries":[]}},{"name":"Hidden","url":"https://hub/2","visibility":"private","owner":{}},{"name":"Fallback","nameWithOwner":"sacha/fallback","url":"https://hub/3","descriptionHtml":"three","visibility":"PUBLIC","owner":{},"defaultBranchRef":{"target":{"committedDate":"2026-02-01T00:00:00Z","abbreviatedOid":"3333333","oid":"333333333333","url":"https://hub/3/commit/3333333"}},"project":{"entries":[{"name":"project.yaml","type":"blob","object":{"text":"name: Metadata Name\ndescription: A <safe> description\n"}},{"name":"image.webp","type":"blob","object":{}}]}}]}}}}`))
+		_, _ = w.Write([]byte(`{"data":{"user":{"projects":{"pageInfo":{"hasNextPage":false},"nodes":[{"name":"First","nameWithOwner":"sacha/first","url":"https://hub/1","descriptionHtml":"one","visibility":"PUBLIC","owner":{"avatarUrl":"avatar"},"defaultBranchRef":{"name":"master","target":{"committedDate":"2026-01-01T00:00:00Z","abbreviatedOid":"1111111","oid":"111111111111","url":"https://hub/1/commit/1111111"}},"licenseInfo":{"spdxId":"MIT","name":"MIT License"},"project":{"entries":[]}},{"name":"Hidden","url":"https://hub/2","visibility":"private","owner":{}},{"name":"Fallback","nameWithOwner":"sacha/fallback","url":"https://hub/3","descriptionHtml":"three","visibility":"PUBLIC","owner":{},"licenseInfo":{"spdxId":"NOASSERTION","name":"Other"},"defaultBranchRef":{"name":"main","target":{"committedDate":"2026-02-01T00:00:00Z","abbreviatedOid":"3333333","oid":"333333333333","url":"https://hub/3/commit/3333333"}},"project":{"entries":[{"name":"project.yaml","type":"blob","object":{"text":"name: Metadata Name\ndescription: A <safe> description\n"}},{"name":"image.webp","type":"blob","object":{}}]}}]}}}}`))
 	}))
 	defer server.Close()
 
@@ -59,6 +59,34 @@ func TestClientFetchesMetadataCommitsAndSortsProjects(t *testing.T) {
 	}
 	if !strings.HasPrefix(cache.Projects[0].HSLColor, "hsl(") {
 		t.Errorf("color = %q", cache.Projects[0].HSLColor)
+	}
+	if got := cache.Projects[1].LicenseSPDXID; got != "MIT" {
+		t.Errorf("licence SPDX ID = %q, want MIT", got)
+	}
+	if got := cache.Projects[1].LicenseURL; got != "https://hub/1/blob/master/LICENSE" {
+		t.Errorf("licence URL = %q", got)
+	}
+	if got := cache.Projects[0].LicenseSPDXID; got != "NOASSERTION" || cache.Projects[0].LicenseURL != "https://hub/3/blob/main/LICENSE" {
+		t.Errorf("custom licence = %q %q", got, cache.Projects[0].LicenseURL)
+	}
+}
+
+func TestLicenseLabel(t *testing.T) {
+	tests := []struct {
+		name, spdxID, licenseName, want string
+	}{
+		{name: "known SPDX identifier", spdxID: "MIT", licenseName: "MIT License", want: "MIT"},
+		{name: "unrecognised licence keeps its name", spdxID: "NOASSERTION", licenseName: "Custom Terms", want: "Custom Terms"},
+		{name: "GitHub bucket Other is generic", spdxID: "NOASSERTION", licenseName: "Other", want: "Custom licence"},
+		{name: "missing identifier and name", spdxID: "", licenseName: "", want: ""},
+		{name: "identifier without name", spdxID: "NOASSERTION", licenseName: "", want: "Custom licence"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := LicenseLabel(test.spdxID, test.licenseName); got != test.want {
+				t.Errorf("LicenseLabel(%q, %q) = %q, want %q", test.spdxID, test.licenseName, got, test.want)
+			}
+		})
 	}
 }
 

@@ -48,6 +48,9 @@ type Project struct {
 	LastCommitDate  time.Time `json:"lastCommitDate"`
 	LastCommitHash  string    `json:"lastCommitHash"`
 	LastCommitURL   string    `json:"lastCommitUrl"`
+	LicenseSPDXID   string    `json:"licenseSpdxId"`
+	LicenseName     string    `json:"licenseName"`
+	LicenseURL      string    `json:"licenseUrl"`
 }
 
 // Cache is the on-disk projects_cache.json format.
@@ -206,7 +209,8 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 					pageInfo { hasNextPage endCursor }
 					nodes {
 						name nameWithOwner url descriptionHtml: descriptionHTML visibility
-						defaultBranchRef { target { ... on Commit { committedDate abbreviatedOid oid url } } }
+						defaultBranchRef { name target { ... on Commit { committedDate abbreviatedOid oid url } } }
+						licenseInfo { spdxId name }
 						project: object(expression: "HEAD:.project") {
 							... on Tree { entries { name type object { ... on Blob { text } } } }
 						}
@@ -220,7 +224,12 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 		URL              string `json:"url"`
 		DescriptionHTML  string `json:"descriptionHtml"`
 		Visibility       string `json:"visibility"`
+		LicenseInfo      *struct {
+			SPDXID string `json:"spdxId"`
+			Name   string `json:"name"`
+		} `json:"licenseInfo"`
 		DefaultBranchRef struct {
+			Name   string `json:"name"`
 			Target struct {
 				CommittedDate  time.Time `json:"committedDate"`
 				AbbreviatedOID string    `json:"abbreviatedOid"`
@@ -273,6 +282,14 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 			project.LastCommitDate = raw.DefaultBranchRef.Target.CommittedDate
 			project.LastCommitHash = raw.DefaultBranchRef.Target.AbbreviatedOID
 			project.LastCommitURL = raw.DefaultBranchRef.Target.URL
+			if raw.LicenseInfo != nil {
+				project.LicenseSPDXID = raw.LicenseInfo.SPDXID
+				project.LicenseName = raw.LicenseInfo.Name
+				project.LicenseURL = raw.URL + "/blob/" + raw.DefaultBranchRef.Name + "/LICENSE"
+				if raw.DefaultBranchRef.Name == "" {
+					project.LicenseURL = raw.URL
+				}
+			}
 			projects = append(projects, project)
 		}
 		if !response.Data.User.Projects.PageInfo.HasNextPage {
@@ -371,6 +388,20 @@ func firstLetter(name string) string {
 		return string(unicode.ToUpper(r))
 	}
 	return ""
+}
+
+// LicenseLabel returns the licence shown on a project card, or "" when the repository has no licence.
+func LicenseLabel(spdxID, name string) string {
+	switch {
+	case spdxID != "" && spdxID != "NOASSERTION":
+		return spdxID
+	case name != "" && name != "Other":
+		return name
+	case spdxID == "" && name == "":
+		return ""
+	default:
+		return "Custom licence"
+	}
 }
 
 func randomColor() string {
