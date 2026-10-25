@@ -34,7 +34,7 @@ func TestClientFetchesMetadataCommitsAndSortsProjects(t *testing.T) {
 		if !strings.Contains(request.Query, `object(expression: "HEAD:.project")`) {
 			t.Errorf("query does not request project metadata: %s", request.Query)
 		}
-		_, _ = w.Write([]byte(`{"data":{"user":{"projects":{"pageInfo":{"hasNextPage":false},"nodes":[{"name":"First","nameWithOwner":"sacha/first","url":"https://hub/1","descriptionHtml":"one","visibility":"PUBLIC","owner":{"avatarUrl":"avatar"},"defaultBranchRef":{"name":"master","target":{"committedDate":"2026-01-01T00:00:00Z","abbreviatedOid":"1111111","oid":"111111111111","url":"https://hub/1/commit/1111111"}},"licenseInfo":{"spdxId":"MIT","name":"MIT License"},"project":{"entries":[]}},{"name":"Hidden","url":"https://hub/2","visibility":"private","owner":{}},{"name":"Fallback","nameWithOwner":"sacha/fallback","url":"https://hub/3","descriptionHtml":"three","visibility":"PUBLIC","owner":{},"licenseInfo":{"spdxId":"NOASSERTION","name":"Other"},"defaultBranchRef":{"name":"main","target":{"committedDate":"2026-02-01T00:00:00Z","abbreviatedOid":"3333333","oid":"333333333333","url":"https://hub/3/commit/3333333"}},"project":{"entries":[{"name":"project.yaml","type":"blob","object":{"text":"name: Metadata Name\ndescription: A <safe> description\n"}},{"name":"image.webp","type":"blob","object":{}}]}}]}}}}`))
+		_, _ = w.Write([]byte(`{"data":{"user":{"projects":{"pageInfo":{"hasNextPage":false},"nodes":[{"name":"First","nameWithOwner":"sacha/first","url":"https://hub/1","descriptionHtml":"one","visibility":"PUBLIC","owner":{"avatarUrl":"avatar"},"defaultBranchRef":{"name":"master","target":{"committedDate":"2026-01-01T00:00:00Z","abbreviatedOid":"1111111","oid":"111111111111","url":"https://hub/1/commit/1111111"}},"licenseInfo":{"spdxId":"MIT","name":"MIT License"},"project":{"entries":[]}},{"name":"Hidden","url":"https://hub/2","visibility":"private","owner":{}},{"name":"Fallback","nameWithOwner":"sacha/fallback","url":"https://hub/3","descriptionHtml":"three","visibility":"PUBLIC","owner":{},"licenseInfo":{"spdxId":"NOASSERTION","name":"Other"},"licenseFile":{"text":"Froment Software License\n\nVersion 1.0\n"},"defaultBranchRef":{"name":"main","target":{"committedDate":"2026-02-01T00:00:00Z","abbreviatedOid":"3333333","oid":"333333333333","url":"https://hub/3/commit/3333333"}},"project":{"entries":[{"name":"project.yaml","type":"blob","object":{"text":"name: Metadata Name\ndescription: A <safe> description\n"}},{"name":"image.webp","type":"blob","object":{}}]}}]}}}}`))
 	}))
 	defer server.Close()
 
@@ -69,13 +69,21 @@ func TestClientFetchesMetadataCommitsAndSortsProjects(t *testing.T) {
 	if got := cache.Projects[0].LicenseSPDXID; got != "NOASSERTION" || cache.Projects[0].LicenseURL != "https://hub/3/blob/main/LICENSE" {
 		t.Errorf("custom licence = %q %q", got, cache.Projects[0].LicenseURL)
 	}
+	if got := cache.Projects[0].LicenseTitle; got != "Froment Software" {
+		t.Errorf("licence title = %q, want Froment Software", got)
+	}
+	if got := cache.Projects[1].LicenseTitle; got != "" {
+		t.Errorf("recognised licence title = %q, want empty", got)
+	}
 }
 
 func TestLicenseLabel(t *testing.T) {
 	tests := []struct {
-		name, spdxID, licenseName, want string
+		name, spdxID, licenseName, title, want string
 	}{
 		{name: "known SPDX identifier", spdxID: "MIT", licenseName: "MIT License", want: "MIT"},
+		{name: "SPDX wins over file title", spdxID: "MIT", title: "Other", want: "MIT"},
+		{name: "unrecognised licence uses file title", spdxID: "NOASSERTION", licenseName: "Other", title: "PolyForm Strict", want: "PolyForm Strict"},
 		{name: "unrecognised licence keeps its name", spdxID: "NOASSERTION", licenseName: "Custom Terms", want: "Custom Terms"},
 		{name: "GitHub bucket Other is generic", spdxID: "NOASSERTION", licenseName: "Other", want: "Custom licence"},
 		{name: "missing identifier and name", spdxID: "", licenseName: "", want: ""},
@@ -83,10 +91,42 @@ func TestLicenseLabel(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if got := LicenseLabel(test.spdxID, test.licenseName); got != test.want {
-				t.Errorf("LicenseLabel(%q, %q) = %q, want %q", test.spdxID, test.licenseName, got, test.want)
+			if got := LicenseLabel(test.spdxID, test.licenseName, test.title); got != test.want {
+				t.Errorf("LicenseLabel(%q, %q, %q) = %q, want %q", test.spdxID, test.licenseName, test.title, got, test.want)
 			}
 		})
+	}
+}
+
+func TestLicenseTitle(t *testing.T) {
+	wren := "Required Notice: Copyright (c) 2026 Sacha Froment (Froment Software) (https://froment.software)\n\n" +
+		"Versions of Wren up to and including 0.3.0 were published under the MIT License and stay under it, for whoever received them.\n" +
+		"Everything published after them is under the terms below.\n\n" +
+		"# PolyForm Strict License 1.0.0\n\n<https://polyformproject.org/licenses/strict/1.0.0>\n"
+	tests := []struct {
+		name, text, want string
+	}{
+		{name: "PolyForm heading", text: wren, want: "PolyForm Strict"},
+		{name: "PolyForm noncommercial", text: "# PolyForm Noncommercial License 1.0.0\n", want: "PolyForm Noncommercial"},
+		{name: "custom title drops License and version line", text: "Froment Software License\n\nVersion 1.0\n", want: "Froment Software"},
+		{name: "custom title on one line", text: "Froment Software License / Version 1.0", want: "Froment Software"},
+		{name: "empty text", text: "", want: ""},
+		{name: "only skipped lines", text: "Copyright (c) 2026 Someone\nVersion 2\n\n", want: ""},
+		{name: "very long line is truncated", text: strings.Repeat("abcdefghij", 40), want: strings.Repeat("abcdefghij", 40)[:32]},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := licenseTitle(test.text); got != test.want {
+				t.Errorf("licenseTitle() = %q, want %q", got, test.want)
+			}
+		})
+	}
+}
+
+func TestLicenseTextIsTruncated(t *testing.T) {
+	long := strings.Repeat("a", licenseTextLimit+500)
+	if got := truncateLicenseText(long); len(got) != licenseTextLimit {
+		t.Fatalf("truncated length = %d, want %d", len(got), licenseTextLimit)
 	}
 }
 

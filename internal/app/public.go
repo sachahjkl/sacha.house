@@ -92,7 +92,7 @@ func projectViews(input []projects.Project) []web.ProjectView {
 			LastCommitDate: project.LastCommitDate.Format("2006-01-02"),
 			LastCommitTime: project.LastCommitDate.Format(time.RFC3339),
 			LastCommitHash: project.LastCommitHash, LastCommitURL: project.LastCommitURL,
-			LicenseLabel: projects.LicenseLabel(project.LicenseSPDXID, project.LicenseName), LicenseURL: project.LicenseURL,
+			LicenseLabel: projects.LicenseLabel(project.LicenseSPDXID, project.LicenseName, project.LicenseTitle), LicenseURL: project.LicenseURL,
 		}
 	}
 	return views
