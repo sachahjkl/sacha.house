@@ -8,7 +8,7 @@ templ CareerPage(data CareerPageData) {
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<link rel="stylesheet" href="/static/css/cv.css"/>
+			<link rel="stylesheet" href={ templ.SafeURL("/static/css/cv.css?v=" + data.PageData.StyleVersion) }/>
 			<title id="page-title">{ data.PageData.Title }</title>
 			<meta name="description" content={ data.PageData.SEO.Description }/>
 		</head>
