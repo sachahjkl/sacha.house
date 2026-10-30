@@ -8,10 +8,19 @@ type CareerExperience struct {
 	Company     string
 	Context     string
 	Summary     string
-	Highlights  []string
+	Highlights  []CareerHighlight
 	Details     []CareerDetail
 	Environment string
 	FullOnly    bool
+}
+
+type CareerHighlight struct {
+	Lead string
+	Text string
+}
+
+func hl(lead, text string) CareerHighlight {
+	return CareerHighlight{Lead: lead, Text: text}
 }
 
 type CareerDetail struct {
@@ -50,7 +59,6 @@ type CareerProfile struct {
 	Language           string
 	OtherLanguage      string
 	OtherLanguageLabel string
-	Title              string
 	Summary            string
 	Nationality        string
 	AgeLabel           string
@@ -58,7 +66,6 @@ type CareerProfile struct {
 	ContactLabel       string
 	ExperienceLabel    string
 	EducationLabel     string
-	SkillsLabel        string
 	ProjectsLabel      string
 	CatalogLabel       string
 	PublicationsLabel  string
@@ -66,13 +73,9 @@ type CareerProfile struct {
 	PrintLabel         string
 	ResumeLabel        string
 	CVLabel            string
-	ProfileLabel       string
-	SelectedLabel      string
 	EnvironmentLabel   string
 	Experiences        []CareerExperience
 	Education          []CareerEducation
-	Skills             []CareerGroup
-	ResumeSkills       []string
 	Projects           []CareerProject
 	Catalog            []CareerGroup
 	Publications       []CareerPublication
@@ -112,24 +115,23 @@ func joinCareerItems(items []string) string {
 func careerFR() CareerProfile {
 	return CareerProfile{
 		Language: "fr", OtherLanguage: "en", OtherLanguageLabel: "English",
-		Title:       "Ingénieur logiciel — modernisation, performance et fiabilité des applications métier",
 		Summary:     "Ingénieur logiciel avec plus de six ans d'expérience, dont trois en alternance, sur des applications métier .NET et Angular. Je prends en charge, souvent de ma propre initiative, les chantiers de fond qui conditionnent la qualité des livraisons : migrations de frameworks, réduction des temps de tests et d'intégration continue, performance applicative, restructuration des socles techniques et design system. Je mesure avant d'agir et je conduis ces chantiers seul, de la conception à l'adoption par l'équipe.",
 		Nationality: "Français", AgeLabel: "ans", LocationLabel: "Marigné-Laillé, France",
-		ContactLabel: "Contact", ExperienceLabel: "Expérience", EducationLabel: "Formation",
-		SkillsLabel: "Compétences", ProjectsLabel: "Projets sélectionnés", CatalogLabel: "Catalogue de projets",
+		ContactLabel: "Contact", ExperienceLabel: "Expérience", EducationLabel: "Études",
+		ProjectsLabel: "Projets sélectionnés", CatalogLabel: "Catalogue de projets",
 		PublicationsLabel: "Publications", LanguagesLabel: "Langues", PrintLabel: "Imprimer / PDF",
-		ResumeLabel: "CV", CVLabel: "CV complet", ProfileLabel: "Profil", SelectedLabel: "Principales réalisations", EnvironmentLabel: "Environnement technique",
+		ResumeLabel: "CV", CVLabel: "CV complet", EnvironmentLabel: "Stack",
 		Experiences: []CareerExperience{
 			{
 				Period: "Depuis avril 2025", Role: "Ingénieur logiciel", Company: "Catamania", Context: "Mission chez le leader français des services funéraires",
 				Summary: "Modernisation, performance et fiabilité d'une suite d'applications métier de gestion des commandes (ASP.NET Core, Angular, SQL Server), au sein d'une organisation d'environ quinze développeurs. Au-delà des développements prévus, j'ai traité seul et de ma propre initiative le travail de fond qui conditionne la fiabilité des livraisons : modernisation du front, performance des tests et de la CI, restructuration de la couche visuelle et design system.",
-				Highlights: []string{
-					"J'ai mené seul la migration d'Angular 17 à 21, avec des codemods AST pour les transformations non couvertes par les outils officiels.",
-					"J'ai migré plus de 900 tests de Jest vers Vitest et je les ai parallélisés : environ 20 minutes → 30 secondes.",
-					"J'ai réduit le pipeline front de 30 à 5-6 minutes, soit environ 2 heures d'attente gagnées par jour et près de 8 heures les jours de pointe. Pipeline back : 20 → 7 minutes (chantier partagé).",
-					"Après profilage, j'ai supprimé des cascades de chargement : une page complexe passe d'environ 5 secondes à 1 seconde.",
-					"J'ai restructuré une couche visuelle incohérente en un thème unifié et étendu le design system avec des pages de démonstration.",
-					"J'ai co-conçu le système transverse de permissions en production, utilisé par Angular et les API .NET.",
+				Highlights: []CareerHighlight{
+					hl("Migration d'Angular 17 à 21 menée seul,", "avec des codemods AST pour les transformations non couvertes par les outils officiels."),
+					hl("Migration de plus de 900 tests de Jest vers Vitest,", "parallélisés : environ 20 minutes → 30 secondes."),
+					hl("Pipeline front ramené de 30 à 5-6 minutes,", "soit environ 2 heures d'attente gagnées par jour et près de 8 heures les jours de pointe. Pipeline back : 20 → 7 minutes (chantier partagé)."),
+					hl("Cascades de chargement supprimées", "après profilage : une page complexe passe d'environ 5 secondes à 1 seconde."),
+					hl("Couche visuelle incohérente restructurée en un thème unifié,", "design system étendu avec des pages de démonstration."),
+					hl("Système transverse de permissions co-conçu,", "en production, utilisé par Angular et les API .NET."),
 				},
 				Details: []CareerDetail{
 					{Title: "Modernisation du front-end", Text: "De ma propre initiative, j'ai mené seul la migration d'Angular 17 à Angular 21, de l'analyse à la mise en production. Pour les transformations que les outils officiels ne couvrent pas, j'ai écrit des codemods AST qui ont automatisé la réécriture du code. J'ai ensuite migré la suite de plus de 900 tests de Jest vers Vitest et je l'ai parallélisée : son exécution est passée d'environ 20 minutes à 30 secondes."},
@@ -148,9 +150,10 @@ func careerFR() CareerProfile {
 			{
 				Period: "Janvier 2023 – mars 2025", Role: "Ingénieur logiciel", Company: "AViSTO", Context: "Mission Alstom",
 				Summary: "Mission de deux ans sur les outils de configuration des systèmes ferroviaires embarqués. J'ai conçu et implémenté seul une CLI .NET 8 utilisée en production, préparé la migration de plusieurs dizaines de projets de NAnt vers MSBuild et fait évoluer des applications WinForms en .NET Framework.",
-				Highlights: []string{
-					"J'ai conçu et implémenté seul une CLI .NET 8 de production : formats binaires, validation XSD, chiffrement et signature.",
-					"J'ai préparé la migration NAnt → MSBuild de plusieurs dizaines de projets C#, outillage d'automatisation compris.",
+				Highlights: []CareerHighlight{
+					hl("CLI .NET 8 de production conçue et implémentée seul :", "formats binaires, validation XSD, chiffrement et signature."),
+					hl("Migration NAnt → MSBuild préparée", "pour plusieurs dizaines de projets C#, outillage d'automatisation compris."),
+					hl("Applications WinForms (.NET Framework 4) maintenues,", "évolutions sécurisées par des tests NUnit unitaires et d'intégration."),
 				},
 				Details: []CareerDetail{
 					{Title: "CLI de production", Text: "À partir de spécifications techniques détaillant les formats binaires, la taille des champs et les règles d'échange, j'ai conçu et implémenté seul l'outil. La CLI produit des archives de données techniques destinées à certains systèmes du train, valide les documents XML selon des schémas spécialisés, contrôle la cohérence des données, puis chiffre et signe les fichiers. J'ai conçu des résultats typés, des diagnostics et des codes de sortie qui rendent chaque échec exploitable par les utilisateurs comme par les traitements automatisés."},
@@ -163,9 +166,9 @@ func careerFR() CareerProfile {
 			{
 				Period: "Septembre 2019 – juin 2022", Role: "Assistant systèmes d'information en alternance", Company: "AG2R La Mondiale",
 				Summary: "Alternance de trois ans dans l'équipe de cartographie du système d'information. J'ai conçu et maintenu seul un framework TypeScript déployé sur près de 50 000 pages, puis conduit la migration de MEGA HOPEX V2R1 vers V5 jusqu'à sa mise en production, comme co-chef de projet MOE.",
-				Highlights: []string{
-					"J'ai conçu un framework TypeScript de 25 modules, déployé sur près de 50 000 pages, et je l'ai maintenu seul jusqu'à mon départ.",
-					"J'ai conduit la migration MEGA HOPEX V2R1 → V5 jusqu'à la mise en production, comme co-chef de projet MOE.",
+				Highlights: []CareerHighlight{
+					hl("Framework TypeScript de 25 modules conçu,", "déployé sur près de 50 000 pages et maintenu seul jusqu'à mon départ."),
+					hl("Migration MEGA HOPEX V2R1 → V5 conduite jusqu'à la mise en production,", "comme co-chef de projet MOE."),
 				},
 				Details: []CareerDetail{
 					{Title: "Refonte du front-end", Text: "J'ai conçu un framework TypeScript de 25 modules et environ 4 900 lignes pour refondre près de 50 000 pages générées par la plateforme. Son architecture apporte gestion d'état, hooks, montage sur un DOM existant et chargement dynamique, tout en conservant les échanges XML, JSON, SOAP et REST du système en place."},
@@ -189,25 +192,13 @@ func careerFR() CareerProfile {
 			},
 		},
 		Education: []CareerEducation{
-			{Period: "2019 – 2022", Degree: "Diplôme d'ingénieur en informatique, spécialité systèmes d'information", School: "Conservatoire national des arts et métiers", Description: "Mon mémoire portait sur la gestion de l'obsolescence, le cadrage, la conduite du changement et la migration réelle vers MEGA HOPEX V5. J'intervenais comme co-chef de projet MOE."},
-			{Period: "2020 – 2021", Degree: "Étude de REST hypermédia et GraphQL", School: "Conservatoire national des arts et métiers", Description: "J'ai comparé les deux modèles d'API, puis réalisé seul un prototype Svelte en trois jours et demi afin d'évaluer leurs contraintes et leur impact sur le client web.", FullOnly: true},
-			{Period: "2019 – 2020", Degree: "Modernisation d'une plateforme de cartographie", School: "Conservatoire national des arts et métiers", Description: "Le premier rapport d'activité documentait la modernisation de la plateforme AG2R et les développements réalisés en C# avec Graphviz, JavaScript et VBScript.", FullOnly: true},
+			{Period: "2019 – 2022", Degree: "Diplôme d'ingénieur en informatique, spécialité systèmes d'information", School: "CNAM", Description: "Mon mémoire portait sur la gestion de l'obsolescence, le cadrage, la conduite du changement et la migration réelle vers MEGA HOPEX V5. J'intervenais comme co-chef de projet MOE."},
+			{Period: "2020 – 2021", Degree: "Étude de REST hypermédia et GraphQL", School: "CNAM", Description: "J'ai comparé les deux modèles d'API, puis réalisé seul un prototype Svelte en trois jours et demi afin d'évaluer leurs contraintes et leur impact sur le client web.", FullOnly: true},
+			{Period: "2019 – 2020", Degree: "Modernisation d'une plateforme de cartographie", School: "CNAM", Description: "Le premier rapport d'activité documentait la modernisation de la plateforme AG2R et les développements réalisés en C# avec Graphviz, JavaScript et VBScript.", FullOnly: true},
 			{Period: "2017 – 2019", Degree: "DUT Informatique", School: "IUT Paris Descartes", Description: "La formation couvrait le développement logiciel, le web, les données, les systèmes et les réseaux. J'ai participé à la Nuit de l'Info 2018."},
 		},
-		Skills: []CareerGroup{
-			{Title: "Développement applicatif", Items: []string{"Je travaille principalement avec C#, .NET Framework, .NET 7/8, ASP.NET Core, WinForms, TypeScript, Angular et Go. Je conçois des applications métier web, des applications de bureau, des CLI et des outils d'intégration. Svelte 5 et SvelteKit complètent cette pratique dans mes projets personnels."}},
-			{Title: "Tests et performance", Items: []string{"J'utilise Vitest, Jest et NUnit pour les tests unitaires et d'intégration. Je profile les applications et les chaînes de build avant d'agir sur les temps d'exécution, les accès aux données ou la parallélisation."}},
-			{Title: "Données, build et livraison", Items: []string{"Je travaille avec SQL Server, SQLite, XML, JSON, SOAP, REST et GraphQL. Mes chaînes de livraison utilisent notamment Azure DevOps, GitLab CI, GitHub Actions, MSBuild, NAnt, Webpack 5, Babel, PowerShell, Nix, Docker et Azure App Service."}},
-			{Title: "Systèmes", Items: []string{"J'administre des systèmes Linux et NixOS avec systemd, des conteneurs, de la virtualisation, Apache, des sauvegardes et de la supervision. Bash, SSH et rsync servent à automatiser leur exploitation."}},
-			{Title: "Leadership technique", Items: []string{"J'identifie les chantiers de fond qui freinent une équipe (dette de framework, CI lente, socle visuel incohérent) et je les conduis de ma propre initiative, de la mesure initiale jusqu'à l'adoption. Je conçois des outils de migration automatisés, des design systems documentés et des architectures transverses comme un système de permissions."}},
-			{Title: "Pratiques professionnelles", Items: []string{"Je travaille en équipe Agile avec des interlocuteurs produit, métier et techniques. Je rédige des spécifications, des documents d'architecture, des descriptions d'interfaces et des procédures d'exploitation. Mon parcours comprend aussi le cadrage, la conduite du changement et la présentation de sujets techniques."}},
-		},
-		ResumeSkills: []string{
-			"Développement applicatif : C#, .NET, ASP.NET Core, Angular, TypeScript, Go et SQL Server pour des applications web, desktop et des outils en ligne de commande.",
-			"Modernisation et performance : migrations de frameworks et codemods AST, profilage, tests automatisés (Vitest, NUnit), optimisation de CI (Azure DevOps, GitLab CI), MSBuild, Docker, Linux et NixOS.",
-			"Leadership technique : chantiers de fond menés de ma propre initiative, design system, architecture de permissions, documentation et transmission aux équipes.",
-		},
 		Projects: []CareerProject{
+			{Name: "wren", URL: "https://github.com/sachahjkl/wren", Summary: "Navigateur web écrit en Odin où WebAssembly est le seul moteur d'exécution, JavaScript compris : moteur JS compilé en Wasm et exécuté par Wasmtime, moteur CSS et mise en page, rendu GPU Direct3D 11.", Description: "Navigateur web écrit en Odin où WebAssembly est le seul moteur d'exécution. Les scripts d'une page tournent dans un moteur JavaScript écrit en Odin, compilé en Wasm et exécuté par Wasmtime, une instance par page, avec limite mémoire et délai. Les pages peuvent aussi appeler directement des modules Wasm ; les API web sont décrites une fois en Web IDL, et un générateur produit les liaisons hôte, le SDK, la documentation et les tests de conformité. Le reste est un vrai moteur : HTML (Lexbor), CSS moderne, shadow DOM, mises en page block, inline, flex, grid et table, rendu GPU Direct3D 11 et texte DirectWrite.", Stack: "Odin, WebAssembly, Wasmtime, Direct3D 11, Web IDL"},
 			{Name: "sacha.house", URL: "https://github.com/sachahjkl/sacha.house", Summary: "Site personnel et moteur de publication en Go, avec composants templ, navigation Datastar, authentification WebAuthn et déploiement Nix.", Description: "Je développe mon site personnel et son moteur de publication en Go. Le serveur utilise templ pour les composants, Datastar pour la navigation progressive et WebAuthn pour authentifier l'accès à l'interface d'administration. Le build, les livraisons et le déploiement reposent sur Nix.", Stack: "Go, templ, Datastar, Tailwind CSS, WebAuthn, Nix"},
 			{Name: "nixconfig", URL: "https://github.com/sachahjkl/nixconfig", Summary: "Infrastructure NixOS déclarative utilisée pour reconstruire plusieurs machines et services à partir de modules partagés.", Description: "Je maintiens une infrastructure NixOS déclarative afin de rendre mes systèmes reproductibles et de limiter les écarts de configuration entre les machines. Les mêmes modules permettent de reconstruire quatre configurations, dont trois machines physiques et un environnement WSL. Le dépôt contient 123 modules flake-parts, 94 modules NixOS et 24 entrées de flake ; il configure 31 hôtes virtuels et 20 conteneurs.", Stack: "Nix, NixOS, flake-parts, systemd, conteneurs"},
 			{Name: "albumator", URL: "https://github.com/sachahjkl/albumator", Description: "J'ai développé cette application de dépôt, de classement et de consultation d'images avec Svelte 5 et SvelteKit.", Stack: "Svelte 5, SvelteKit, Tailwind CSS"},
@@ -235,14 +226,12 @@ func careerEN() CareerProfile {
 	profile.Language = "en"
 	profile.OtherLanguage = "fr"
 	profile.OtherLanguageLabel = "Français"
-	profile.Title = "Software engineer — modernization, performance, and reliability of business applications"
 	profile.Summary = "Software engineer with more than six years of experience, including a three-year apprenticeship, on .NET and Angular business applications. I take ownership, often on my own initiative, of the foundational work that determines delivery quality: framework migrations, faster tests and continuous integration, application performance, platform restructuring, and design systems. I measure before acting and drive this work on my own, from design through team adoption."
 	profile.Nationality = "French"
 	profile.AgeLabel = "years old"
 	profile.ContactLabel = "Contact"
 	profile.ExperienceLabel = "Experience"
 	profile.EducationLabel = "Education"
-	profile.SkillsLabel = "Skills"
 	profile.ProjectsLabel = "Selected projects"
 	profile.CatalogLabel = "Project catalog"
 	profile.PublicationsLabel = "Publications"
@@ -250,20 +239,18 @@ func careerEN() CareerProfile {
 	profile.PrintLabel = "Print / PDF"
 	profile.ResumeLabel = "Résumé"
 	profile.CVLabel = "Full CV"
-	profile.ProfileLabel = "Profile"
-	profile.SelectedLabel = "Main achievements"
-	profile.EnvironmentLabel = "Technical environment"
+	profile.EnvironmentLabel = "Stack"
 	profile.Experiences = []CareerExperience{
 		{
 			Period: "Since April 2025", Role: "Software engineer", Company: "Catamania", Context: "Assignment with France's leading funeral services group",
 			Summary: "Modernization, performance, and reliability of a suite of order-management business applications (ASP.NET Core, Angular, SQL Server) in an organization of about fifteen developers. Beyond planned feature work, I took on, alone and on my own initiative, the foundational work that determines delivery reliability: front-end modernization, test and CI performance, visual-layer restructuring, and the design system.",
-			Highlights: []string{
-				"Led the Angular 17 to 21 migration alone, writing AST codemods for transformations not covered by official tooling.",
-				"Migrated 900+ tests from Jest to Vitest and parallelized them: about 20 minutes → 30 seconds.",
-				"Cut the front-end pipeline from 30 to 5–6 minutes, saving about 2 hours of waiting per day and nearly 8 hours on peak days. Back-end pipeline: 20 → 7 minutes (shared effort).",
-				"Profiled and removed loading cascades: a complex page went from about 5 seconds to 1 second.",
-				"Restructured an inconsistent visual layer into a unified theme and extended the design system with demo pages.",
-				"Co-designed the cross-cutting permission system now in production, used by Angular and the .NET APIs.",
+			Highlights: []CareerHighlight{
+				hl("Angular 17 to 21 migration led alone,", "with AST codemods for transformations not covered by official tooling."),
+				hl("900+ tests migrated from Jest to Vitest", "and parallelized: about 20 minutes → 30 seconds."),
+				hl("Front-end pipeline cut from 30 to 5–6 minutes,", "saving about 2 hours of waiting per day and nearly 8 hours on peak days. Back-end pipeline: 20 → 7 minutes (shared effort)."),
+				hl("Loading cascades removed", "after profiling: a complex page went from about 5 seconds to 1 second."),
+				hl("Inconsistent visual layer restructured into a unified theme,", "design system extended with demo pages."),
+				hl("Cross-cutting permission system co-designed,", "in production, used by Angular and the .NET APIs."),
 			},
 			Details: []CareerDetail{
 				{Title: "Front-end modernization", Text: "On my own initiative, I led the Angular 17 to Angular 21 migration alone, from analysis to production. For transformations not covered by official tooling, I wrote AST codemods that automated the code rewrite. I then migrated the 900+ test suite from Jest to Vitest and parallelized it, reducing runtime from about 20 minutes to 30 seconds."},
@@ -282,9 +269,10 @@ func careerEN() CareerProfile {
 		{
 			Period: "January 2023 – March 2025", Role: "Software engineer", Company: "AViSTO", Context: "Alstom assignment",
 			Summary: "Two-year assignment on configuration tools for embedded railway systems. I designed and implemented a production .NET 8 CLI on my own, prepared several dozen projects for migration from NAnt to MSBuild, and evolved WinForms applications on .NET Framework.",
-			Highlights: []string{
-				"Designed and implemented a production .NET 8 CLI on my own: binary formats, XSD validation, encryption, and signing.",
-				"Prepared the NAnt → MSBuild migration of several dozen C# projects, including automation tooling.",
+			Highlights: []CareerHighlight{
+				hl("Production .NET 8 CLI designed and implemented alone:", "binary formats, XSD validation, encryption, and signing."),
+				hl("NAnt → MSBuild migration prepared", "for several dozen C# projects, including automation tooling."),
+				hl("WinForms applications (.NET Framework 4) maintained,", "with changes secured by NUnit unit and integration tests."),
 			},
 			Details: []CareerDetail{
 				{Title: "Production CLI", Text: "Working from technical specifications that defined binary layouts, field sizes, and exchange rules, I designed and implemented the tool on my own. It produces technical-data archives for selected train systems, validates XML documents against specialized schemas, checks data consistency, then encrypts and signs the resulting files. I designed typed results, diagnostics, and exit codes that make failures actionable for both users and automated processing."},
@@ -297,9 +285,9 @@ func careerEN() CareerProfile {
 		{
 			Period: "September 2019 – June 2022", Role: "Information systems assistant, apprenticeship", Company: "AG2R La Mondiale",
 			Summary: "Three-year apprenticeship in the information-system mapping team. I designed and solely maintained a TypeScript framework deployed across almost 50,000 pages, then led the MEGA HOPEX V2R1-to-V5 migration through production as joint technical project lead.",
-			Highlights: []string{
-				"Designed a 25-module TypeScript framework deployed across almost 50,000 pages and remained its sole maintainer until leaving.",
-				"Led the MEGA HOPEX V2R1 → V5 migration through production as joint technical project lead.",
+			Highlights: []CareerHighlight{
+				hl("25-module TypeScript framework designed,", "deployed across almost 50,000 pages and solely maintained until I left."),
+				hl("MEGA HOPEX V2R1 → V5 migration led through production", "as joint technical project lead."),
 			},
 			Details: []CareerDetail{
 				{Title: "Front-end redesign", Text: "I designed a 25-module, 4,900-line TypeScript framework to redesign almost 50,000 pages generated by the platform. Its architecture adds state management, hooks, mounting on an existing DOM, and dynamic loading while preserving the existing XML, JSON, SOAP, and REST exchanges."},
@@ -313,25 +301,13 @@ func careerEN() CareerProfile {
 		{Period: "April – August 2019", Role: "Systems administration intern", Company: "Italic", FullOnly: true, Summary: "Administered 5 to 10 Linux VPS instances hosting customer websites. Bash automation covered configuration, backups, deployments, and monitoring for the LAMP infrastructure.", Details: []CareerDetail{{Title: "Automation and operations", Text: "Bash scripts automated server configuration, backups, deployments, and monitoring. Operations relied on Apache, PHP, MySQL or MariaDB, SSH, and rsync. Additional research explored Ruby-based automation of EBICS banking statements."}}, Environment: "Linux, Bash, Apache, PHP, MySQL/MariaDB, SSH, rsync, OVH, Ruby, EBICS"},
 	}
 	profile.Education = []CareerEducation{
-		{Period: "2019 – 2022", Degree: "Engineering degree in computer science, information systems", School: "Conservatoire national des arts et métiers", Description: "My thesis covered obsolescence management, project scoping, change management, and the production migration to MEGA HOPEX V5. I acted as joint technical project lead."},
-		{Period: "2020 – 2021", Degree: "REST hypermedia and GraphQL study", School: "Conservatoire national des arts et métiers", Description: "I compared both API models and independently built a Svelte prototype in three and a half days to assess their constraints and impact on the web client.", FullOnly: true},
-		{Period: "2019 – 2020", Degree: "Information-system mapping platform modernization", School: "Conservatoire national des arts et métiers", Description: "The first activity report documented the AG2R platform modernization and development work in C# with Graphviz, JavaScript, and VBScript.", FullOnly: true},
+		{Period: "2019 – 2022", Degree: "Engineering degree in computer science, information systems", School: "CNAM", Description: "My thesis covered obsolescence management, project scoping, change management, and the production migration to MEGA HOPEX V5. I acted as joint technical project lead."},
+		{Period: "2020 – 2021", Degree: "REST hypermedia and GraphQL study", School: "CNAM", Description: "I compared both API models and independently built a Svelte prototype in three and a half days to assess their constraints and impact on the web client.", FullOnly: true},
+		{Period: "2019 – 2020", Degree: "Information-system mapping platform modernization", School: "CNAM", Description: "The first activity report documented the AG2R platform modernization and development work in C# with Graphviz, JavaScript, and VBScript.", FullOnly: true},
 		{Period: "2017 – 2019", Degree: "Two-year university degree in computer science", School: "IUT Paris Descartes", Description: "The course covered software, web, data, systems, and networks. I participated in Nuit de l'Info 2018."},
 	}
-	profile.Skills = []CareerGroup{
-		{Title: "Application development", Items: []string{"I work primarily with C#, .NET Framework, .NET 7/8, ASP.NET Core, WinForms, TypeScript, Angular, and Go. I design business web applications, desktop applications, CLIs, and integration tools. Svelte 5 and SvelteKit complement this work in personal projects."}},
-		{Title: "Testing and performance", Items: []string{"I use Vitest, Jest, and NUnit for unit and integration testing. I profile applications and build chains before changing execution times, data access, or parallelism."}},
-		{Title: "Data, build, and delivery", Items: []string{"I work with SQL Server, SQLite, XML, JSON, SOAP, REST, and GraphQL. My delivery chains use Azure DevOps, GitLab CI, GitHub Actions, MSBuild, NAnt, Webpack 5, Babel, PowerShell, Nix, Docker, and Azure App Service."}},
-		{Title: "Systems", Items: []string{"I administer Linux and NixOS systems with systemd, containers, virtualization, Apache, backups, and monitoring. Bash, SSH, and rsync support their operation."}},
-		{Title: "Technical leadership", Items: []string{"I identify the foundational work that slows a team down (framework debt, slow CI, inconsistent visual foundations) and drive it on my own initiative, from initial measurement through adoption. I design automated migration tooling, documented design systems, and cross-cutting architectures such as a permission system."}},
-		{Title: "Professional practices", Items: []string{"I work in Agile teams with product, business, and technical stakeholders. I write specifications, architecture documents, interface descriptions, and operating procedures. My experience also includes project scoping, change management, and technical presentations."}},
-	}
-	profile.ResumeSkills = []string{
-		"Application development: C#, .NET, ASP.NET Core, Angular, TypeScript, Go, and SQL Server for web, desktop, and command-line applications.",
-		"Modernization and performance: framework migrations and AST codemods, profiling, automated testing (Vitest, NUnit), CI optimization (Azure DevOps, GitLab CI), MSBuild, Docker, Linux, and NixOS.",
-		"Technical leadership: self-initiated foundational work, design systems, permission architecture, documentation, and handover to teams.",
-	}
 	profile.Projects = []CareerProject{
+		{Name: "wren", URL: "https://github.com/sachahjkl/wren", Summary: "Web browser written in Odin where WebAssembly is the only execution engine, JavaScript included: a JS engine compiled to Wasm and run by Wasmtime, a CSS and layout engine, Direct3D 11 GPU rendering.", Description: "Web browser written in Odin where WebAssembly is the only execution engine. Page scripts run in a JavaScript engine written in Odin, compiled to Wasm and run by Wasmtime, one instance per page with a memory cap and a deadline. Pages can also call Wasm modules directly; the web APIs are described once in Web IDL, and a generator produces the host bindings, the guest SDK, the documentation, and the conformance tests. Everything else is a real engine: HTML (Lexbor), modern CSS, shadow DOM, block, inline, flex, grid, and table layout, Direct3D 11 GPU rendering, and DirectWrite text.", Stack: "Odin, WebAssembly, Wasmtime, Direct3D 11, Web IDL"},
 		{Name: "sacha.house", URL: "https://github.com/sachahjkl/sacha.house", Summary: "Personal website and publishing engine in Go, with templ components, Datastar navigation, WebAuthn authentication, and Nix deployment.", Description: "I develop my personal website and publishing engine in Go. The server uses templ for components, Datastar for progressive navigation, and WebAuthn to authenticate access to the administration interface. Nix handles builds, releases, and deployment.", Stack: "Go, templ, Datastar, Tailwind CSS, WebAuthn, Nix"},
 		{Name: "nixconfig", URL: "https://github.com/sachahjkl/nixconfig", Summary: "Declarative NixOS infrastructure used to rebuild several machines and services from shared modules.", Description: "I maintain declarative NixOS infrastructure to make my systems reproducible and limit configuration drift between machines. Shared modules rebuild four configurations, including three physical computers and one WSL environment. The repository contains 123 flake-parts modules, 94 NixOS modules, and 24 flake inputs; it configures 31 virtual hosts and 20 containers.", Stack: "Nix, NixOS, flake-parts, systemd, containers"},
 		{Name: "albumator", URL: "https://github.com/sachahjkl/albumator", Description: "I developed this image upload, organization, and browsing application with Svelte 5 and SvelteKit.", Stack: "Svelte 5, SvelteKit, Tailwind CSS"},
