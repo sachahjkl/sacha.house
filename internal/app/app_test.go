@@ -24,6 +24,10 @@ import (
 	"sacha.house/internal/projects"
 )
 
+var testPasswordHash = sync.OnceValues(func() (string, error) {
+	return auth.HashPassword("test-password", []byte("test-pepper"))
+})
+
 type testProjectsFetcher struct{}
 
 func (testProjectsFetcher) Fetch(context.Context) (projects.Cache, error) {
@@ -71,7 +75,7 @@ func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *
 		"linkedin_profile.json": &fstest.MapFile{Data: []byte(`{"experiences":[],"education":[]}`)},
 		"hello.txt":             &fstest.MapFile{Data: []byte("static")},
 	}
-	hash, err := auth.HashPassword("test-password", []byte("test-pepper"))
+	hash, err := testPasswordHash()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,6 +122,9 @@ func (fetcher blockingProjectsFetcher) Fetch(context.Context) (projects.Cache, e
 func TestStaleProjectsCacheRefreshDoesNotBlockStartup(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
+	if _, err := testPasswordHash(); err != nil {
+		t.Fatal(err)
+	}
 	begin := time.Now()
 	application := newTestAppWithFetcher(t, blockingProjectsFetcher{started: started, release: release}, true)
 	if elapsed := time.Since(begin); elapsed > time.Second {
