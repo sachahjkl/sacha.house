@@ -29,10 +29,10 @@ type CareerDetail struct {
 }
 
 type CareerEducation struct {
-	Period      string
-	Degree      string
-	School      string
-	Notes       []CareerHighlight
+	Period string
+	Degree string
+	School string
+	Notes  []CareerHighlight
 }
 
 type CareerProject struct {
