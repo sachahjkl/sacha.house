@@ -32,8 +32,7 @@ type CareerEducation struct {
 	Period      string
 	Degree      string
 	School      string
-	Description string
-	FullOnly    bool
+	Notes       []CareerHighlight
 }
 
 type CareerProject struct {
@@ -192,10 +191,14 @@ func careerFR() CareerProfile {
 			},
 		},
 		Education: []CareerEducation{
-			{Period: "2019 – 2022", Degree: "Diplôme d'ingénieur en informatique, spécialité systèmes d'information", School: "CNAM", Description: "Mon mémoire portait sur la gestion de l'obsolescence, le cadrage, la conduite du changement et la migration réelle vers MEGA HOPEX V5. J'intervenais comme co-chef de projet MOE."},
-			{Period: "2020 – 2021", Degree: "Étude de REST hypermédia et GraphQL", School: "CNAM", Description: "J'ai comparé les deux modèles d'API, puis réalisé seul un prototype Svelte en trois jours et demi afin d'évaluer leurs contraintes et leur impact sur le client web.", FullOnly: true},
-			{Period: "2019 – 2020", Degree: "Modernisation d'une plateforme de cartographie", School: "CNAM", Description: "Le premier rapport d'activité documentait la modernisation de la plateforme AG2R et les développements réalisés en C# avec Graphviz, JavaScript et VBScript.", FullOnly: true},
-			{Period: "2017 – 2019", Degree: "DUT Informatique", School: "IUT Paris Descartes", Description: "La formation couvrait le développement logiciel, le web, les données, les systèmes et les réseaux. J'ai participé à la Nuit de l'Info 2018."},
+			{Period: "2019 – 2022", Degree: "Diplôme d'ingénieur en informatique, spécialité systèmes d'information", School: "CNAM", Notes: []CareerHighlight{
+				hl("Mémoire :", "gestion de l'obsolescence, cadrage, conduite du changement et migration vers MEGA HOPEX V5, comme co-chef de projet MOE."),
+				hl("Rapport d'activité (2019 – 2020) :", "modernisation de la plateforme de cartographie AG2R, développée en C# avec Graphviz, JavaScript et VBScript."),
+				hl("Étude (2020 – 2021) :", "comparaison de REST hypermédia et de GraphQL, avec un prototype Svelte réalisé seul en trois jours et demi pour mesurer l'impact sur le client web."),
+			}},
+			{Period: "2017 – 2019", Degree: "DUT Informatique", School: "IUT Paris Descartes", Notes: []CareerHighlight{
+				hl("Programme :", "développement logiciel, web, données, systèmes et réseaux ; participation à la Nuit de l'info 2018."),
+			}},
 		},
 		Projects: []CareerProject{
 			{Name: "wren", URL: "https://github.com/sachahjkl/wren", Summary: "Navigateur web écrit en Odin où WebAssembly est le seul moteur d'exécution, JavaScript compris : moteur JS compilé en Wasm et exécuté par Wasmtime, moteur CSS et mise en page, rendu GPU Direct3D 11.", Description: "Navigateur web écrit en Odin où WebAssembly est le seul moteur d'exécution. Les scripts d'une page tournent dans un moteur JavaScript écrit en Odin, compilé en Wasm et exécuté par Wasmtime, une instance par page, avec limite mémoire et délai. Les pages peuvent aussi appeler directement des modules Wasm ; les API web sont décrites une fois en Web IDL, et un générateur produit les liaisons hôte, le SDK, la documentation et les tests de conformité. Le reste est un vrai moteur : HTML (Lexbor), CSS moderne, shadow DOM, mises en page block, inline, flex, grid et table, rendu GPU Direct3D 11 et texte DirectWrite.", Stack: "Odin, WebAssembly, Wasmtime, Direct3D 11, Web IDL"},
@@ -301,10 +304,14 @@ func careerEN() CareerProfile {
 		{Period: "April – August 2019", Role: "Systems administration intern", Company: "Italic", FullOnly: true, Summary: "Administered 5 to 10 Linux VPS instances hosting customer websites. Bash automation covered configuration, backups, deployments, and monitoring for the LAMP infrastructure.", Details: []CareerDetail{{Title: "Automation and operations", Text: "Bash scripts automated server configuration, backups, deployments, and monitoring. Operations relied on Apache, PHP, MySQL or MariaDB, SSH, and rsync. Additional research explored Ruby-based automation of EBICS banking statements."}}, Environment: "Linux, Bash, Apache, PHP, MySQL/MariaDB, SSH, rsync, OVH, Ruby, EBICS"},
 	}
 	profile.Education = []CareerEducation{
-		{Period: "2019 – 2022", Degree: "Engineering degree in computer science, information systems", School: "CNAM", Description: "My thesis covered obsolescence management, project scoping, change management, and the production migration to MEGA HOPEX V5. I acted as joint technical project lead."},
-		{Period: "2020 – 2021", Degree: "REST hypermedia and GraphQL study", School: "CNAM", Description: "I compared both API models and independently built a Svelte prototype in three and a half days to assess their constraints and impact on the web client.", FullOnly: true},
-		{Period: "2019 – 2020", Degree: "Information-system mapping platform modernization", School: "CNAM", Description: "The first activity report documented the AG2R platform modernization and development work in C# with Graphviz, JavaScript, and VBScript.", FullOnly: true},
-		{Period: "2017 – 2019", Degree: "Two-year university degree in computer science", School: "IUT Paris Descartes", Description: "The course covered software, web, data, systems, and networks. I participated in Nuit de l'Info 2018."},
+		{Period: "2019 – 2022", Degree: "Engineering degree in computer science, information systems", School: "CNAM", Notes: []CareerHighlight{
+			hl("Thesis:", "obsolescence management, scoping, change management, and migration to MEGA HOPEX V5, as joint technical project lead."),
+			hl("Activity report (2019 – 2020):", "modernization of the AG2R information-system mapping platform, built with C#, Graphviz, JavaScript, and VBScript."),
+			hl("Study (2020 – 2021):", "comparison of hypermedia REST and GraphQL, with a Svelte prototype built alone in three and a half days to assess the impact on the web client."),
+		}},
+		{Period: "2017 – 2019", Degree: "Two-year university degree in computer science", School: "IUT Paris Descartes", Notes: []CareerHighlight{
+			hl("Curriculum:", "software development, web, data, systems, and networks; took part in Nuit de l'Info 2018."),
+		}},
 	}
 	profile.Projects = []CareerProject{
 		{Name: "wren", URL: "https://github.com/sachahjkl/wren", Summary: "Web browser written in Odin where WebAssembly is the only execution engine, JavaScript included: a JS engine compiled to Wasm and run by Wasmtime, a CSS and layout engine, Direct3D 11 GPU rendering.", Description: "Web browser written in Odin where WebAssembly is the only execution engine. Page scripts run in a JavaScript engine written in Odin, compiled to Wasm and run by Wasmtime, one instance per page with a memory cap and a deadline. Pages can also call Wasm modules directly; the web APIs are described once in Web IDL, and a generator produces the host bindings, the guest SDK, the documentation, and the conformance tests. Everything else is a real engine: HTML (Lexbor), modern CSS, shadow DOM, block, inline, flex, grid, and table layout, Direct3D 11 GPU rendering, and DirectWrite text.", Stack: "Odin, WebAssembly, Wasmtime, Direct3D 11, Web IDL"},

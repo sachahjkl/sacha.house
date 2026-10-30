@@ -47,17 +47,19 @@ templ CareerContent(data CareerPageData) {
 		<section>
 			<h2>{ data.Profile.EducationLabel }</h2>
 			for _, education := range data.Profile.Education {
-				if data.Full || !education.FullOnly {
-					<div class="entry education-entry">
-						<div class="entry-head">
-							<span><strong class="entry-title">{ education.School }</strong> <span class="entry-sep">·</span> <em>{ education.Degree }</em></span>
-							<span class="entry-date">{ education.Period }</span>
-						</div>
-						if data.Full {
-							<p class="cv-meta">{ education.Description }</p>
-						}
+				<div class="entry education-entry">
+					<div class="entry-head">
+						<span><strong class="entry-title">{ education.School }</strong> <span class="entry-sep">·</span> <em>{ education.Degree }</em></span>
+						<span class="entry-date">{ education.Period }</span>
 					</div>
-				}
+					if data.Full && len(education.Notes) > 0 {
+						<ul class="cv-bullets">
+							for _, note := range education.Notes {
+								<li><strong>{ note.Lead }</strong> { note.Text }</li>
+							}
+						</ul>
+					}
+				</div>
 			}
 		</section>
 
