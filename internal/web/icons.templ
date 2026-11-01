@@ -1,0 +1,26 @@
+package web
+
+// Icon renders a Noto emoji SVG embedded in static/icons/noto, sized to the surrounding text.
+templ Icon(name string) {
+	<img src={ iconURL(name) } alt="" width="20" height="20" aria-hidden="true" class="not-prose mr-[0.3em] inline-block h-[1.1em] w-[1.1em] align-[-0.2em]"/>
+}
+
+// IconEnd is Icon placed after a label.
+templ IconEnd(name string) {
+	<img src={ iconURL(name) } alt="" width="20" height="20" aria-hidden="true" class="not-prose ml-[0.3em] inline-block h-[1.1em] w-[1.1em] align-[-0.2em]"/>
+}
+
+// BigIcon renders a large animated Noto SVG.
+templ BigIcon(name string) {
+	<img src={ iconURL(name) } alt="" width="144" height="144" aria-hidden="true" class="not-prose inline-block h-36 w-36 animate-bounce drop-shadow-md"/>
+}
+
+// ArrowLeft is the Lucide arrow-left icon, drawn in the current text colour.
+templ ArrowLeft() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="mr-[0.3em] inline-block h-[1em] w-[1em] align-[-0.125em]"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
+}
+
+// ArrowRight is the Lucide arrow-right icon, drawn in the current text colour.
+templ ArrowRight() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="mr-[0.3em] inline-block h-[1em] w-[1em] align-[-0.125em]"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+}

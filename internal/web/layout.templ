@@ -72,7 +72,8 @@ templ Header(data PageData) {
 					<legend class="ml-3 px-2">Navigation</legend>
 				<ul class="hidden flex-wrap gap-3 whitespace-nowrap sm:flex">
 					for index, item := range data.NavItems {
-						<li class="flex-[100%] sm:flex-none"><a href={ templ.SafeURL(item.Pathname) } class={ templ.KV("active", item.IsActive) } if item.IsActive { aria-current="page" }>{ item.Icon } { item.Title }</a></li>
+						<li class="flex-[100%] sm:flex-none"><a href={ templ.SafeURL(item.Pathname) } class={ templ.KV("active", item.IsActive) } if item.IsActive { aria-current="page" }>@Icon(item.Icon)
+{ item.Title }</a></li>
 						if index < len(data.NavItems)-1 {
 							<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
 						}
@@ -83,7 +84,8 @@ templ Header(data PageData) {
 						<summary id="nav-summary" class="mb-1">Open navigation</summary>
 						<ul class="flex flex-wrap gap-3 whitespace-nowrap">
 							for index, item := range data.NavItems {
-								<li class="flex-[100%] sm:flex-none"><a class={ "inline-block w-full", templ.KV("active", item.IsActive) } href={ templ.SafeURL(item.Pathname) } if item.IsActive { aria-current="page" }>{ item.Icon } { item.Title }</a></li>
+								<li class="flex-[100%] sm:flex-none"><a class={ "inline-block w-full", templ.KV("active", item.IsActive) } href={ templ.SafeURL(item.Pathname) } if item.IsActive { aria-current="page" }>@Icon(item.Icon)
+{ item.Title }</a></li>
 								if index < len(data.NavItems)-1 {
 									<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
 								}

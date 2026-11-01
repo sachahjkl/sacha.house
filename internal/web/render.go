@@ -2,7 +2,7 @@ package web
 
 type BrewMessage struct {
 	Text  string
-	Emoji string
+	Emoji string // name of a Noto icon in static/icons/noto
 }
 
 type TeapotPageData struct {

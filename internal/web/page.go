@@ -13,12 +13,12 @@ type NavItem struct {
 }
 
 var defaultNavItems = [...]NavItem{
-	{Title: "home", Pathname: "/", Icon: "🏠"},
-	{Title: "projects", Pathname: "/projects", Icon: "📁"},
-	{Title: "blog", Pathname: "/blog", Icon: "📝"},
-	{Title: "about", Pathname: "/about", Icon: "📜"},
-	{Title: "résumé", Pathname: "/resume", Icon: "📄"},
-	{Title: "admin", Pathname: "/admin", Icon: "🔒"},
+	{Title: "home", Pathname: "/", Icon: "house"},
+	{Title: "projects", Pathname: "/projects", Icon: "file-folder"},
+	{Title: "blog", Pathname: "/blog", Icon: "memo"},
+	{Title: "about", Pathname: "/about", Icon: "scroll"},
+	{Title: "résumé", Pathname: "/resume", Icon: "page-facing-up"},
+	{Title: "admin", Pathname: "/admin", Icon: "locked"},
 }
 
 func NavItems(activePathname string) []NavItem {
