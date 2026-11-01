@@ -75,6 +75,7 @@ func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *
 		"linkedin_profile.json": &fstest.MapFile{Data: []byte(`{"experiences":[],"education":[]}`)},
 		"hello.txt":             &fstest.MapFile{Data: []byte("static")},
 		"sachahjkl.pub":         &fstest.MapFile{Data: []byte("ssh-ed25519 AAAA test\n")},
+		"sachahjkl.gpg":         &fstest.MapFile{Data: []byte("-----BEGIN PGP PUBLIC KEY BLOCK-----\n")},
 	}
 	hash, err := testPasswordHash()
 	if err != nil {
@@ -132,6 +133,27 @@ func TestPublicKeyIsShownInTheBrowser(t *testing.T) {
 	}
 	if got := recorder.Header().Get("Content-Disposition"); got != "inline" {
 		t.Errorf("Content-Disposition = %q, want inline", got)
+	}
+}
+
+func TestKeyPagesShowTheKeyAsHTML(t *testing.T) {
+	application := newTestApp(t)
+	for _, test := range []struct{ path, key, raw string }{
+		{"/ssh", "ssh-ed25519 AAAA test", "/sachahjkl.pub"},
+		{"/gpg", "BEGIN PGP PUBLIC KEY BLOCK", "/sachahjkl.gpg"},
+	} {
+		recorder := httptest.NewRecorder()
+		application.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, test.path, nil))
+		if recorder.Code != http.StatusOK {
+			t.Fatalf("%s: status = %d, want 200", test.path, recorder.Code)
+		}
+		if got := recorder.Header().Get("Content-Type"); !strings.HasPrefix(got, "text/html") {
+			t.Errorf("%s: Content-Type = %q, want text/html", test.path, got)
+		}
+		body := recorder.Body.String()
+		if !strings.Contains(body, test.key) || !strings.Contains(body, test.raw) {
+			t.Errorf("%s: body misses the key or the raw link", test.path)
+		}
 	}
 }
 

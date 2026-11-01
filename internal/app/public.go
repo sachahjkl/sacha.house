@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"time"
 
@@ -113,6 +114,23 @@ func (app *App) teapot(writer http.ResponseWriter, request *http.Request) {
 		data.BrewMessage = web.BrewMessage{Text: fmt.Sprintf("What kind of a drink is %q ???", request.URL.Query().Get("drink")), Emoji: "nauseated-face"}
 	}
 	renderHTML(writer, request, web.TeapotPage(data), status)
+}
+
+// keyPage shows a public key file as a regular HTML page, so that every browser
+// displays it instead of offering to download it.
+func (app *App) keyPage(file, rawPath, heading, description string) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		key, err := fs.ReadFile(app.static, file)
+		if err != nil {
+			http.NotFound(writer, request)
+			return
+		}
+		data := web.KeyPageData{
+			PageData: app.page(request.URL.Path, heading+" / sacha.house", description),
+			Heading:  heading, Description: description, Key: string(key), RawPath: rawPath,
+		}
+		renderHTML(writer, request, web.KeyPage(data), http.StatusOK)
+	}
 }
 
 func randomString(length int) string {

@@ -1206,6 +1206,9 @@
   .whitespace-pre {
     white-space: pre;
   }
+  .whitespace-pre-wrap {
+    white-space: pre-wrap;
+  }
   .text-bgColor {
     color: var(--color-bgColor);
   }
