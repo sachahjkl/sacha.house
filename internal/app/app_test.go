@@ -74,6 +74,7 @@ func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *
 	assets := fstest.MapFS{
 		"linkedin_profile.json": &fstest.MapFile{Data: []byte(`{"experiences":[],"education":[]}`)},
 		"hello.txt":             &fstest.MapFile{Data: []byte("static")},
+		"sachahjkl.pub":         &fstest.MapFile{Data: []byte("ssh-ed25519 AAAA test\n")},
 	}
 	hash, err := testPasswordHash()
 	if err != nil {
@@ -117,6 +118,21 @@ func (fetcher blockingProjectsFetcher) Fetch(context.Context) (projects.Cache, e
 	close(fetcher.started)
 	<-fetcher.release
 	return projects.Cache{Projects: []projects.Project{{Name: "Background refresh complete"}}}, nil
+}
+
+func TestPublicKeyIsShownInTheBrowser(t *testing.T) {
+	application := newTestApp(t)
+	recorder := httptest.NewRecorder()
+	application.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/sachahjkl.pub", nil))
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", recorder.Code)
+	}
+	if got := recorder.Header().Get("Content-Type"); !strings.HasPrefix(got, "text/plain") {
+		t.Errorf("Content-Type = %q, want text/plain", got)
+	}
+	if got := recorder.Header().Get("Content-Disposition"); got != "inline" {
+		t.Errorf("Content-Disposition = %q, want inline", got)
+	}
 }
 
 func TestStaleProjectsCacheRefreshDoesNotBlockStartup(t *testing.T) {
