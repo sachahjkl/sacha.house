@@ -103,14 +103,14 @@ func (app *App) teapot(writer http.ResponseWriter, request *http.Request) {
 	status := http.StatusOK
 	switch request.URL.Query().Get("drink") {
 	case "tea":
-		data.BrewMessage = web.BrewMessage{Text: "Here is your tea!", Emoji: "🍵"}
+		data.BrewMessage = web.BrewMessage{Text: "Here is your tea!", Emoji: "teacup-without-handle"}
 	case "coffee":
 		status = http.StatusTeapot
 		data.IsATeapot = true
 		data.BrewMessage.Text = "Did you really think a teapot could brew you coffee ??\nare you some kind of lunatic or something ?"
 	case "":
 	default:
-		data.BrewMessage = web.BrewMessage{Text: fmt.Sprintf("What kind of a drink is %q ???", request.URL.Query().Get("drink")), Emoji: "🤮"}
+		data.BrewMessage = web.BrewMessage{Text: fmt.Sprintf("What kind of a drink is %q ???", request.URL.Query().Get("drink")), Emoji: "nauseated-face"}
 	}
 	renderHTML(writer, request, web.TeapotPage(data), status)
 }

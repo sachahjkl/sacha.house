@@ -1,3 +1,12 @@
+function setStatusMessage(element, icon, text) {
+  const image = document.createElement("img");
+  image.src = "/static/icons/noto/" + icon + ".svg";
+  image.alt = "";
+  image.setAttribute("aria-hidden", "true");
+  image.className = "not-prose mr-[0.3em] inline-block h-[1.1em] w-[1.1em] align-[-0.2em]";
+  element.replaceChildren(image, text);
+}
+
 function getPasskeyLabel() {
   const input = document.getElementById("passkey-label");
   return input ? input.value.trim() : "";
@@ -99,7 +108,7 @@ async function registerPasskey(button) {
   if (button) button.disabled = true;
   const statusEl = document.getElementById("passkey-status");
   statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
-  statusEl.textContent = "⏳ Fetching registration challenge...";
+  setStatusMessage(statusEl, "hourglass-not-done", "Fetching registration challenge...");
   statusEl.classList.remove("hidden");
 
   try {
@@ -107,10 +116,10 @@ async function registerPasskey(button) {
     const url = `/admin/webauthn/register-challenge?label=${encodeURIComponent(label)}`;
     const publicKey = await fetchPublicKeyOptions(url, decodeCreationOptions);
 
-    statusEl.textContent = "🔐 Please complete the passkey creation on your device...";
+    setStatusMessage(statusEl, "locked-with-key", "Please complete the passkey creation on your device...");
     const credential = await navigator.credentials.create({ publicKey });
 
-    statusEl.textContent = "⏳ Verifying registration...";
+    setStatusMessage(statusEl, "hourglass-not-done", "Verifying registration...");
 
     const verifyRes = await fetch("/admin/webauthn/register", {
       method: "POST",
@@ -120,11 +129,11 @@ async function registerPasskey(button) {
 
     await requireJSONSuccess(verifyRes);
     statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
-    statusEl.textContent = "✅ Passkey registered successfully!";
+    setStatusMessage(statusEl, "check-mark-button", "Passkey registered successfully!");
     document.getElementById("refresh-passkeys")?.click();
   } catch (error) {
     statusEl.className = "status-error mt-4";
-    statusEl.textContent = "❌ Error: " + error.message;
+    setStatusMessage(statusEl, "cross-mark", "Error: " + error.message);
   } finally {
     if (button) button.disabled = false;
   }
@@ -135,7 +144,7 @@ async function testPasskey(button) {
   if (button) button.disabled = true;
   const statusEl = document.getElementById("passkey-status");
   statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
-  statusEl.textContent = "⏳ Fetching authentication challenge...";
+  setStatusMessage(statusEl, "hourglass-not-done", "Fetching authentication challenge...");
   statusEl.classList.remove("hidden");
 
   try {
@@ -144,10 +153,10 @@ async function testPasskey(button) {
       decodeRequestOptions,
     );
 
-    statusEl.textContent = "🔐 Please complete the passkey verification on your device...";
+    setStatusMessage(statusEl, "locked-with-key", "Please complete the passkey verification on your device...");
     const assertion = await navigator.credentials.get({ publicKey });
 
-    statusEl.textContent = "⏳ Verifying authentication...";
+    setStatusMessage(statusEl, "hourglass-not-done", "Verifying authentication...");
 
     const verifyRes = await fetch("/admin/webauthn/login", {
       method: "POST",
@@ -157,10 +166,10 @@ async function testPasskey(button) {
 
     await requireJSONSuccess(verifyRes);
     statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
-    statusEl.textContent = "✅ Passkey authentication successful!";
+    setStatusMessage(statusEl, "check-mark-button", "Passkey authentication successful!");
   } catch (error) {
     statusEl.className = "status-error mt-4";
-    statusEl.textContent = "❌ Error: " + error.message;
+    setStatusMessage(statusEl, "cross-mark", "Error: " + error.message);
   } finally {
     if (button) button.disabled = false;
   }
@@ -171,7 +180,7 @@ async function loginWebAuthnPasskey(button) {
   if (button) button.disabled = true;
   const statusEl = document.getElementById("login-status");
   statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
-  statusEl.textContent = "⏳ Fetching authentication challenge...";
+  setStatusMessage(statusEl, "hourglass-not-done", "Fetching authentication challenge...");
   statusEl.classList.remove("hidden");
 
   try {
@@ -180,10 +189,10 @@ async function loginWebAuthnPasskey(button) {
       decodeRequestOptions,
     );
 
-    statusEl.textContent = "🔐 Please complete the passkey verification on your device...";
+    setStatusMessage(statusEl, "locked-with-key", "Please complete the passkey verification on your device...");
     const assertion = await navigator.credentials.get({ publicKey });
 
-    statusEl.textContent = "⏳ Verifying authentication...";
+    setStatusMessage(statusEl, "hourglass-not-done", "Verifying authentication...");
 
     const verifyRes = await fetch("/admin/webauthn/login", {
       method: "POST",
@@ -195,7 +204,7 @@ async function loginWebAuthnPasskey(button) {
     window.location.assign("/admin");
   } catch (error) {
     statusEl.className = "status-error mt-4";
-    statusEl.textContent = "❌ Error: " + error.message;
+    setStatusMessage(statusEl, "cross-mark", "Error: " + error.message);
   } finally {
     if (button) button.disabled = false;
   }
