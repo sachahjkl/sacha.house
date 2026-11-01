@@ -1,0 +1,21 @@
+package web
+
+templ KeyPage(data KeyPageData) {
+	@Document(data.PageData, KeyContent(data))
+}
+
+templ KeyContent(data KeyPageData) {
+	<article class="mx-auto max-w-5xl">
+		<p class="mb-4 text-sm"><a href="/" class="opacity-60 underline">
+			@ArrowLeft()
+			Home
+		</a></p>
+		<h1 class="h1">{ data.Heading }</h1>
+		<p class="mb-4">{ data.Description }</p>
+		<pre id="public-key" class="mb-4 border-2 p-3 break-all whitespace-pre-wrap">{ data.Key }</pre>
+		<p class="flex flex-wrap gap-4">
+			<button type="button" onclick="navigator.clipboard.writeText(document.getElementById('public-key').textContent.trim()).then(() => { this.textContent = 'copied' })" class="underline">copy</button>
+			<a href={ templ.SafeURL(data.RawPath) } class="underline">raw file</a>
+		</p>
+	</article>
+}
