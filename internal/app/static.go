@@ -15,6 +15,14 @@ var rootStaticAssets = map[string]struct{}{
 	"/sachahjkl.pub":        {},
 }
 
+// textRootAssets are plain-text key files. Their extensions map to unrelated
+// binary types (.pub is Microsoft Publisher), which makes browsers download
+// them instead of showing the key.
+var textRootAssets = map[string]struct{}{
+	"/sachahjkl.gpg": {},
+	"/sachahjkl.pub": {},
+}
+
 func (app *App) staticHandler() http.Handler {
 	server := http.StripPrefix("/static/", http.FileServerFS(app.static))
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
@@ -35,6 +43,10 @@ func (app *App) rootStaticHandler() http.Handler {
 			return
 		}
 		writer.Header().Set("Cache-Control", publicCache)
+		if _, text := textRootAssets[request.URL.Path]; text {
+			writer.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			writer.Header().Set("Content-Disposition", "inline")
+		}
 		server.ServeHTTP(writer, request)
 	})
 }
