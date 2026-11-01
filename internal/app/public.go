@@ -116,18 +116,32 @@ func (app *App) teapot(writer http.ResponseWriter, request *http.Request) {
 	renderHTML(writer, request, web.TeapotPage(data), status)
 }
 
-// keyPage shows a public key file as a regular HTML page, so that every browser
-// displays it instead of offering to download it.
-func (app *App) keyPage(file, rawPath, heading, description string) http.HandlerFunc {
+// publicKeys are the key files shown on the key pages, by page path.
+var publicKeys = map[string]struct{ id, heading, file string }{
+	"/ssh": {"ssh-key", "ssh public key", "sachahjkl.pub"},
+	"/gpg": {"gpg-key", "pgp public key", "sachahjkl.gpg"},
+}
+
+// keyPage shows one or several public keys as a regular HTML page, so that
+// every browser displays them instead of offering to download them.
+func (app *App) keyPage(heading, description string, paths ...string) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		key, err := fs.ReadFile(app.static, file)
-		if err != nil {
-			http.NotFound(writer, request)
-			return
+		keys := make([]web.KeyView, 0, len(paths))
+		for _, path := range paths {
+			source := publicKeys[path]
+			content, err := fs.ReadFile(app.static, source.file)
+			if err != nil {
+				http.NotFound(writer, request)
+				return
+			}
+			keys = append(keys, web.KeyView{
+				ID: source.id, Heading: source.heading, Key: string(content),
+				Path: path, RawPath: "/" + source.file,
+			})
 		}
 		data := web.KeyPageData{
 			PageData: app.page(request.URL.Path, heading+" / sacha.house", description),
-			Heading:  heading, Description: description, Key: string(key), RawPath: rawPath,
+			Heading:  heading, Description: description, Keys: keys,
 		}
 		renderHTML(writer, request, web.KeyPage(data), http.StatusOK)
 	}

@@ -21,8 +21,10 @@ about me</a></li>
 my <a href={ templ.SafeURL(data.CV) }>curriculum vitae</a> and <a href={ templ.SafeURL(data.Resume) }>résumé</a></li>
 				<li><a href={ templ.SafeURL("mailto:" + data.Mail) }>@Icon("e-mail")
 shoot me an email (will reply asap)</a></li>
-				<li><a href="/ssh">@Icon("locked-with-key")
-my ssh public key</a></li>
+				<li>
+					@Icon("locked-with-key")
+					my <a href="/ssh">ssh</a> and <a href="/gpg">gpg</a> <a href="/keys">public keys</a>
+				</li>
 			</ul>
 		</section>
 		<section class="mb-8"><picture><img class="m-auto w-full max-w-md" src="/static/c-omrade.jpg" width="1000" height="1305" alt="comrade" fetchpriority="high"/></picture></section>
