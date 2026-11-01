@@ -141,6 +141,8 @@ func TestKeyPagesShowTheKeyAsHTML(t *testing.T) {
 	for _, test := range []struct{ path, key, raw string }{
 		{"/ssh", "ssh-ed25519 AAAA test", "/sachahjkl.pub"},
 		{"/gpg", "BEGIN PGP PUBLIC KEY BLOCK", "/sachahjkl.gpg"},
+		{"/keys", "ssh-ed25519 AAAA test", "/sachahjkl.pub"},
+		{"/keys", "BEGIN PGP PUBLIC KEY BLOCK", "/sachahjkl.gpg"},
 	} {
 		recorder := httptest.NewRecorder()
 		application.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, test.path, nil))
