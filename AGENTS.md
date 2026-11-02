@@ -12,6 +12,7 @@
 - Generated CSS lives in `internal/web/static/css/style.css`.
 - Static assets are embedded through `internal/web/static/embed.go`.
 - Blog content is filesystem-backed under `data/blog/`.
+- `data/embed.go` embeds `data/blog/` in the binary. At start, `blog.ImportMissing` copies the posts the running data directory does not have yet; an existing post is never overwritten, so a post written in the repository is published by a deployment, and a post edited in the admin keeps its edits.
 - Encrypted Gist paste code lives in `internal/paste/` and `internal/app/paste.go`.
 
 ## Common Commands

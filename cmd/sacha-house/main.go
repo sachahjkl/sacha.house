@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ import (
 
 	"golang.org/x/term"
 
+	"sacha.house/data"
 	"sacha.house/internal/app"
 	"sacha.house/internal/auth"
 )
@@ -72,8 +74,12 @@ func run(arguments []string) error {
 	if err != nil {
 		return err
 	}
+	blogSeed, err := fs.Sub(data.Blog, "blog")
+	if err != nil {
+		return err
+	}
 	application, err := app.NewWithOptions(config, app.Options{
-		Version: version, CommitHash: commitHash, Development: development,
+		Version: version, CommitHash: commitHash, Development: development, BlogSeed: blogSeed,
 	})
 	if err != nil {
 		return err
