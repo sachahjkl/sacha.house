@@ -305,8 +305,8 @@ html {
 dialog.lightbox {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: auto;
+  height: auto;
   max-width: none;
   max-height: none;
   margin: 0;
@@ -379,4 +379,22 @@ dialog.lightbox[open] {
   .diagram-tools {
     border-bottom-color: #39ff14;
   }
+
+  .diagram-body,
+  .diagram pre.mermaid,
+  .lightbox-stage {
+    scrollbar-color: #39ff14 #000000;
+  }
+}
+
+/* The page does not scroll behind the viewer, so the viewer is never narrower than its toolbar */
+html:has(dialog.lightbox[open]) {
+  overflow: hidden;
+}
+
+/* Scrollbars in the colours of the site: the text colour on the background, so they follow the scheme */
+html,
+* {
+  scrollbar-color: var(--color-textColor) var(--color-bgColor);
+  scrollbar-width: auto;
 }

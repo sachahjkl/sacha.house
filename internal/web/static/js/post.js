@@ -386,6 +386,28 @@
     });
   }
 
+  // A diagram's viewBox is computed from the size of the labels at layout time; if anything came out larger (a
+  // font that arrived late, a wide edge label), it would be clipped. Grow the viewBox to the real content.
+  function fitViewBox(svg) {
+    if (!svg || !svg.viewBox || !svg.viewBox.baseVal) return;
+    // Sequence diagrams size themselves from their actors and messages, and their lifelines would skew the box.
+    if ((svg.getAttribute("aria-roledescription") || "").startsWith("sequence")) return;
+    try {
+      const view = svg.viewBox.baseVal;
+      const box = svg.getBBox();
+      const padding = 12;
+      const left = Math.min(view.x, box.x - padding);
+      const top = Math.min(view.y, box.y - padding);
+      const right = Math.max(view.x + view.width, box.x + box.width + padding);
+      const bottom = Math.max(view.y + view.height, box.y + box.height + padding);
+      if (left === view.x && top === view.y && right === view.x + view.width && bottom === view.y + view.height) return;
+      svg.setAttribute("viewBox", `${left} ${top} ${right - left} ${bottom - top}`);
+      if (svg.style.maxWidth) svg.style.maxWidth = `${right - left}px`;
+    } catch (error) {
+      // getBBox needs the element to be rendered; leave the diagram as Mermaid made it
+    }
+  }
+
   async function renderDiagrams(figures) {
     let mermaid;
     try {
@@ -395,6 +417,17 @@
       return;
     }
     configure(mermaid);
+    // Mermaid measures the labels while it lays the diagram out: with a fallback font the boxes come out the wrong
+    // size, and the text is clipped once the real font is in. Wait for the fonts first.
+    try {
+      await Promise.race([
+        Promise.all([document.fonts.load('400 15px "Fira Code"'), document.fonts.load('700 15px "Fira Code"')]),
+        new Promise((resolve) => setTimeout(resolve, 4000)),
+      ]);
+      await document.fonts.ready;
+    } catch (error) {
+      // render with what is there
+    }
     let counter = 0;
     for (const figure of figures) {
       const source = sources.get(figure);
@@ -408,6 +441,7 @@
           figure.append(body);
         }
         body.innerHTML = svg;
+        fitViewBox(body.querySelector("svg"));
         figure.classList.add("diagram-ready");
         figure.classList.remove("diagram-error");
         addTools(figure);
