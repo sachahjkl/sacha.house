@@ -50,6 +50,9 @@ func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	view.HTML = html
+	for _, entry := range blog.TableOfContents(document.Markdown) {
+		view.TOC = append(view.TOC, web.TOCItem{Level: entry.Level, ID: entry.ID, Title: entry.Title})
+	}
 	data := web.PostPageData{
 		PageData: app.page(request.URL.Path, document.Metadata.Title+" / sacha.house", blog.Excerpt(document.Markdown, blog.ExcerptLength)),
 		Post:     view,

@@ -159,6 +159,20 @@ func TestKeyPagesShowTheKeyAsHTML(t *testing.T) {
 	}
 }
 
+func TestPostPagesLoadTheViewerScript(t *testing.T) {
+	application := newTestApp(t)
+	for path, want := range map[string]bool{"/blog/hello": true, "/blog": false, "/": false} {
+		recorder := httptest.NewRecorder()
+		application.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, path, nil))
+		if recorder.Code != http.StatusOK {
+			t.Fatalf("%s: status = %d", path, recorder.Code)
+		}
+		if got := strings.Contains(recorder.Body.String(), "/static/js/post.js"); got != want {
+			t.Errorf("%s: loads post.js = %t, want %t", path, got, want)
+		}
+	}
+}
+
 func TestStaleProjectsCacheRefreshDoesNotBlockStartup(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
@@ -483,7 +497,7 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	edit.AddCookie(cookie)
 	editResponse := httptest.NewRecorder()
 	application.ServeHTTP(editResponse, edit)
-	if editResponse.Code != http.StatusOK || !strings.Contains(editResponse.Body.String(), "<h1>Preview</h1>") || !strings.Contains(editResponse.Body.String(), `<option value="fr" class="bg-bgColor text-textColor" selected>`) {
+	if editResponse.Code != http.StatusOK || !strings.Contains(editResponse.Body.String(), `<h1 id="preview">Preview</h1>`) || !strings.Contains(editResponse.Body.String(), `<option value="fr" class="bg-bgColor text-textColor" selected>`) {
 		t.Fatalf("editor = %d %s", editResponse.Code, editResponse.Body.String())
 	}
 

@@ -10,12 +10,20 @@ import (
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
+	"github.com/yuin/goldmark/extension"
+	extensionast "github.com/yuin/goldmark/extension/ast"
+	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
 )
 
 const ExcerptLength = 180
 
-var markdown = goldmark.New()
+// markdown renders CommonMark plus tables, strikethrough, anchored headings and Mermaid diagrams. Raw HTML in a
+// post stays escaped.
+var markdown = goldmark.New(
+	goldmark.WithExtensions(extension.Table, extension.Strikethrough, diagrams{}),
+	goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+)
 
 // NormalizeMarkdown converts all line endings to Unix line endings.
 func NormalizeMarkdown(source string) string {
@@ -70,7 +78,8 @@ func PlainText(markdownSource string) string {
 		}
 		if !entering {
 			switch node.Kind() {
-			case ast.KindParagraph, ast.KindHeading, ast.KindList, ast.KindListItem, ast.KindBlockquote:
+			case ast.KindParagraph, ast.KindHeading, ast.KindList, ast.KindListItem, ast.KindBlockquote,
+				extensionast.KindTableCell, extensionast.KindTableRow:
 				pendingSpace = true
 			}
 			return ast.WalkContinue, nil

@@ -61,6 +61,8 @@ type PageData struct {
 	StyleVersion string
 	HotReload    bool
 	AdminScripts bool
+	// PostScripts loads static/js/post.js: the image and diagram viewer and the Mermaid loader.
+	PostScripts bool
 }
 
 type PageOptions struct {
@@ -118,6 +120,8 @@ func NewPageData(options PageOptions) PageData {
 		StyleVersion: styleVersion,
 		HotReload:    options.HotReload,
 		AdminScripts: strings.HasPrefix(options.ActivePathname, "/admin"),
+		PostScripts: strings.HasPrefix(options.ActivePathname, "/blog/") ||
+			strings.HasPrefix(options.ActivePathname, "/admin/blogposts/"),
 	}
 }
 
@@ -167,6 +171,14 @@ type PostView struct {
 	CreatedAtTime string
 	UpdatedOn     string
 	UpdatedAtTime string
+	TOC           []TOCItem
+}
+
+// TOCItem is one entry of a post's table of contents.
+type TOCItem struct {
+	Level int
+	ID    string
+	Title string
 }
 
 type PostYearGroup struct {

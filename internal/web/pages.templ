@@ -182,6 +182,18 @@ templ PostContent(data PostPageData) {
 	<p class="mb-4 text-sm"><a href="/blog" class="opacity-60 underline">@ArrowLeft()
  Go back to the articles list</a></p>
 	<header class="mb-4"><h1 class="h1 mb-0">{ data.Post.Title }</h1><p class="text-textColor/50 text-sm">crea: <span title={ "created on " + data.Post.CreatedOn + " at " + data.Post.CreatedAtTime }>{ data.Post.CreatedOn }</span> / upd: <span title={ "last updated on " + data.Post.UpdatedOn + " at " + data.Post.UpdatedAtTime }>{ data.Post.UpdatedOn }</span></p></header>
+	if len(data.Post.TOC) >= 4 {
+		<nav class="toc" aria-label="Table of contents">
+			<details open>
+				<summary>Contents</summary>
+				<ol>
+					for _, item := range data.Post.TOC {
+						<li class={ templ.KV("toc-sub", item.Level > 2) }><a href={ templ.SafeURL("#" + item.ID) }>{ item.Title }</a></li>
+					}
+				</ol>
+			</details>
+		</nav>
+	}
 	<article class="prose">@templ.Raw(data.Post.HTML)</article>
 }
 
