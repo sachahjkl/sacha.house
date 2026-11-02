@@ -217,6 +217,7 @@ func careerFR() CareerProfile {
 			{Title: "Projets académiques", Items: []string{"Portefeuille Ethereum Android en Kotlin", "Musées du monde en RDF/SPARQL et Symfony", "Prototype REST hypermédia contre GraphQL en Svelte", "Bibliothèque JSP", "services web dynamiques", "simulation de propagation virale", "emploi du temps web", "algorithmes de sac à dos", "messagerie Java", "Sudoku C#"}},
 		},
 		Publications: []CareerPublication{
+			{Date: "Novembre 2026", Title: "Wren: a browser where WebAssembly runs everything", URL: "/blog/wren"},
 			{Date: "Novembre 2025", Title: "Design draft for chat.sacha.house", URL: "/blog/rust-rewrite-xmaybex"},
 			{Date: "Novembre 2025", Title: "HTTP Benchmark of sacha.house", URL: "/blog/sacha-house-benchmark"},
 			{Date: "Octobre 2025", Title: "Homelab Architecture Diagram", URL: "/blog/homelab-architecture-diagram"},
@@ -331,10 +332,11 @@ func careerEN() CareerProfile {
 		{Title: "Experiments", Items: profile.Catalog[2].Items},
 		{Title: "Academic projects", Items: []string{"Read-only Ethereum wallet for Android in Kotlin", "World museums with RDF/SPARQL and Symfony", "REST hypermedia versus GraphQL prototype in Svelte", "JSP library", "dynamic web services", "virus propagation simulation", "web timetable", "knapsack algorithms", "Java messaging application", "C# Sudoku"}},
 	}
-	profile.Publications[0].Date = "November 2025"
+	profile.Publications[0].Date = "November 2026"
 	profile.Publications[1].Date = "November 2025"
-	profile.Publications[2].Date = "October 2025"
-	profile.Publications[3].Date = "March 2023"
+	profile.Publications[2].Date = "November 2025"
+	profile.Publications[3].Date = "October 2025"
+	profile.Publications[4].Date = "March 2023"
 	profile.Languages = []string{"French: native", "English: bilingual professional and technical proficiency"}
 	return profile
 }
