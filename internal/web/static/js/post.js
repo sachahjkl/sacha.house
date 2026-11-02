@@ -274,28 +274,63 @@
 
   const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-  // The site is black or white by the system's scheme; Mermaid's own dark theme is too dark on black.
+  // Dark scheme: a retro terminal on black. Bright phosphor strokes (green, cyan, amber, magenta) on near-black
+  // fills, not pastels. In the light scheme Mermaid's "neutral" theme is used.
   const DARK_THEME = {
     darkMode: true,
     background: "#000000",
-    primaryColor: "#1b2a41",
-    primaryTextColor: "#f2f2f2",
-    primaryBorderColor: "#6ea8fe",
-    secondaryColor: "#1f3d2f",
-    tertiaryColor: "#2c2438",
-    lineColor: "#c9c9c9",
-    textColor: "#f2f2f2",
-    noteBkgColor: "#3a3320",
-    noteTextColor: "#f2f2f2",
-    pie1: "#6ea8fe", pie2: "#7ee0a1", pie3: "#f0b36b", pie4: "#d98aea", pie5: "#f07f7f", pie6: "#8ad6d6",
-    pie7: "#c4d96e", pie8: "#e0a0b4", pie9: "#9db4ff", pie10: "#ffd27d", pie11: "#a0e0c8", pie12: "#d4b0ff",
-    pieTitleTextColor: "#f2f2f2", pieSectionTextColor: "#000000", pieLegendTextColor: "#f2f2f2",
-    cScale0: "#2b5c9e", cScale1: "#2f7d5b", cScale2: "#9a6a24", cScale3: "#7b3f9a",
-    cScale4: "#a03c3c", cScale5: "#2a7f86", cScale6: "#6b7f23", cScale7: "#9a4a73",
-    cScaleLabel0: "#ffffff", cScaleLabel1: "#ffffff", cScaleLabel2: "#ffffff", cScaleLabel3: "#ffffff",
-    cScaleLabel4: "#ffffff", cScaleLabel5: "#ffffff", cScaleLabel6: "#ffffff", cScaleLabel7: "#ffffff",
+    fontSize: "15px",
+    // nodes and clusters
+    primaryColor: "#06120a",
+    primaryTextColor: "#d9ffd0",
+    primaryBorderColor: "#39ff14",
+    secondaryColor: "#0a0f14",
+    secondaryTextColor: "#bff6ff",
+    secondaryBorderColor: "#00e5ff",
+    tertiaryColor: "#140f02",
+    tertiaryTextColor: "#ffe3a0",
+    tertiaryBorderColor: "#ffb000",
+    mainBkg: "#06120a",
+    nodeBorder: "#39ff14",
+    nodeTextColor: "#d9ffd0",
+    clusterBkg: "#0b0b0b",
+    clusterBorder: "#ffb000",
+    titleColor: "#ffb000",
+    // lines and labels
+    lineColor: "#00e5ff",
+    textColor: "#e6e6e6",
+    edgeLabelBackground: "#000000",
+    // sequence diagrams
+    actorBkg: "#06101a",
+    actorBorder: "#00e5ff",
+    actorTextColor: "#bff6ff",
+    actorLineColor: "#3a6f7a",
+    signalColor: "#39ff14",
+    signalTextColor: "#d9ffd0",
+    labelBoxBkgColor: "#140f02",
+    labelBoxBorderColor: "#ffb000",
+    labelTextColor: "#ffe3a0",
+    loopTextColor: "#ffb000",
+    noteBkgColor: "#190a14",
+    noteBorderColor: "#ff2bd6",
+    noteTextColor: "#ffd0f3",
+    activationBkgColor: "#0a2a14",
+    activationBorderColor: "#39ff14",
+    sequenceNumberColor: "#000000",
+    // states
+    labelColor: "#d9ffd0",
+    altBackground: "#0b0b0b",
+    // pie
+    pie1: "#39ff14", pie2: "#00e5ff", pie3: "#ffb000", pie4: "#ff2bd6", pie5: "#ff4d4d", pie6: "#f5ff3b",
+    pie7: "#7a5cff", pie8: "#ff8a00", pie9: "#00ffa3", pie10: "#ff6ec7", pie11: "#5ad1ff", pie12: "#b6ff00",
+    pieTitleTextColor: "#ffb000", pieSectionTextColor: "#000000", pieLegendTextColor: "#e6e6e6",
+    pieStrokeColor: "#000000", pieOuterStrokeColor: "#39ff14", pieOpacity: "0.95",
+    // timeline
+    cScale0: "#39ff14", cScale1: "#00e5ff", cScale2: "#ffb000", cScale3: "#ff2bd6",
+    cScale4: "#ff4d4d", cScale5: "#f5ff3b", cScale6: "#7a5cff", cScale7: "#00ffa3",
+    cScaleLabel0: "#000000", cScaleLabel1: "#000000", cScaleLabel2: "#000000", cScaleLabel3: "#000000",
+    cScaleLabel4: "#000000", cScaleLabel5: "#000000", cScaleLabel6: "#ffffff", cScaleLabel7: "#000000",
   };
-
   function configure(mermaid) {
     const dark = darkQuery.matches;
     mermaid.initialize({
