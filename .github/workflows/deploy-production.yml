@@ -4,7 +4,46 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Production is the promotion of what staging runs, and staging is deployed by the CI of each push. Without this
+  # wait, a promotion started right after a merge promotes the previous commit, because the CI of the merge has
+  # not reached staging yet.
+  latest-merge:
+    name: wait for the CI of the latest merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Wait for the CI of the latest commit of the branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -eu
+          head=$(gh api "repos/$REPOSITORY/commits/$BRANCH" --jq .sha)
+          echo "Latest commit of $BRANCH: $head"
+          for _ in $(seq 1 110); do
+            state=$(gh api "repos/$REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$head&event=push" \
+              --jq '.workflow_runs[0] | if . == null then "missing" else "\(.status) \(.conclusion // "-")" end')
+            echo "CI of $head: $state"
+            case "$state" in
+              "completed success")
+                exit 0
+                ;;
+              "completed "*)
+                echo "The CI of the latest commit did not succeed: nothing to promote." >&2
+                exit 1
+                ;;
+            esac
+            sleep 20
+          done
+          echo "The CI of the latest commit did not finish in time." >&2
+          exit 1
+
   production:
+    needs: latest-merge
     permissions:
       actions: read
       attestations: read
