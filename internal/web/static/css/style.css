@@ -1756,6 +1756,17 @@ dialog.lightbox[open] {
   width: 100%;
   height: 100%;
 }
+@media (prefers-color-scheme: dark) {
+  .diagram-body svg {
+    filter: drop-shadow(0 0 2px rgb(0 229 255 / 0.35)) drop-shadow(0 0 6px rgb(57 255 20 / 0.15));
+  }
+  .prose figure.diagram {
+    border-color: #39ff14;
+  }
+  .diagram-tools {
+    border-bottom-color: #39ff14;
+  }
+}
 @property --tw-rotate-x {
   syntax: "*";
   inherits: false;
