@@ -218,7 +218,7 @@ func careerFR() CareerProfile {
 		},
 		Publications: []CareerPublication{
 			{Date: "Novembre 2026", Title: "Wren: a browser where WebAssembly runs everything", URL: "/blog/wren"},
-		{Date: "Novembre 2025", Title: "Design draft for chat.sacha.house", URL: "/blog/rust-rewrite-xmaybex"},
+			{Date: "Novembre 2025", Title: "Design draft for chat.sacha.house", URL: "/blog/rust-rewrite-xmaybex"},
 			{Date: "Novembre 2025", Title: "HTTP Benchmark of sacha.house", URL: "/blog/sacha-house-benchmark"},
 			{Date: "Octobre 2025", Title: "Homelab Architecture Diagram", URL: "/blog/homelab-architecture-diagram"},
 			{Date: "Mars 2023", Title: "Make your Windows PowerShell experience feel like Linux", URL: "/blog/powershell-like-linux"},
