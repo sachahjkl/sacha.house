@@ -26,7 +26,10 @@ const (
 )
 
 type Options struct {
-	BlogRoot        string
+	BlogRoot string
+	// BlogSeed holds the posts of the repository (one directory per post). Those the blog root does not have
+	// are copied there at start; existing posts are never touched.
+	BlogSeed        fs.FS
 	ProjectsPath    string
 	ProjectsFetcher projects.Fetcher
 	StaticFS        fs.FS
@@ -80,6 +83,15 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 		options.Now = time.Now
 	}
 
+	if options.BlogSeed != nil {
+		imported, err := blog.ImportMissing(options.BlogRoot, options.BlogSeed)
+		if err != nil {
+			slog.Warn("blog posts of the repository could not all be imported", "error", err)
+		}
+		if len(imported) > 0 {
+			slog.Info("blog posts imported from the repository", "posts", imported)
+		}
+	}
 	blogStore, err := blog.NewStore(options.BlogRoot, web.Me.FullName)
 	if err != nil {
 		return nil, err
