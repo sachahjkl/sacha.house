@@ -36,6 +36,9 @@ templ Head(data PageData) {
 		<meta property="og:locale" content="fr_FR"/>
 		<meta name="twitter:card" content="summary_large_image"/>
 		<meta name="author" content={ data.SEO.Author }/>
+		if data.PostScripts {
+			<script defer src={ templ.SafeURL("/static/js/post.js?v=" + data.StyleVersion) }></script>
+		}
 		if data.AdminScripts {
 			<script type="module" src={ templ.SafeURL("/static/js/datastar.js?v=" + data.StyleVersion) }></script>
 			<script defer src={ templ.SafeURL("/static/js/admin.js?v=" + data.StyleVersion) }></script>
