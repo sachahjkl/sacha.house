@@ -1,0 +1,494 @@
+/* Christmas mode (static/js/christmas.js). Loaded only from 25 November to 5 January, or with ?xmas=1.
+   Every element is decoration and is removed from the printed page. */
+
+html.xmas ::selection {
+  background: #d42426;
+  color: #ffffff;
+}
+
+/* ------------------------------------------------------------------ garland */
+
+.xmas-garland {
+  position: relative;
+  height: 52px;
+  margin: 0 0 -4px;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.xmas-garland svg.xmas-wire {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.xmas-wire path {
+  fill: none;
+  stroke: #3b4a3b;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.xmas-socket {
+  fill: #2b3a2b;
+}
+
+.xmas-bulb {
+  fill: currentColor;
+  filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 12px currentColor);
+  animation: xmas-twinkle-a 2.4s ease-in-out infinite;
+}
+
+.xmas-bulb.b1 {
+  animation-name: xmas-twinkle-b;
+  animation-duration: 3.1s;
+}
+
+.xmas-bulb.b2 {
+  animation-name: xmas-twinkle-c;
+  animation-duration: 1.9s;
+}
+
+@keyframes xmas-twinkle-a {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.35; }
+  60% { opacity: 1; }
+}
+
+@keyframes xmas-twinkle-b {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+@keyframes xmas-twinkle-c {
+  0%, 30%, 70%, 100% { opacity: 1; }
+  40%, 60% { opacity: 0.25; }
+}
+
+.xmas-ornament {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  transform-origin: 50% 0;
+  animation: xmas-swing 3.6s ease-in-out infinite;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.45));
+}
+
+.xmas-ornament:nth-of-type(2n) {
+  animation-duration: 4.4s;
+  animation-delay: -1.3s;
+}
+
+.xmas-ornament:nth-of-type(3n) {
+  animation-duration: 3.1s;
+  animation-delay: -2.2s;
+}
+
+@keyframes xmas-swing {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+
+/* -------------------------------------------------------------------- snow */
+
+.xmas-snow {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.xmas-snow.back {
+  z-index: -1;
+}
+
+.xmas-snow.front {
+  z-index: 60;
+}
+
+.xmas-frost {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 38% 34% at 0% 0%, rgb(190 230 255 / 0.2), transparent 70%),
+    radial-gradient(ellipse 38% 34% at 100% 0%, rgb(190 230 255 / 0.2), transparent 70%),
+    radial-gradient(ellipse 30% 26% at 0% 100%, rgb(190 230 255 / 0.16), transparent 70%),
+    radial-gradient(ellipse 30% 26% at 100% 100%, rgb(190 230 255 / 0.16), transparent 70%);
+  box-shadow: inset 0 0 90px 10px rgb(170 215 255 / 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .xmas-frost {
+    background:
+      radial-gradient(ellipse 38% 34% at 0% 0%, rgb(120 175 230 / 0.2), transparent 70%),
+      radial-gradient(ellipse 38% 34% at 100% 0%, rgb(120 175 230 / 0.2), transparent 70%),
+      radial-gradient(ellipse 30% 26% at 0% 100%, rgb(120 175 230 / 0.16), transparent 70%),
+      radial-gradient(ellipse 30% 26% at 100% 100%, rgb(120 175 230 / 0.16), transparent 70%);
+    box-shadow: inset 0 0 90px 10px rgb(120 175 230 / 0.12);
+  }
+}
+
+/* ------------------------------------------------------------------ ground */
+
+.xmas-ground {
+  position: fixed;
+  right: 0;
+  bottom: var(--xmas-footer, 0px);
+  left: 0;
+  z-index: 4;
+  height: 64px;
+  pointer-events: none;
+}
+
+.xmas-bank {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 34px;
+}
+
+.xmas-bank path.snow {
+  fill: #f4f9ff;
+}
+
+.xmas-bank path.shade {
+  fill: #cfe3f7;
+}
+
+@media (prefers-color-scheme: light) {
+  .xmas-bank path.snow {
+    fill: #e3eef9;
+  }
+
+  .xmas-bank path.shade {
+    fill: #bcd5ee;
+  }
+}
+
+.xmas-scene {
+  position: absolute;
+  bottom: 14px;
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.4));
+}
+
+.xmas-scene.tree {
+  left: 2.5%;
+  width: 60px;
+  height: 60px;
+}
+
+.xmas-scene.gift-a {
+  left: calc(2.5% + 52px);
+  width: 28px;
+  height: 28px;
+  bottom: 12px;
+}
+
+.xmas-scene.gift-b {
+  left: calc(2.5% + 74px);
+  width: 22px;
+  height: 22px;
+  bottom: 10px;
+}
+
+.xmas-scene.snowman {
+  right: 3%;
+  width: 52px;
+  height: 52px;
+}
+
+.xmas-scene.cookie {
+  right: calc(3% + 60px);
+  width: 22px;
+  height: 22px;
+  bottom: 10px;
+}
+
+.xmas-tree-lights {
+  position: absolute;
+  bottom: 14px;
+  left: 2.5%;
+  width: 60px;
+  height: 60px;
+}
+
+.xmas-tree-lights i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px 2px currentColor;
+  animation: xmas-twinkle-a 1.7s ease-in-out infinite;
+}
+
+.xmas-tree-lights i:nth-child(2n) {
+  animation-name: xmas-twinkle-b;
+  animation-duration: 2.3s;
+}
+
+.xmas-tree-lights i:nth-child(3n) {
+  animation-name: xmas-twinkle-c;
+  animation-duration: 1.3s;
+}
+
+/* -------------------------------------------------------------------- chip */
+
+.xmas-chip {
+  position: fixed;
+  right: 10px;
+  bottom: calc(var(--xmas-footer, 0px) + 68px);
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: calc(100vw - 20px);
+  border: 2px solid #d42426;
+  padding: 0.2rem 0.3rem 0.2rem 0.6rem;
+  background: var(--color-bgColor);
+  color: var(--color-textColor);
+  box-shadow: 0 0 12px rgb(212 36 38 / 0.45), 0 0 0 1px #39ff14 inset;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.xmas-chip img {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.xmas-chip button {
+  border: 1px solid currentColor;
+  padding: 0 0.5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.xmas-chip button:hover {
+  background: var(--color-textColor);
+  color: var(--color-bgColor);
+}
+
+/* "off": only the chip stays, so the decorations can be brought back */
+html.xmas-off .xmas-garland,
+html.xmas-off .xmas-snow,
+html.xmas-off .xmas-frost,
+html.xmas-off .xmas-ground,
+html.xmas-off .xmas-santa,
+html.xmas-off .xmas-gift {
+  display: none;
+}
+
+html.xmas-off .xmas-chip {
+  bottom: calc(var(--xmas-footer, 0px) + 8px);
+}
+
+/* ------------------------------------------------------------------- santa */
+
+.xmas-santa {
+  position: fixed;
+  top: 12vh;
+  left: 0;
+  z-index: 65;
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform;
+  animation: xmas-fly var(--xmas-fly, 18s) linear forwards;
+}
+
+.xmas-santa.leftward {
+  animation-name: xmas-fly-back;
+}
+
+/* The icons look to the left: flying to the right puts the deer on the right and mirrors them */
+.xmas-santa-inner {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+  animation: xmas-bob 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.5));
+}
+
+.xmas-santa.leftward .xmas-santa-inner {
+  flex-direction: row;
+}
+
+.xmas-santa:not(.leftward) .deer,
+.xmas-santa:not(.leftward) .sled {
+  scale: -1 1;
+}
+
+.xmas-santa img {
+  display: block;
+  width: 58px;
+  height: 58px;
+}
+
+.xmas-santa .deer {
+  margin-left: -10px;
+}
+
+.xmas-santa.leftward .deer {
+  margin-left: 0;
+  margin-right: -10px;
+}
+
+.xmas-santa .deer:nth-child(2) {
+  animation: xmas-gallop 0.5s ease-in-out infinite;
+}
+
+.xmas-santa .deer:nth-child(3) {
+  animation: xmas-gallop 0.5s ease-in-out infinite reverse;
+}
+
+.xmas-santa .sleigh {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin-left: 6px;
+}
+
+.xmas-santa .claus {
+  position: absolute;
+  top: -26px;
+  left: 14px;
+  width: 54px;
+  height: 54px;
+}
+
+@keyframes xmas-fly {
+  from { transform: translateX(-420px); }
+  to { transform: translateX(calc(100vw + 40px)); }
+}
+
+@keyframes xmas-fly-back {
+  from { transform: translateX(calc(100vw + 40px)); }
+  to { transform: translateX(-420px); }
+}
+
+@keyframes xmas-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+}
+
+@keyframes xmas-gallop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.xmas-gift {
+  position: fixed;
+  z-index: 66;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+  animation: xmas-drop var(--xmas-drop, 2.2s) cubic-bezier(0.4, 0, 0.9, 0.6) both;
+}
+
+@keyframes xmas-drop {
+  from { transform: translate(0, 0) rotate(0); opacity: 1; }
+  to { transform: translate(var(--xmas-dx, 0), 85vh) rotate(var(--xmas-spin, 300deg)); opacity: 0.9; }
+}
+
+.xmas-bubble {
+  position: fixed;
+  z-index: 67;
+  border: 2px solid #d42426;
+  padding: 0.15rem 0.5rem;
+  background: var(--color-bgColor);
+  color: var(--color-textColor);
+  box-shadow: 0 0 10px rgb(212 36 38 / 0.5);
+  font-size: 0.85rem;
+  pointer-events: none;
+  animation: xmas-bubble 1.8s ease-out forwards;
+}
+
+@keyframes xmas-bubble {
+  0% { opacity: 0; transform: translateY(6px) scale(0.9); }
+  15% { opacity: 1; transform: translateY(0) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* ---------------------------------------------------- hat on the portrait */
+
+html.xmas .avatar picture {
+  position: relative;
+}
+
+html.xmas .avatar picture::after {
+  position: absolute;
+  top: -50px;
+  right: -34px;
+  z-index: 2;
+  width: 130px;
+  height: 104px;
+  background: url("/static/icons/xmas/santa-hat.svg") center / contain no-repeat;
+  content: "";
+  transform: rotate(14deg);
+  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.45));
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ others */
+
+@media (max-width: 700px) {
+  .xmas-scene.gift-a,
+  .xmas-scene.gift-b,
+  .xmas-scene.cookie {
+    display: none;
+  }
+
+  .xmas-chip {
+    bottom: calc(var(--xmas-footer, 0px) + 66px);
+    font-size: 0.72rem;
+  }
+
+  html.xmas .avatar picture::after {
+    top: -36px;
+    right: 0;
+    width: 96px;
+    height: 77px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xmas-bulb,
+  .xmas-ornament,
+  .xmas-tree-lights i {
+    animation: none;
+  }
+}
+
+@media print {
+  .xmas-garland,
+  .xmas-snow,
+  .xmas-frost,
+  .xmas-ground,
+  .xmas-chip,
+  .xmas-santa,
+  .xmas-gift,
+  .xmas-bubble {
+    display: none !important;
+  }
+
+  html.xmas .avatar picture::after {
+    display: none;
+  }
+}
