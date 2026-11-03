@@ -22,6 +22,7 @@ import (
 	"sacha.house/internal/auth"
 	"sacha.house/internal/paste"
 	"sacha.house/internal/projects"
+	"sacha.house/internal/web/static"
 )
 
 var testPasswordHash = sync.OnceValues(func() (string, error) {
@@ -169,6 +170,25 @@ func TestPostPagesLoadTheViewerScript(t *testing.T) {
 		}
 		if got := strings.Contains(recorder.Body.String(), "/static/js/post.js"); got != want {
 			t.Errorf("%s: loads post.js = %t, want %t", path, got, want)
+		}
+	}
+}
+
+func TestChristmasScriptIsOnPublicPagesOnly(t *testing.T) {
+	application := newTestApp(t)
+	for path, want := range map[string]bool{"/": true, "/blog": true, "/about": true, "/admin/login": false} {
+		recorder := httptest.NewRecorder()
+		application.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, path, nil))
+		if recorder.Code != http.StatusOK {
+			t.Fatalf("%s: status = %d", path, recorder.Code)
+		}
+		if got := strings.Contains(recorder.Body.String(), "/static/js/christmas.js"); got != want {
+			t.Errorf("%s: loads christmas.js = %t, want %t", path, got, want)
+		}
+	}
+	for _, asset := range []string{"/static/js/christmas.js", "/static/css/christmas.css", "/static/icons/xmas/santa-hat.svg"} {
+		if _, err := static.Files.ReadFile(strings.TrimPrefix(asset, "/static/")); err != nil {
+			t.Errorf("%s is not embedded: %v", asset, err)
 		}
 	}
 }

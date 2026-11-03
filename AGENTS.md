@@ -8,6 +8,7 @@
 - Generated templ files use the `*_templ.go` suffix.
 - Datastar server integration lives in Go handlers.
 - Datastar browser code and other JavaScript live in `internal/web/static/js/`.
+- Christmas mode lives in `static/js/christmas.js` and `static/css/christmas.css`, loaded on every public page. It switches itself on from 25 November to 5 January, by the visitor's date. Preview it with `?xmas=1` or `?xmasDate=2026-12-24` (also 2026-12-31 for the fireworks); `?xmas=0` turns it off. Everything in it is decoration, hidden from print.
 - Tailwind source lives in `styles/app.css`.
 - Generated CSS lives in `internal/web/static/css/style.css`.
 - Static assets are embedded through `internal/web/static/embed.go`.
