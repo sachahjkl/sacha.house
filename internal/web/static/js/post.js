@@ -275,7 +275,7 @@
   const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
   // Dark scheme: a retro terminal on black. Bright phosphor strokes (green, cyan, amber, magenta) on near-black
-  // fills, not pastels. In the light scheme Mermaid's "neutral" theme is used.
+  // fills, not pastels. The light scheme has its own, muted palette (LIGHT_THEME).
   const DARK_THEME = {
     darkMode: true,
     background: "#000000",
@@ -331,14 +331,66 @@
     cScaleLabel0: "#000000", cScaleLabel1: "#000000", cScaleLabel2: "#000000", cScaleLabel3: "#000000",
     cScaleLabel4: "#000000", cScaleLabel5: "#000000", cScaleLabel6: "#ffffff", cScaleLabel7: "#000000",
   };
+  // Light scheme: colour, but muted. Tinted fills with a darker border of the same hue, so nothing is white or
+  // shouting; "neutral" left the nodes almost white.
+  const LIGHT_THEME = {
+    darkMode: false,
+    background: "#ffffff",
+    fontSize: "15px",
+    primaryColor: "#d3e1f0",
+    primaryTextColor: "#1f2f44",
+    primaryBorderColor: "#5a7fa8",
+    secondaryColor: "#d6e8d8",
+    secondaryTextColor: "#1f3a24",
+    secondaryBorderColor: "#5d8f63",
+    tertiaryColor: "#efe2c8",
+    tertiaryTextColor: "#4a3511",
+    tertiaryBorderColor: "#a8803a",
+    mainBkg: "#d3e1f0",
+    nodeBorder: "#5a7fa8",
+    nodeTextColor: "#1f2f44",
+    clusterBkg: "#f1ebdd",
+    clusterBorder: "#b0894a",
+    titleColor: "#7a5a1e",
+    lineColor: "#4b5b70",
+    textColor: "#1f2937",
+    edgeLabelBackground: "#ffffff",
+    actorBkg: "#d3e1f0",
+    actorBorder: "#5a7fa8",
+    actorTextColor: "#1f2f44",
+    actorLineColor: "#9aa8b8",
+    signalColor: "#3f7d6e",
+    signalTextColor: "#1f2937",
+    labelBoxBkgColor: "#efe2c8",
+    labelBoxBorderColor: "#a8803a",
+    labelTextColor: "#4a3511",
+    loopTextColor: "#7a5a1e",
+    noteBkgColor: "#f0d5df",
+    noteBorderColor: "#b05c7c",
+    noteTextColor: "#4a1f33",
+    activationBkgColor: "#cfe3d0",
+    activationBorderColor: "#5d8f63",
+    sequenceNumberColor: "#ffffff",
+    labelColor: "#1f2f44",
+    altBackground: "#f3f1ea",
+    pie1: "#5a7fa8", pie2: "#6aa070", pie3: "#c9a24f", pie4: "#b0698a", pie5: "#b86a64", pie6: "#5f9ea0",
+    pie7: "#8aa24f", pie8: "#8a78b5", pie9: "#c9875a", pie10: "#5f9a90", pie11: "#a56fa8", pie12: "#b59a4a",
+    pieTitleTextColor: "#1f2937", pieSectionTextColor: "#ffffff", pieLegendTextColor: "#1f2937",
+    pieStrokeColor: "#ffffff", pieOuterStrokeColor: "#4b5b70", pieOpacity: "0.95",
+    cScale0: "#5a7fa8", cScale1: "#6aa070", cScale2: "#c9a24f", cScale3: "#b0698a",
+    cScale4: "#b86a64", cScale5: "#5f9ea0", cScale6: "#8a78b5", cScale7: "#8aa24f",
+    cScaleLabel0: "#ffffff", cScaleLabel1: "#ffffff", cScaleLabel2: "#1f2937", cScaleLabel3: "#ffffff",
+    cScaleLabel4: "#ffffff", cScaleLabel5: "#ffffff", cScaleLabel6: "#ffffff", cScaleLabel7: "#1f2937",
+  };
+
   function configure(mermaid) {
     const dark = darkQuery.matches;
     mermaid.initialize({
       startOnLoad: false,
       securityLevel: "strict",
       suppressErrorRendering: true,
-      theme: dark ? "base" : "neutral",
-      themeVariables: dark ? DARK_THEME : {},
+      theme: "base",
+      themeVariables: dark ? DARK_THEME : LIGHT_THEME,
       fontFamily: '"Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
       // SVG text labels: HTML labels (foreignObject) are measured with the page's own CSS, which skews the layout.
       htmlLabels: false,
