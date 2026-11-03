@@ -123,7 +123,7 @@ templ ProjectList(projects []ProjectView) {
 		for _, project := range projects {
 			<li class="snap-start"><div class="border-bgColor bg-bgColor text-textColor hover:border-textColor flex overflow-hidden border-4">
 				if project.HasAvatar {
-					<div class="grid shrink-0 place-content-center"><img class="aspect-square max-w-fit size-16 sm:size-32" loading="lazy" src={ templ.SafeURL(project.AvatarURL) } alt=""/></div>
+					<div class="shrink-0 self-start"><img class="block aspect-square size-16 object-cover sm:size-32" loading="lazy" src={ templ.SafeURL(project.AvatarURL) } alt=""/></div>
 				} else {
 					<div style={ "background-color: " + project.HSLColor + ";" } class="grid aspect-square size-16 shrink-0 place-content-center sm:size-32" aria-hidden="true"><span class="shadow-sm flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-center text-3xl text-neutral-100">{ project.FirstLetter }</span></div>
 				}

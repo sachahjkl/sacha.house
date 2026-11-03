@@ -861,9 +861,6 @@
   .max-w-5xl {
     max-width: var(--container-5xl);
   }
-  .max-w-fit {
-    max-width: fit-content;
-  }
   .max-w-full {
     max-width: 100%;
   }
@@ -967,6 +964,9 @@
       margin-block-start: calc(2px * var(--tw-space-y-reverse));
       margin-block-end: calc(2px * calc(1 - var(--tw-space-y-reverse)));
     }
+  }
+  .self-start {
+    align-self: flex-start;
   }
   .truncate {
     overflow: hidden;
@@ -1078,6 +1078,9 @@
   }
   .bg-clip-text {
     background-clip: text;
+  }
+  .object-cover {
+    object-fit: cover;
   }
   .p-0 {
     padding: calc(var(--spacing) * 0);
