@@ -239,15 +239,20 @@ html {
   font-size: 0.8em;
 }
 
-.diagram-ready > pre.mermaid {
+/* Each drawn diagram carries a light and a dark SVG; the reader's scheme picks one. */
+.prose figure.diagram .diagram-source {
   display: none;
 }
 
-.diagram-error::after {
+.diagram-body svg.diagram-dark {
+  display: none;
+}
+
+.diagram-missing::after {
   display: block;
   padding: 0.5rem 1rem;
   border-top: 2px solid var(--color-textColor);
-  content: "This diagram could not be drawn here; its source is shown instead.";
+  content: "This diagram was not drawn ahead of time; its source is shown instead.";
   font-size: 0.8em;
   opacity: 0.8;
 }
@@ -368,6 +373,14 @@ dialog.lightbox[open] {
 }
 
 @media (prefers-color-scheme: dark) {
+  .diagram-body svg.diagram-light {
+    display: none;
+  }
+
+  .diagram-body svg.diagram-dark {
+    display: inline-block;
+  }
+
   .diagram-body svg {
     filter: drop-shadow(0 0 2px rgb(0 229 255 / 0.35)) drop-shadow(0 0 6px rgb(57 255 20 / 0.15));
   }

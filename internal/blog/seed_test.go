@@ -75,3 +75,28 @@ func TestImportMissingIsIdempotentAndRespectsDeletions(t *testing.T) {
 		t.Fatalf("second import = %v, %v; want nothing", imported, err)
 	}
 }
+
+func TestImportSyncsDiagramsOfExistingPosts(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, "old"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "old", "content.md"), []byte("edited"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	seed := fstest.MapFS{}
+	seedPost(seed, "old", "Old")
+	seed["old/assets/diagrams/index.json"] = &fstest.MapFile{Data: []byte("{}")}
+	seed["old/assets/diagrams/0123456789abcdef-light.svg"] = &fstest.MapFile{Data: []byte("<svg/>")}
+	for range 2 {
+		if _, err := ImportMissing(root, seed); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if got, _ := os.ReadFile(filepath.Join(root, "old", "content.md")); string(got) != "edited" {
+		t.Fatalf("an existing post was overwritten: %q", got)
+	}
+	if got, err := os.ReadFile(filepath.Join(root, "old", "assets", "diagrams", "0123456789abcdef-light.svg")); err != nil || string(got) != "<svg/>" {
+		t.Fatalf("the diagrams were not synced: %q, %v", got, err)
+	}
+}

@@ -1,0 +1,77 @@
+{
+  "10b3cd18fa716bc2": {
+    "title": "Lines of code by language",
+    "width": 931,
+    "height": 462
+  },
+  "264db1f1aef164bc": {
+    "title": "Wren at a glance",
+    "width": 1267,
+    "height": 1063
+  },
+  "6afe191c606f0d74": {
+    "title": "From a .widl file to the whole API surface",
+    "width": 1462,
+    "height": 586
+  },
+  "7dceb75de1df5a1a": {
+    "title": "Threads and the loop",
+    "width": 1026,
+    "height": 682
+  },
+  "800ebb0c4c1ad8aa": {
+    "title": "A script reaches into a same-origin frame",
+    "width": 1482,
+    "height": 541
+  },
+  "88f1735c725c8981": {
+    "title": "The ownership tree",
+    "width": 848,
+    "height": 554
+  },
+  "958bcfa595f318cc": {
+    "title": "The first two weeks",
+    "width": 1990,
+    "height": 929
+  },
+  "a1b50c4a605cd757": {
+    "title": "Crash recovery at start",
+    "width": 744,
+    "height": 943
+  },
+  "a20c394862aec025": {
+    "title": "The loop JIT, from a hot back edge to a deopt",
+    "width": 1736,
+    "height": 998
+  },
+  "b25a20cbf7952296": {
+    "title": "A Wasm guest calls an import",
+    "width": 1764,
+    "height": 727
+  },
+  "bcde36d30b3f6aa4": {
+    "title": "The content blocker",
+    "width": 1955,
+    "height": 322
+  },
+  "dacf19969235b8c1": {
+    "title": "A request through the policy layer",
+    "width": 1825,
+    "height": 1095
+  },
+  "e09ba91b469ac42d": {
+    "title": "How the JavaScript module is built",
+    "width": 1949,
+    "height": 286
+  },
+  "e3c038e928606b2a": {
+    "title": "The rendering pipeline",
+    "width": 1835,
+    "height": 324
+  },
+  "fd9a9d04513a5969": {
+    "title": "WebGL and its crash domains",
+    "width": 1596,
+    "height": 417
+  }
+}

@@ -29,7 +29,7 @@ func TestMermaidBlocksBecomeDiagrams(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(html, `<figure class="diagram"><pre class="mermaid">graph TD`) {
+	if !strings.Contains(html, `<figure class="diagram diagram-missing"><pre class="mermaid">graph TD`) {
 		t.Fatalf("diagram is not marked: %q", html)
 	}
 	if strings.Contains(html, "<b>") || !strings.Contains(html, "&lt;b&gt;x&lt;/b&gt;") {

@@ -30,10 +30,18 @@ func NormalizeMarkdown(source string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(source, "\r\n", "\n"), "\r", "\n")
 }
 
-// RenderMarkdown converts CommonMark Markdown to HTML.
+// RenderMarkdown converts CommonMark Markdown to HTML. Diagrams are shown as source.
 func RenderMarkdown(source string) (string, error) {
+	return RenderMarkdownWithDiagrams(source, nil)
+}
+
+// RenderMarkdownWithDiagrams converts Markdown to HTML and inlines the prerendered drawing of each Mermaid block
+// that has one in diagrams.
+func RenderMarkdownWithDiagrams(source string, diagrams Diagrams) (string, error) {
 	var output bytes.Buffer
-	if err := markdown.Convert([]byte(NormalizeMarkdown(source)), &output); err != nil {
+	context := parser.NewContext()
+	context.Set(diagramContextKey, diagramContext{diagrams: diagrams})
+	if err := markdown.Convert([]byte(NormalizeMarkdown(source)), &output, parser.WithContext(context)); err != nil {
 		return "", fmt.Errorf("render markdown: %w", err)
 	}
 	return output.String(), nil

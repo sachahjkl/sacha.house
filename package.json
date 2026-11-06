@@ -5,6 +5,7 @@
   "scripts": {
     "templates": "go tool templ generate",
     "build:css": "tailwindcss -i ./styles/app.css -o ./internal/web/static/css/style.css",
+    "diagrams": "bun tools/diagrams.ts",
     "generate": "bun run templates && bun run build:css"
   },
   "dependencies": {
@@ -15,5 +16,10 @@
   "trustedDependencies": [
     "@parcel/watcher",
     "@tailwindcss/oxide"
-  ]
+  ],
+  "devDependencies": {
+    "@fontsource/fira-code": "^5.3.0",
+    "mermaid": "12.2.0",
+    "puppeteer-core": "^25.16.0"
+  }
 }
