@@ -13,12 +13,10 @@ type NavItem struct {
 }
 
 var defaultNavItems = [...]NavItem{
-	{Title: "home", Pathname: "/", Icon: "house"},
 	{Title: "projects", Pathname: "/projects", Icon: "file-folder"},
 	{Title: "blog", Pathname: "/blog", Icon: "memo"},
 	{Title: "about", Pathname: "/about", Icon: "scroll"},
 	{Title: "résumé", Pathname: "/resume", Icon: "page-facing-up"},
-	{Title: "admin", Pathname: "/admin", Icon: "locked"},
 }
 
 func NavItems(activePathname string) []NavItem {
@@ -26,9 +24,7 @@ func NavItems(activePathname string) []NavItem {
 	copy(items, defaultNavItems[:])
 
 	for i := range items {
-		if items[i].Pathname == "/" {
-			items[i].IsActive = activePathname == "/"
-		} else if items[i].Pathname == "/resume" {
+		if items[i].Pathname == "/resume" {
 			items[i].IsActive = strings.HasPrefix(activePathname, "/resume") || strings.HasPrefix(activePathname, "/cv")
 		} else {
 			items[i].IsActive = strings.HasPrefix(activePathname, items[i].Pathname)
@@ -38,11 +34,17 @@ func NavItems(activePathname string) []NavItem {
 	return items
 }
 
+// SiteURL is the public origin of the site, used wherever an absolute URL is required.
+const SiteURL = "https://sacha.house"
+
 type SEO struct {
 	Title       string
 	Description string
 	Author      string
 	Image       string
+	URL         string
+	Type        string
+	NoIndex     bool
 }
 
 type Footer struct {
@@ -63,6 +65,16 @@ type PageData struct {
 	AdminScripts bool
 	// PostScripts loads static/js/post.js: the image and diagram viewer and the Mermaid loader.
 	PostScripts bool
+	// HomeIsActive marks the site name in the header as the current page.
+	HomeIsActive bool
+}
+
+// Locale is the Open Graph locale of the page.
+func (data PageData) Locale() string {
+	if data.Language == "fr" {
+		return "fr_FR"
+	}
+	return "en_US"
 }
 
 type PageOptions struct {
@@ -89,7 +101,16 @@ func NewPageData(options PageOptions) PageData {
 		seo.Author = Me.FullName
 	}
 	if seo.Image == "" {
-		seo.Image = "/favicon_shadow.png"
+		seo.Image = SiteURL + "/static/og.png"
+	}
+	if seo.URL == "" {
+		seo.URL = SiteURL + options.ActivePathname
+	}
+	if seo.Type == "" {
+		seo.Type = "website"
+	}
+	if strings.HasPrefix(options.ActivePathname, "/admin") {
+		seo.NoIndex = true
 	}
 
 	now := options.Now
@@ -119,6 +140,7 @@ func NewPageData(options PageOptions) PageData {
 		NavItems:     NavItems(options.ActivePathname),
 		StyleVersion: styleVersion,
 		HotReload:    options.HotReload,
+		HomeIsActive: options.ActivePathname == "/",
 		AdminScripts: strings.HasPrefix(options.ActivePathname, "/admin"),
 		PostScripts: strings.HasPrefix(options.ActivePathname, "/blog/") ||
 			strings.HasPrefix(options.ActivePathname, "/admin/blogposts/"),
@@ -127,17 +149,24 @@ func NewPageData(options PageOptions) PageData {
 
 type HomePageData struct {
 	PageData
-	Mail   string
-	CV     string
-	Resume string
+	Mail         string
+	CV           string
+	Resume       string
+	Projects     []ProjectView
+	ProjectCount int
+	Posts        []PostView
+}
+
+type NotFoundPageData struct {
+	PageData
+	Path string
 }
 
 type AboutPageData struct {
 	PageData
 	Identity
-	Age                 int
-	LinkedInExperiences []LinkedInExperience
-	LinkedInEducation   []LinkedInEducation
+	Age    int
+	Career CareerProfile
 }
 
 type ProjectView struct {
@@ -159,14 +188,42 @@ type ProjectView struct {
 type ProjectsPageData struct {
 	PageData
 	Identity
-	Projects []ProjectView
+	Featured []ProjectView
+	Others   []ProjectView
+}
+
+// featuredProjects names the repositories shown first, in order.
+var featuredProjects = [...]string{"wren", "gui_toolkit", "opencode_native", "lutin", "quorum-pki", "wthhyb.sacha.house"}
+
+// SplitProjects separates the featured projects, in their curated order, from the
+// others, which keep their order. A featured project that is missing is skipped.
+func SplitProjects(projects []ProjectView) (featured, others []ProjectView) {
+	byName := make(map[string]ProjectView, len(projects))
+	for _, project := range projects {
+		byName[project.Name] = project
+	}
+	isFeatured := make(map[string]bool, len(featuredProjects))
+	for _, name := range featuredProjects {
+		if project, found := byName[name]; found {
+			featured = append(featured, project)
+			isFeatured[name] = true
+		}
+	}
+	for _, project := range projects {
+		if !isFeatured[project.Name] {
+			others = append(others, project)
+		}
+	}
+	return featured, others
 }
 
 type PostView struct {
 	Slug          string
 	Title         string
 	Excerpt       string
+	Language      string
 	HTML          string
+	PublishedOn   string
 	CreatedOn     string
 	CreatedAtTime string
 	UpdatedOn     string

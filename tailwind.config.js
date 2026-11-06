@@ -7,7 +7,7 @@ module.exports = {
         DEFAULT: {
           css: {
             a: {
-              wordBreak: "break-all",
+              overflowWrap: "anywhere",
             },
             maxWidth: "var(--width-full)",
             "--tw-prose-body": "var(--color-textColor)",

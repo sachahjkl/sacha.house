@@ -28,6 +28,34 @@ func (app *App) feedPosts() ([]feedPost, error) {
 	return posts, nil
 }
 
+// sitemapPages are the public pages listed in the sitemap, next to the blog posts.
+var sitemapPages = [...]string{"/", "/projects", "/blog", "/about", "/resume", "/cv", "/keys"}
+
+func (app *App) sitemap(writer http.ResponseWriter, _ *http.Request) {
+	posts, err := app.feedPosts()
+	if err != nil {
+		http.Error(writer, "failed to load blog", http.StatusInternalServerError)
+		return
+	}
+	var output bytes.Buffer
+	output.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
+	for _, page := range sitemapPages {
+		output.WriteString("  <url>\n")
+		writeXMLText(&output, "    ", "loc", web.SiteURL+page)
+		output.WriteString("  </url>\n")
+	}
+	for _, post := range posts {
+		output.WriteString("  <url>\n")
+		writeXMLText(&output, "    ", "loc", web.SiteURL+"/blog/"+post.Metadata.Slug)
+		writeXMLText(&output, "    ", "lastmod", post.Date.Format("2006-01-02"))
+		output.WriteString("  </url>\n")
+	}
+	output.WriteString("</urlset>\n")
+	writer.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	writer.Header().Set("Cache-Control", publicCache)
+	_, _ = writer.Write(output.Bytes())
+}
+
 func (app *App) rss(writer http.ResponseWriter, _ *http.Request) {
 	posts, err := app.feedPosts()
 	if err != nil {

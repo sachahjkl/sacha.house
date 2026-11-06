@@ -73,10 +73,9 @@ func newTestAppWithFetcher(t *testing.T, fetcher projects.Fetcher, stale bool) *
 		t.Fatal(err)
 	}
 	assets := fstest.MapFS{
-		"linkedin_profile.json": &fstest.MapFile{Data: []byte(`{"experiences":[],"education":[]}`)},
-		"hello.txt":             &fstest.MapFile{Data: []byte("static")},
-		"sachahjkl.pub":         &fstest.MapFile{Data: []byte("ssh-ed25519 AAAA test\n")},
-		"sachahjkl.gpg":         &fstest.MapFile{Data: []byte("-----BEGIN PGP PUBLIC KEY BLOCK-----\n")},
+		"hello.txt":     &fstest.MapFile{Data: []byte("static")},
+		"sachahjkl.pub": &fstest.MapFile{Data: []byte("ssh-ed25519 AAAA test\n")},
+		"sachahjkl.gpg": &fstest.MapFile{Data: []byte("-----BEGIN PGP PUBLIC KEY BLOCK-----\n")},
 	}
 	hash, err := testPasswordHash()
 	if err != nil {
@@ -219,6 +218,34 @@ func TestStaleProjectsCacheRefreshDoesNotBlockStartup(t *testing.T) {
 	}
 }
 
+func TestHomeShowsTheLatestPosts(t *testing.T) {
+	application := newTestApp(t)
+	recorder := httptest.NewRecorder()
+	application.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/", nil))
+	body := recorder.Body.String()
+	for _, want := range []string{"latest writing", `href="/blog/hello"`, `rel="canonical"`, `type="application/rss+xml"`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("home misses %q", want)
+		}
+	}
+	if strings.Contains(body, "fonts.googleapis.com") {
+		t.Error("home still loads fonts from a third party")
+	}
+}
+
+func TestNotFoundEscapesThePathAndIsNotIndexed(t *testing.T) {
+	application := newTestApp(t)
+	recorder := httptest.NewRecorder()
+	application.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/%3Cscript%3E", nil))
+	body := recorder.Body.String()
+	if recorder.Code != http.StatusNotFound {
+		t.Fatalf("status = %d", recorder.Code)
+	}
+	if strings.Contains(body, "<script>") || !strings.Contains(body, `content="noindex"`) {
+		t.Errorf("unsafe or indexable 404: %s", body)
+	}
+}
+
 func TestPublicRoutes(t *testing.T) {
 	application := newTestApp(t)
 	tests := []struct {
@@ -227,13 +254,13 @@ func TestPublicRoutes(t *testing.T) {
 		contentType string
 		contains    string
 	}{
-		{path: "/", status: 200, contentType: "text/html", contains: "welcome to my website"},
+		{path: "/", status: 200, contentType: "text/html", contains: "hi, i'm sacha"},
 		{path: "/blog", status: 200, contentType: "text/html", contains: "Hello &amp; Go"},
 		{path: "/blog/hello", status: 200, contentType: "text/html", contains: "A public post."},
-		{path: "/blog/missing", status: 404, contentType: "text/plain", contains: "404 page not found"},
+		{path: "/blog/missing", status: 404, contentType: "text/html", contains: "/blog/missing: no such room in this house"},
 		{path: "/blog/rss.xml", status: 200, contentType: "application/rss+xml", contains: "Hello &amp; Go"},
 		{path: "/blog/atom.xml", status: 200, contentType: "application/atom+xml", contains: "Hello &amp; Go"},
-		{path: "/about", status: 200, contentType: "text/html", contains: "Professional Details"},
+		{path: "/about", status: 200, contentType: "text/html", contains: "Software engineer with more than six years"},
 		{path: "/resume", status: 200, contentType: "text/html", contains: "<h1>Sacha Froment</h1>"},
 		{path: "/resume?lang=en", status: 200, contentType: "text/html", contains: "<h2>Education</h2>"},
 		{path: "/cv", status: 200, contentType: "text/html", contains: "Catalogue de projets"},
@@ -246,8 +273,9 @@ func TestPublicRoutes(t *testing.T) {
 		{path: "/api/ip", status: 200, contentType: "text/plain", contains: "192.0.2.1"},
 		{path: "/static/hello.txt", status: 200, contentType: "text/plain", contains: "static"},
 		{path: "/media/blog/hello/assets/image.txt", status: 200, contentType: "text/plain", contains: "media"},
-		{path: "/linkedin_profile.json", status: 404, contentType: "text/plain", contains: "404 page not found"},
-		{path: "/unknown", status: 404, contentType: "text/plain", contains: "404 page not found"},
+		{path: "/linkedin_profile.json", status: 404, contentType: "text/html", contains: "no such room in this house"},
+		{path: "/unknown", status: 404, contentType: "text/html", contains: "no such room in this house"},
+		{path: "/sitemap.xml", status: 200, contentType: "application/xml", contains: "<loc>https://sacha.house/blog/hello</loc>"},
 	}
 	for _, test := range tests {
 		t.Run(test.path, func(t *testing.T) {
@@ -359,12 +387,15 @@ func TestPageLanguageAndCreatedDate(t *testing.T) {
 
 	index := httptest.NewRecorder()
 	application.ServeHTTP(index, httptest.NewRequest(http.MethodGet, "/blog", nil))
-	if !strings.Contains(index.Body.String(), ">2026</h3>") || strings.Contains(index.Body.String(), ">2025</h3>") {
+	if !strings.Contains(index.Body.String(), ">2026</h2>") || strings.Contains(index.Body.String(), ">2025</h2>") {
 		t.Fatalf("blog index does not group by PublishedAt: %s", index.Body.String())
 	}
 
 	atom := httptest.NewRecorder()
 	application.ServeHTTP(atom, httptest.NewRequest(http.MethodGet, "/blog/atom.xml", nil))
+	if !strings.Contains(index.Body.String(), "<time>02/01/2026</time>") {
+		t.Errorf("blog index does not show the publication date: %s", index.Body.String())
+	}
 	if !strings.Contains(atom.Body.String(), `<entry xml:lang="fr">`) {
 		t.Fatalf("Atom entry lacks its language: %s", atom.Body.String())
 	}

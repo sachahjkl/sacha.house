@@ -26,7 +26,7 @@ templ CareerContent(data CareerPageData) {
 				<a href={ templ.SafeURL(careerPath(true, data.Profile.Language)) } class={ templ.KV("active", data.Full) }>{ data.Profile.CVLabel }</a>
 			</div>
 			<div>
-				<a href="/">← retour à sacha.house</a>
+				<a href="/">{ data.Profile.BackLabel }</a>
 				<a href={ templ.SafeURL(careerPath(data.Full, data.Profile.OtherLanguage)) } lang={ data.Profile.OtherLanguage }>{ data.Profile.OtherLanguageLabel }</a>
 				<button type="button" onclick="window.print()">{ data.Profile.PrintLabel }</button>
 			</div>

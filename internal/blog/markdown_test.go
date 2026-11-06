@@ -80,6 +80,12 @@ func TestTableOfContents(t *testing.T) {
 	}
 }
 
+func TestExcerptShowsEscapedPunctuationAsWritten(t *testing.T) {
+	if got := Excerpt(`\[DRAFT\] notes`, ExcerptLength); got != "[DRAFT] notes" {
+		t.Fatalf("Excerpt() = %q", got)
+	}
+}
+
 func TestExcerptUsesRunesAndWordBoundary(t *testing.T) {
 	if got := Excerpt("one two three", 8); got != "one two..." {
 		t.Fatalf("Excerpt() = %q", got)

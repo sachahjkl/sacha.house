@@ -14,6 +14,7 @@ import (
 	extensionast "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
+	"github.com/yuin/goldmark/util"
 )
 
 const ExcerptLength = 180
@@ -95,7 +96,7 @@ func PlainText(markdownSource string) string {
 
 		switch node := node.(type) {
 		case *ast.Text:
-			appendText(node.Segment.Value(source))
+			appendText(util.UnescapePunctuations(node.Segment.Value(source)))
 			if node.SoftLineBreak() || node.HardLineBreak() {
 				pendingSpace = true
 			}

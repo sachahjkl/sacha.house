@@ -22,7 +22,7 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 		if err != nil {
 			continue
 		}
-		view := postView(document)
+		view := metadataView(document.Metadata)
 		view.Excerpt = blog.Excerpt(document.Markdown, blog.ExcerptLength)
 		year := web.LocalYear(parseTime(metadata.PublishedAt))
 		if len(groups) == 0 || groups[len(groups)-1].Year != year {
@@ -40,10 +40,10 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 	document, err := app.blog.Load(request.PathValue("slug"), false)
 	if err != nil {
-		http.NotFound(writer, request)
+		app.notFound(writer, request)
 		return
 	}
-	view := postView(document)
+	view := metadataView(document.Metadata)
 	html, err := blog.RenderMarkdownWithDiagrams(document.Markdown, app.blog.Diagrams(document.Metadata.Slug))
 	if err != nil {
 		http.Error(writer, "failed to render blog post", http.StatusInternalServerError)
@@ -58,18 +58,20 @@ func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 		Post:     view,
 	}
 	data.PageData.Language = document.Metadata.Language
+	data.PageData.SEO.Type = "article"
 	renderHTML(writer, request, web.PostPage(data), http.StatusOK)
 }
 
-func postView(document blog.Document) web.PostView {
-	created := parseTime(document.Metadata.CreatedAt)
-	updated := parseTime(document.Metadata.UpdatedAt)
+func metadataView(metadata blog.Metadata) web.PostView {
+	created := parseTime(metadata.CreatedAt)
+	updated := parseTime(metadata.UpdatedAt)
 	if updated.IsZero() {
 		updated = created
 	}
 	return web.PostView{
-		Slug: document.Metadata.Slug, Title: document.Metadata.Title,
-		CreatedOn: web.FormatDate(created), CreatedAtTime: web.FormatTime(created),
+		Slug: metadata.Slug, Title: metadata.Title, Language: metadata.Language,
+		PublishedOn: web.FormatDate(parseTime(metadata.PublishedAt)),
+		CreatedOn:   web.FormatDate(created), CreatedAtTime: web.FormatTime(created),
 		UpdatedOn: web.FormatDate(updated), UpdatedAtTime: web.FormatTime(updated),
 	}
 }

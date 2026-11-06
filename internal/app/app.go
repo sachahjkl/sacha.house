@@ -47,7 +47,6 @@ type App struct {
 	passkeys        *auth.PasskeyStore
 	pastes          *paste.Store
 	projects        *projects.Store
-	profile         web.LinkedInProfile
 	static          fs.FS
 	config          Config
 	options         Options
@@ -112,10 +111,6 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 	}
 	refreshProjects := loadErr != nil || projectStore.Stale(options.Now(), projectsCacheMaxAge)
 
-	profile, err := (web.FSLinkedInProfileLoader{FS: options.StaticFS, Path: "linkedin_profile.json"}).Load()
-	if err != nil {
-		return nil, err
-	}
 	cookie := auth.DefaultCookieConfig()
 	cookie.Secure = !options.Development
 	cookie.SameSite = http.SameSiteStrictMode
@@ -173,7 +168,7 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 
 	application := &App{
 		auth: authStore, blog: blogStore, passkeys: passkeys, pastes: pasteStore, projects: projectStore,
-		profile: profile, static: options.StaticFS, config: config, options: options,
+		static: options.StaticFS, config: config, options: options,
 		passwordChecks:  make(chan struct{}, 2),
 		projectsRefresh: make(chan struct{}, 1),
 		bootID:          fmt.Sprintf("%d", options.Now().UnixNano()),
@@ -196,6 +191,7 @@ func (app *App) routes() http.Handler {
 	mux.HandleFunc("GET /blog/{slug}", app.blogPost)
 	mux.HandleFunc("GET /blog/rss.xml", app.rss)
 	mux.HandleFunc("GET /blog/atom.xml", app.atom)
+	mux.HandleFunc("GET /sitemap.xml", app.sitemap)
 	mux.HandleFunc("GET /about", app.about)
 	mux.HandleFunc("GET /resume", app.resume)
 	mux.HandleFunc("GET /cv", app.curriculumVitae)

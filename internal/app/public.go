@@ -8,8 +8,14 @@ import (
 	"net/http"
 	"time"
 
+	"sacha.house/internal/blog"
 	"sacha.house/internal/projects"
 	"sacha.house/internal/web"
+)
+
+const (
+	homeProjects = 4
+	homePosts    = 3
 )
 
 func (app *App) page(pathname, title, description string) web.PageData {
@@ -27,11 +33,40 @@ func (app *App) page(pathname, title, description string) web.PageData {
 }
 
 func (app *App) home(writer http.ResponseWriter, request *http.Request) {
+	all := projectViews(app.projects.Get().Projects)
+	featured, _ := web.SplitProjects(all)
 	data := web.HomePageData{
-		PageData: app.page(request.URL.Path, "home / sacha.house", web.Me.FullName+"'s personal website."),
+		PageData: app.page(request.URL.Path, web.Me.FullName+" / sacha.house", web.Me.FullName+", software engineer. Projects, writing, and how to reach me."),
 		Mail:     web.Me.Mail, CV: web.Me.CurriculumVitae, Resume: "/resume",
+		Projects: featured[:min(len(featured), homeProjects)], ProjectCount: len(all),
+		Posts: app.latestPosts(homePosts),
 	}
 	renderHTML(writer, request, web.HomePage(data), http.StatusOK)
+}
+
+// latestPosts returns the most recent published posts. The home page stays up without them.
+func (app *App) latestPosts(limit int) []web.PostView {
+	posts, err := app.blog.List(false)
+	if err != nil {
+		return nil
+	}
+	views := make([]web.PostView, 0, limit)
+	for _, metadata := range posts[:min(len(posts), limit)] {
+		view := metadataView(metadata)
+		if document, err := app.blog.Load(metadata.Slug, false); err == nil {
+			view.Excerpt = blog.Excerpt(document.Markdown, blog.ExcerptLength)
+		}
+		views = append(views, view)
+	}
+	return views
+}
+
+// notFound is the HTML 404 of the public site.
+func (app *App) notFound(writer http.ResponseWriter, request *http.Request) {
+	page := app.page("/404", "not found / sacha.house", "This page does not exist.")
+	page.SEO.NoIndex = true
+	data := web.NotFoundPageData{PageData: page, Path: request.URL.Path}
+	renderHTML(writer, request, web.NotFoundPage(data), http.StatusNotFound)
 }
 
 func (app *App) careerPage(writer http.ResponseWriter, request *http.Request, full bool) {
@@ -67,18 +102,17 @@ func (app *App) legacyCurriculumVitae(writer http.ResponseWriter, request *http.
 func (app *App) about(writer http.ResponseWriter, request *http.Request) {
 	identity := web.Me
 	data := web.AboutPageData{
-		PageData: app.page(request.URL.Path, "about / sacha.house", "Presentation of Sacha Froment and his contact details."),
-		Identity: identity, Age: identity.AgeAt(app.options.Now()),
-		LinkedInExperiences: app.profile.Experiences, LinkedInEducation: app.profile.Education,
+		PageData: app.page(request.URL.Path, "about / sacha.house", "Who I am, where I have worked, and how to reach me."),
+		Identity: identity, Age: identity.AgeAt(app.options.Now()), Career: web.Career("en"),
 	}
 	renderHTML(writer, request, web.AboutPage(data), http.StatusOK)
 }
 
 func (app *App) projectsPage(writer http.ResponseWriter, request *http.Request) {
-	cache := app.projects.Get()
+	featured, others := web.SplitProjects(projectViews(app.projects.Get().Projects))
 	data := web.ProjectsPageData{
-		PageData: app.page(request.URL.Path, "projects / sacha.house", "My personal projects."),
-		Identity: web.Me, Projects: projectViews(cache.Projects),
+		PageData: app.page(request.URL.Path, "projects / sacha.house", "What I build: a web browser, a GUI toolkit, native clients, and everything else on my GitHub."),
+		Identity: web.Me, Featured: featured, Others: others,
 	}
 	renderHTML(writer, request, web.ProjectsPage(data), http.StatusOK)
 }
@@ -131,7 +165,7 @@ func (app *App) keyPage(heading, description string, paths ...string) http.Handl
 			source := publicKeys[path]
 			content, err := fs.ReadFile(app.static, source.file)
 			if err != nil {
-				http.NotFound(writer, request)
+				app.notFound(writer, request)
 				return
 			}
 			keys = append(keys, web.KeyView{
