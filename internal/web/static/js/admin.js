@@ -107,7 +107,7 @@ async function registerPasskey(button) {
   if (button?.disabled) return;
   if (button) button.disabled = true;
   const statusEl = document.getElementById("passkey-status");
-  statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
+  statusEl.className = "status mt-4";
   setStatusMessage(statusEl, "hourglass-not-done", "Fetching registration challenge...");
   statusEl.classList.remove("hidden");
 
@@ -128,11 +128,11 @@ async function registerPasskey(button) {
     });
 
     await requireJSONSuccess(verifyRes);
-    statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
+    statusEl.className = "status status-ok mt-4";
     setStatusMessage(statusEl, "check-mark-button", "Passkey registered successfully!");
     document.getElementById("refresh-passkeys")?.click();
   } catch (error) {
-    statusEl.className = "status-error mt-4";
+    statusEl.className = "status status-error mt-4";
     setStatusMessage(statusEl, "cross-mark", "Error: " + error.message);
   } finally {
     if (button) button.disabled = false;
@@ -143,7 +143,7 @@ async function testPasskey(button) {
   if (button?.disabled) return;
   if (button) button.disabled = true;
   const statusEl = document.getElementById("passkey-status");
-  statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
+  statusEl.className = "status mt-4";
   setStatusMessage(statusEl, "hourglass-not-done", "Fetching authentication challenge...");
   statusEl.classList.remove("hidden");
 
@@ -165,10 +165,10 @@ async function testPasskey(button) {
     });
 
     await requireJSONSuccess(verifyRes);
-    statusEl.className = "mt-4 p-3 bg-green-100 border-2 border-green-300 text-green-800";
+    statusEl.className = "status status-ok mt-4";
     setStatusMessage(statusEl, "check-mark-button", "Passkey authentication successful!");
   } catch (error) {
-    statusEl.className = "status-error mt-4";
+    statusEl.className = "status status-error mt-4";
     setStatusMessage(statusEl, "cross-mark", "Error: " + error.message);
   } finally {
     if (button) button.disabled = false;
@@ -179,7 +179,7 @@ async function loginWebAuthnPasskey(button) {
   if (button?.disabled) return;
   if (button) button.disabled = true;
   const statusEl = document.getElementById("login-status");
-  statusEl.className = "mt-4 p-3 bg-blue-100 border-2 border-blue-300 text-blue-800";
+  statusEl.className = "status mt-4";
   setStatusMessage(statusEl, "hourglass-not-done", "Fetching authentication challenge...");
   statusEl.classList.remove("hidden");
 
@@ -203,7 +203,7 @@ async function loginWebAuthnPasskey(button) {
     await requireJSONSuccess(verifyRes);
     window.location.assign("/admin");
   } catch (error) {
-    statusEl.className = "status-error mt-4";
+    statusEl.className = "status status-error mt-4";
     setStatusMessage(statusEl, "cross-mark", "Error: " + error.message);
   } finally {
     if (button) button.disabled = false;
@@ -223,9 +223,9 @@ function setBlogEditorStatus(message, type = "info") {
   if (!statusEl) return;
 
   const classes = {
-    info: "mb-4 border-2 border-blue-300 bg-blue-100 p-3 text-blue-800",
-    success: "mb-4 border-2 border-green-300 bg-green-100 p-3 text-green-800",
-    error: "mb-4 border-2 border-red-300 bg-red-100 p-3 text-red-800",
+    info: "status mb-4",
+    success: "status status-ok mb-4",
+    error: "status status-error mb-4",
   };
 
   statusEl.className = classes[type] || classes.info;
@@ -259,13 +259,14 @@ function fileToBase64(file) {
   });
 }
 
-async function uploadPastedBlogImage(file, slug) {
+async function uploadPastedBlogImage(file, slug, currentSlug) {
   const base64 = await fileToBase64(file);
   const response = await fetch("/admin/blogposts/upload-image", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       slug,
+      currentSlug,
       filename: file.name || "pasted-image.png",
       mimeType: file.type,
       dataBase64: base64,
@@ -291,9 +292,11 @@ function initBlogEditor() {
   const publishedAtPickerButton = document.getElementById("blog-published-at-picker");
   if (!titleInput || !slugInput || !markdownInput) return;
 
+  const currentSlug = form.dataset.currentSlug || "";
   let slugWasManual = slugInput.value.trim() !== "";
   let pendingUploads = 0;
-  let slugLocked = false;
+  // A new post that failed to save comes back with its images, already stored under this slug.
+  let slugLocked = currentSlug === "" && slugInput.value !== "" && markdownInput.value.includes(`/media/blog/${slugInput.value}/`);
   const submitButtons = Array.from(form.querySelectorAll('button[type="submit"]'));
   const updateUploadState = () => {
     slugInput.readOnly = slugLocked || pendingUploads > 0;
@@ -307,7 +310,7 @@ function initBlogEditor() {
   });
 
   titleInput.addEventListener("input", () => {
-    if (!slugWasManual) {
+    if (!slugWasManual && !slugLocked && pendingUploads === 0) {
       slugInput.value = slugifyBlogTitle(titleInput.value);
     }
   });
@@ -326,6 +329,8 @@ function initBlogEditor() {
       }
     });
   }
+
+  updateUploadState();
 
   markdownInput.addEventListener("paste", async (event) => {
     const items = Array.from(event.clipboardData?.items || []);
@@ -347,7 +352,7 @@ function initBlogEditor() {
     updateUploadState();
     try {
       setBlogEditorStatus("Uploading pasted image...", "info");
-      const upload = await uploadPastedBlogImage(file, slug);
+      const upload = await uploadPastedBlogImage(file, slug, currentSlug);
       insertTextAtCursor(markdownInput, `${upload.markdown}\n`);
       slugLocked = true;
       setBlogEditorStatus("Image uploaded and inserted into markdown.", "success");
@@ -358,6 +363,43 @@ function initBlogEditor() {
       updateUploadState();
     }
   });
+}
+
+// Checks the session before a form that holds typed text is sent: a redirect to the login page would lose it.
+function initSessionGuards() {
+  for (const form of document.querySelectorAll("form[data-session-guard]")) {
+    if (form.dataset.sessionGuardReady === "1") continue;
+    form.dataset.sessionGuardReady = "1";
+
+    const showError = (message) => {
+      const statusEl = document.getElementById(form.dataset.sessionGuard);
+      if (!statusEl) return;
+      statusEl.className = "status status-error mb-4";
+      statusEl.textContent = message;
+    };
+
+    form.addEventListener("submit", async (event) => {
+      if (event.defaultPrevented) return;
+      if (form.dataset.sessionChecked === "1") {
+        delete form.dataset.sessionChecked;
+        return;
+      }
+      event.preventDefault();
+      const submitter = event.submitter || undefined;
+      try {
+        const response = await fetch("/admin/session", { cache: "no-store" });
+        if (response.status === 401) {
+          showError("Your session expired, and nothing was sent. Log in again in another tab, then save here.");
+          return;
+        }
+      } catch (error) {
+        showError("The server cannot be reached, and nothing was sent. Save again when it is back.");
+        return;
+      }
+      form.dataset.sessionChecked = "1";
+      form.requestSubmit(submitter);
+    });
+  }
 }
 
 function initBlogpostsFilter() {
@@ -390,6 +432,7 @@ function initBlogpostsFilter() {
 
 function initAdminPageEnhancements() {
   initBlogEditor();
+  initSessionGuards();
   initBlogpostsFilter();
   if (!document.documentElement.dataset.adminEnhancementsReady) {
     document.documentElement.dataset.adminEnhancementsReady = "1";
@@ -397,6 +440,7 @@ function initAdminPageEnhancements() {
       if (event.detail?.type !== "datastar-patch-elements") return;
       queueMicrotask(() => {
         initBlogEditor();
+        initSessionGuards();
         initBlogpostsFilter();
       });
     });

@@ -164,16 +164,14 @@ func (client *GistClient) request(ctx context.Context, method, target string, pa
 	}
 	response, err := client.client.Do(request)
 	if err != nil {
+		// A mutation that timed out may still have happened at GitHub.
+		if mutation {
+			return nil, &GistError{Kind: GistOutcomeUnknown, Message: "GitHub mutation outcome is unknown"}
+		}
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			return nil, &GistError{Kind: GistTimeout, Message: "GitHub request timed out"}
 		}
-		kind := GistNetwork
-		message := "GitHub network request failed"
-		if mutation {
-			kind = GistOutcomeUnknown
-			message = "GitHub mutation outcome is unknown"
-		}
-		return nil, &GistError{Kind: kind, Message: message}
+		return nil, &GistError{Kind: GistNetwork, Message: "GitHub network request failed"}
 	}
 	defer response.Body.Close()
 	if response.StatusCode != expected {

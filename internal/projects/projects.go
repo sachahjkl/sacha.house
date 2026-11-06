@@ -12,6 +12,7 @@ import (
 	"html"
 	"image/png"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -275,7 +276,8 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 			}
 			project := newProject(raw.Name, raw.URL, raw.DescriptionHTML, "")
 			if err := applyProjectFiles(&project, raw.NameWithOwner, raw.DefaultBranchRef.Target.OID, raw.Project.Entries); err != nil {
-				return nil, fmt.Errorf("read metadata for %s: %w", raw.NameWithOwner, err)
+				// One repository's file must not cost the whole list: it shows what GitHub knows about it.
+				slog.Warn("skipping project metadata", "repository", raw.NameWithOwner, "error", err)
 			}
 			if !project.HasAvatar {
 				avatarURL, err := identiconURL(raw.NameWithOwner)

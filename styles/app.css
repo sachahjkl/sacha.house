@@ -262,19 +262,21 @@ body {
   font-size: 0.875rem;
 }
 
-.status-error {
-  @apply border-2 p-3;
-  background-color: #fee2e2;
-  border-color: #991b1b;
-  color: #7f1d1d;
+/* Messages: the text says what happened, the colour only underlines it */
+.status {
+  border: 2px solid var(--color-textColor);
+  padding: 0.5rem 0.75rem;
+  overflow-wrap: anywhere;
 }
 
-@media (prefers-color-scheme: dark) {
-  .status-error {
-    background-color: #7f1d1d;
-    border-color: #fca5a5;
-    color: #ffffff;
-  }
+.status-ok {
+  background: var(--color-textColor);
+  color: var(--color-bgColor);
+}
+
+.status-error {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 /* Buttons */
@@ -300,6 +302,39 @@ body {
   text-decoration: none;
 }
 
+.btn:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.btn-primary {
+  @apply bg-textColor text-bgColor;
+}
+
+.btn-primary:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-bgColor);
+}
+
+/* The one colour of the interface also marks what cannot be undone */
+.btn-danger {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-danger:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-bgColor);
+}
+
 /* Titled frames, like the header */
 .pane {
   position: relative;
@@ -315,6 +350,16 @@ body {
   padding-inline: 0.5rem;
   background: var(--color-bgColor);
   font-weight: 700;
+}
+
+.pane-danger,
+.pane-danger .pane-title {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.pane-danger p {
+  color: var(--color-textColor);
 }
 
 .pane-more {
@@ -546,6 +591,10 @@ body {
   gap: 0.25rem 1rem;
 }
 
+.facts-wide {
+  grid-template-columns: 11ch minmax(0, 1fr);
+}
+
 .facts dt {
   color: var(--color-bgOffColor);
 }
@@ -563,6 +612,123 @@ body {
   .facts dd {
     margin-bottom: 0;
   }
+}
+
+/* Admin */
+.admin-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.admin-head .h1 {
+  flex: 1;
+  min-width: 12rem;
+  margin-bottom: 0;
+}
+
+.admin-narrow {
+  max-width: 28rem;
+  margin: 2rem auto 0;
+}
+
+.back-link {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 44rem) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.form-or {
+  margin-block: 0.5rem;
+  text-align: center;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.field-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.field-row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.input {
+  width: 100%;
+  height: 2.5rem;
+  border: 2px solid var(--color-textColor);
+  padding-inline: 0.75rem;
+  background: var(--color-bgColor);
+  color: var(--color-textColor);
+}
+
+.input::placeholder {
+  color: var(--color-bgOffColor);
+}
+
+.input-editor {
+  height: auto;
+  min-height: 32rem;
+  padding-block: 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Lists of things to manage. The li stays a block, for the .hidden of the filter. */
+.rows li {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-textColor) 20%, transparent);
+  padding-block: 0.6rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.row-main {
+  flex: 1;
+  min-width: min(100%, 16rem);
+}
+
+.row-title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.row-code {
+  overflow-wrap: anywhere;
 }
 
 /* 404 */

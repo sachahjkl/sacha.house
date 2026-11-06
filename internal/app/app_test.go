@@ -548,7 +548,7 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	edit.AddCookie(cookie)
 	editResponse := httptest.NewRecorder()
 	application.ServeHTTP(editResponse, edit)
-	if editResponse.Code != http.StatusOK || !strings.Contains(editResponse.Body.String(), `<h1 id="preview">Preview</h1>`) || !strings.Contains(editResponse.Body.String(), `<option value="fr" class="bg-bgColor text-textColor" selected>`) {
+	if editResponse.Code != http.StatusOK || !strings.Contains(editResponse.Body.String(), `<h1 id="preview">Preview</h1>`) || !strings.Contains(editResponse.Body.String(), `<option value="fr" selected>`) {
 		t.Fatalf("editor = %d %s", editResponse.Code, editResponse.Body.String())
 	}
 
@@ -572,7 +572,7 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	uploadBody := fmt.Sprintf(`{"slug":"renamed-post","filename":"pixel.png","mimeType":"image/png","dataBase64":%q}`,
+	uploadBody := fmt.Sprintf(`{"slug":"renamed-post","currentSlug":"renamed-post","filename":"pixel.png","mimeType":"image/png","dataBase64":%q}`,
 		base64.StdEncoding.EncodeToString(png))
 	upload := httptest.NewRequest(http.MethodPost, "/admin/blogposts/upload-image", strings.NewReader(uploadBody))
 	upload.Header.Set("Content-Type", "application/json")
@@ -604,8 +604,8 @@ func TestAdminBlogCRUDAndProjectRefresh(t *testing.T) {
 	datastarResponse := httptest.NewRecorder()
 	application.ServeHTTP(datastarResponse, datastarRefresh)
 	if datastarResponse.Code != http.StatusOK || !strings.Contains(datastarResponse.Body.String(), "datastar-patch-elements") ||
-		!strings.Contains(datastarResponse.Body.String(), "Rafraîchissement des projets en cours") ||
-		!strings.Contains(datastarResponse.Body.String(), "Projets rafraîchis avec succès") {
+		!strings.Contains(datastarResponse.Body.String(), "Refreshing projects") ||
+		!strings.Contains(datastarResponse.Body.String(), "Projects refreshed") {
 		t.Fatalf("Datastar refresh = %d: %s", datastarResponse.Code, datastarResponse.Body.String())
 	}
 	deadline = time.Now().Add(time.Second)
@@ -627,9 +627,9 @@ func TestAdminProjectRefreshReportsFailure(t *testing.T) {
 	application.ServeHTTP(response, request)
 
 	if response.Code != http.StatusOK ||
-		!strings.Contains(response.Body.String(), "Rafraîchissement des projets en cours") ||
-		!strings.Contains(response.Body.String(), "Échec du rafraîchissement des projets") ||
-		!strings.Contains(response.Body.String(), "border-red-300") {
+		!strings.Contains(response.Body.String(), "Refreshing projects") ||
+		!strings.Contains(response.Body.String(), "Could not refresh the projects") ||
+		!strings.Contains(response.Body.String(), "status-error") {
 		t.Fatalf("Datastar refresh failure = %d: %s", response.Code, response.Body.String())
 	}
 }
@@ -679,7 +679,7 @@ func TestAdminProjectRefreshStreamsProgressBeforeCompletion(t *testing.T) {
 
 	select {
 	case event := <-firstEvent:
-		if !strings.Contains(event, "Rafraîchissement des projets en cours") {
+		if !strings.Contains(event, "Refreshing projects") {
 			t.Fatalf("first SSE event = %q", event)
 		}
 	case <-time.After(time.Second):

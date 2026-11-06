@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -154,4 +155,20 @@ func TestStoreSupportsConcurrentAccess(t *testing.T) {
 		}()
 	}
 	wait.Wait()
+}
+
+func TestFailureKeysAreBounded(t *testing.T) {
+	now := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+	store := NewStore(Config{Now: func() time.Time { return now }})
+	for index := range maxChallengeIPs + 10 {
+		store.RecordFailure(fmt.Sprintf("client-%d", index))
+	}
+	if len(store.failures) > maxChallengeIPs {
+		t.Fatalf("failures holds %d keys", len(store.failures))
+	}
+	now = now.Add(FailureWindow)
+	store.RecordFailure("after-the-window")
+	if len(store.failures) != 1 {
+		t.Fatalf("expired keys were not swept: %d", len(store.failures))
+	}
 }

@@ -49,7 +49,7 @@ func TestImportMissingCopiesOnlyAbsentPosts(t *testing.T) {
 			t.Errorf("%s should not have been imported", name)
 		}
 	}
-	leftovers, _ := filepath.Glob(filepath.Join(filepath.Dir(root), ".import-*"))
+	leftovers, _ := filepath.Glob(filepath.Join(root, ".import-*"))
 	if len(leftovers) != 0 {
 		t.Fatalf("temporary directories left behind: %v", leftovers)
 	}

@@ -36,7 +36,7 @@
     const title = element("span", "lightbox-title");
     bar.append(
       title,
-      button("âˆ’", "zoom-out", "Zoom out (-)"),
+      button("−", "zoom-out", "Zoom out (-)"),
       button("+", "zoom-in", "Zoom in (+)"),
       button("fit", "fit", "Fit to the window (0)"),
       button("1:1", "actual", "Actual size (1)"),
@@ -296,10 +296,10 @@
         try {
           await navigator.clipboard.writeText(figureSource(figure));
           target.textContent = "copied";
-          setTimeout(() => { target.textContent = "source"; }, 1500);
         } catch (error) {
           target.textContent = "failed";
         }
+        setTimeout(() => { target.textContent = "source"; }, 1500);
       }
     });
   }

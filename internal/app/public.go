@@ -33,6 +33,7 @@ func (app *App) page(pathname, title, description string) web.PageData {
 }
 
 func (app *App) home(writer http.ResponseWriter, request *http.Request) {
+	app.refreshStaleProjects()
 	all := projectViews(app.projects.Get().Projects)
 	featured, _ := web.SplitProjects(all)
 	data := web.HomePageData{
@@ -109,6 +110,7 @@ func (app *App) about(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (app *App) projectsPage(writer http.ResponseWriter, request *http.Request) {
+	app.refreshStaleProjects()
 	featured, others := web.SplitProjects(projectViews(app.projects.Get().Projects))
 	data := web.ProjectsPageData{
 		PageData: app.page(request.URL.Path, "projects / sacha.house", "What I build: a web browser, a GUI toolkit, native clients, and everything else on my GitHub."),

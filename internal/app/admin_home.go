@@ -35,22 +35,39 @@ func (app *App) adminRefreshProjects(writer http.ResponseWriter, request *http.R
 	writer.Header().Set("X-Accel-Buffering", "no")
 	sse := datastar.NewSSE(writer, request)
 	if !started {
-		_ = sse.PatchElementTempl(web.ProjectRefreshStatus("Un rafraîchissement est déjà en cours.", false))
+		_ = sse.PatchElementTempl(web.ProjectRefreshStatus("A refresh is already running.", ""))
 		return
 	}
-	if err := sse.PatchElementTempl(web.ProjectRefreshStatus("Rafraîchissement des projets en cours…", false)); err != nil {
+	if err := sse.PatchElementTempl(web.ProjectRefreshStatus("Refreshing projects…", "")); err != nil {
 		return
 	}
 
 	select {
 	case err := <-result:
 		if err != nil {
-			_ = sse.PatchElementTempl(web.ProjectRefreshStatus("Échec du rafraîchissement des projets.", true))
+			_ = sse.PatchElementTempl(web.ProjectRefreshStatus("Could not refresh the projects.", "status-error"))
 			return
 		}
-		_ = sse.PatchElementTempl(web.ProjectRefreshStatus("Projets rafraîchis avec succès.", false))
+		_ = sse.PatchElementTempl(web.ProjectRefreshStatus("Projects refreshed.", "status-ok"))
 	case <-request.Context().Done():
 	}
+}
+
+// projectsRetryInterval spaces the refreshes a stale cache starts by itself, so a failing GitHub is not hammered.
+const projectsRetryInterval = 10 * time.Minute
+
+// refreshStaleProjects starts a background refresh when the pages that show projects find the cache stale. The
+// server can run for weeks, and a refresh that failed at start must be tried again.
+func (app *App) refreshStaleProjects() {
+	now := app.options.Now()
+	if !app.projects.Stale(now, projectsCacheMaxAge) {
+		return
+	}
+	last := app.projectsAttempt.Load()
+	if now.Sub(time.Unix(0, last)) < projectsRetryInterval || !app.projectsAttempt.CompareAndSwap(last, now.UnixNano()) {
+		return
+	}
+	_, _ = app.startProjectsRefresh()
 }
 
 func (app *App) startProjectsRefresh() (<-chan error, bool) {

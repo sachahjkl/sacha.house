@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"sacha.house/internal/auth"
@@ -52,6 +53,8 @@ type App struct {
 	options         Options
 	passwordChecks  chan struct{}
 	projectsRefresh chan struct{}
+	// projectsAttempt is when a stale cache was last refreshed, in Unix nanoseconds.
+	projectsAttempt atomic.Int64
 	bootID          string
 }
 
@@ -82,6 +85,10 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 		options.Now = time.Now
 	}
 
+	blogStore, err := blog.NewStore(options.BlogRoot, web.Me.FullName)
+	if err != nil {
+		return nil, err
+	}
 	if options.BlogSeed != nil {
 		imported, err := blog.ImportMissing(options.BlogRoot, options.BlogSeed)
 		if err != nil {
@@ -90,10 +97,6 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 		if len(imported) > 0 {
 			slog.Info("blog posts imported from the repository", "posts", imported)
 		}
-	}
-	blogStore, err := blog.NewStore(options.BlogRoot, web.Me.FullName)
-	if err != nil {
-		return nil, err
 	}
 
 	fetcher := options.ProjectsFetcher
@@ -174,6 +177,7 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 		bootID:          fmt.Sprintf("%d", options.Now().UnixNano()),
 	}
 	application.handler = application.routes()
+	application.projectsAttempt.Store(options.Now().UnixNano())
 	if refreshProjects {
 		_, _ = application.startProjectsRefresh()
 	}
@@ -227,6 +231,7 @@ func (app *App) routes() http.Handler {
 	mux.Handle("POST /admin/pastes/{id}", app.requireAdmin(http.HandlerFunc(app.adminSavePaste)))
 	mux.Handle("POST /admin/pastes/{id}/rotate", app.requireAdmin(http.HandlerFunc(app.adminRotatePaste)))
 	mux.Handle("POST /admin/pastes/{id}/delete", app.requireAdmin(http.HandlerFunc(app.adminDeletePaste)))
+	mux.Handle("GET /admin/session", app.requireAdminAPI(http.HandlerFunc(app.adminSession)))
 	mux.Handle("GET /admin/webauthn", app.requireAdmin(http.HandlerFunc(app.adminWebAuthn)))
 	mux.Handle("GET /admin/webauthn/passkeys", app.requireAdminAPI(http.HandlerFunc(app.adminPasskeys)))
 	mux.Handle("GET /admin/webauthn/register-challenge", app.requireAdminAPI(http.HandlerFunc(app.webAuthnRegisterChallenge)))

@@ -21,6 +21,9 @@ const (
 	commitMarker   = ".commit-target"
 	backupPrefix   = ".backup-"
 	stagingPrefix  = ".post-"
+	importPrefix   = ".import-"
+	// reservedSlug would be shadowed by the /admin/blogposts/new route: the post could never be opened again.
+	reservedSlug = "new"
 )
 
 var (
@@ -28,6 +31,9 @@ var (
 	ErrInvalidAsset = errors.New("invalid blog asset path")
 	ErrNotPublished = errors.New("blog post is not published")
 	ErrPostExists   = errors.New("blog post already exists")
+	ErrPostConflict = errors.New("this blogpost changed since this page was opened: copy your text, reload, and save again")
+	ErrPostGone     = errors.New("this blogpost no longer exists at this address: copy your text and reopen it from the list")
+	ErrReservedSlug = errors.New("this slug is reserved")
 	slugPattern     = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
 	extPattern      = regexp.MustCompile(`^\.[A-Za-z0-9]+$`)
 )
@@ -56,6 +62,8 @@ type SaveInput struct {
 	Status      string
 	PublishedAt string
 	Markdown    string
+	// Revision is the UpdatedAt the editor loaded. When set, Save refuses to overwrite a newer version.
+	Revision string
 }
 
 type UploadResult struct {
@@ -126,6 +134,9 @@ func (store *Store) List(includeDrafts bool) ([]Metadata, error) {
 			continue
 		}
 		metadata, err := store.loadMetadata(entry.Name())
+		if errors.Is(err, fs.ErrNotExist) {
+			continue // images uploaded for a post that is not saved yet
+		}
 		if err != nil {
 			slog.Warn("skipping invalid blog metadata", "slug", entry.Name(), "error", err)
 			continue
@@ -147,6 +158,15 @@ func (store *Store) Load(slug string, includeDrafts bool) (Document, error) {
 }
 
 func (store *Store) OpenPublishedAsset(slug, assetPath string) (*os.File, error) {
+	return store.openAsset(slug, assetPath, false)
+}
+
+// OpenAsset also serves the assets of a draft, for the admin's preview.
+func (store *Store) OpenAsset(slug, assetPath string) (*os.File, error) {
+	return store.openAsset(slug, assetPath, true)
+}
+
+func (store *Store) openAsset(slug, assetPath string, includeDrafts bool) (*os.File, error) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
 
@@ -160,7 +180,7 @@ func (store *Store) OpenPublishedAsset(slug, assetPath string) (*os.File, error)
 	if err != nil {
 		return nil, err
 	}
-	if metadata.Status != "published" {
+	if !includeDrafts && metadata.Status != "published" {
 		return nil, ErrNotPublished
 	}
 	root, err := os.OpenRoot(store.root)
@@ -190,6 +210,9 @@ func (store *Store) Save(input SaveInput, oldSlug string) (string, error) {
 	if !validSlug(newSlug) {
 		return "", ErrInvalidSlug
 	}
+	if newSlug == reservedSlug {
+		return "", fmt.Errorf("%w: %s", ErrReservedSlug, newSlug)
+	}
 	if oldSlug != "" && !validSlug(oldSlug) {
 		return "", ErrInvalidSlug
 	}
@@ -207,8 +230,14 @@ func (store *Store) Save(input SaveInput, oldSlug string) (string, error) {
 	existing := Document{}
 	if oldSlug != "" {
 		existing, err = store.load(oldSlug, true)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		if errors.Is(err, fs.ErrNotExist) {
+			return "", ErrPostGone
+		}
+		if err != nil {
 			return "", err
+		}
+		if input.Revision != "" && input.Revision != existing.Metadata.UpdatedAt {
+			return "", ErrPostConflict
 		}
 	}
 	if oldSlug == "" || oldSlug != newSlug {
@@ -231,7 +260,7 @@ func (store *Store) Save(input SaveInput, oldSlug string) (string, error) {
 	if status == "published" && published == "" {
 		published = existing.Metadata.PublishedAt
 		if published == "" {
-			published = createdAt
+			published = now
 		}
 	}
 	markdownSource := NormalizeMarkdown(input.Markdown)
@@ -375,7 +404,7 @@ func (store *Store) recoverDirectories() error {
 	for _, entry := range entries {
 		name := entry.Name()
 		fullPath := filepath.Join(store.root, name)
-		if entry.IsDir() && strings.HasPrefix(name, stagingPrefix) {
+		if entry.IsDir() && (strings.HasPrefix(name, stagingPrefix) || strings.HasPrefix(name, importPrefix)) {
 			if err := os.RemoveAll(fullPath); err != nil {
 				return fmt.Errorf("remove abandoned blog staging directory: %w", err)
 			}
@@ -406,7 +435,8 @@ func (store *Store) recoverBackup(backupDirectory string) error {
 	if !validSlug(targetSlug) {
 		return fmt.Errorf("blog recovery marker has invalid target %q", targetSlug)
 	}
-	if _, err := os.Stat(store.postDirectory(targetSlug)); err == nil {
+	// Only a post.json proves the commit finished: the target directory alone can hold images uploaded early.
+	if _, err := os.Stat(store.metadataPath(targetSlug)); err == nil {
 		return os.RemoveAll(backupDirectory)
 	} else if !errors.Is(err, fs.ErrNotExist) {
 		return fmt.Errorf("check recovered blog target: %w", err)
@@ -419,16 +449,28 @@ func (store *Store) recoverBackup(backupDirectory string) error {
 		}
 	}
 	restoreDirectory := store.postDirectory(restoreSlug)
-	if _, err := os.Stat(restoreDirectory); err == nil {
+	if _, err := os.Stat(store.metadataPath(restoreSlug)); err == nil {
 		return os.RemoveAll(backupDirectory)
 	} else if !errors.Is(err, fs.ErrNotExist) {
 		return fmt.Errorf("check blog recovery destination: %w", err)
 	}
-	if err := os.Remove(filepath.Join(backupDirectory, commitMarker)); err != nil {
-		return fmt.Errorf("remove blog recovery marker: %w", err)
+	if _, err := os.Stat(restoreDirectory); err == nil {
+		// Images uploaded early sit where the post goes back: keep them with it.
+		if err := copyAssets(filepath.Join(restoreDirectory, "assets"), filepath.Join(backupDirectory, "assets")); err != nil {
+			return fmt.Errorf("keep uploaded blog assets: %w", err)
+		}
+		if err := os.RemoveAll(restoreDirectory); err != nil {
+			return fmt.Errorf("clear blog recovery destination: %w", err)
+		}
+	} else if !errors.Is(err, fs.ErrNotExist) {
+		return fmt.Errorf("check blog recovery destination: %w", err)
 	}
+	// The marker goes last: a failed rename must leave a backup the next start can still recover.
 	if err := os.Rename(backupDirectory, restoreDirectory); err != nil {
 		return fmt.Errorf("recover blog directory: %w", err)
+	}
+	if err := os.Remove(filepath.Join(restoreDirectory, commitMarker)); err != nil {
+		slog.Warn("could not remove blog recovery marker", "slug", restoreSlug, "error", err)
 	}
 	slog.Warn("recovered interrupted blog commit", "slug", restoreSlug)
 	return nil
@@ -461,11 +503,24 @@ func copyAssets(source, destination string) error {
 }
 
 func (store *Store) Upload(slug, filename, mimeType string, data []byte) (UploadResult, error) {
+	return store.UploadFor(slug, slug, filename, mimeType, data)
+}
+
+// UploadFor stores an image under slug for the post being edited as ownerSlug, which is empty for a new post.
+// It refuses a slug that belongs to another post, whose assets the image would otherwise join.
+func (store *Store) UploadFor(slug, ownerSlug, filename, mimeType string, data []byte) (UploadResult, error) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
 	if !validSlug(slug) {
 		return UploadResult{}, ErrInvalidSlug
+	}
+	if slug != ownerSlug {
+		if _, err := os.Stat(store.metadataPath(slug)); err == nil {
+			return UploadResult{}, fmt.Errorf("%w: %s", ErrPostExists, slug)
+		} else if !errors.Is(err, fs.ErrNotExist) {
+			return UploadResult{}, fmt.Errorf("check blog post: %w", err)
+		}
 	}
 	extension := mimeExtension(mimeType)
 	if !extPattern.MatchString(extension) {
