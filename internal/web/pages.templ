@@ -9,25 +9,64 @@ templ HomePage(data HomePageData) {
 }
 
 templ HomeContent(data HomePageData) {
-	<article>
-		<h1 class="h1">welcome to my website</h1>
-		<section class="mb-8"><div class="ascii-logo-wrap ascii-logo-wrap-hero">@ASCIILogo()</div></section>
-		<section class="mb-8">
-			<h2 class="h2">Quick links</h2>
-			<ul>
-				<li><a href="/about">@ArrowRight()
-about me</a></li>
-				<li>@Icon("page-facing-up")
-my <a href={ templ.SafeURL(data.CV) }>curriculum vitae</a> and <a href={ templ.SafeURL(data.Resume) }>résumé</a></li>
-				<li><a href={ templ.SafeURL("mailto:" + data.Mail) }>@Icon("e-mail")
-shoot me an email (will reply asap)</a></li>
-				<li>
-					@Icon("locked-with-key")
-					my <a href="/ssh">ssh</a> and <a href="/gpg">gpg</a> <a href="/keys">public keys</a>
-				</li>
+	<article class="home">
+		<div class="ascii-logo-wrap ascii-logo-wrap-hero">@ASCIILogo()</div>
+		<section class="intro">
+			<div>
+				<h1 class="h1">hi, i'm sacha</h1>
+				<p>I'm a software engineer in France. At work I take on the foundational jobs: framework migrations, faster tests and CI, performance, design systems. I measure before acting.</p>
+				<p>At home I build my own tools, from a web browser to a GUI toolkit, and I run them on my own homelab.</p>
+				<p class="actions">
+					<a class="btn" href={ templ.SafeURL(data.Resume) }>@Icon("page-facing-up")
+résumé</a>
+					<a class="btn" href={ templ.SafeURL(data.CV) }>full cv</a>
+					<a class="btn" href={ templ.SafeURL("mailto:" + data.Mail) }>@Icon("e-mail")
+shoot me an email</a>
+				</p>
+				<p class="meta">Will reply asap.</p>
+			</div>
+			<picture class="poster"><img src="/static/c-omrade.jpg" width="1000" height="1305" alt="Poster of two hands holding up The C Programming Language" fetchpriority="high"/></picture>
+		</section>
+		<div class="panes">
+			if len(data.Projects) > 0 {
+				<section class="pane">
+					<h2 class="pane-title">now building</h2>
+					<ul class="project-list">
+						for _, project := range data.Projects {
+							@ProjectCard(project)
+						}
+					</ul>
+					<p class="pane-more"><a href="/projects">
+						all { fmt.Sprintf("%d", data.ProjectCount) } projects
+						@ArrowRightEnd()
+					</a></p>
+				</section>
+			}
+			if len(data.Posts) > 0 {
+				<section class="pane">
+					<h2 class="pane-title">latest writing</h2>
+					<ul class="post-list">
+						for _, post := range data.Posts {
+							@PostRow(post)
+						}
+					</ul>
+					<p class="pane-more"><a href="/blog">
+						all articles
+						@ArrowRightEnd()
+					</a></p>
+				</section>
+			}
+		</div>
+		<section class="pane pane-wide">
+			<h2 class="pane-title">find me</h2>
+			<ul class="link-row">
+				<li><a href="/about">about me</a></li>
+				<li><a href={ templ.SafeURL("mailto:" + data.Mail) }>{ data.Mail }</a></li>
+				<li><a href={ templ.SafeURL(Me.GitHub) }>github</a></li>
+				<li><a href={ templ.SafeURL(Me.LinkedIn) }>linkedin</a></li>
+				<li><a href="/ssh">ssh</a> and <a href="/gpg">gpg</a> <a href="/keys">public keys</a></li>
 			</ul>
 		</section>
-		<section class="mb-8"><picture><img class="m-auto w-full max-w-md" src="/static/c-omrade.jpg" width="1000" height="1305" alt="comrade" fetchpriority="high"/></picture></section>
 	</article>
 }
 
@@ -36,70 +75,68 @@ templ AboutPage(data AboutPageData) {
 }
 
 templ AboutContent(data AboutPageData) {
-	<article class="about-page mx-auto max-w-full text-sm sm:text-base print:max-w-full">
+	<article class="about-page">
 		<h1 class="h1">about</h1>
-		<section class="mb-8">
-			<div class="avatar my-6 flex justify-center"><picture class="border-textColor block border-4"><img class="me" src="/static/me.jpg" height="400" width="400" alt="Moi"/></picture></div>
-			<p>My name is <b>{ data.FirstName }</b>, I'm <em>{ fmt.Sprintf("%d years old", data.Age) }</em> and I live in <em>{ data.PlaceOfLiving }</em>.</p>
-			<p>I'm a software engineer. I strive to produce simple, high-quality work.</p>
-			<p>Feel free to <a class="underline" href={ templ.SafeURL("mailto:" + data.Mail) }>send me an email</a> about what you think of this site or any other topic that might interest me (work, discussion, project, ...).</p>
-			<p>You can <b>find my curriculum vitae</b> by clicking <a class="underline" href={ templ.SafeURL(data.CurriculumVitae) }>here</a>.</p>
-		</section>
-		<section class="mb-8" id="professional-details">
-			<h2 class="h2">@Icon("desktop-computer")
-Professional Details</h2>
-			<div class="flex flex-col gap-4">
-				for _, experience := range data.LinkedInExperiences {
-					<section class="border-textColor border-s-[16px] py-2 ps-4">
-						<div class="mb-3"><h3 class="ms-0 font-bold">
-							if experience.CompanyLinkedInProfileURL != "" {
-								<a class="font-bold no-underline hover:underline" href={ templ.SafeURL(experience.CompanyLinkedInProfileURL) }>{ experience.Company }
-@IconEnd("link")</a>
-							} else {
-								{ experience.Company }
-							}
-						</h3><h4 class="italic">{ experience.Title }</h4><small class="text-bgOffColor"><time>{ experience.StartsOn() }</time> - <time>{ experience.EndsOn() }</time></small></div>
-						<div></div><p class="!mb-0">@templ.Raw(experience.Description)</p>
-					</section>
-				}
+		<section class="about-intro">
+			<div class="avatar"><picture><img class="me" src="/static/me.jpg" height="400" width="400" alt="Portrait of Sacha Froment"/></picture></div>
+			<div>
+				<p>My name is <b>{ data.FullName }</b>, I'm <em>{ fmt.Sprintf("%d years old", data.Age) }</em> and I live in <em>{ data.PlaceOfLiving }</em>.</p>
+				<p>{ data.Career.Summary }</p>
+				<p>I strive to produce simple, high-quality work.</p>
+				<p>Feel free to <a href={ templ.SafeURL("mailto:" + data.Mail) }>send me an email</a> about what you think of this site or any other topic that might interest me (work, discussion, project, ...).</p>
 			</div>
 		</section>
-		<section class="mb-8" id="academic-background">
-			<h2 class="h2">@Icon("school")
-Academic Background</h2>
-			<div class="flex flex-col gap-4">
-				for _, education := range data.LinkedInEducation {
-					<section class="border-textColor border-s-[16px] py-2 ps-4">
-						<div class="mb-3"><h3 class="ms-0 font-bold">
-							if education.SchoolLinkedInProfileURL != "" {
-								<a class="font-bold no-underline hover:underline" href={ templ.SafeURL(education.SchoolLinkedInProfileURL) }>{ education.School }
-@IconEnd("link")</a>
-							} else {
-								{ education.School }
-							}
-						</h3><h4 class="italic">{ education.Title() }</h4><small class="text-bgOffColor"><time>{ education.StartsOn() }</time> - <time>{ education.EndsOn() }</time></small></div>
-						<div></div>
-						if education.Description != "" {
-							<p class="!mb-0">@templ.Raw(education.Description)</p>
-						} else {
-							<p class="!mb-0">No description available.</p>
-						}
-					</section>
+		<section id="career" class="mb-10">
+			<h2 class="h2">career</h2>
+			<ol class="timeline">
+				for _, experience := range data.Career.Experiences {
+					if !experience.FullOnly {
+						<li>
+							<span class="meta">{ experience.Period }</span>
+							<span><b>{ experience.Company }</b>, { experience.Role }</span>
+						</li>
+					}
 				}
-			</div>
+			</ol>
+			<p class="actions">
+				<a class="btn" href="/resume?lang=en">one-page résumé</a>
+				<a class="btn" href="/cv?lang=en">full cv</a>
+			</p>
 		</section>
-		<section id="contact" class="mb-8">
-			<h2 class="h2">@Icon("fountain-pen")
-Contact</h2><p>Here's a list of my contact information:</p>
-			<ul class="list-inside list-[square] break-words">
-				<li>Email: { data.Mail }</li><li>Ethereum Address: { data.ETHAddress }</li><li>Monero Address: { data.MoneroAddress }</li>
-				<li>GPG Public key: <a href="/sachahjkl.gpg">{ data.GPGFingerprint }</a></li>
-				<li>LinkedIn Profile: <a href={ templ.SafeURL(data.LinkedIn) }>{ data.LinkedIn }</a></li>
-				<li>GitHub Profile: <a href={ templ.SafeURL(data.GitHub) }>{ data.GitHub }</a></li>
-			</ul>
+		<section id="education" class="mb-10">
+			<h2 class="h2">education</h2>
+			<ol class="timeline">
+				for _, education := range data.Career.Education {
+					<li>
+						<span class="meta">{ education.Period }</span>
+						<span><b>{ education.School }</b>, { education.Degree }</span>
+					</li>
+				}
+			</ol>
 		</section>
-		<section id="project-build-status"><h2 class="h2">@Icon("building-construction")
-Project Build Status</h2><a href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/commit/" + data.Footer.CommitHash) }><img width="300" src={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/actions/workflows/build.yml/badge.svg?branch=master") } loading="lazy" decoding="async" alt="Build Status Badge"/></a></section>
+		<section id="contact" class="mb-10">
+			<h2 class="h2">contact</h2>
+			<dl class="facts">
+				<dt>email</dt>
+				<dd><a href={ templ.SafeURL("mailto:" + data.Mail) }>{ data.Mail }</a></dd>
+				<dt>github</dt>
+				<dd><a href={ templ.SafeURL(data.GitHub) }>{ data.GitHub }</a></dd>
+				<dt>linkedin</dt>
+				<dd><a href={ templ.SafeURL(data.LinkedIn) }>{ data.LinkedIn }</a></dd>
+				<dt>gpg</dt>
+				<dd><a href="/gpg">{ data.GPGFingerprint }</a></dd>
+				<dt>ssh</dt>
+				<dd><a href="/ssh">public key</a></dd>
+				<dt>ethereum</dt>
+				<dd>{ data.ETHAddress }</dd>
+				<dt>monero</dt>
+				<dd>{ data.MoneroAddress }</dd>
+			</dl>
+		</section>
+		<section id="colophon">
+			<h2 class="h2">colophon</h2>
+			<p>This site is a single Go binary built with templ and Tailwind CSS. Public pages need no JavaScript framework, and it runs from a Nix-built image on Nomad, in my homelab. The <a href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID) }>source is on GitHub</a>.</p>
+		</section>
 	</article>
 }
 
@@ -108,44 +145,86 @@ templ ProjectsPage(data ProjectsPageData) {
 }
 
 templ ProjectsContent(data ProjectsPageData) {
-	<article class="mx-auto">
+	<article>
 		<h1 class="h1">projects</h1>
-		<section class="mb-8"><p>A collection of my work, including both completed and ongoing projects. These repositories were created to:</p>
-			<ul class="ms-4 list-inside list-[square]"><li>Explore new technologies</li><li>Practice project management, design, and software architecture</li><li>Collaborate on personal projects</li><li>Organize academic work</li><li>Store personal environment files</li></ul>
-			<p>My public projects are hosted on <b>GitHub</b>.</p>
-		</section>
-		<section class="mb-8"><h2 class="h2 mb-0"><img class="m-0 mr-2 inline-block w-[1.2em] align-middle" src="/static/github.png" alt=""/> <a class="no-underline hover:underline" href={ templ.SafeURL(data.GitHub) }>GitHub / @{ data.Username }</a></h2>@ProjectList(data.Projects)</section>
+		<p class="lead">Everything public on <a href={ templ.SafeURL(data.GitHub) }>GitHub / @{ data.Username }</a>: { fmt.Sprintf("%d", len(data.Featured)+len(data.Others)) } repositories, from school assignments to the things I work on now.</p>
+		if len(data.Featured) > 0 {
+			<section class="mb-10">
+				<h2 class="h2">selected</h2>
+				<ul class="project-list project-grid">
+					for _, project := range data.Featured {
+						@ProjectCard(project)
+					}
+				</ul>
+			</section>
+		}
+		if len(data.Others) > 0 {
+			<section>
+				<h2 class="h2">everything else</h2>
+				<p class="meta mb-4">Latest commit first.</p>
+				<ul class="ls">
+					for _, project := range data.Others {
+						<li>
+							if project.LastCommitURL != "" {
+								<a class="ls-date" href={ templ.SafeURL(project.LastCommitURL) }><time datetime={ project.LastCommitTime }>{ project.LastCommitDate }</time></a>
+							} else {
+								<span class="ls-date"></span>
+							}
+							<a class="ls-name" href={ templ.SafeURL(project.URL) }>{ project.Name }</a>
+							<span class="ls-description">
+								@templ.Raw(project.DescriptionHTML)
+							</span>
+						</li>
+					}
+				</ul>
+			</section>
+		}
 	</article>
 }
 
-templ ProjectList(projects []ProjectView) {
-	<ul class="scrollbar-thin border-textColor mx-4 flex max-h-[540px] snap-y snap-mandatory list-none flex-col gap-4 overflow-y-scroll border-y-4 p-0">
-		for _, project := range projects {
-			<li class="snap-start"><div class="border-bgColor bg-bgColor text-textColor hover:border-textColor flex overflow-hidden border-4">
-				if project.HasAvatar {
-					<div class="shrink-0 self-start"><img class="block aspect-square size-16 object-cover sm:size-32" loading="lazy" src={ templ.SafeURL(project.AvatarURL) } alt=""/></div>
-				} else {
-					<div style={ "background-color: " + project.HSLColor + ";" } class="grid aspect-square size-16 shrink-0 place-content-center sm:size-32" aria-hidden="true"><span class="shadow-sm flex h-12 w-12 place-content-center place-items-center rounded bg-neutral-900/50 text-center text-3xl text-neutral-100">{ project.FirstLetter }</span></div>
-				}
-				<div class="text-textColor flex w-full min-w-0 flex-col overflow-hidden p-0 text-sm sm:text-base"><h2 class="bg-textColor text-bgColor ps-2 font-bold"><a class="block" href={ templ.SafeURL(project.URL) }>{ project.Name }</a></h2><div class="line-clamp-2 flex-1 ps-2 pt-2">
-					if project.DescriptionHTML != "" {
-						@templ.Raw(project.DescriptionHTML)
-					} else {
-						@Icon("disappointed-face")
-Unfortunately, no description is available (I was probs lazy ahh).
+templ ProjectAvatar(project ProjectView) {
+	if project.HasAvatar {
+		<img class="project-avatar" loading="lazy" src={ templ.SafeURL(project.AvatarURL) } width="48" height="48" alt=""/>
+	} else {
+		<span class="project-avatar project-letter" style={ "background-color: " + project.HSLColor + ";" } aria-hidden="true">{ project.FirstLetter }</span>
+	}
+}
+
+templ ProjectCard(project ProjectView) {
+	<li class="project-card">
+		@ProjectAvatar(project)
+		<div class="min-w-0">
+			<h3><a href={ templ.SafeURL(project.URL) }>{ project.Name }</a></h3>
+			if project.DescriptionHTML != "" {
+				<div class="project-description">
+					@templ.Raw(project.DescriptionHTML)
+				</div>
+			}
+			if project.LastCommitURL != "" {
+				<p class="meta">
+					<time datetime={ project.LastCommitTime }>{ project.LastCommitDate }</time> · <a href={ templ.SafeURL(project.LastCommitURL) }>{ project.LastCommitHash }</a>
+					if project.LicenseLabel != "" {
+						· <a href={ templ.SafeURL(project.LicenseURL) }>{ project.LicenseLabel }</a>
 					}
-				</div>
-				if project.LastCommitURL != "" {
-					<small class="text-textColor/60 px-2 pb-1"><time datetime={ project.LastCommitTime }>{ project.LastCommitDate }</time> · <a class="underline" href={ templ.SafeURL(project.LastCommitURL) }>{ project.LastCommitHash }</a>
-						if project.LicenseLabel != "" {
-							<span class="ms-2 border border-textColor/40 px-1"><a class="no-underline hover:underline" href={ templ.SafeURL(project.LicenseURL) }>{ project.LicenseLabel }</a></span>
-						}
-					</small>
-				}
-				</div>
-			</div></li>
+				</p>
+			}
+		</div>
+	</li>
+}
+
+templ PostRow(post PostView) {
+	<li class="post-row">
+		<a href={ templ.SafeURL("/blog/" + post.Slug) } if post.Excerpt != "" { aria-describedby={ "excerpt-" + post.Slug } }>{ post.Title }</a>
+		<p class="meta">
+			<time>{ post.PublishedOn }</time>
+			if post.Language == "fr" {
+				· en français
+			}
+		</p>
+		if post.Excerpt != "" {
+			<p id={ "excerpt-" + post.Slug } class="post-excerpt">{ post.Excerpt }</p>
 		}
-	</ul>
+	</li>
 }
 
 templ BlogPage(data BlogPageData) {
@@ -153,21 +232,17 @@ templ BlogPage(data BlogPageData) {
 }
 
 templ BlogContent(data BlogPageData) {
-	<article class="blog-page">
-		<h1 class="h1 flex items-center gap-2">blog <a href="/blog/rss.xml" target="_blank" title="RSS Feed" class="opacity-50 hover:opacity-100"><img src="/static/rss.svg" alt="RSS Feed" class="h-6 w-6"/></a><a href="/blog/atom.xml" target="_blank" title="Atom Feed" class="opacity-50 hover:opacity-100"><img src="/static/atom.svg" alt="Atom Feed" class="h-6 w-6"/></a></h1>
-		<h2 class="mb-2 font-bold">@Icon("newspaper")
-Available articles</h2>
+	<article class="reading">
+		<h1 class="h1">blog</h1>
+		<p class="lead">Notes on what I build, and the occasional recipe. Follow along with <a href="/blog/rss.xml">rss</a> or <a href="/blog/atom.xml">atom</a>.</p>
 		if len(data.YearGroups) == 0 {
 			<p>No articles yet.</p>
 		}
 		for _, group := range data.YearGroups {
-			<h3 class="text-xl font-bold mt-4 mb-2">{ fmt.Sprintf("%d", group.Year) }</h3><ul class="list-inside list-[square]">
+			<h2 class="h2 mt-8">{ fmt.Sprintf("%d", group.Year) }</h2>
+			<ul class="post-list">
 				for _, post := range group.Posts {
-					<li><a href={ templ.SafeURL("/blog/" + post.Slug) } if post.Excerpt != "" { aria-describedby={ "excerpt-" + post.Slug } }>{ post.Title }</a>
-						if post.Excerpt != "" {
-							<p id={ "excerpt-" + post.Slug } class="wrap-anywhere mb-3 mt-1 list-none text-sm opacity-70">{ post.Excerpt }</p>
-						}
-					</li>
+					@PostRow(post)
 				}
 			</ul>
 		}
@@ -179,22 +254,54 @@ templ PostPage(data PostPageData) {
 }
 
 templ PostContent(data PostPageData) {
-	<p class="mb-4 text-sm"><a href="/blog" class="opacity-60 underline">@ArrowLeft()
- Go back to the articles list</a></p>
-	<header class="mb-4"><h1 class="h1 mb-0">{ data.Post.Title }</h1><p class="text-textColor/50 text-sm">crea: <span title={ "created on " + data.Post.CreatedOn + " at " + data.Post.CreatedAtTime }>{ data.Post.CreatedOn }</span> / upd: <span title={ "last updated on " + data.Post.UpdatedOn + " at " + data.Post.UpdatedAtTime }>{ data.Post.UpdatedOn }</span></p></header>
-	if len(data.Post.TOC) >= 4 {
-		<nav class="toc" aria-label="Table of contents">
-			<details open>
-				<summary>Contents</summary>
-				<ol>
-					for _, item := range data.Post.TOC {
-						<li class={ templ.KV("toc-sub", item.Level > 2) }><a href={ templ.SafeURL("#" + item.ID) }>{ item.Title }</a></li>
-					}
-				</ol>
-			</details>
-		</nav>
-	}
-	<article class="prose">@templ.Raw(data.Post.HTML)</article>
+	<div class="reading">
+		<p class="mb-4 text-sm"><a href="/blog">@ArrowLeft()
+all articles</a></p>
+		<header class="mb-6">
+			<h1 class="h1 mb-1">{ data.Post.Title }</h1>
+			<p class="meta">
+				<span title={ "created on " + data.Post.CreatedOn + " at " + data.Post.CreatedAtTime }>{ data.Post.CreatedOn }</span>
+				if data.Post.UpdatedOn != data.Post.CreatedOn {
+					· updated <span title={ "last updated on " + data.Post.UpdatedOn + " at " + data.Post.UpdatedAtTime }>{ data.Post.UpdatedOn }</span>
+				}
+			</p>
+		</header>
+		if len(data.Post.TOC) >= 4 {
+			<nav class="toc" aria-label="Table of contents">
+				<details open>
+					<summary>Contents</summary>
+					<ol>
+						for _, item := range data.Post.TOC {
+							<li class={ templ.KV("toc-sub", item.Level > 2) }><a href={ templ.SafeURL("#" + item.ID) }>{ item.Title }</a></li>
+						}
+					</ol>
+				</details>
+			</nav>
+		}
+		<article class="prose">@templ.Raw(data.Post.HTML)</article>
+		<p class="post-end"><a href="/blog">@ArrowLeft()
+all articles</a><a href={ templ.SafeURL("mailto:" + Me.Mail + "?subject=" + data.Post.Slug) }>reply by email</a></p>
+	</div>
+}
+
+templ NotFoundPage(data NotFoundPageData) {
+	@Document(data.PageData, NotFoundContent(data))
+}
+
+templ NotFoundContent(data NotFoundPageData) {
+	<article class="not-found">
+		<h1 class="h1">404</h1>
+		<div class="terminal">
+			<p><span class="prompt">$</span> cat { data.Path }</p>
+			<p>cat: { data.Path }: no such room in this house</p>
+		</div>
+		<p class="actions">
+			<a class="btn" href="/">home</a>
+			<a class="btn" href="/projects">projects</a>
+			<a class="btn" href="/blog">blog</a>
+			<a class="btn" href="/teapot">make some tea</a>
+		</p>
+	</article>
 }
 
 templ TeapotPage(data TeapotPageData) {

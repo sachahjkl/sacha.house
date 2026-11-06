@@ -116,7 +116,8 @@
 
   function footerHeight() {
     const footer = document.querySelector("footer");
-    return footer ? footer.offsetHeight : 0;
+    // Only a footer pinned to the viewport takes room from the ground; one at the end of the page does not.
+    return footer && getComputedStyle(footer).position === "fixed" ? footer.offsetHeight : 0;
   }
 
   const BULB_COLORS = ["#ff2b2b", "#39ff14", "#ffd24a", "#00b7ff", "#ff2bd6", "#ff8a00"];

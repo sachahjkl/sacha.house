@@ -1,3 +1,5 @@
 User-Agent: *
 Allow: /
 Disallow: /teapot
+
+Sitemap: https://sacha.house/sitemap.xml

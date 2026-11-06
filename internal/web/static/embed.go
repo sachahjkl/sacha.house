@@ -2,7 +2,7 @@ package static
 
 import "embed"
 
-// Files contains static assets and the internal LinkedIn profile snapshot.
+// Files contains the static assets of the site.
 //
-//go:embed css fonts gifs icons js share *.gpg *.ico *.jpg *.json *.pdf *.pdn *.png *.pub *.svg *.txt *.webmanifest *.xml
+//go:embed css fonts icons js share *.gpg *.ico *.jpg *.pdf *.pdn *.png *.pub *.svg *.txt *.webmanifest *.webp *.xml
 var Files embed.FS

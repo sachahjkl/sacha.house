@@ -70,6 +70,7 @@ type CareerProfile struct {
 	PublicationsLabel  string
 	LanguagesLabel     string
 	PrintLabel         string
+	BackLabel          string
 	ResumeLabel        string
 	CVLabel            string
 	EnvironmentLabel   string
@@ -119,6 +120,7 @@ func careerFR() CareerProfile {
 		ContactLabel: "Contact", ExperienceLabel: "Expérience", EducationLabel: "Études",
 		ProjectsLabel: "Projets sélectionnés", CatalogLabel: "Catalogue de projets",
 		PublicationsLabel: "Publications", LanguagesLabel: "Langues", PrintLabel: "Imprimer / PDF",
+		BackLabel:   "← retour à sacha.house",
 		ResumeLabel: "CV", CVLabel: "CV complet", EnvironmentLabel: "Stack",
 		Experiences: []CareerExperience{
 			{
@@ -243,6 +245,7 @@ func careerEN() CareerProfile {
 	profile.PublicationsLabel = "Publications"
 	profile.LanguagesLabel = "Languages"
 	profile.PrintLabel = "Print / PDF"
+	profile.BackLabel = "← back to sacha.house"
 	profile.ResumeLabel = "Résumé"
 	profile.CVLabel = "Full CV"
 	profile.EnvironmentLabel = "Stack"

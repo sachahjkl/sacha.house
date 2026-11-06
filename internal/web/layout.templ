@@ -9,33 +9,32 @@ templ Head(data PageData) {
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<title id="page-title">{ data.Title }</title>
-		<link rel="icon" href="/static/favicon_shadow.png"/>
-		<link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
-		<link rel="dns-prefetch" href="https://fonts.gstatic.com"/>
-		<link rel="preconnect" href="https://fonts.googleapis.com"/>
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-		<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap" rel="stylesheet"/>
-		<link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400&display=swap" rel="stylesheet"/>
-		<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
-		<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet"/></noscript>
-		<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
+		<meta name="description" content={ data.SEO.Description }/>
+		<meta name="author" content={ data.SEO.Author }/>
+		if data.SEO.NoIndex {
+			<meta name="robots" content="noindex"/>
+		} else {
+			<link rel="canonical" href={ templ.SafeURL(data.SEO.URL) }/>
+		}
+		<meta property="og:site_name" content="sacha.house"/>
+		<meta property="og:title" content={ data.Title }/>
+		<meta property="og:description" content={ data.SEO.Description }/>
+		<meta property="og:type" content={ data.SEO.Type }/>
+		<meta property="og:url" content={ data.SEO.URL }/>
+		<meta property="og:image" content={ data.SEO.Image }/>
+		<meta property="og:locale" content={ data.Locale() }/>
+		<meta name="twitter:card" content="summary_large_image"/>
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"/>
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000"/>
+		<link rel="alternate" type="application/rss+xml" title="sacha.house blog (RSS)" href="/blog/rss.xml"/>
+		<link rel="alternate" type="application/atom+xml" title="sacha.house blog (Atom)" href="/blog/atom.xml"/>
 		<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png"/>
 		<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png"/>
+		<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
 		<link rel="manifest" href="/static/site.webmanifest"/>
 		<link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#000000"/>
-		<meta name="msapplication-TileColor" content="#000000"/>
-		<meta name="theme-color" content="#ffffff"/>
+		<link rel="preload" href="/static/fonts/fira-code/fira-code-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin/>
 		<link rel="stylesheet" href={ templ.SafeURL("/static/css/style.css?v=" + data.StyleVersion) }/>
-		<meta name="description" content={ data.SEO.Description }/>
-		<meta property="og:description" content={ data.SEO.Description }/>
-		<meta name="twitter:description" content={ data.SEO.Description }/>
-		<meta name="twitter:image" content={ data.SEO.Image }/>
-		<meta property="og:image" content={ data.SEO.Image }/>
-		<meta name="keywords" content="Blog, Programmation, Programming, Portfolio, Personal, Personnel"/>
-		<meta name="generator" content="Go"/>
-		<meta property="og:locale" content="fr_FR"/>
-		<meta name="twitter:card" content="summary_large_image"/>
-		<meta name="author" content={ data.SEO.Author }/>
 		if !data.AdminScripts {
 			<script defer src={ templ.SafeURL("/static/js/christmas.js?v=" + data.StyleVersion) }></script>
 		}
@@ -53,9 +52,10 @@ templ Document(data PageData, body templ.Component) {
 	<!doctype html>
 	<html lang={ data.Language }>
 		@Head(data)
-		<body id="page-body" class="bg-bgColor text-textColor">
+		<body id="page-body" class="site bg-bgColor text-textColor">
+			<a class="skip-link" href="#main">Skip to content</a>
 			@Header(data)
-			<main id="main" class="m-auto max-w-5xl p-3 pb-16">@body</main>
+			<main id="main" class="site-main">@body</main>
 			@SiteFooter(data)
 		</body>
 	</html>
@@ -72,42 +72,29 @@ templ BareDocument(data PageData, body templ.Component) {
 }
 
 templ Header(data PageData) {
-	<header class="bg-bgColor sticky top-0 z-10 px-3">
-		<nav>
-			<fieldset class="border-textColor border-2 p-2 px-4">
-					<legend class="ml-3 px-2">Navigation</legend>
-				<ul class="hidden flex-wrap gap-3 whitespace-nowrap sm:flex">
-					for index, item := range data.NavItems {
-						<li class="flex-[100%] sm:flex-none"><a href={ templ.SafeURL(item.Pathname) } class={ templ.KV("active", item.IsActive) } if item.IsActive { aria-current="page" }>@Icon(item.Icon)
+	<header class="site-header">
+		<nav class="site-nav" aria-label="Main">
+			<a class="site-mark" href="/" if data.HomeIsActive { aria-current="page" }>sacha.house</a>
+			<ul>
+				for _, item := range data.NavItems {
+					<li><a href={ templ.SafeURL(item.Pathname) } class={ templ.KV("active", item.IsActive) } if item.IsActive { aria-current="page" }>@Icon(item.Icon)
 { item.Title }</a></li>
-						if index < len(data.NavItems)-1 {
-							<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
-						}
-					}
-				</ul>
-				<div class="block sm:hidden">
-					<details>
-						<summary id="nav-summary" class="mb-1">Open navigation</summary>
-						<ul class="flex flex-wrap gap-3 whitespace-nowrap">
-							for index, item := range data.NavItems {
-								<li class="flex-[100%] sm:flex-none"><a class={ "inline-block w-full", templ.KV("active", item.IsActive) } href={ templ.SafeURL(item.Pathname) } if item.IsActive { aria-current="page" }>@Icon(item.Icon)
-{ item.Title }</a></li>
-								if index < len(data.NavItems)-1 {
-									<li class="border-textColor hidden border-r-2 sm:inline-block"></li>
-								}
-							}
-						</ul>
-					</details>
-				</div>
-			</fieldset>
+				}
+			</ul>
 		</nav>
 	</header>
 }
 
 templ SiteFooter(data PageData) {
-	<footer class="bg-textColor text-bgColor fixed bottom-0 flex w-full flex-wrap items-center justify-between gap-2 px-2 py-1 font-bold text-sm">
-		<div><p>sacha.house (C) { fmt.Sprintf("%d", data.Footer.Year) }</p></div>
-		<div class="flex items-center gap-2"><a class="underline" href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/commit/" + data.Footer.CommitHash) }>{ data.Footer.Version }</a></div>
+	<footer class="site-footer">
+		<p>sacha.house (C) { fmt.Sprintf("%d", data.Footer.Year) }</p>
+		<ul>
+			<li><a href="/blog/rss.xml">rss</a></li>
+			<li><a href="/keys">keys</a></li>
+			<li><a href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID) }>source</a></li>
+			<li><a href="/admin">admin</a></li>
+			<li><a href={ templ.SafeURL("https://github.com/" + data.Footer.GitRepoID + "/commit/" + data.Footer.CommitHash) }>{ data.Footer.Version }</a></li>
+		</ul>
 		if data.HotReload {
 			<script src="/static/js/hot-reload.js"></script>
 		}
@@ -115,5 +102,5 @@ templ SiteFooter(data PageData) {
 }
 
 templ ASCIILogo() {
-	<pre class="inline-block text-transparent bg-clip-text ascii-logo ascii-logo-fire whitespace-pre" aria-label="sacha.house ASCII logo">@templ.Raw(asciiLogo)</pre>
+	<pre class="inline-block text-transparent bg-clip-text ascii-logo ascii-logo-fire whitespace-pre" role="img" aria-label="House of Sacha, in letters of fire">@templ.Raw(asciiLogo)</pre>
 }

@@ -39,7 +39,7 @@ func (app *App) rootStaticHandler() http.Handler {
 	server := http.FileServerFS(app.static)
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		if _, allowed := rootStaticAssets[request.URL.Path]; !allowed {
-			http.NotFound(writer, request)
+			app.notFound(writer, request)
 			return
 		}
 		writer.Header().Set("Cache-Control", publicCache)
