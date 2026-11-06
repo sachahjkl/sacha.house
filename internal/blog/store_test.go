@@ -66,14 +66,14 @@ func TestDraftFilteringDefaultsAndSorting(t *testing.T) {
 		t.Fatal(err)
 	}
 	store.now = func() time.Time { return time.Date(2026, 8, 6, 12, 0, 0, 0, time.UTC) }
-	if _, err := store.Save(SaveInput{Title: "New", Slug: "new", Language: "en", Status: "published", Markdown: "new"}, ""); err != nil {
+	if _, err := store.Save(SaveInput{Title: "New", Slug: "recent", Language: "en", Status: "published", Markdown: "new"}, ""); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := store.Load("old", false); !errors.Is(err, ErrNotPublished) {
 		t.Fatalf("Load(draft) error = %v", err)
 	}
 	posts, err := store.List(true)
-	if err != nil || len(posts) != 2 || posts[0].Slug != "new" || posts[1].Status != "draft" {
+	if err != nil || len(posts) != 2 || posts[0].Slug != "recent" || posts[1].Status != "draft" {
 		t.Fatalf("List(true) = %#v, %v", posts, err)
 	}
 }
@@ -92,21 +92,21 @@ func TestRenamePreservesIdentityAndAssets(t *testing.T) {
 	}
 	created := store.now().UTC().Format(time.RFC3339)
 	store.now = func() time.Time { return time.Date(2026, 8, 7, 12, 0, 0, 0, time.UTC) }
-	slug, err := store.Save(SaveInput{Title: "Post", Slug: "new", Language: "fr", Status: "published", Markdown: "![](/media/blog/old/assets/a.png)"}, "old")
-	if err != nil || slug != "new" {
+	slug, err := store.Save(SaveInput{Title: "Post", Slug: "renamed", Language: "fr", Status: "published", Markdown: "![](/media/blog/old/assets/a.png)"}, "old")
+	if err != nil || slug != "renamed" {
 		t.Fatalf("Save(rename) = %q, %v", slug, err)
 	}
-	document, err := store.Load("new", false)
+	document, err := store.Load("renamed", false)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if document.Metadata.ID != "old" || document.Metadata.CreatedAt != created || document.Metadata.Language != "fr" {
 		t.Fatalf("renamed metadata = %#v", document.Metadata)
 	}
-	if !strings.Contains(document.Markdown, "/media/blog/new/assets/") {
+	if !strings.Contains(document.Markdown, "/media/blog/renamed/assets/") {
 		t.Fatalf("renamed markdown = %q", document.Markdown)
 	}
-	if _, err := os.Stat(filepath.Join(store.postDirectory("new"), "assets", "a.png")); err != nil {
+	if _, err := os.Stat(filepath.Join(store.postDirectory("renamed"), "assets", "a.png")); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -274,7 +274,7 @@ func TestNewStoreRecoversInterruptedDirectoryCommit(t *testing.T) {
 		t.Fatal(err)
 	}
 	oldDirectory := store.postDirectory("old")
-	if err := writeCommitMarker(oldDirectory, "new"); err != nil {
+	if err := writeCommitMarker(oldDirectory, "renamed"); err != nil {
 		t.Fatal(err)
 	}
 	backupDirectory := filepath.Join(store.root, backupPrefix+"old-interrupted")

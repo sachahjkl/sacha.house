@@ -237,11 +237,22 @@ func (store *Store) Delete(ctx context.Context, gistID, expectedRevision string)
 	}
 	store.mutations.Lock()
 	defer store.mutations.Unlock()
-	current, err := store.Get(ctx, gistID)
+	gist, err := store.gist.Get(ctx, gistID)
 	if err != nil {
-		return err
+		return gistError(err)
 	}
-	if current.Revision != expectedRevision {
+	if !sameGistID(gist.ID, gistID) {
+		return pasteError(ErrorUpstreamUnavailable)
+	}
+	// A paste that cannot be read any more can still be ours, and deleting it is the only thing left to do.
+	if _, err := store.loadedFromGist(gist); err != nil {
+		switch ErrorKindOf(err) {
+		case ErrorUnknownKey, ErrorCorrupt, ErrorTooLarge:
+		default:
+			return err
+		}
+	}
+	if len(gist.History) == 0 || gist.History[0].Version != expectedRevision {
 		return pasteError(ErrorConflict)
 	}
 	return gistError(store.gist.Delete(ctx, gistID))

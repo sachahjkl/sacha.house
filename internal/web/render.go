@@ -88,6 +88,8 @@ type AdminBlogPostsPageData struct {
 type BlogPostForm struct {
 	IsNew       bool
 	FormAction  string
+	CurrentSlug string
+	Revision    string
 	Title       string
 	Slug        string
 	Language    string

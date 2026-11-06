@@ -105,7 +105,8 @@
 
   /* ------------------------------------------------------- DOM, once ready */
 
-  let enabled = store() !== "off";
+  let enabled = forced || store() !== "off";
+  let stopSanta = null;
   let garland = null;
   let ground = null;
   let backCanvas = null;
@@ -241,6 +242,7 @@
       scheduleSanta(initial ? random(5000, 9000) : 1500);
     } else {
       engine.stop();
+      if (stopSanta) stopSanta();
     }
   }
 
@@ -590,11 +592,14 @@
       }
     });
 
-    santa.addEventListener("animationend", () => {
+    // Turning the decor off hides Santa, which cancels the animation: animationend alone would never come.
+    stopSanta = () => {
       clearInterval(trail);
       santa.remove();
       santaBusy = false;
-    });
+      stopSanta = null;
+    };
+    santa.addEventListener("animationend", stopSanta);
   }
 
   function bubble(x, y, text) {
@@ -621,7 +626,7 @@
   document.addEventListener("keydown", (event) => {
     if (event.target.closest && event.target.closest("input, textarea, select, [contenteditable]")) return;
     const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-    progress = key === KONAMI[progress] ? progress + 1 : key === KONAMI[0] ? 1 : 0;
+    progress = key === KONAMI[progress] ? progress + 1 : key === KONAMI[0] ? (progress === 2 ? 2 : 1) : 0;
     if (progress === KONAMI.length) {
       progress = 0;
       if (enabled && !reduced) {

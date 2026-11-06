@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"mime"
 	"net/http"
 	"path"
@@ -84,7 +85,13 @@ func parseTime(value string) time.Time {
 func (app *App) blogMedia(writer http.ResponseWriter, request *http.Request) {
 	slug := request.PathValue("slug")
 	assetPath := request.PathValue("path")
+	session, signedIn := app.auth.SessionFromRequest(request)
+	admin := signedIn && session.UserID == adminUserID
 	file, err := app.blog.OpenPublishedAsset(slug, assetPath)
+	draft := admin && errors.Is(err, blog.ErrNotPublished)
+	if draft {
+		file, err = app.blog.OpenAsset(slug, assetPath)
+	}
 	if err != nil {
 		http.NotFound(writer, request)
 		return
@@ -95,7 +102,11 @@ func (app *App) blogMedia(writer http.ResponseWriter, request *http.Request) {
 		http.NotFound(writer, request)
 		return
 	}
-	writer.Header().Set("Cache-Control", publicCache)
+	if draft {
+		writer.Header().Set("Cache-Control", "no-store")
+	} else {
+		writer.Header().Set("Cache-Control", publicCache)
+	}
 	if contentType := mime.TypeByExtension(path.Ext(assetPath)); contentType != "" {
 		writer.Header().Set("Content-Type", contentType)
 	}

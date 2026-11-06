@@ -10,12 +10,19 @@ import (
 const (
 	adminUserID      = "admin"
 	maxAdminFormBody = 2 << 20
+	// maxBlogFormBody fits a blogpost at its 1 MiB limit even if every byte is percent-encoded.
+	maxBlogFormBody = 3<<20 + 64<<10
 )
 
 func (app *App) requireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		session, ok := app.auth.SessionFromRequest(request)
 		if !ok || session.UserID != adminUserID {
+			if isDatastarRequest(request) {
+				// Datastar would patch the login page into the page it was sent from.
+				http.Error(writer, "admin authentication required", http.StatusUnauthorized)
+				return
+			}
 			http.Redirect(writer, request, "/admin/login", http.StatusSeeOther)
 			return
 		}
@@ -32,6 +39,13 @@ func (app *App) requireAdminAPI(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(writer, request)
 	})
+}
+
+// adminSession lets the editors check the session before they submit: a redirect to the login page would lose
+// what was typed.
+func (app *App) adminSession(writer http.ResponseWriter, _ *http.Request) {
+	writer.Header().Set("Cache-Control", "no-store")
+	writer.WriteHeader(http.StatusNoContent)
 }
 
 func (app *App) adminLoginPage(writer http.ResponseWriter, request *http.Request) {

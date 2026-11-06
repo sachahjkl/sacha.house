@@ -220,6 +220,16 @@ func (s *Store) RecordFailure(key string) bool {
 		s.failures[key] = recent
 		return true
 	}
+	if len(recent) == 0 && len(s.failures) >= maxChallengeIPs {
+		for storedKey, failures := range s.failures {
+			if failures = pruneFailures(failures, now); len(failures) == 0 {
+				delete(s.failures, storedKey)
+			}
+		}
+		if len(s.failures) >= maxChallengeIPs {
+			return false
+		}
+	}
 	recent = append(recent, now)
 	s.failures[key] = recent
 	return len(recent) >= FailureLimit

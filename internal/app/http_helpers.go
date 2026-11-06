@@ -19,7 +19,8 @@ func (app *App) requestIP(request *http.Request) string {
 		direct = host
 	}
 	directIP := net.ParseIP(direct)
-	if app.config.TrustProxyHTTPS && directIP != nil && directIP.IsLoopback() {
+	// The reverse proxy reaches the container from a private bridge address, not from loopback.
+	if app.config.TrustProxyHTTPS && directIP != nil && (directIP.IsLoopback() || directIP.IsPrivate()) {
 		if address := parseForwardedIP(request.Header.Get("X-Real-IP")); address != "" {
 			return address
 		}

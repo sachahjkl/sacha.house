@@ -194,8 +194,16 @@ func writeDiagram(writer util.BufWriter, node *diagramNode) {
 	_, _ = writer.WriteString("</pre></figure>\n")
 }
 
-// wrapDiagram adds the scheme class the CSS switches on to the root of a drawn SVG.
+// diagramIDPattern finds the id Mermaid gives a drawing: every selector and marker of the SVG starts with it.
+var diagramIDPattern = regexp.MustCompile(`<svg[^>]*?\sid="([^"]+)"`)
+
+// wrapDiagram adds the scheme class the CSS switches on to the root of a drawn SVG, and makes its id unique.
+// Both drawings of a block share an id, and a <style> applies to the whole page even in a hidden SVG: without
+// this, the last drawing's colours would win in both schemes, and its markers would resolve to the first one.
 func wrapDiagram(svg, scheme string) string {
+	if match := diagramIDPattern.FindStringSubmatch(svg); match != nil {
+		svg = strings.ReplaceAll(svg, match[1], match[1]+"-"+scheme)
+	}
 	if index := strings.Index(svg, "<svg"); index >= 0 {
 		end := index + len("<svg")
 		return svg[:end] + ` class="` + scheme + `"` + svg[end:]
