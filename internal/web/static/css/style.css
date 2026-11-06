@@ -52,6 +52,8 @@
     --radius-sm: 0.25rem;
     --drop-shadow-md: 0 3px 3px rgb(0 0 0 / 0.12);
     --animate-bounce: bounce 1s infinite;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
     --color-bgColor: #ffffff;
@@ -210,6 +212,9 @@
 @layer utilities {
   .visible {
     visibility: visible;
+  }
+  .absolute {
+    position: absolute;
   }
   .fixed {
     position: fixed;
@@ -1326,6 +1331,11 @@
     -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
     backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
   }
+  .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: var(--color-textColor) var(--color-bgColor);
@@ -1657,14 +1667,17 @@ html {
   overflow: auto;
   font-size: 0.8em;
 }
-.diagram-ready > pre.mermaid {
+.prose figure.diagram .diagram-source {
   display: none;
 }
-.diagram-error::after {
+.diagram-body svg.diagram-dark {
+  display: none;
+}
+.diagram-missing::after {
   display: block;
   padding: 0.5rem 1rem;
   border-top: 2px solid var(--color-textColor);
-  content: "This diagram could not be drawn here; its source is shown instead.";
+  content: "This diagram was not drawn ahead of time; its source is shown instead.";
   font-size: 0.8em;
   opacity: 0.8;
 }
@@ -1767,6 +1780,12 @@ dialog.lightbox[open] {
   height: 100%;
 }
 @media (prefers-color-scheme: dark) {
+  .diagram-body svg.diagram-light {
+    display: none;
+  }
+  .diagram-body svg.diagram-dark {
+    display: inline-block;
+  }
   .diagram-body svg {
     filter: drop-shadow(0 0 2px rgb(0 229 255 / 0.35)) drop-shadow(0 0 6px rgb(57 255 20 / 0.15));
   }

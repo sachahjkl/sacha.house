@@ -44,7 +44,7 @@ func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	view := postView(document)
-	html, err := blog.RenderMarkdown(document.Markdown)
+	html, err := blog.RenderMarkdownWithDiagrams(document.Markdown, app.blog.Diagrams(document.Metadata.Slug))
 	if err != nil {
 		http.Error(writer, "failed to render blog post", http.StatusInternalServerError)
 		return

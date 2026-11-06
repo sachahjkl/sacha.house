@@ -524,6 +524,16 @@ func (store *Store) loadMetadata(slug string) (Metadata, error) {
 	return metadata, nil
 }
 
+// Diagrams returns the prerendered diagrams of a post, or nil when it has none.
+func (store *Store) Diagrams(slug string) Diagrams {
+	if !validSlug(slug) {
+		return nil
+	}
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+	return LoadDiagrams(store.postDirectory(slug))
+}
+
 func (store *Store) postDirectory(slug string) string { return filepath.Join(store.root, slug) }
 func (store *Store) metadataPath(slug string) string {
 	return filepath.Join(store.postDirectory(slug), "post.json")

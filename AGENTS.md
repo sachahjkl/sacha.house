@@ -13,6 +13,7 @@
 - Generated CSS lives in `internal/web/static/css/style.css`.
 - Static assets are embedded through `internal/web/static/embed.go`.
 - Blog content is filesystem-backed under `data/blog/`.
+- Mermaid diagrams are prerendered, never drawn in the browser: run `just diagrams` after editing a `mermaid` block, and commit the SVGs. A test fails when a shipped post has a diagram without its drawing.
 - `data/embed.go` embeds `data/blog/` in the binary. At start, `blog.ImportMissing` copies the posts the running data directory does not have yet; an existing post is never overwritten, so a post written in the repository is published by a deployment, and a post edited in the admin keeps its edits.
 - Encrypted Gist paste code lives in `internal/paste/` and `internal/app/paste.go`.
 
@@ -22,6 +23,7 @@
 - `just build release`: regenerate templ and CSS, then build `bin/release/sacha.house`.
 - `just templates`: run `go tool templ generate`.
 - `just css`: rebuild Tailwind CSS with Bun.
+- `just diagrams`: draw the Mermaid diagrams of `data/blog/*` into `assets/diagrams` (`tools/diagrams.ts`, needs Chrome or Edge; set `CHROME_PATH` if it is not found).
 - `just test`: run `go test ./...`.
 - `just secrets-check`: validate the encrypted production secrets without printing their values.
 - `just run`: build and run the debug binary.
