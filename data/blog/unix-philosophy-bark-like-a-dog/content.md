@@ -5,6 +5,8 @@
 It sounds wise. It is also how you end up making a duck, a mouse and an elephant bark like a dog.
 
 
+![A mallard duck, a house mouse and an African elephant, followed by a German shepherd that is really barking](/media/blog/unix-philosophy-bark-like-a-dog/assets/duck-mouse-elephant-dog.jpg)
+
 ## The dog
 
 In the Unix philosophy, the dog is the text stream: lines of bytes, with no type and no shape. Every program reads it. Every program writes it. That is why they all fit together with a `|`.
@@ -115,3 +117,4 @@ The duck can quack. The mouse can squeak. The program that reads them only has t
 *   OWASP, [SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html).
 *   NVD, [CVE-2014-6271](https://nvd.nist.gov/vuln/detail/cve-2014-6271) (Shellshock).
 *   OWASP, [Prompt Injection](https://community.owasp.org/attacks/PromptInjection) and [LLM01:2025 Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/).
+*   Illustration: four photographs from Wikimedia Commons: a [mallard duck](https://commons.wikimedia.org/wiki/File:Male_mallard_duck;_2008.jpg) (CC0), a [house mouse](https://commons.wikimedia.org/wiki/File:House_mouse_%28Mus_musculus%29_2808.jpg) (CC0), an [African elephant bull](https://commons.wikimedia.org/wiki/File:African_elephant_bull_%286987533681%29.jpg) (public domain), and a [military dog barking](https://commons.wikimedia.org/wiki/File:Military_dog_barking_%28cropped%29.JPG) (public domain).
