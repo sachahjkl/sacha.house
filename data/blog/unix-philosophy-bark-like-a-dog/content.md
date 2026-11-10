@@ -109,7 +109,28 @@ Anything. Look at what the word puts together:
 
 That is three releases: one that can lose your data, one that must wait for the GPU, and one that cannot fail. They share a word. They do not share a mechanism.
 
-Scope-bound cleanup is a good tool for some of these things. The problem is the word. "Resource" says that they are one kind of thing, and it makes them bark like a dog: acquire, release.
+Scope-bound cleanup is not the problem. Hiding it inside the type is. The word "resource" says that these things are one kind of thing, so that one mechanism can release them all. It makes them bark like a dog: acquire, release.
+
+Several languages do the cleanup in the open, with `defer`. The release is a line of code, written next to the acquisition.
+
+*   **Go** runs a deferred call "immediately before the surrounding function returns". The specification adds that a deferred function "may access and modify the result parameters before they are returned". So the error of the file has somewhere to go:
+
+```go
+func write(name string, data []byte) (err error) {
+	f, err := os.Create(name)
+	if err != nil {
+		return err
+	}
+	defer func() { err = errors.Join(err, f.Close()) }()
+	_, err = f.Write(data)
+	return err
+}
+```
+
+*   **Zig** has `defer`, which executes an expression "unconditionally at scope exit". It also has `errdefer`, which runs only if the function returns an error. A destructor runs on both paths. `errdefer` is written for one of them.
+*   **Odin** shows `defer os.close(f)` right after `os.open`, and its documentation says that it "acts akin to an explicit C++ destructor however, the error handling is basic control flow".
+
+Nothing is hidden. The reader sees what is released, when it is released, and what happens to the error. Each thing has its own release, written for it, and no type decides for all of them.
 
 Sandi Metz wrote a sentence that sounds exaggerated and is not: "duplication is far cheaper than the wrong abstraction". Her advice for when you are stuck in one is: "the fastest way forward is back". A wrong abstraction is worse than none, because every user must work around it, and its presence argues that it is correct. Without it, each thing would have a release that says what it does: a file closes with a function that returns an error, a texture is destroyed through a queue that waits for the GPU. It would be a few more lines. They would be true.
 
@@ -117,7 +138,7 @@ Sandi Metz wrote a sentence that sounds exaggerated and is not: "duplication is 
 
 The answer is not a better universal format. It is to stop looking for one.
 
-A call to create a process, with a parameter for each thing that matters. Objects with named properties that you can list. A release for each thing, with its own result and its own timing. A file format for a project, with the two keys that the project needs. Each of them says what it carries. Each can be documented, discovered and checked. And the program that uses them has less to guess.
+A call to create a process, with a parameter for each thing that matters. Objects with named properties that you can list. A release for each thing, written next to its acquisition, with its own result and its own timing. A file format for a project, with the two keys that the project needs. Each of them says what it carries. Each can be documented, discovered and checked. And the program that uses them has less to guess.
 
 Unix is right about small programs that do one thing. It is wrong about one shape for everything. The text stream treats every conversation between two programs as if it were public, even when only two programs of mine are talking.
 
@@ -141,3 +162,6 @@ The duck can quack. The mouse can squeak. The program that reads them only has t
 *   Linux man-pages, [close(2)](https://man7.org/linux/man-pages/man2/close.2.html), on the errors reported at `close` and the silent loss of data.
 *   Khronos, [vkDestroyImage](https://docs.vulkan.org/refpages/latest/refpages/source/vkDestroyImage.html), on the commands that must have completed before an image is destroyed.
 *   Sandi Metz, [The Wrong Abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction), 2016.
+*   The Go Programming Language Specification, [Defer statements](https://go.dev/ref/spec#Defer_statements).
+*   Zig Language Reference, [defer](https://ziglang.org/documentation/master/#defer) and [errdefer](https://ziglang.org/documentation/master/#errdefer).
+*   Odin Programming Language, Overview, [defer statement](https://odin-lang.org/docs/overview/#defer-statement).
