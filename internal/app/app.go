@@ -90,12 +90,18 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 		return nil, err
 	}
 	if options.BlogSeed != nil {
-		imported, err := blog.ImportMissing(options.BlogRoot, options.BlogSeed)
+		merged, err := blog.MergeSeed(options.BlogRoot, options.BlogSeed)
 		if err != nil {
-			slog.Warn("blog posts of the repository could not all be imported", "error", err)
+			slog.Warn("blog posts of the repository could not all be merged", "error", err)
 		}
-		if len(imported) > 0 {
-			slog.Info("blog posts imported from the repository", "posts", imported)
+		if len(merged.Imported) > 0 {
+			slog.Info("blog posts imported from the repository", "posts", merged.Imported)
+		}
+		if len(merged.Updated) > 0 {
+			slog.Info("blog posts updated from the repository", "posts", merged.Updated)
+		}
+		if len(merged.Conflicts) > 0 {
+			slog.Warn("blog posts changed in the repository and in the admin: the admin version stays, merge post.seed.json and content.seed.md by hand", "posts", merged.Conflicts)
 		}
 	}
 

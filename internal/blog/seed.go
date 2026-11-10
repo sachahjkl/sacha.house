@@ -1,6 +1,8 @@
 package blog
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,29 +16,59 @@ import (
 
 var seedSlug = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
 
-// ImportMissing copies into root every post of seed that root does not have yet, and returns their slugs.
+// seedStateName is the file of the blog root that remembers, for each post of the repository, what the last merge saw.
+// It lives outside the post directories because Store.Save rebuilds a post directory from scratch.
+const seedStateName = ".seed-state.json"
+
+// seedRecord is the memory of one post. Seed is the hash of the repository version that was last imported or
+// reported. Live is the hash of the version the site held right after the last import: if the site still holds
+// it, nobody edited the post in the admin since.
+type seedRecord struct {
+	Seed string `json:"seed"`
+	Live string `json:"live"`
+}
+
+// SeedResult lists what MergeSeed did, by slug.
+type SeedResult struct {
+	Imported  []string // posts the site did not have: copied
+	Updated   []string // posts that only the repository changed: replaced
+	Conflicts []string // posts that both sides changed: the site version stays
+}
+
+// MergeSeed merges the posts of seed into root with a three-way merge, and reports what it did.
 //
-// seed holds one directory per post. A post is imported only when root has no post of that slug or of that ID:
-// an existing post is never touched, so edits made in the admin are never overwritten, a post renamed in the
-// admin does not come back under its old slug, and importing again does nothing. A post is copied to a
-// temporary directory inside root, then moved into place, so a post that is visible is always complete. A post
-// that cannot be imported does not stop the others. Run it after NewStore: recovery must see an interrupted
-// commit before an import can take its place.
-func ImportMissing(root string, seed fs.FS) ([]string, error) {
+// seed holds one directory per post. For each post of the repository, the site version, the repository version,
+// and the version of the last merge (the base) decide:
+//   - The site has no post of that slug or of that ID: the post is imported. The ID survives a rename in the
+//     admin, so a post renamed there does not come back under its old slug.
+//   - The repository version is the one of the last merge, or the site already holds it: nothing to do.
+//   - Only the repository changed since the last merge: the site post is replaced. Its uploaded images stay.
+//   - Both sides changed, or the post was never merged before and differs: the site version stays. The
+//     repository version is written next to it as post.seed.json and content.seed.md, and the post is listed in
+//     Conflicts. It is reported once: it is reported again only when the repository changes again.
+//
+// A post is written to a temporary directory inside root, then moved into place, so a post that is visible is
+// always complete. A post that cannot be merged does not stop the others. Run it after NewStore: recovery must
+// see an interrupted commit before a merge can take its place.
+func MergeSeed(root string, seed fs.FS) (SeedResult, error) {
+	var result SeedResult
 	entries, err := fs.ReadDir(seed, ".")
 	if err != nil {
-		return nil, fmt.Errorf("read the blog seed: %w", err)
+		return result, fmt.Errorf("read the blog seed: %w", err)
 	}
 	absoluteRoot, err := filepath.Abs(root)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 	if err := os.MkdirAll(absoluteRoot, 0o755); err != nil {
-		return nil, err
+		return result, err
+	}
+	state, err := readSeedState(absoluteRoot)
+	if err != nil {
+		return result, err
 	}
 
 	owners := postOwners(absoluteRoot)
-	var imported []string
 	var failures []error
 	for _, entry := range entries {
 		slug := entry.Name()
@@ -49,8 +81,13 @@ func ImportMissing(root string, seed fs.FS) ([]string, error) {
 		if _, err := fs.Stat(seed, path.Join(slug, "content.md")); err != nil {
 			continue
 		}
+		id := seedPostID(seed, slug)
+		key := id
+		if key == "" {
+			key = slug
+		}
 		destination := filepath.Join(absoluteRoot, slug)
-		if owner, found := owners[seedPostID(seed, slug)]; found {
+		if owner, found := owners[id]; found {
 			destination = filepath.Join(absoluteRoot, owner)
 		}
 		exists, err := hasPost(destination)
@@ -58,21 +95,108 @@ func ImportMissing(root string, seed fs.FS) ([]string, error) {
 			failures = append(failures, fmt.Errorf("%s: %w", slug, err))
 			continue
 		}
-		if exists {
-			// The post is the admin's now, but its prerendered diagrams are build output: keep them current.
-			if err := syncSeedDiagrams(seed, slug, destination); err != nil {
-				failures = append(failures, fmt.Errorf("%s diagrams: %w", slug, err))
-			}
-			continue
-		}
-		if err := copySeedPost(seed, slug, destination); err != nil {
+		seedHash, err := postHash(func(name string) ([]byte, error) { return fs.ReadFile(seed, path.Join(slug, name)) })
+		if err != nil {
 			failures = append(failures, fmt.Errorf("%s: %w", slug, err))
 			continue
 		}
-		imported = append(imported, slug)
+		if !exists {
+			if err := copySeedPost(seed, slug, destination); err != nil {
+				failures = append(failures, fmt.Errorf("%s: %w", slug, err))
+				continue
+			}
+			state[key] = seedRecord{Seed: seedHash, Live: seedHash}
+			result.Imported = append(result.Imported, slug)
+			continue
+		}
+
+		record, known := state[key]
+		// A post that lacks one of its files was edited by hand: its hash is empty and matches nothing.
+		liveHash, _ := postHash(func(name string) ([]byte, error) { return os.ReadFile(filepath.Join(destination, name)) })
+		switch {
+		case known && record.Seed == seedHash:
+		case liveHash == seedHash:
+			state[key] = seedRecord{Seed: seedHash, Live: seedHash}
+		case known && liveHash != "" && liveHash == record.Live:
+			if err := copySeedPost(seed, slug, destination); err != nil {
+				failures = append(failures, fmt.Errorf("%s: %w", slug, err))
+				continue
+			}
+			state[key] = seedRecord{Seed: seedHash, Live: seedHash}
+			result.Updated = append(result.Updated, slug)
+		default:
+			if err := writeSeedConflict(seed, slug, destination); err != nil {
+				failures = append(failures, fmt.Errorf("%s conflict: %w", slug, err))
+				continue
+			}
+			state[key] = seedRecord{Seed: seedHash, Live: record.Live}
+			result.Conflicts = append(result.Conflicts, slug)
+		}
+		// Prerendered diagrams are build output, not text: keep them current whatever the merge decided.
+		if err := syncSeedDiagrams(seed, slug, destination); err != nil {
+			failures = append(failures, fmt.Errorf("%s diagrams: %w", slug, err))
+		}
 	}
-	sort.Strings(imported)
-	return imported, errors.Join(failures...)
+	if err := writeSeedState(absoluteRoot, state); err != nil {
+		failures = append(failures, err)
+	}
+	sort.Strings(result.Imported)
+	sort.Strings(result.Updated)
+	sort.Strings(result.Conflicts)
+	return result, errors.Join(failures...)
+}
+
+// postHash hashes the two text files of a post. Images and diagrams are not part of the merge.
+func postHash(read func(name string) ([]byte, error)) (string, error) {
+	hash := sha256.New()
+	for _, name := range []string{"post.json", "content.md"} {
+		content, err := read(name)
+		if err != nil {
+			return "", err
+		}
+		fmt.Fprintf(hash, "%s %d\n", name, len(content))
+		hash.Write(content)
+	}
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
+func writeSeedConflict(seed fs.FS, slug, destination string) error {
+	for source, target := range map[string]string{"post.json": "post.seed.json", "content.md": "content.seed.md"} {
+		content, err := fs.ReadFile(seed, path.Join(slug, source))
+		if err != nil {
+			return err
+		}
+		if err := writeIfChanged(filepath.Join(destination, target), content); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func readSeedState(root string) (map[string]seedRecord, error) {
+	state := map[string]seedRecord{}
+	content, err := os.ReadFile(filepath.Join(root, seedStateName))
+	if errors.Is(err, fs.ErrNotExist) {
+		return state, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("read %s: %w", seedStateName, err)
+	}
+	if err := json.Unmarshal(content, &state); err != nil {
+		return nil, fmt.Errorf("decode %s: %w", seedStateName, err)
+	}
+	return state, nil
+}
+
+func writeSeedState(root string, state map[string]seedRecord) error {
+	content, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encode %s: %w", seedStateName, err)
+	}
+	if err := writeIfChanged(filepath.Join(root, seedStateName), append(content, '\n')); err != nil {
+		return fmt.Errorf("write %s: %w", seedStateName, err)
+	}
+	return nil
 }
 
 // postOwners maps the ID of every post of root to its directory: the ID survives a rename, the slug does not.
