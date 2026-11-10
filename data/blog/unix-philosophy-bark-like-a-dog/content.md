@@ -61,7 +61,16 @@ The second pass is the real work. It is the only one that knows what your file m
 
 My old code shows it. It decoded the YAML with strict field names. It decoded a second time to refuse a file with two documents. Then it copied two fields. All the checks were mine, written on top of the parser. The parser's own job added nothing to them.
 
-To be fair, the generic pass is not worthless. You get editor support, validators, and the ability to read a file from an author you have never met. And a library hides the two passes behind one call. But the second pass is still yours, in every case. So when the first pass is not needed, ask what it is paying for.
+The usual answer is the tooling: syntax colors, validators, formatters, support in every editor. It is real. But look at what it costs. Each of those tools must implement the whole generic format, and a generic format is big. So there is a lot of code, in a lot of independent implementations, and every one of them has its own bugs.
+
+The implementations do not agree with each other:
+
+*   In YAML 1.1, the unquoted value `no` is a boolean. The country code of Norway becomes `false`. YAML 1.2 fixed it, and libraries still differ on which version they follow.
+*   _Parsing JSON is a Minefield_ is an article with a test suite that compares JSON parsers on valid, invalid and ambiguous inputs. The parsers do not give the same answer.
+
+A generic format promised that we would agree on one thing. We now have to agree on which parser, which version and which options. We did not remove the problem. We built a new one next to it, and it is bigger than the one we started with.
+
+To be fair, the second pass is still yours in every case, even with a library that hides both passes behind one call. So when the first pass is not needed, ask what it is paying for.
 
 ## Do not be afraid of the custom thing
 
