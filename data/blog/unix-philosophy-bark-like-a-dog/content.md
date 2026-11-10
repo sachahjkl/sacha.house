@@ -95,11 +95,29 @@ Look at what happened there. Nobody built one universal tool interface where eve
 
 Structure removes the guess. A flat string brings it back, even inside a specialized API.
 
+## The same mistake in C++: the resource
+
+Unix made the first resource: the file. The 1974 paper says that file and device I/O are "as similar as possible", so that a program written for a file works on a device. The same paper already shows the leak. For some devices, "seek calls are ignored". A read from a typewriter never returns more than one line. A read may return less than you asked for, "without error". The abstraction held until it met something that was not a file.
+
+C++ built the same thing into the language, and gave it a name. RAII ties the lifetime of an object to a "resource", and cppreference defines the word: allocated heap memory, a thread, an open socket, an open file, a locked mutex, disk space, a database connection, "anything that exists in limited supply".
+
+Anything. Look at what the word puts together:
+
+*   **A file.** Closing it can fail, and the failure matters. The `close(2)` manual says that errors on an earlier write may be reported only at the final `close`, and that not checking it "may lead to silent loss of data". The RAII rule says that "the destructor releases the resource and never throws exceptions". So the one error that matters has nowhere to go. To see it, you must close the file yourself before the destructor runs. The abstraction does nothing, and it is still there.
+*   **A texture.** In Vulkan, destroying an image (a `VkImage`, the texture on the GPU) is valid only when all submitted commands that refer to it "have completed execution". The release must wait for another device. The end of a scope is not the moment to decide that.
+*   **Heap memory.** `free` returns nothing. It has no error to report and nobody to wait for.
+
+That is three releases: one that can lose your data, one that must wait for the GPU, and one that cannot fail. They share a word. They do not share a mechanism.
+
+Scope-bound cleanup is a good tool for some of these things. The problem is the word. "Resource" says that they are one kind of thing, and it makes them bark like a dog: acquire, release.
+
+Sandi Metz wrote a sentence that sounds exaggerated and is not: "duplication is far cheaper than the wrong abstraction". Her advice for when you are stuck in one is: "the fastest way forward is back". A wrong abstraction is worse than none, because every user must work around it, and its presence argues that it is correct. Without it, each thing would have a release that says what it does: a file closes with a function that returns an error, a texture is destroyed through a queue that waits for the GPU. It would be a few more lines. They would be true.
+
 ## Let the interface fit the thing
 
 The answer is not a better universal format. It is to stop looking for one.
 
-A call to create a process, with a parameter for each thing that matters. Objects with named properties that you can list. A file format for a project, with the two keys that the project needs. Each of them says what it carries. Each can be documented, discovered and checked. And the program that uses them has less to guess.
+A call to create a process, with a parameter for each thing that matters. Objects with named properties that you can list. A release for each thing, with its own result and its own timing. A file format for a project, with the two keys that the project needs. Each of them says what it carries. Each can be documented, discovered and checked. And the program that uses them has less to guess.
 
 Unix is right about small programs that do one thing. It is wrong about one shape for everything. The text stream treats every conversation between two programs as if it were public, even when only two programs of mine are talking.
 
@@ -119,3 +137,7 @@ The duck can quack. The mouse can squeak. The program that reads them only has t
 *   Microsoft, [CreateProcess function](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa), on the parameters, and on the four readings of the command line.
 *   Microsoft, [about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines), on objects in the pipeline, `Get-Member` and `Get-Help`.
 *   Model Context Protocol, [Tools](https://modelcontextprotocol.io/specification/2025-06-18/server/tools), specification of 2025-06-18, on `inputSchema` and `outputSchema`.
+*   cppreference, [RAII](https://en.cppreference.com/w/cpp/language/raii), for the definition of a resource and the rule that a destructor never throws.
+*   Linux man-pages, [close(2)](https://man7.org/linux/man-pages/man2/close.2.html), on the errors reported at `close` and the silent loss of data.
+*   Khronos, [vkDestroyImage](https://docs.vulkan.org/refpages/latest/refpages/source/vkDestroyImage.html), on the commands that must have completed before an image is destroyed.
+*   Sandi Metz, [The Wrong Abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction), 2016.
