@@ -103,4 +103,17 @@ This is the real point. The Unix philosophy is right about small programs that d
 
 A custom format is worth it when its rule fits in one paragraph. If it needs a manual, you shaped it badly. The rule of `info.txt` fits in one sentence.
 
+## Who is the reader?
+
+There is one question that decides everything: who reads this?
+
+*   **If the reader is you**, your own programs reading your own data, shape the format to the data. Nobody else needs to agree with you, so you do not need a format that everybody agrees on.
+*   **If the readers are strangers**, the convention wins. HTTP, SMTP, a JSON API that other teams call: these exist so that people who never met can talk. It is not for us to impose our own protocol on everyone.
+
+And a protocol is not something you declare. A protocol is a protocol because it was built to be shared: it has a specification, several independent implementations, and people who agreed on it before the first byte was sent. A file does not become one because you gave it a format.
+
+That is exactly where the generic format went wrong for me. `.project/project.yaml` was a private file. I invented the `.project` folder, and as far as I know nobody else had ever been asked to read it. Yet I had dressed it as a protocol, with the parser, the schema and the dependency that go with it. The mistake was not YAML itself. It was paying the price of sharing for a file that was never shared.
+
+The Unix text stream makes the same mistake at a bigger scale. It treats every conversation between two programs as if it were public, even when only two programs of mine are talking.
+
 The duck can quack. The mouse can squeak. The program that reads them only has to know which one it is talking to.
