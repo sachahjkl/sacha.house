@@ -60,7 +60,7 @@ One rule: a line that starts with `key=` opens a key, and any other line continu
 
 It is not less structured than the YAML file. It is structured to fit what it carries. And it is not perfect: a description that has a line starting with `word=` would be cut at that line. I chose to live with this limit, because it fits in one sentence and I know exactly where it is. I cannot say the same about the limits of a YAML parser.
 
-## Two passes, and only one of them is useful
+## Two passes where one would do
 
 Look at what a program does with a generic format like YAML, JSON or XML. It reads the file twice.
 
@@ -80,7 +80,18 @@ The implementations do not agree with each other:
 
 A generic format promised that we would agree on one thing. We now have to agree on which parser, which version and which options. We did not remove the problem. We built a new one next to it, and it is bigger than the one we started with.
 
-To be fair, the second pass is still yours in every case, even with a library that hides both passes behind one call. So when the first pass is not needed, ask what it is paying for.
+Now take the other road: a format that is yours.
+
+You know its shape before you read the file. So you do not need a tree, and you do not need to check the format first and understand it second. You read the file once, and the data comes out in the form your program wants. The check and the extraction are the same loop. The parser for `info.txt` is that loop: it walks the lines, a `key=` line opens a key, any other line continues it, and what comes out is a flat map of strings, which is exactly what the program uses. There is no generic tree in between.
+
+You also get something that no library can sell you: you are in charge of how the file is read.
+
+*   You decide what an invalid file is, and what the error says.
+*   You decide the limits, and you know where they are.
+*   You do not wait for an upstream fix, you do not read a changelog, and you do not pin a version.
+*   You carry no code that you do not use.
+
+The generic format was supposed to save work. It gave you two passes, a dependency and a bug surface that other people own. The custom format gives you one pass and no one else to wait for.
 
 ## Do not be afraid of the custom thing
 
@@ -90,6 +101,6 @@ This is the real point. The Unix philosophy is right about small programs that d
 *   If the data is a number, return a number.
 *   If the data is a post, a project or a process, let the format and the functions follow the data.
 
-Custom has a price. You must document it, and you can no longer pipe everything into everything. So keep the rule small enough to explain in one paragraph. If it needs a manual, it is not custom, it is just another elephant.
+A custom format is worth it when its rule fits in one paragraph. If it needs a manual, you shaped it badly. The rule of `info.txt` fits in one sentence.
 
 The duck can quack. The mouse can squeak. The program that reads them only has to know which one it is talking to.
