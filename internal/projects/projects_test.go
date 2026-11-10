@@ -34,7 +34,7 @@ func TestClientFetchesMetadataCommitsAndSortsProjects(t *testing.T) {
 		if !strings.Contains(request.Query, `object(expression: "HEAD:.project")`) {
 			t.Errorf("query does not request project metadata: %s", request.Query)
 		}
-		_, _ = w.Write([]byte(`{"data":{"user":{"projects":{"pageInfo":{"hasNextPage":false},"nodes":[{"name":"First","nameWithOwner":"sacha/first","url":"https://hub/1","descriptionHtml":"one","visibility":"PUBLIC","owner":{"avatarUrl":"avatar"},"defaultBranchRef":{"name":"master","target":{"committedDate":"2026-01-01T00:00:00Z","abbreviatedOid":"1111111","oid":"111111111111","url":"https://hub/1/commit/1111111"}},"licenseInfo":{"spdxId":"MIT","name":"MIT License"},"project":{"entries":[]}},{"name":"Hidden","url":"https://hub/2","visibility":"private","owner":{}},{"name":"Fallback","nameWithOwner":"sacha/fallback","url":"https://hub/3","descriptionHtml":"three","visibility":"PUBLIC","owner":{},"licenseInfo":{"spdxId":"NOASSERTION","name":"Other"},"licenseFile":{"text":"Froment Software License\n\nVersion 1.0\n"},"defaultBranchRef":{"name":"main","target":{"committedDate":"2026-02-01T00:00:00Z","abbreviatedOid":"3333333","oid":"333333333333","url":"https://hub/3/commit/3333333"}},"project":{"entries":[{"name":"project.yaml","type":"blob","object":{"text":"name: Metadata Name\ndescription: A <safe> description\n"}},{"name":"image.webp","type":"blob","object":{}}]}}]}}}}`))
+		_, _ = w.Write([]byte(`{"data":{"user":{"projects":{"pageInfo":{"hasNextPage":false},"nodes":[{"name":"First","nameWithOwner":"sacha/first","url":"https://hub/1","descriptionHtml":"one","visibility":"PUBLIC","owner":{"avatarUrl":"avatar"},"defaultBranchRef":{"name":"master","target":{"committedDate":"2026-01-01T00:00:00Z","abbreviatedOid":"1111111","oid":"111111111111","url":"https://hub/1/commit/1111111"}},"licenseInfo":{"spdxId":"MIT","name":"MIT License"},"project":{"entries":[]}},{"name":"Hidden","url":"https://hub/2","visibility":"private","owner":{}},{"name":"Fallback","nameWithOwner":"sacha/fallback","url":"https://hub/3","descriptionHtml":"three","visibility":"PUBLIC","owner":{},"licenseInfo":{"spdxId":"NOASSERTION","name":"Other"},"licenseFile":{"text":"Froment Software License\n\nVersion 1.0\n"},"defaultBranchRef":{"name":"main","target":{"committedDate":"2026-02-01T00:00:00Z","abbreviatedOid":"3333333","oid":"333333333333","url":"https://hub/3/commit/3333333"}},"project":{"entries":[{"name":"info.txt","type":"blob","object":{"text":"name=Metadata Name\ndescription=A <safe> description\n"}},{"name":"image.webp","type":"blob","object":{}}]}}]}}}}`))
 	}))
 	defer server.Close()
 
@@ -207,14 +207,7 @@ func TestClientRetriesGitHubRateLimit(t *testing.T) {
 	}
 }
 
-func TestProjectMetadataRejectsInvalidYAMLAndEncodesImagePath(t *testing.T) {
-	invalid := "name: valid\n---\n[unterminated"
-	entries := []projectEntry{{Name: "project.yaml", Type: "blob"}}
-	entries[0].Object.Text = &invalid
-	if err := applyProjectFiles(&Project{}, "owner/repository", "commit", entries); err == nil || !strings.Contains(err.Error(), "invalid .project/project.yaml") {
-		t.Fatalf("invalid YAML error = %v", err)
-	}
-
+func TestProjectImagePathIsEncoded(t *testing.T) {
 	imageEntries := []projectEntry{{Name: "image. name#.webp", Type: "blob"}}
 	project := Project{}
 	if err := applyProjectFiles(&project, "owner name/repository#1", "commit hash", imageEntries); err != nil {
@@ -225,57 +218,38 @@ func TestProjectMetadataRejectsInvalidYAMLAndEncodesImagePath(t *testing.T) {
 	}
 }
 
-func TestProjectMetadataAcceptsCompleteSchema(t *testing.T) {
-	metadata := `name: "sacha.house"
-description: "https://sacha.house - Site personnel."
-topics:
-  - "CI/CD"
-  - "odin"
-  - "self-hosted"
-homepage: ""
-source:
-  provider: github
-  namespace: "sachahjkl"
-  path: "sachahjkl/sacha.house"
-`
-	entries := []projectEntry{{Name: "project.yaml", Type: "blob"}}
-	entries[0].Object.Text = &metadata
-	project := newProject("Repository Name", "https://github.com/sachahjkl/sacha.house", "Repository description", "")
+func TestParseInfoSupportsMultilineValuesAndEquals(t *testing.T) {
+	info := parseInfo("name=sacha.house\ndescription=Line one: https://x.test/?a=b\nLine two\n\nLine four\n")
+	if info["name"] != "sacha.house" {
+		t.Fatalf("name = %q", info["name"])
+	}
+	if want := "Line one: https://x.test/?a=b\nLine two\n\nLine four"; info["description"] != want {
+		t.Fatalf("description = %q, want %q", info["description"], want)
+	}
+	if len(parseInfo("text before any key\n")) != 0 {
+		t.Fatal("text before the first key must be ignored")
+	}
+}
 
+func TestProjectInfoFillsMissingFieldsOnly(t *testing.T) {
+	info := "name=Info Name\ndescription=A <safe> description\n"
+	entries := []projectEntry{{Name: "info.txt", Type: "blob"}}
+	entries[0].Object.Text = &info
+
+	project := newProject("Repository Name", "https://github.com/sachahjkl/sacha.house", "Repository description", "")
 	if err := applyProjectFiles(&project, "sachahjkl/sacha.house", "commit", entries); err != nil {
 		t.Fatal(err)
 	}
 	if project.Name != "Repository Name" || project.DescriptionHTML != "Repository description" {
-		t.Fatalf("metadata project = %#v", project)
-	}
-	if project.URL != "https://github.com/sachahjkl/sacha.house" {
-		t.Fatalf("URL = %q", project.URL)
-	}
-
-	metadata = "homepage: https://example.com/project\n"
-	if err := applyProjectFiles(&project, "sachahjkl/sacha.house", "commit", entries); err != nil {
-		t.Fatal(err)
-	}
-	if project.URL != "https://github.com/sachahjkl/sacha.house" {
-		t.Fatalf("URL after homepage metadata = %q", project.URL)
+		t.Fatalf("project with GitHub data = %#v", project)
 	}
 
 	project = newProject("", "https://github.com/sachahjkl/sacha.house", "", "")
-	metadata = `name: Fallback Name
-description: A <safe> fallback
-topics:
-  - go
-homepage: https://example.com
-source:
-  provider: github
-  namespace: sachahjkl
-  path: sachahjkl/sacha.house
-`
 	if err := applyProjectFiles(&project, "sachahjkl/sacha.house", "commit", entries); err != nil {
 		t.Fatal(err)
 	}
-	if project.Name != "Fallback Name" || project.DescriptionHTML != "A &lt;safe&gt; fallback" {
-		t.Fatalf("fallback metadata project = %#v", project)
+	if project.Name != "Info Name" || project.DescriptionHTML != "A &lt;safe&gt; description" {
+		t.Fatalf("project from info.txt = %#v", project)
 	}
 }
 
@@ -294,17 +268,6 @@ func TestIdenticonURLIsDeterministic(t *testing.T) {
 	}
 	if first != second || first == other || !strings.HasPrefix(first, "data:image/png;base64,") {
 		t.Fatalf("identicons are not deterministic or distinct")
-	}
-}
-
-func TestProjectMetadataRejectsUnknownField(t *testing.T) {
-	metadata := "name: valid\nunknown: rejected\n"
-	entries := []projectEntry{{Name: "project.yaml", Type: "blob"}}
-	entries[0].Object.Text = &metadata
-
-	err := applyProjectFiles(&Project{}, "owner/repository", "commit", entries)
-	if err == nil || !strings.Contains(err.Error(), "field unknown not found") {
-		t.Fatalf("unknown field error = %v", err)
 	}
 }
 

@@ -27,7 +27,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/issue9/identicon/v2"
-	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -321,42 +320,43 @@ func (c *Client) fetchGitHub(ctx context.Context) ([]Project, error) {
 	return projects, nil
 }
 
-type projectMetadata struct {
-	Name        string   `yaml:"name"`
-	Description string   `yaml:"description"`
-	Topics      []string `yaml:"topics"`
-	Homepage    string   `yaml:"homepage"`
-	Source      struct {
-		Provider  string `yaml:"provider"`
-		Namespace string `yaml:"namespace"`
-		Path      string `yaml:"path"`
-	} `yaml:"source"`
+var infoKeyPattern = regexp.MustCompile(`^([a-z_]+)=`)
+
+// parseInfo reads the key=value format of .project/info.txt.
+// A line that starts with "key=" opens a new key. Any other line continues the previous value.
+func parseInfo(text string) map[string]string {
+	values := map[string]string{}
+	key := ""
+	for _, line := range strings.Split(text, "\n") {
+		if match := infoKeyPattern.FindStringSubmatch(line); match != nil {
+			key = match[1]
+			line = line[len(match[0]):]
+		} else if key != "" {
+			line = values[key] + "\n" + line
+		} else {
+			continue
+		}
+		values[key] = line
+	}
+	for key, value := range values {
+		values[key] = strings.TrimSpace(value)
+	}
+	return values
 }
 
 func applyProjectFiles(project *Project, nameWithOwner, commitOID string, entries []projectEntry) error {
 	if project.Name == "" || project.DescriptionHTML == "" {
 		for _, entry := range entries {
-			if entry.Name != "project.yaml" || entry.Object.Text == nil {
+			if entry.Name != "info.txt" || entry.Object.Text == nil {
 				continue
 			}
-			var metadata projectMetadata
-			decoder := yaml.NewDecoder(strings.NewReader(*entry.Object.Text))
-			decoder.KnownFields(true)
-			if err := decoder.Decode(&metadata); err != nil {
-				return fmt.Errorf("invalid .project/project.yaml: %w", err)
+			info := parseInfo(*entry.Object.Text)
+			if project.Name == "" && info["name"] != "" {
+				project.Name = info["name"]
+				project.FirstLetter = firstLetter(info["name"])
 			}
-			if err := decoder.Decode(&struct{}{}); err != io.EOF {
-				if err == nil {
-					err = errors.New("multiple YAML documents are not allowed")
-				}
-				return fmt.Errorf("invalid .project/project.yaml: %w", err)
-			}
-			if project.Name == "" && metadata.Name != "" {
-				project.Name = metadata.Name
-				project.FirstLetter = firstLetter(metadata.Name)
-			}
-			if project.DescriptionHTML == "" && metadata.Description != "" {
-				project.DescriptionHTML = html.EscapeString(metadata.Description)
+			if project.DescriptionHTML == "" && info["description"] != "" {
+				project.DescriptionHTML = html.EscapeString(info["description"])
 			}
 			break
 		}
