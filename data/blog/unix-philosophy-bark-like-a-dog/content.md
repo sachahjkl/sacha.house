@@ -50,6 +50,19 @@ One rule: a line that starts with `key=` opens a key, and any other line continu
 
 It is not less structured than the YAML file. It is structured to fit what it carries.
 
+## Two passes, and only one of them is useful
+
+Look at what a program does with a generic format like YAML, JSON or XML. It reads the file twice.
+
+1.  **The generic pass.** The parser checks that the text is valid YAML, or JSON, or XML, and builds a tree. It knows nothing about your problem.
+2.  **The specific pass.** Your code walks the tree, looks for the keys it needs, checks that they have the right shape, and rejects the rest.
+
+The second pass is the real work. It is the only one that knows what your file means. The first pass only proves that the dog barked correctly.
+
+My old code shows it. It decoded the YAML with strict field names. It decoded a second time to refuse a file with two documents. Then it copied two fields. All the checks were mine, written on top of the parser. The parser's own job added nothing to them.
+
+To be fair, the generic pass is not worthless. You get editor support, validators, and the ability to read a file from an author you have never met. And a library hides the two passes behind one call. But the second pass is still yours, in every case. So when the first pass is not needed, ask what it is paying for.
+
 ## Do not be afraid of the custom thing
 
 This is the real point. The Unix philosophy is right about small programs that do one thing. It is wrong about one shape for everything.
