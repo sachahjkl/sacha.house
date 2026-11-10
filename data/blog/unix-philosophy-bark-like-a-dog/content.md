@@ -38,6 +38,25 @@ So the order is: a machine with 144K of memory forced a simple stream, then the 
 
 The constraint is gone. A machine today has gigabytes of memory, and a pipe between two programs is cheap. The habit stayed, and in my experience it became a badge: knowing `awk` and `sed` by heart is treated as a sign of intelligence. A way to survive a small machine became a way to prove you belong. This is my opinion, not a finding. But I think that is how a limit turns into a culture.
 
+## The same story with fork
+
+Starting a program on Unix takes two steps. The process clones itself with `fork`. Then the clone replaces itself with the new program with `exec`. You copy a whole process, and you throw the copy away a moment later.
+
+It looks like a design. It was a shortcut. Ritchie wrote that the first `fork` took 27 lines of assembly on the PDP-7, and that it exists in Unix "mainly because of the ease with which fork could be implemented without changing much else". He also noted that a single call to create a process and run a program "would have been considerably more complicated, if only because exec as such did not exist": the shell did that job with explicit I/O.
+
+In 2019, four researchers from Microsoft Research, Boston University and ETH Zurich wrote a paper with a clear title: _A fork() in the road_. Their conclusion is that `fork` "was a clever hack for machines and programs of the 1970s that has long outlived its usefulness and is now a liability". Here is some of what they list:
+
+*   The POSIX specification now lists 25 special cases for what the child inherits from the parent.
+*   In a program with several threads, the child gets only one of them. A lock held by another thread stays locked forever in the child.
+*   The child inherits everything by default, which goes against the principle of least privilege.
+*   On their test machine, `posix_spawn` took about 0.5 ms whatever the size of the parent, while `fork` followed by `exec` took longer as the parent grew. Chrome has measured delays of up to 100 ms in `fork`.
+
+They also looked at how the culture talks about it. Every operating system textbook they reviewed presents `fork` in positive or uncritical terms. One of them says: "the Unix designers simply got it right". Fifty years later, they counted 1,304 Ubuntu packages that call `fork`, and 41 that call `posix_spawn`.
+
+Windows made the opposite choice: a function built for the job, `CreateProcess`. It creates a process and its primary thread. It takes ten parameters: the program, the command line, the security attributes of the process and of its thread, whether to inherit handles, creation flags, the environment, the current directory, the startup information, and a structure that receives the result. That is long. But it is written down: each aspect of the new process has a parameter, and the documentation describes each one. Apache, Chrome and PostgreSQL all run on Windows without `fork`.
+
+One mechanism for everything is simple to implement on a small machine. It is not simple to live with.
+
 ## The universal interface is a loan
 
 An interface is universal when it carries no meaning. The meaning does not disappear. It moves to the reader, and every reader pays for it, again and again.
@@ -50,15 +69,41 @@ You know the symptoms:
 *   A program that prints a friendlier message breaks every script that read the old message. The output was never an API, but it became one.
 *   Each tool brings its own half-parser for the text: `cut`, `awk`, `sed`, `tr`, and a regular expression that nobody wants to read again.
 
-PowerShell made a different bet: pass objects, not text. You can dislike its syntax and still see the point. A file is a file object, with a size that is a number.
+## The other bet: structure
 
-## One shape for everything
+PowerShell made a different bet: pass objects, not text.
 
-Unix is right about small programs that do one thing. It is wrong about one shape for everything.
+Take one job, twice. List the text files bigger than 10,000 bytes, sorted by size.
 
-The text stream treats every conversation between two programs as if it were public, even when only two programs of mine are talking. And the mistake did not stay in the shell. It followed us into our files, with a nicer coat: YAML, JSON and XML are the same dog, dressed for the modern web.
+```
+ls -l *.txt | awk '$5 > 10000' | sort -k5 -n
+```
 
-I paid for it this week, in my own repositories. That is the subject of [the next post](/blog/generic-formats-same-dog-nicer-coat).
+```
+Get-ChildItem -Path *.txt | Where-Object {$_.Length -gt 10000} | Sort-Object -Property Length
+```
+
+In the first line, `5` is a column number. I must know that the fifth column of `ls -l` is the size. The text does not say it. The position is the only information.
+
+In the second line, `Length` is the name of a property of a file object. Nothing is guessed. And I can ask. Piping a command to `Get-Member` lists the type of the objects it returns, with their properties and methods. `Get-Help Start-Service -Parameter *` says which parameters accept pipeline input, and of which type. With text, the only way to learn the shape of the data is to run the command and look at it.
+
+The more structure the data carries, the less the next program has to guess about its context. It is also where the ambiguity comes back when the structure is missing. `CreateProcess` takes the command line as one string. Its own documentation says that `c:\program files\sub dir\program name` can be read in four ways, and that the system tries them in order: `c:\program.exe`, then `c:\program files\sub.exe`, and so on. It also warns that this can run a `Program.exe` planted by an attacker instead of the program you meant. Unix passes the arguments of `exec` as separate strings, and it has done so since 1974: `execute(file, arg1, arg2, ..., argn)`. That ambiguity does not exist there.
+
+This matters more in the era of AI, because the reader of the output is now often a language model. A model that reads the text of `ls -l` has to guess what each column means from the context, and it can guess wrong. The tools that coding agents call are built the other way. In the Model Context Protocol, each tool declares a name, a description, and an `inputSchema` that defines its parameters. It can also declare an `outputSchema` for its result. The specification gives the reason: it helps "clients and LLMs to properly parse and utilize the returned data". A reader that has only the text to go on needs the data to say what it is.
+
+Look at what happened there. Nobody built one universal tool interface where every tool takes a string. Each tool declares its own shape.
+
+Structure removes the guess. A flat string brings it back, even inside a specialized API.
+
+## Let the interface fit the thing
+
+The answer is not a better universal format. It is to stop looking for one.
+
+A call to create a process, with a parameter for each thing that matters. Objects with named properties that you can list. A file format for a project, with the two keys that the project needs. Each of them says what it carries. Each can be documented, discovered and checked. And the program that uses them has less to guess.
+
+Unix is right about small programs that do one thing. It is wrong about one shape for everything. The text stream treats every conversation between two programs as if it were public, even when only two programs of mine are talking.
+
+The mistake did not stay in the shell. It followed us into our files, with a nicer coat: YAML, JSON and XML are the same dog, dressed for the modern web. I paid for it this week, in my own repositories. That is the subject of [the next post](/blog/generic-formats-same-dog-nicer-coat).
 
 The duck can quack. The mouse can squeak. The program that reads them only has to know which one it is talking to.
 
@@ -69,3 +114,8 @@ The duck can quack. The mouse can squeak. The program that reads them only has t
 *   Douglas McIlroy, [the 1964 memo on connecting programs like a garden hose](https://doc.cat-v.org/unix/pipes/), and Doug McIlroy's account of the pipe added by Ken Thompson in 1973 in [A Research Unix Reader](https://www.cs.dartmouth.edu/~doug/reader.pdf).
 *   Peter H. Salus, _A Quarter Century of UNIX_, Addison-Wesley, 1994, pages 52 to 53.
 *   Mike Gancarz, _The UNIX Philosophy_, 1994. Eric S. Raymond, _The Art of Unix Programming_, Addison-Wesley, 2003.
+*   Andrew Baumann, Jonathan Appavoo, Orran Krieger and Timothy Roscoe, [A fork() in the road](https://www.microsoft.com/en-us/research/wp-content/uploads/2019/04/fork-hotos19.pdf), HotOS '19, 2019. The source of the quotes about Ritchie, the list of problems, the measures, the textbooks and the package counts.
+*   Dennis M. Ritchie, [The Evolution of the Unix Time-sharing System](https://www.read.seas.harvard.edu/~kohler/class/aosref/ritchie84evolution.pdf), on the 27 lines of assembly of the first `fork`.
+*   Microsoft, [CreateProcess function](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa), on the parameters, and on the four readings of the command line.
+*   Microsoft, [about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines), on objects in the pipeline, `Get-Member` and `Get-Help`.
+*   Model Context Protocol, [Tools](https://modelcontextprotocol.io/specification/2025-06-18/server/tools), specification of 2025-06-18, on `inputSchema` and `outputSchema`.
