@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="t d">
+  <title id="t">A duck, a mouse and an elephant all barking like a dog</title>
+  <desc id="d">An elephant, a duck and a mouse each say the same woof in a speech bubble, while a small dog sits at the right, looking proud.</desc>
+  <style>
+    .line { stroke: #2b2b2b; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+    .bubble { fill: #ffffff; }
+    .woof { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 28px; font-weight: 700; fill: #2b2b2b; text-anchor: middle; }
+  </style>
+
+  <rect width="1200" height="630" fill="#fbf3e4"/>
+  <ellipse cx="600" cy="540" rx="560" ry="22" fill="#eadcbf"/>
+
+  <!-- Elephant -->
+  <g class="line">
+    <rect x="190" y="470" width="46" height="62" rx="14" fill="#8e9cac"/>
+    <rect x="330" y="470" width="46" height="62" rx="14" fill="#8e9cac"/>
+    <ellipse cx="290" cy="410" rx="152" ry="105" fill="#98a6b5"/>
+    <rect x="245" y="480" width="46" height="52" rx="14" fill="#a6b3c1"/>
+    <rect x="385" y="480" width="46" height="52" rx="14" fill="#a6b3c1"/>
+    <path d="M118 378 C92 420 98 474 126 504 C138 516 156 508 150 492 C132 466 138 432 152 402 Z" fill="#98a6b5"/>
+    <circle cx="170" cy="360" r="72" fill="#98a6b5"/>
+    <ellipse cx="222" cy="352" rx="50" ry="64" fill="#8795a5"/>
+    <path d="M134 408 C106 418 104 446 118 454 C124 436 138 426 150 416 Z" fill="#fff8e7"/>
+    <path d="M168 404 Q190 440 212 404 Z" fill="#8a2a2a"/>
+    <path d="M178 414 Q190 428 202 414 Z" fill="#e8808f" stroke="none"/>
+    <circle cx="150" cy="342" r="7" fill="#2b2b2b" stroke="none"/>
+  </g>
+  <g>
+    <rect class="bubble line" x="70" y="80" width="250" height="120" rx="28"/>
+    <path class="bubble line" d="M178 200 L160 290 L226 200 Z"/>
+    <path d="M168 197 L232 197" stroke="#ffffff" stroke-width="8"/>
+    <text class="woof" x="195" y="128">woof woof</text>
+    <text class="woof" x="195" y="170">woof</text>
+  </g>
+
+  <!-- Duck -->
+  <g class="line">
+    <path d="M524 430 L500 405 L530 392 Z" fill="#f6c945"/>
+    <ellipse cx="590" cy="440" rx="78" ry="56" fill="#f6c945"/>
+    <ellipse cx="578" cy="446" rx="40" ry="28" fill="#e9b52e"/>
+    <circle cx="642" cy="372" r="42" fill="#f6c945"/>
+    <path d="M672 360 L722 350 L674 376 Z" fill="#f28c28"/>
+    <path d="M674 380 L720 396 L672 392 Z" fill="#f28c28"/>
+    <path d="M674 376 L712 374 L674 382 Z" fill="#8a2a2a"/>
+    <circle cx="652" cy="360" r="5" fill="#2b2b2b" stroke="none"/>
+    <path d="M574 494 L574 530 M606 494 L606 530 M562 532 L586 532 M594 532 L618 532" stroke="#f28c28" fill="none"/>
+  </g>
+  <g>
+    <rect class="bubble line" x="470" y="190" width="250" height="120" rx="28"/>
+    <path class="bubble line" d="M640 310 L686 352 L690 310 Z"/>
+    <path d="M644 307 L686 307" stroke="#ffffff" stroke-width="8"/>
+    <text class="woof" x="595" y="238">woof woof</text>
+    <text class="woof" x="595" y="280">woof</text>
+  </g>
+
+  <!-- Mouse -->
+  <g class="line">
+    <path d="M760 492 C716 504 708 456 734 444" fill="none" stroke="#b8bec6" stroke-width="7"/>
+    <path d="M760 492 C716 504 708 456 734 444" fill="none" stroke-width="2" stroke="#2b2b2b" opacity="0"/>
+    <ellipse cx="812" cy="486" rx="56" ry="40" fill="#b8bec6"/>
+    <rect x="790" y="512" width="22" height="20" rx="8" fill="#a3aab3"/>
+    <rect x="826" y="512" width="22" height="20" rx="8" fill="#a3aab3"/>
+    <circle cx="848" cy="440" r="17" fill="#f2a9b8"/>
+    <circle cx="874" cy="444" r="15" fill="#f2a9b8"/>
+    <circle cx="862" cy="468" r="28" fill="#b8bec6"/>
+    <path d="M880 474 Q890 492 872 492 Q864 482 880 474 Z" fill="#8a2a2a"/>
+    <circle cx="887" cy="468" r="5" fill="#f2a9b8"/>
+    <circle cx="866" cy="460" r="3.5" fill="#2b2b2b" stroke="none"/>
+  </g>
+  <g>
+    <rect class="bubble line" x="730" y="270" width="250" height="120" rx="28"/>
+    <path class="bubble line" d="M905 390 L930 390 L892 468 Z"/>
+    <path d="M909 387 L926 387" stroke="#ffffff" stroke-width="8"/>
+    <text class="woof" x="855" y="318">woof woof</text>
+    <text class="woof" x="855" y="360">woof</text>
+  </g>
+
+  <!-- Dog, proud -->
+  <g class="line">
+    <path d="M1098 480 C1134 462 1140 434 1128 414" fill="none" stroke-width="12" stroke="#2b2b2b"/>
+    <path d="M1098 480 C1134 462 1140 434 1128 414" fill="none" stroke-width="5" stroke="#a9713e"/>
+    <rect x="1012" y="490" width="26" height="42" rx="10" fill="#a9713e"/>
+    <rect x="1050" y="490" width="26" height="42" rx="10" fill="#a9713e"/>
+    <ellipse cx="1046" cy="456" rx="62" ry="56" fill="#a9713e"/>
+    <circle cx="1046" cy="364" r="46" fill="#a9713e"/>
+    <ellipse cx="1004" cy="374" rx="16" ry="32" fill="#7a4a22" transform="rotate(12 1004 374)"/>
+    <ellipse cx="1070" cy="380" rx="28" ry="19" fill="#e7c9a0"/>
+    <circle cx="1090" cy="372" r="7" fill="#2b2b2b" stroke="none"/>
+    <path d="M1060 390 Q1078 402 1094 388" fill="none"/>
+    <circle cx="1056" cy="352" r="5" fill="#2b2b2b" stroke="none"/>
+    <rect x="1010" y="404" width="72" height="12" rx="6" fill="#d94b4b"/>
+    <circle cx="1046" cy="424" r="8" fill="#f6c945"/>
+  </g>
+  <path d="M1112 300 l6 16 17 1 -13 11 5 17 -15 -9 -15 9 5 -17 -13 -11 17 -1 z" fill="#f6c945" stroke="#2b2b2b" stroke-width="3" stroke-linejoin="round"/>
+</svg>

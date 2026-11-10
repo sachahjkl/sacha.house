@@ -4,6 +4,8 @@
 
 It sounds wise. It is also how you end up making a duck, a mouse and an elephant bark like a dog.
 
+![A duck, a mouse and an elephant each say "woof woof woof" in a speech bubble, while a small dog sits at the right, looking proud](/media/blog/unix-philosophy-bark-like-a-dog/assets/duck-mouse-elephant.svg)
+
 ## The dog
 
 In the Unix philosophy, the dog is the text stream: lines of bytes, with no type and no shape. Every program reads it. Every program writes it. That is why they all fit together with a `|`.
