@@ -115,6 +115,26 @@ You also get something that no library can sell you: you are in charge of how th
 
 The generic format was supposed to save work. It gave you two passes, a dependency and a bug surface that other people own. The custom format gives you one pass and no one else to wait for.
 
+## Less code, fewer bugs, a smaller target
+
+There is one more reason, and it is not about convenience. It is about safety.
+
+Code that does not exist has no bugs. A reader that needs twenty lines has fewer places to fail than a reader that needs a library. The library I removed from my site, `yaml.v3`, is about 11,000 lines of Go without its tests, and that includes a writer for YAML that I never used. The parser of `info.txt` is 23 lines, comments included. I can read all of it. I cannot say that of the 11,000.
+
+And every feature of a format is something an attacker can use, even a feature you never needed:
+
+*   **YAML can build objects.** Before version 2.0, SnakeYAML, a widely used Java library, let a YAML document instantiate any class on the classpath. Whoever controlled the document could run code. It is CVE-2022-1471.
+*   **A format inside a format.** In 2013, Ruby on Rails accepted XML parameters. An XML parameter could declare itself as YAML, and Rails decoded it as YAML. That could expose the application to remote code execution or SQL injection. It is CVE-2013-0156.
+*   **XML can read files.** An XML document can declare an external entity. A parser that resolves it can be made to disclose local files, call internal servers, or hang. OWASP has a whole name for it, XXE, and a cheat sheet to disable the feature.
+
+None of these is a story about a careless programmer. Each one is a feature of a generic format that the reader did not need and that someone else found a use for.
+
+A `key=value` file has none of this. A line is text. A value is text. Nothing is built, resolved, included or executed, because the format has no word for it. You cannot add power to a format that has none.
+
+This is also what makes the format cheap to share. Even when someone else has to read your file, a format that fits in twenty lines is the lightest thing you can ask of them: they write their reader in an afternoon, with no dependency and no attack surface that they did not choose.
+
+A simple, custom format is not only more convenient. It makes the programs that read it smaller, easier to check, and harder to attack.
+
 ## Do not be afraid of the custom thing
 
 This is the real point. The Unix philosophy is right about small programs that do one thing. It is wrong about one shape for everything.
@@ -147,3 +167,6 @@ The duck can quack. The mouse can squeak. The program that reads them only has t
 *   Douglas McIlroy, [the 1964 memo on connecting programs like a garden hose](https://doc.cat-v.org/unix/pipes/), and Doug McIlroy's account of the pipe added by Ken Thompson in 1973 in [A Research Unix Reader](https://www.cs.dartmouth.edu/~doug/reader.pdf).
 *   Peter H. Salus, _A Quarter Century of UNIX_, Addison-Wesley, 1994, pages 52 to 53.
 *   Mike Gancarz, _The UNIX Philosophy_, 1994. Eric S. Raymond, _The Art of Unix Programming_, Addison-Wesley, 2003.
+*   [CVE-2022-1471](https://nvd.nist.gov/vuln/detail/cve-2022-1471), SnakeYAML unsafe deserialization, with the [Veracode analysis](https://www.veracode.com/blog/resolving-cve-2022-1471-snakeyaml-20-release-0/).
+*   [CVE-2013-0156](https://nvd.nist.gov/vuln/detail/cve-2013-0156), Ruby on Rails, with the [Rapid7 explanation](https://www.rapid7.com/blog/post/2013/01/09/serialization-mischief-in-ruby-land-cve-2013-0156/).
+*   OWASP, [XML External Entity (XXE) Processing](https://community.owasp.org/vulnerabilities/XML_External_Entity_(XXE)_Processing) and the [XXE Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html).
