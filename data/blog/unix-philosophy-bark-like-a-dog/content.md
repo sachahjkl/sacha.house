@@ -7,6 +7,8 @@ It sounds wise. It is also how you end up making a duck, a mouse and an elephant
 
 ![A mallard duck, a house mouse and an African elephant, followed by a German shepherd that is really barking](/media/blog/unix-philosophy-bark-like-a-dog/assets/duck-mouse-elephant-dog.jpg)
 
+*4 dogs*
+
 ## The dog
 
 In the Unix philosophy, the dog is the text stream: lines of bytes, with no type and no shape. Every program reads it. Every program writes it. That is why they all fit together with a `|`.
