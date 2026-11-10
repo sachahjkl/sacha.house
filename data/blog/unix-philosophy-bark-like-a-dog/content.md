@@ -13,6 +13,10 @@ It sounds wise. It is also how you end up making a duck, a mouse and an elephant
 
 In the Unix philosophy, the dog is the text stream: lines of bytes, with no type and no shape. Every program reads it. Every program writes it. That is why they all fit together with a `|`.
 
+![A Teletype ASR-33 terminal on a table at a computer festival](/media/blog/unix-philosophy-bark-like-a-dog/assets/teletype.jpg)
+
+*A Teletype ASR-33, a typical terminal of the 1970s. It prints text, and nothing else.*
+
 Now look at what has to bark:
 
 *   **The duck** is a list of files, each with a name, a size, an owner and a date.
@@ -30,6 +34,10 @@ In 1974, Dennis Ritchie and Ken Thompson wrote down why Unix looks the way it do
 > there have always been fairly severe size constraints on the system and its software. [...] the size constraint has encouraged not only economy but a certain elegance of design. This may be a thinly disguised version of the "salvation through suffering" philosophy, but in our case it worked.
 
 The machine in that paper is a PDP-11/45 with 144K bytes of memory. Unix itself takes 42K of it.
+
+![A man in a white coat at a PDP-11 computer and its terminal](/media/blog/unix-philosophy-bark-like-a-dog/assets/pdp11.jpg)
+
+*A PDP-11/34 at a U.S. Army center, 1978. The PDP-11/45 of the 1974 paper had 144K bytes of memory.*
 
 On that machine, a uniform stream of bytes was the cheap answer. The paper says that all programs must work with any file or device, so the device-specific code goes into the operating system: the alternatives are "expensive in space", or "expensive either in overhead or in hardware". Pipes had the same reason. About commands like `ls`, they write that it would be "unwise for efficiency reasons" to ask each one to provide many output options.
 
@@ -120,3 +128,4 @@ The duck can quack. The mouse can squeak. The program that reads them only has t
 *   NVD, [CVE-2014-6271](https://nvd.nist.gov/vuln/detail/cve-2014-6271) (Shellshock).
 *   OWASP, [Prompt Injection](https://community.owasp.org/attacks/PromptInjection) and [LLM01:2025 Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/).
 *   Illustration: four photographs from Wikimedia Commons: a [mallard duck](https://commons.wikimedia.org/wiki/File:Male_mallard_duck;_2008.jpg) (CC0), a [house mouse](https://commons.wikimedia.org/wiki/File:House_mouse_%28Mus_musculus%29_2808.jpg) (CC0), an [African elephant bull](https://commons.wikimedia.org/wiki/File:African_elephant_bull_%286987533681%29.jpg) (public domain), and a [military dog barking](https://commons.wikimedia.org/wiki/File:Military_dog_barking_%28cropped%29.JPG) (public domain).
+*   Photographs from Wikimedia Commons, cropped and resized: a [Teletype ASR-33](https://commons.wikimedia.org/wiki/File:TTY_%2829649845893%29.jpg) by Wolfgang Stief (CC0) and a [PDP-11/34](https://commons.wikimedia.org/wiki/File:PDP_11-34,_by_the_U.S._Army_Natick_Soldier_Systems_Center,_April_18,_1978,_from_the_Digital_Commonwealth_-_commonwealth_4f16d844r.jpg) by the U.S. Army Natick Soldier Systems Center (public domain).

@@ -2,9 +2,17 @@ In [the first post](/blog/unix-philosophy-bark-like-a-dog), I looked at the Unix
 
 The same pattern appears elsewhere. Someone finds a mechanism that is cheap to build. It gets used for everything. Fifty years later it is taught as a good idea. This post looks at two cases: starting a program, and the idea of a "resource".
 
+![A spool of thread, a plug adapter, a filing cabinet and a pile of gravel](/media/blog/wrong-abstraction-fork-files-resources/assets/four-resources.jpg)
+
+*4 resources*
+
 ## The same story with fork
 
 Starting a program on Unix takes two steps. The process clones itself with `fork`. Then the clone replaces itself with the new program with `exec`. You copy a whole process, and you throw the copy away a moment later.
+
+![A photocopier next to a paper shredder](/media/blog/wrong-abstraction-fork-files-resources/assets/fork-exec.jpg)
+
+*fork(); exec();*
 
 It looks like a design. It was a shortcut. Ritchie wrote that the first `fork` took 27 lines of assembly on the PDP-7, and that it exists in Unix "mainly because of the ease with which fork could be implemented without changing much else". He also noted that a single call to create a process and run a program "would have been considerably more complicated, if only because exec as such did not exist": the shell did that job with explicit I/O.
 
@@ -81,3 +89,4 @@ The same mistake lives in our files. YAML, JSON and XML are the same dog, dresse
 *   The Go Programming Language Specification, [Defer statements](https://go.dev/ref/spec#Defer_statements).
 *   Zig Language Reference, [defer](https://ziglang.org/documentation/master/#defer) and [errdefer](https://ziglang.org/documentation/master/#errdefer).
 *   Odin Programming Language, Overview, [defer statement](https://odin-lang.org/docs/overview/#defer-statement).
+*   Photographs from Wikimedia Commons, cropped and resized: a [spool of thread](https://commons.wikimedia.org/wiki/File:Spool_of_sewing_thread_made_by_M%C3%B6lnlycke_-_SG1L1735.jpg) by vonSmall (public domain), a [plug adapter](https://commons.wikimedia.org/wiki/File:Mains.plug%2Bsockets.JPG) by Julo (public domain), a [filing cabinet](https://commons.wikimedia.org/wiki/File:Cabinet,_filing_%28AM_2004.52.32-7%29.jpg) from Auckland Museum ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), a [gravel pile](https://commons.wikimedia.org/wiki/File:Gravel_Pile.jpg) by Al-muhaqqiqi (CC0), a [photocopier](https://commons.wikimedia.org/wiki/File:The_Closest_Photocopier_%283594209596%29.jpg) by Dennis Sylvester Hurd (CC0), and a [paper shredder](https://commons.wikimedia.org/wiki/File:Paper_Shredder.jpg) by High Plains Drifter (public domain).

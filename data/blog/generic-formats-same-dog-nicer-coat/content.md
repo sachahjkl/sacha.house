@@ -2,6 +2,10 @@ In [the first post](/blog/unix-philosophy-bark-like-a-dog), I looked at where th
 
 This post is about the same mistake in a modern coat. YAML, JSON and XML are generic formats: they bark every kind of data in one shape. We pay for it in code, in bugs, and in attack surface.
 
+![Two small dogs wearing knitted sweaters, standing on grass](/media/blog/generic-formats-same-dog-nicer-coat/assets/dogs-in-sweaters.jpg)
+
+*Still a dog.*
+
 ## The same dog, with a nicer coat
 
 This week I counted that cost in my own projects.
@@ -71,6 +75,10 @@ There is one more reason, and it is not about convenience. It is about safety.
 
 Code that does not exist has no bugs. A reader that needs twenty lines has fewer places to fail than a reader that needs a library. The library I removed from my site, `yaml.v3`, is about 11,000 lines of Go without its tests, and that includes a writer for YAML that I never used. The parser of `info.txt` is 23 lines, comments included. I can read all of it. I cannot say that of the 11,000.
 
+![A large pile of books on the floor of a library](/media/blog/generic-formats-same-dog-nicer-coat/assets/stack-of-books.jpg)
+
+*yaml.v3: about 11,000 lines of Go, without the tests.*
+
 And every feature of a format is something an attacker can use, even a feature you never needed:
 
 *   **YAML can build objects.** Before version 2.0, SnakeYAML, a widely used Java library, let a YAML document instantiate any class on the classpath. Whoever controlled the document could run code. It is CVE-2022-1471.
@@ -113,3 +121,4 @@ The Unix text stream makes the same mistake at a bigger scale, as I wrote in the
 *   [CVE-2022-1471](https://nvd.nist.gov/vuln/detail/cve-2022-1471), SnakeYAML unsafe deserialization, with the [Veracode analysis](https://www.veracode.com/blog/resolving-cve-2022-1471-snakeyaml-20-release-0/).
 *   [CVE-2013-0156](https://nvd.nist.gov/vuln/detail/cve-2013-0156), Ruby on Rails, with the [Rapid7 explanation](https://www.rapid7.com/blog/post/2013/01/09/serialization-mischief-in-ruby-land-cve-2013-0156/).
 *   OWASP, [XML External Entity (XXE) Processing](https://community.owasp.org/vulnerabilities/XML_External_Entity_(XXE)_Processing) and the [XXE Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html).
+*   Photographs from Wikimedia Commons, resized: [dog sweater](https://commons.wikimedia.org/wiki/File:Dog_sweater_1.jpg) by Sciencia58 (CC0), and [books in a stack](https://commons.wikimedia.org/wiki/File:Books_in_a_stack_%28a_stack_of_books%29_-_Flickr_-_austinevan.jpg) by Evan Bench ([CC BY 2.0](https://creativecommons.org/licenses/by/2.0/)).
