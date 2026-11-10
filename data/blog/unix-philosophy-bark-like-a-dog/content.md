@@ -50,6 +50,22 @@ You know the symptoms:
 *   A program that prints a friendlier message breaks every script that read the old message. The output was never an API, but it became one.
 *   Each tool brings its own half-parser for the text: `cut`, `awk`, `sed`, `tr`, and a regular expression that nobody wants to read again.
 
+## When the text is also the command
+
+Text is fine for people to read: a log, a message, a README. The trouble starts when text is the interface between programs. A program that reads text cannot tell the data from the commands. They travel in the same channel, and whoever writes the data can write a command.
+
+The best example is the language that was meant to be written by anyone. In 1974, Donald Chamberlin and Raymond Boyce called it SEQUEL, for Structured English Query Language. Their abstract says it is "intended as a data base sublanguage for both the professional programmer and the more infrequent data base user". Plain English words, so that you did not need to be a programmer. In my experience, that is not what happened. Today SQL is written by programmers, and the text it is made of is assembled by programs, from strings.
+
+That is where the trouble comes from. OWASP defines a SQL injection like this: "untrusted data (usually strings) becomes part of a query's SQL syntax, modifying the logic of the SQL request". Its first example is a query built by gluing a request parameter into a string. The user types SQL, and the database runs it.
+
+The fix is to stop using one channel. OWASP says: "define the SQL structure separately from its data values, then bind those values through the database API". The query goes one way, the values go the other way. It is structure that fixes the problem. And even then, parameter markers stand for values only, not for table names, column names or `ASC` and `DESC`. Those still travel as text, so OWASP asks for a fixed list of allowed choices. It calls manual escaping "strongly discouraged".
+
+The same thing happened in the shell. In 2014, Shellshock (CVE-2014-6271) showed that Bash processed "trailing strings after function definitions in the values of environment variables". An environment variable is text. A function definition is code. A crafted value was enough to run commands on the server.
+
+And it is happening again with language models. OWASP explains prompt injection like this: the developer's instructions and the user's input "share the same fundamental format: natural-language text strings". The model reads both in one stream. It is the first risk on OWASP's list for LLM applications in 2025.
+
+Look at the pattern. A text interface is easy to write for everyone. That was the idea. It is also easy to write for an attacker, and the good intentions did not change that.
+
 ## The other bet: structure
 
 PowerShell made a different bet: pass objects, not text.
@@ -94,3 +110,7 @@ The duck can quack. The mouse can squeak. The program that reads them only has t
 *   Microsoft, [CreateProcess function](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa), on the parameters, and on the four readings of the command line.
 *   Microsoft, [about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines), on objects in the pipeline, `Get-Member` and `Get-Help`.
 *   Model Context Protocol, [Tools](https://modelcontextprotocol.io/specification/2025-06-18/server/tools), specification of 2025-06-18, on `inputSchema` and `outputSchema`.
+*   Donald D. Chamberlin and Raymond F. Boyce, [SEQUEL: A structured English query language](https://dl.acm.org/doi/10.1145/800296.811515), 1974.
+*   OWASP, [SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html).
+*   NVD, [CVE-2014-6271](https://nvd.nist.gov/vuln/detail/cve-2014-6271) (Shellshock).
+*   OWASP, [Prompt Injection](https://community.owasp.org/attacks/PromptInjection) and [LLM01:2025 Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/).
