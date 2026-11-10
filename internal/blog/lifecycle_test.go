@@ -106,7 +106,7 @@ func TestRecoveryRunsBeforeTheSeedCanReplaceAnEditedPost(t *testing.T) {
 	}
 	seed := fstest.MapFS{}
 	seedPost(seed, "kept", "Seed version")
-	if imported, err := ImportMissing(store.root, seed); err != nil || len(imported) != 0 {
+	if imported, err := MergeSeed(store.root, seed); err != nil || len(imported.Imported) != 0 {
 		t.Fatalf("imported = %v, %v", imported, err)
 	}
 	if document, err := recovered.Load("kept", true); err != nil || document.Markdown != "content of kept" {
@@ -132,7 +132,7 @@ func TestImportDoesNotBringBackARenamedPost(t *testing.T) {
 	store := newTestStore(t)
 	seed := fstest.MapFS{}
 	seedPost(seed, "first", "First")
-	if _, err := ImportMissing(store.root, seed); err != nil {
+	if _, err := MergeSeed(store.root, seed); err != nil {
 		t.Fatal(err)
 	}
 	document, err := store.Load("first", true)
@@ -142,7 +142,7 @@ func TestImportDoesNotBringBackARenamedPost(t *testing.T) {
 	if _, err := store.Save(SaveInput{Title: "Renamed", Slug: "renamed", Language: "en", Markdown: document.Markdown}, "first"); err != nil {
 		t.Fatal(err)
 	}
-	if imported, err := ImportMissing(store.root, seed); err != nil || len(imported) != 0 {
+	if imported, err := MergeSeed(store.root, seed); err != nil || len(imported.Imported) != 0 {
 		t.Fatalf("the renamed post came back: %v, %v", imported, err)
 	}
 }
@@ -154,7 +154,7 @@ func TestImportFillsADirectoryHoldingOnlyUploads(t *testing.T) {
 	}
 	seed := fstest.MapFS{}
 	seedPost(seed, "first", "First")
-	if imported, err := ImportMissing(store.root, seed); err != nil || len(imported) != 1 {
+	if imported, err := MergeSeed(store.root, seed); err != nil || len(imported.Imported) != 1 {
 		t.Fatalf("imported = %v, %v", imported, err)
 	}
 	if _, err := store.Load("first", true); err != nil {
@@ -180,7 +180,7 @@ func TestDiagramSyncKeepsEntriesTheDeployedPostStillUses(t *testing.T) {
 	seed := fstest.MapFS{}
 	seedPost(seed, "post", "Post")
 	seed["post/assets/diagrams/index.json"] = &fstest.MapFile{Data: []byte(`{"bbbbbbbbbbbbbbbb":{"title":"new"}}`)}
-	if _, err := ImportMissing(root, seed); err != nil {
+	if _, err := MergeSeed(root, seed); err != nil {
 		t.Fatal(err)
 	}
 	manifest, err := os.ReadFile(filepath.Join(directory, diagramManifest))
