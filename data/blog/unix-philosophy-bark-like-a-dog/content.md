@@ -36,7 +36,7 @@ The idea of the pipe was good, and it was deliberate. Doug McIlroy wrote a memo 
 
 So the order is: a machine with 144K of memory forced a simple stream, then the stream was explained as a design, then it was taught as a principle.
 
-The constraint is gone. A machine today has gigabytes of memory, and a pipe between two programs costs nothing. The habit stayed, and in my experience it became a badge: knowing `awk` and `sed` by heart is treated as a sign of intelligence. A way to survive a small machine became a way to prove you belong. This is my opinion, not a finding. But I think that is how a limit turns into a culture.
+The constraint is gone. A machine today has gigabytes of memory, and a pipe between two programs is cheap. The habit stayed, and in my experience it became a badge: knowing `awk` and `sed` by heart is treated as a sign of intelligence. A way to survive a small machine became a way to prove you belong. This is my opinion, not a finding. But I think that is how a limit turns into a culture.
 
 ## The universal interface is a loan
 
