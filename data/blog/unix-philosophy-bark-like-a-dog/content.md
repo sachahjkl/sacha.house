@@ -4,7 +4,6 @@
 
 It sounds wise. It is also how you end up making a duck, a mouse and an elephant bark like a dog.
 
-![A duck, a mouse and an elephant each say "woof woof woof" in a speech bubble, while a small dog sits at the right, looking proud](/media/blog/unix-philosophy-bark-like-a-dog/assets/duck-mouse-elephant.svg)
 
 ## The dog
 
