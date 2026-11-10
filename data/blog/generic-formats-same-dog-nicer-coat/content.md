@@ -1,4 +1,4 @@
-In [the first post](/blog/unix-philosophy-bark-like-a-dog), I looked at where the Unix text stream comes from: a small machine, a size constraint, and a slogan written down twenty-one years later. The text stream forces a duck, a mouse and an elephant to bark like a dog.
+In [the first post](/blog/unix-philosophy-bark-like-a-dog), I looked at where the Unix text stream comes from. In [the second](/blog/wrong-abstraction-fork-files-resources), I looked at the same shortcut in `fork`, in files and in the idea of a "resource". They all make a duck, a mouse and an elephant bark like a dog.
 
 This post is about the same mistake in a modern coat. YAML, JSON and XML are generic formats: they bark every kind of data in one shape. We pay for it in code, in bugs, and in attack surface.
 
