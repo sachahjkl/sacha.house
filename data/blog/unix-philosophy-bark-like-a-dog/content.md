@@ -32,13 +32,23 @@ PowerShell made a different bet: pass objects, not text. You can dislike its syn
 
 ## The same dog, with a nicer coat
 
-I did the same thing to my own projects last week.
+This week I did the same thing to my own projects, and I got to count the cost.
 
-Each of my repositories had a `.project/project.yaml` file with the data of my site: a name, a description, and some fields that nothing read. YAML is the modern dog. It can bark anything: lists, maps, anchors, multiline blocks, and several ways to write a string.
+Each of my repositories had a `.project/project.yaml` file, with metadata for my website. It held five fields: `name`, `description`, `topics`, `homepage` and a nested `source` map with a provider, a namespace and a path. The site read two of them. The other three were never read by anything, and `source` only repeated the address of the repository.
 
-My site needed two values. To read them, it embedded a full YAML parser. Every other tool that wanted to read the file had to embed one too. And "YAML" does not mean one thing: block scalars, quoting rules and `---` markers made my own migration script fail on the first run, on one repository.
+Still, the site embedded a full YAML parser to read them. It decoded in strict mode, so that an unknown field was an error. Then it decoded a second time, to refuse a file with two documents. Only after that did it copy two strings. That code was mine, and it was all checks.
 
-So I replaced it. The new file is `.project/info.txt`:
+Then I decided to leave YAML. More than a hundred repositories on GitHub had to change, so I wrote a migration script. Here is what the "universal format" gave me:
+
+*   **A dependency I did not have.** The Python on my machine has no YAML module. To read a "standard" file I had two choices: install a package, or write a partial parser. I wrote a few regular expressions for the two fields I needed.
+*   **A value that looked right and was wrong.** The dry run printed the plan for every repository before changing anything. One of them, `backoffice-demo`, showed the description `>-`. That is not a description. It is the YAML marker for a folded block, and the real text was on the next lines. My regular expression read the marker as the value. Nothing had crashed. The file was valid YAML, and my second pass just did not know the block syntax.
+*   **Hidden line endings.** Some descriptions held Windows line endings (`\r\n`), written as escape sequences inside quoted strings. They would have gone into the new files as they were. The script now turns them into plain newlines.
+
+I fixed the script to handle block scalars, and to stop with an error on any value it does not understand. Then I ran it. Without the dry run, it would have written `>-` as the description of a project.
+
+Then the site. I removed the YAML dependency. That one change altered the hash of the Go modules in the Nix build, so I had to recompute it and rebuild before the change could ship. A dependency is not only code. It is also a line in every lock file and every build.
+
+The new file is `.project/info.txt`:
 
 ```
 name=sacha.house
@@ -46,9 +56,9 @@ description=Personal website.
 It can have several lines.
 ```
 
-One rule: a line that starts with `key=` opens a key, and any other line continues the previous value. The parser has about twenty lines. A shell script can read it with `grep`.
+One rule: a line that starts with `key=` opens a key, and any other line continues the previous value. The parser has about twenty lines, and a shell script can read the file with `grep`.
 
-It is not less structured than the YAML file. It is structured to fit what it carries.
+It is not less structured than the YAML file. It is structured to fit what it carries. And it is not perfect: a description that has a line starting with `word=` would be cut at that line. I chose to live with this limit, because it fits in one sentence and I know exactly where it is. I cannot say the same about the limits of a YAML parser.
 
 ## Two passes, and only one of them is useful
 
@@ -59,7 +69,7 @@ Look at what a program does with a generic format like YAML, JSON or XML. It rea
 
 The second pass is the real work. It is the only one that knows what your file means. The first pass only proves that the dog barked correctly.
 
-My old code shows it. It decoded the YAML with strict field names. It decoded a second time to refuse a file with two documents. Then it copied two fields. All the checks were mine, written on top of the parser. The parser's own job added nothing to them.
+My old code shows it. It decoded the YAML with strict field names. It decoded a second time to refuse a file with two documents. Then it copied two fields. All the checks were mine, written on top of the parser. And in my migration script, the `>-` mistake came from the second pass, not from the first: the file was valid, and my code did not understand what it meant.
 
 The usual answer is the tooling: syntax colors, validators, formatters, support in every editor. It is real. But look at what it costs. Each of those tools must implement the whole generic format, and a generic format is big. So there is a lot of code, in a lot of independent implementations, and every one of them has its own bugs.
 
