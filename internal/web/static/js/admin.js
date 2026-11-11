@@ -424,6 +424,7 @@ function initBlogpostsFilter() {
     if (emptyState) {
       emptyState.classList.toggle("hidden", visibleCount !== 0);
     }
+    window.searchHighlight?.highlight(list, [needle]);
   };
 
   input.addEventListener("input", applyFilter);

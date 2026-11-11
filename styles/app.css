@@ -1121,6 +1121,12 @@ html,
   scrollbar-width: auto;
 }
 
+/* Matches of a search or a filter, marked by static/js/highlight.js */
+::highlight(search-match) {
+  background-color: #ffe14d;
+  color: #000000;
+}
+
 /* Search of the blog index */
 .blog-search {
   display: flex;

@@ -1,8 +1,11 @@
 package app
 
 import (
+	"bytes"
 	"errors"
+	"io/fs"
 	"net/http"
+	"strconv"
 
 	"sacha.house/internal/blog"
 	"sacha.house/internal/web"
@@ -75,4 +78,22 @@ func (app *App) resolveBlogConflict(writer http.ResponseWriter, request *http.Re
 		return
 	}
 	http.Redirect(writer, request, "/admin/blogposts", http.StatusSeeOther)
+}
+
+// adminDownloadBlogPost sends the site version of a post as a zip, to copy into data/blog of the repository.
+func (app *App) adminDownloadBlogPost(writer http.ResponseWriter, request *http.Request) {
+	slug := request.PathValue("slug")
+	var archive bytes.Buffer
+	if err := app.blog.WriteArchive(slug, &archive); err != nil {
+		if errors.Is(err, fs.ErrNotExist) || errors.Is(err, blog.ErrInvalidSlug) {
+			http.NotFound(writer, request)
+			return
+		}
+		http.Error(writer, "failed to archive the blogpost", http.StatusInternalServerError)
+		return
+	}
+	writer.Header().Set("Content-Type", "application/zip")
+	writer.Header().Set("Content-Disposition", `attachment; filename="`+slug+`.zip"`)
+	writer.Header().Set("Content-Length", strconv.Itoa(archive.Len()))
+	_, _ = writer.Write(archive.Bytes())
 }

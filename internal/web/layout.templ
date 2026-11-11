@@ -57,6 +57,9 @@ templ Head(data PageData) {
 		if !data.AdminScripts {
 			<script defer src={ templ.SafeURL("/static/js/christmas.js?v=" + data.StyleVersion) }></script>
 		}
+		if data.SearchScripts {
+			<script defer src={ templ.SafeURL("/static/js/highlight.js?v=" + data.StyleVersion) }></script>
+		}
 		if data.PostScripts {
 			<noscript><style>.diagram-slot{display:none}</style></noscript>
 			<script defer src={ templ.SafeURL("/static/js/post.js?v=" + data.StyleVersion) }></script>

@@ -233,6 +233,9 @@ templ AdminBlogPostEditorContent(data AdminBlogPostEditorPageData) {
 				if data.Form.PublicURL != "" {
 					<a href={ templ.SafeURL(data.Form.PublicURL) } class="btn">Open public page</a>
 				}
+				if !data.Form.IsNew && data.Form.CurrentSlug != "" {
+					<a href={ templ.SafeURL("/admin/blogposts/" + data.Form.CurrentSlug + "/download") } class="btn" download>Download (zip)</a>
+				}
 				if data.Form.CreatedAt != "" || data.Form.UpdatedAt != "" {
 					<p class="meta">
 						if data.Form.CreatedAt != "" {
@@ -471,7 +474,8 @@ templ AdminBlogConflictContent(data AdminBlogConflictPageData) {
 				<button type="submit" class="btn">Keep the site version</button>
 			</form>
 			<a class="btn" href={ templ.SafeURL("/admin/blogposts/" + data.Slug) }>Edit the site version</a>
+			<a class="btn" href={ templ.SafeURL("/admin/blogposts/" + data.Slug + "/download") } download>Download the site version (zip)</a>
 		</div>
-		<p class="meta mt-4">Taking the repository version keeps the uploaded images. Keeping the site version stops this report until the repository changes again; copy the site version into the repository to end the conflicts for good.</p>
+		<p class="meta mt-4">Taking the repository version keeps the uploaded images. Keeping the site version stops this report until the repository changes again. To end the conflicts for good, download the site version, extract it in <code>data/blog/</code> of the repository, and commit it.</p>
 	</article>
 }

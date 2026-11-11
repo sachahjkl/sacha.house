@@ -197,3 +197,45 @@ func Matches(document Document, query string) bool {
 	}
 	return len(words) > 0
 }
+
+// searchSnippetRadius is how many characters a search snippet keeps on each side of a match.
+const searchSnippetRadius = 90
+
+// SearchSnippet is the text a search result shows: the description when every word of query appears in the
+// title or the description, otherwise the passage of the text around the first word found only there.
+func SearchSnippet(document Document, query, description string) string {
+	head := strings.ToLower(document.Metadata.Title + "\n" + description)
+	plain := []rune(PlainText(document.Markdown))
+	lowered := []rune(strings.ToLower(string(plain)))
+	if len(lowered) != len(plain) {
+		return description
+	}
+	for _, word := range strings.Fields(strings.ToLower(query)) {
+		if strings.Contains(head, word) {
+			continue
+		}
+		index := strings.Index(string(lowered), word)
+		if index < 0 {
+			continue
+		}
+		position := len([]rune(string(lowered)[:index]))
+		start := max(0, position-searchSnippetRadius)
+		end := min(len(plain), position+len([]rune(word))+searchSnippetRadius)
+		// Cut at word boundaries, so the snippet starts and ends with whole words.
+		for start > 0 && start < position && !unicode.IsSpace(plain[start-1]) {
+			start++
+		}
+		for end < len(plain) && end > position && !unicode.IsSpace(plain[end]) {
+			end--
+		}
+		snippet := strings.TrimSpace(string(plain[start:end]))
+		if start > 0 {
+			snippet = "…" + snippet
+		}
+		if end < len(plain) {
+			snippet += "…"
+		}
+		return snippet
+	}
+	return description
+}

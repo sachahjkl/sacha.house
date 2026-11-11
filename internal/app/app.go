@@ -230,6 +230,7 @@ func (app *App) routes() http.Handler {
 	mux.Handle("POST /admin/blogposts/new", app.requireAdmin(http.HandlerFunc(app.adminCreateBlogPost)))
 	mux.Handle("GET /admin/blogposts/{slug}", app.requireAdmin(http.HandlerFunc(app.adminEditBlogPost)))
 	mux.Handle("POST /admin/blogposts/{slug}/save", app.requireAdmin(http.HandlerFunc(app.adminSaveBlogPost)))
+	mux.Handle("GET /admin/blogposts/{slug}/download", app.requireAdmin(http.HandlerFunc(app.adminDownloadBlogPost)))
 	mux.Handle("GET /admin/blogposts/{slug}/conflict", app.requireAdmin(http.HandlerFunc(app.adminBlogConflict)))
 	mux.Handle("POST /admin/blogposts/{slug}/conflict/take-repository", app.requireAdmin(http.HandlerFunc(app.adminTakeRepositoryVersion)))
 	mux.Handle("POST /admin/blogposts/{slug}/conflict/keep-site", app.requireAdmin(http.HandlerFunc(app.adminKeepSiteVersion)))

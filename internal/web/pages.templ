@@ -247,14 +247,16 @@ templ BlogContent(data BlogPageData) {
 		} else if len(data.YearGroups) == 0 {
 			<p>No articles yet.</p>
 		}
-		for _, group := range data.YearGroups {
-			<h2 class="h2 mt-8">{ fmt.Sprintf("%d", group.Year) }</h2>
-			<ul class="post-list">
-				for _, post := range group.Posts {
-					@PostRow(post)
-				}
-			</ul>
-		}
+		<div data-highlight-terms={ data.Query }>
+			for _, group := range data.YearGroups {
+				<h2 class="h2 mt-8">{ fmt.Sprintf("%d", group.Year) }</h2>
+				<ul class="post-list">
+					for _, post := range group.Posts {
+						@PostRow(post)
+					}
+				</ul>
+			}
+		</div>
 	</article>
 }
 

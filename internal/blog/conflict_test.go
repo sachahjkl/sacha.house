@@ -1,9 +1,13 @@
 package blog
 
 import (
+	"archive/zip"
+	"bytes"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"testing/fstest"
 )
@@ -135,5 +139,49 @@ func TestTakeRepositoryVersionKeepsARenamedSlug(t *testing.T) {
 	}
 	if document.Metadata.Slug != "renamed" || document.Markdown != "# From the repository\n" {
 		t.Fatalf("document = %#v", document)
+	}
+}
+
+func TestWriteArchiveHoldsTheSiteVersion(t *testing.T) {
+	store, _ := conflictedStore(t)
+	diagrams := filepath.Join(store.postDirectory("first"), "assets", "diagrams")
+	if err := os.MkdirAll(diagrams, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(diagrams, "index.json"), []byte("{}"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var output bytes.Buffer
+	if err := store.WriteArchive("first", &output); err != nil {
+		t.Fatal(err)
+	}
+	archive, err := zip.NewReader(bytes.NewReader(output.Bytes()), int64(output.Len()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	names := map[string]string{}
+	for _, file := range archive.File {
+		reader, err := file.Open()
+		if err != nil {
+			t.Fatal(err)
+		}
+		content, _ := io.ReadAll(reader)
+		_ = reader.Close()
+		names[file.Name] = string(content)
+	}
+	if names["first/content.md"] != "edited in the admin" || names["first/post.json"] == "" {
+		t.Fatalf("archive = %v", names)
+	}
+	images, _ := filepath.Glob(filepath.Join(store.postDirectory("first"), "assets", "*.png"))
+	if len(images) != 1 || names["first/assets/"+filepath.Base(images[0])] != "png" {
+		t.Fatalf("the uploaded image is missing: %v", names)
+	}
+	for name := range names {
+		if strings.Contains(name, "diagrams") || strings.Contains(name, ".seed.") {
+			t.Fatalf("the archive holds %s", name)
+		}
+	}
+	if err := store.WriteArchive("missing", io.Discard); err == nil {
+		t.Fatal("a missing post has no archive")
 	}
 }

@@ -18,8 +18,10 @@ const (
 )
 
 func (app *App) page(pathname, title, description string) web.PageData {
+	// Versioned static files are cached for a year. A local build has no commit ("dev"): each start gets its own
+	// version, or the browser keeps the files of an earlier build.
 	styleVersion := ""
-	if app.options.Development {
+	if app.options.Development || app.options.CommitHash == "" || app.options.CommitHash == "dev" {
 		styleVersion = app.bootID
 	}
 	return web.NewPageData(web.PageOptions{
