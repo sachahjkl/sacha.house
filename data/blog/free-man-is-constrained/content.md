@@ -59,6 +59,28 @@ Programs, processes and languages have the same story.
 
 **Interfaces.** The first article of this series was about a constraint that was too weak: a text stream, with no shape. A tool that declares its parameters with a schema is a constraint that frees, because nobody has to guess. And `info.txt` is the smallest constraint I could write: a line that starts with `key=` opens a key.
 
+## The price of constraints
+
+Everyone agreed that these constraints were good. For a long time, many teams still did without them, and ignorance was not the reason. The price was.
+
+When code was written by hand, a constraint had a cost on three sides.
+
+*   **Time.** A test suite, a build that checks types, a pipeline that validates every change: each one is work to set up before it protects anything.
+*   **Skills.** The machinery became a craft of its own. The first DevOpsDays conference was held in Ghent in 2009. In my experience, the word named a real job: somebody had to know how the pipeline worked. Jenkins appeared in 2011, Travis CI was founded the same year, and GitHub Actions launched in November 2019. Each step made it cheaper. None made it free.
+*   **Friction.** All that machinery has to run, and it has to be maintained. A slow or broken pipeline slows every change. When a deadline came, the pipeline was what had to be justified, and it often lost: skip the tests, merge anyway, add it later.
+
+So constraints were won one at a time, and often given up.
+
+AI changed both sides of the balance.
+
+On the need side: when an agent writes code faster than a person can read it, the check cannot be a person reading. The 2024 DORA report estimated that each 25% increase in AI adoption went with a 1.5% decrease in delivery throughput and a 7.2% reduction in delivery stability. In 2025, the same researchers wrote that "AI's primary role in software development is that of an amplifier. It magnifies the strengths of high-performing organizations and the dysfunctions of struggling ones." An amplifier with no harness amplifies the instability too.
+
+On the cost side: the same agent that writes the code can write the tests and the pipeline around it. What used to need a specialist is now a request.
+
+So the argument turns upside down. Constraints used to be a tax on development, and they had to be justified. Now they are what lets you accept code that nobody wrote line by line. They have become central, and almost impossible to refuse: they are the safety harness of the whole circuit.
+
+I can see it on this very site. Every push runs `nix flake check`, which builds the project and runs its Go tests. A merge to `master` publishes the build and deploys it to staging. Production waits for an approval. When I removed the YAML dependency, the build refused to go on until the hash of the Go modules was updated. And one flaky test failed the pipeline for a post that touched no Go code, so I ran it again. The price is still real. But it is small now: the agent read the log, found the test and told me that it was unrelated.
+
 ## The era of AI
 
 This is the strongest case, because an agent is a free man without a childhood. It reads, writes, deletes, pushes and deploys faster than you can look. Its freedom, left absolute, is the freedom to destroy.
@@ -67,7 +89,7 @@ Every tool has a switch to turn the questions off. In Claude Code, it is named `
 
 Here is what happened this week. I asked an AI coding agent to migrate the metadata files of 112 GitHub repositories. Twelve of them refused the push: "Changes must be made through a pull request. Required status check "platform / check" is expected." That rule was mine, set on those repositories, and it stopped my own agent. The agent did not go around it. It asked me. I said yes, for those twelve. It switched one protection off for each repository, pushed, and switched it back on, and I could check afterwards that all of them were in place. The production deploy waits for an approval before it starts. It takes a backup of the data first. And before it changed any repository, the script printed a plan. One description in that plan read `>-`, which is not text but a YAML marker. Without the plan, it would have been written into a repository.
 
-I could hand a hundred repositories to an agent because the framework limited what it could break: protected branches, a plan before the action, an approval gate, a backup. The more constraints I have, the more I can delegate. The freedom I give grows with the constraints I keep.
+I could hand a hundred repositories to an agent because of that harness. It limited what the agent could break: protected branches, a plan before the action, an approval gate, a backup. The more constraints I have, the more I can delegate. The freedom I give grows with the constraints I keep.
 
 ![A single-line kite flying in a blue sky](/media/blog/free-man-is-constrained/assets/kite-on-a-line.jpg)
 
@@ -95,3 +117,5 @@ The free man is constrained. That is not a bug. It is the specification.
 *   Microsoft Security Response Center, [We need a safer systems programming language](https://www.microsoft.com/en-us/msrc/blog/2019/07/we-need-a-safer-systems-programming-language), 2019. The Rust Book, [Fearless Concurrency](https://doc.rust-lang.org/book/ch16-00-concurrency.html). [Go Proverbs](https://go-proverbs.github.io/).
 *   Model Context Protocol, [Tools](https://modelcontextprotocol.io/specification/2025-06-18/server/tools). Claude Code, [CLI reference](https://docs.claude.com/en/docs/claude-code/cli-reference).
 *   Photographs and paintings from Wikimedia Commons, cropped and resized, all in the public domain or under CC0: [Rousseau](https://commons.wikimedia.org/wiki/File:Jean-Jacques_Rousseau_%28painted_portrait%29.jpg) by Maurice Quentin de La Tour, the [Declaration of the Rights of Man and of the Citizen](https://commons.wikimedia.org/wiki/File:Declaration_of_the_Rights_of_Man_and_of_the_Citizen_in_1789.jpg), a [single-line kite](https://commons.wikimedia.org/wiki/File:Single_Line_Kite_in_Sky_-_DPLA_-_7a29acc44821c56b3a12cf7b43acc2cd.jpg) (1983), and a [wisteria trellis](https://commons.wikimedia.org/wiki/File:Kurogi%27s_Great_Wisteria_-_A_wisteria_trellis_built_above_National_Route_442.jpg) by 水だらけのプール (CC0).
+*   [DevOps](https://en.wikipedia.org/wiki/DevOps), [Jenkins](https://en.wikipedia.org/wiki/Jenkins_%28software%29), [Travis CI](https://en.wikipedia.org/wiki/Travis_CI) and [GitHub](https://en.wikipedia.org/wiki/GitHub) on Wikipedia, for the dates of DevOpsDays (2009), Jenkins (2011), Travis CI (2011) and GitHub Actions (2019).
+*   DORA, [Accelerate State of DevOps Report 2024](https://dora.dev/research/2024/dora-report/) and its [announcement](https://cloud.google.com/blog/products/devops-sre/announcing-the-2024-dora-report), and the [2025 State of AI-assisted Software Development](https://dora.dev/research/2025/dora-report/).
