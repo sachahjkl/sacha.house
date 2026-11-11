@@ -217,7 +217,7 @@ type ProjectsPageData struct {
 }
 
 // featuredProjects names the repositories shown first, in order.
-var featuredProjects = [...]string{"wren", "papier", "gui_toolkit", "opencode_native", "lutin", "shojiwm-win7"}
+var featuredProjects = [...]string{"wren", "papier", "gui_toolkit", "opencode_native", "lutin", "shojiwm-desktop"}
 
 // SplitProjects separates the featured projects, in their curated order, from the
 // others, which keep their order. A featured project that is missing is skipped.
