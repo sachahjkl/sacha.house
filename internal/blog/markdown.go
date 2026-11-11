@@ -19,10 +19,19 @@ import (
 
 const ExcerptLength = 180
 
-// markdown renders CommonMark plus tables, strikethrough, anchored headings and Mermaid diagrams. Raw HTML in a
-// post stays escaped.
+// markdown renders CommonMark plus tables, strikethrough, notes, anchored headings and Mermaid diagrams. Raw HTML
+// in a post stays escaped.
+//
+// A note is written [^1] in the text and [^1]: its text, in a paragraph of its own. The page lists the notes
+// after the post, each with a link back to its place in the text, and static/js/post.js also sets them in the
+// margin of a wide screen.
 var markdown = goldmark.New(
-	goldmark.WithExtensions(extension.Table, extension.Strikethrough, diagrams{}),
+	goldmark.WithExtensions(extension.Table, extension.Strikethrough, diagrams{},
+		extension.NewFootnote(
+			extension.WithFootnoteLinkTitle("Show the note"),
+			extension.WithFootnoteBacklinkTitle("Back to the text"),
+			extension.WithFootnoteBacklinkHTML("↩"),
+		)),
 	goldmark.WithParserOptions(parser.WithAutoHeadingID()),
 )
 
@@ -95,6 +104,9 @@ func PlainText(markdownSource string) string {
 		}
 
 		switch node := node.(type) {
+		case *extensionast.FootnoteList:
+			// The notes are sources, not text: they stay out of excerpts and searches.
+			return ast.WalkSkipChildren, nil
 		case *ast.Text:
 			appendText(util.UnescapePunctuations(node.Segment.Value(source)))
 			if node.SoftLineBreak() || node.HardLineBreak() {
