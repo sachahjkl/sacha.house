@@ -279,6 +279,16 @@ all articles</a></p>
 			</nav>
 		}
 		<article class="prose">@templ.Raw(data.Post.HTML)</article>
+		if len(data.More) > 0 {
+			<nav class="more-posts" aria-labelledby="more-posts-heading">
+				<h2 id="more-posts-heading" class="h2">more writing</h2>
+				<ul>
+					for _, post := range data.More {
+						<li><a href={ templ.SafeURL("/blog/" + post.Slug) } hreflang={ post.Language }>{ post.Title }</a> <span class="meta">{ post.PublishedOn }</span></li>
+					}
+				</ul>
+			</nav>
+		}
 		<p class="post-end"><a href="/blog">@ArrowLeft()
 all articles</a><a href={ templ.SafeURL("mailto:" + Me.Mail + "?subject=" + data.Post.Slug) }>reply by email</a></p>
 	</div>

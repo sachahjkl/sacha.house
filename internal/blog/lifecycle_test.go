@@ -289,15 +289,3 @@ func TestDraftAssetsAreOpenOnlyThroughOpenAsset(t *testing.T) {
 	}
 	_ = file.Close()
 }
-
-func TestBothDrawingsOfADiagramGetTheirOwnIDs(t *testing.T) {
-	svg := `<svg id="d123" width="1"><style>#d123 .node{fill:red}</style><path marker-end="url(#d123-arrow)"/></svg>`
-	light := wrapDiagram(svg, "diagram-light")
-	dark := wrapDiagram(svg, "diagram-dark")
-	if !strings.Contains(light, `id="d123-diagram-light"`) || !strings.Contains(light, "#d123-diagram-light .node") {
-		t.Fatalf("light = %s", light)
-	}
-	if !strings.Contains(dark, "url(#d123-diagram-dark-arrow)") || strings.Contains(dark, "#d123 ") {
-		t.Fatalf("dark = %s", dark)
-	}
-}

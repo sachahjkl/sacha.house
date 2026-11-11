@@ -1,35 +1,38 @@
 package blog
 
 import (
+	"bytes"
+	"image"
+	"image/png"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func TestPrerenderedDiagramIsInlined(t *testing.T) {
+func TestPrerenderedDiagramIsLoadedOnDemand(t *testing.T) {
 	source := "```mermaid\n%% title: T\ngraph TD\n  A --> B\n```\n"
 	hash := DiagramHash("%% title: T\ngraph TD\n  A --> B\n")
-	diagrams := Diagrams{hash: {Title: "T", Width: 10, Height: 5,
-		Light: "<!-- light -->\n<svg width=\"10\"><title>L</title></svg>\n",
-		Dark:  "<!-- dark -->\n<svg width=\"10\"><title>D</title></svg>\n"}}
-	html, err := RenderMarkdownWithDiagrams(source, diagrams)
+	diagrams := Diagrams{hash: {Title: "T", Width: 10, Height: 5, LightURL: "/m/l.svg", DarkURL: "/m/d.svg"}}
+	html, err := RenderPost(source, PostAssets{Diagrams: diagrams})
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{`diagram-ready`, `<svg class="diagram-light" width="10">`, `<svg class="diagram-dark" width="10">`, `pre class="diagram-source" hidden>%% title: T`, `data-title="T"`} {
+	for _, want := range []string{`diagram-ready`, `data-light="/m/l.svg"`, `data-dark="/m/d.svg"`,
+		`style="width:10px;aspect-ratio:10/5"`, `<source media="(prefers-color-scheme: dark)" srcset="/m/d.svg">`,
+		`<img src="/m/l.svg" alt="T" width="10" height="5" loading="lazy"`, `pre class="diagram-source" hidden>%% title: T`, `data-title="T"`} {
 		if !strings.Contains(html, want) {
 			t.Errorf("rendered diagram lacks %q: %s", want, html)
 		}
 	}
-	if strings.Contains(html, `class="mermaid"`) {
-		t.Errorf("a drawn diagram still has a Mermaid block: %s", html)
+	if strings.Contains(html, `class="mermaid"`) || strings.Contains(html, "<svg") {
+		t.Errorf("a drawn diagram is inlined or still has a Mermaid block: %s", html)
 	}
 }
 
 func TestStaleDiagramFallsBackToSource(t *testing.T) {
-	diagrams := Diagrams{DiagramHash("other"): {Light: "<svg></svg>", Dark: "<svg></svg>"}}
-	html, err := RenderMarkdownWithDiagrams("```mermaid\ngraph TD\n```\n", diagrams)
+	diagrams := Diagrams{DiagramHash("other"): {LightURL: "/l.svg", DarkURL: "/d.svg"}}
+	html, err := RenderPost("```mermaid\ngraph TD\n```\n", PostAssets{Diagrams: diagrams})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,8 +42,8 @@ func TestStaleDiagramFallsBackToSource(t *testing.T) {
 }
 
 func TestLoadDiagramsDropsEntriesWithoutFiles(t *testing.T) {
-	post := t.TempDir()
-	directory := filepath.Join(post, "assets", "diagrams")
+	assets := t.TempDir()
+	directory := filepath.Join(assets, "diagrams")
 	if err := os.MkdirAll(directory, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -56,11 +59,12 @@ func TestLoadDiagramsDropsEntriesWithoutFiles(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	got := LoadDiagrams(post)
-	if len(got) != 1 || got["0123456789abcdef"].Light != "<svg>l</svg>" || got["0123456789abcdef"].Dark != "<svg>d</svg>" {
+	got := LoadDiagrams(assets, "/media/blog/p/assets")
+	if len(got) != 1 || got["0123456789abcdef"].LightURL != "/media/blog/p/assets/diagrams/0123456789abcdef-light.svg" ||
+		got["0123456789abcdef"].DarkURL != "/media/blog/p/assets/diagrams/0123456789abcdef-dark.svg" {
 		t.Fatalf("LoadDiagrams() = %+v", got)
 	}
-	if LoadDiagrams(t.TempDir()) != nil {
+	if LoadDiagrams(t.TempDir(), "/x") != nil {
 		t.Fatal("a post without a manifest has no diagrams")
 	}
 }
@@ -89,7 +93,8 @@ func TestShippedPostsHavePrerenderedDiagrams(t *testing.T) {
 		if err != nil {
 			continue
 		}
-		html, err := RenderMarkdownWithDiagrams(string(content), LoadDiagrams(filepath.Join(root, entry.Name())))
+		directory := filepath.Join(root, entry.Name(), "assets")
+		html, err := RenderPost(string(content), PostAssets{Diagrams: LoadDiagrams(directory, "/media/blog/"+entry.Name()+"/assets")})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -100,5 +105,27 @@ func TestShippedPostsHavePrerenderedDiagrams(t *testing.T) {
 	}
 	if drawn == 0 {
 		t.Error("no prerendered diagram found in data/blog")
+	}
+}
+
+func TestPostImagesGetDimensionsAndLazyLoading(t *testing.T) {
+	directory := t.TempDir()
+	picture := image.NewRGBA(image.Rect(0, 0, 7, 3))
+	var encoded bytes.Buffer
+	if err := png.Encode(&encoded, picture); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(directory, "a.png"), encoded.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	assets := PostAssets{Directory: directory, URL: "/media/blog/p/assets"}
+	html, err := RenderPost("![A](/media/blog/p/assets/a.png)\n\n![B](/media/blog/p/assets/missing.png)\n\n![C](/media/blog/p/assets/../x.png)\n", assets)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{`alt="A" loading="lazy" decoding="async" width="7" height="3"`, `alt="B" loading="lazy" decoding="async">`, `alt="C" loading="lazy" decoding="async">`} {
+		if !strings.Contains(html, want) {
+			t.Errorf("rendered images lack %q: %s", want, html)
+		}
 	}
 }

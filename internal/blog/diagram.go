@@ -26,8 +26,9 @@ type Diagram struct {
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 
-	Light string `json:"-"`
-	Dark  string `json:"-"`
+	// LightURL and DarkURL are the public addresses of the two drawings.
+	LightURL string `json:"-"`
+	DarkURL  string `json:"-"`
 }
 
 // Diagrams maps the hash of a block's source to the diagram that was drawn from it.
@@ -50,10 +51,11 @@ func DiagramHash(source string) string {
 	return hex.EncodeToString(sum[:])[:diagramHashLength]
 }
 
-// LoadDiagrams reads the manifest and the SVGs a post has under its assets directory. A manifest entry whose
-// files are missing is dropped, so the block falls back to its source instead of showing a broken diagram.
-func LoadDiagrams(postDirectory string) Diagrams {
-	directory := filepath.Join(postDirectory, "assets", diagramDirectory)
+// LoadDiagrams reads the manifest of the SVGs a post has under its assets directory. assetsURL is the public
+// address of that directory. A manifest entry whose files are missing is dropped, so the block falls back to its
+// source instead of showing a broken diagram.
+func LoadDiagrams(assetsDirectory, assetsURL string) Diagrams {
+	directory := filepath.Join(assetsDirectory, diagramDirectory)
 	content, err := os.ReadFile(filepath.Join(directory, diagramManifest))
 	if err != nil {
 		return nil
@@ -67,22 +69,22 @@ func LoadDiagrams(postDirectory string) Diagrams {
 		if !diagramHashPattern.MatchString(hash) {
 			continue
 		}
-		light, err := os.ReadFile(filepath.Join(directory, hash+"-light.svg"))
-		if err != nil {
+		if !isFile(filepath.Join(directory, hash+"-light.svg")) || !isFile(filepath.Join(directory, hash+"-dark.svg")) {
 			continue
 		}
-		dark, err := os.ReadFile(filepath.Join(directory, hash+"-dark.svg"))
-		if err != nil {
-			continue
-		}
-		diagram.Light = string(light)
-		diagram.Dark = string(dark)
+		diagram.LightURL = assetsURL + "/" + diagramDirectory + "/" + hash + "-light.svg"
+		diagram.DarkURL = assetsURL + "/" + diagramDirectory + "/" + hash + "-dark.svg"
 		diagrams[hash] = diagram
 	}
 	if len(diagrams) == 0 {
 		return nil
 	}
 	return diagrams
+}
+
+func isFile(name string) bool {
+	info, err := os.Stat(name)
+	return err == nil && info.Mode().IsRegular()
 }
 
 // kindDiagram is the node a ```mermaid fenced block becomes.
@@ -101,19 +103,10 @@ func (node *diagramNode) Dump(source []byte, level int) {
 	ast.DumpHelper(node, source, level, nil, nil)
 }
 
-var diagramContextKey = parser.NewContextKey()
-
-type diagramContext struct {
-	diagrams Diagrams
-}
-
 type diagramTransformer struct{}
 
 func (diagramTransformer) Transform(document *ast.Document, reader text.Reader, context parser.Context) {
-	var available Diagrams
-	if value := context.Get(diagramContextKey); value != nil {
-		available = value.(diagramContext).diagrams
-	}
+	available := assetsFromContext(context).Diagrams
 	var blocks []*ast.FencedCodeBlock
 	_ = ast.Walk(document, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
 		if block, ok := node.(*ast.FencedCodeBlock); ok && entering && strings.EqualFold(string(block.Language(reader.Source())), "mermaid") {
@@ -170,15 +163,18 @@ func writeDiagramSource(writer util.BufWriter, node *diagramNode) {
 	_, _ = writer.WriteString("</pre></figure>\n")
 }
 
-// writeDiagram writes both drawn SVGs and lets the CSS pick the one of the reader's scheme: the page stays
-// without JavaScript, and a reader without scripts still gets the diagram. The source is kept, hidden, for the
-// copy button.
+// writeDiagram reserves the room of the drawing and names its two SVGs. static/js/post.js inlines the SVG of
+// the reader's scheme when the figure comes near the screen: inline, because the drawings use the page's font,
+// and on demand, because a long post has dozens of them. A reader without scripts gets the drawings as images.
+// The source is kept, hidden, for the copy button.
 func writeDiagram(writer util.BufWriter, node *diagramNode) {
 	diagram := node.diagram
 	title := html.EscapeString(diagram.Title)
 	if title == "" {
 		title = "Diagram " + strconv.Itoa(node.index)
 	}
+	width, height := strconv.Itoa(max(diagram.Width, 1)), strconv.Itoa(max(diagram.Height, 1))
+	light, dark := html.EscapeString(diagram.LightURL), html.EscapeString(diagram.DarkURL)
 	_, _ = writer.WriteString(`<figure class="diagram diagram-ready" id="diagram-`)
 	_, _ = writer.WriteString(strconv.Itoa(node.index))
 	_, _ = writer.WriteString(`" data-title="` + title + `">`)
@@ -186,36 +182,21 @@ func writeDiagram(writer util.BufWriter, node *diagramNode) {
 	_, _ = writer.WriteString(`<button type="button" data-action="expand" title="Open in the viewer: pan, zoom, full screen">expand</button>`)
 	_, _ = writer.WriteString(`<button type="button" data-action="download" title="Download the diagram as SVG">svg</button>`)
 	_, _ = writer.WriteString(`<button type="button" data-action="copy" title="Copy the Mermaid source">source</button></div>`)
-	_, _ = writer.WriteString(`<div class="diagram-body">`)
-	_, _ = writer.WriteString(wrapDiagram(diagram.Light, "diagram-light"))
-	_, _ = writer.WriteString(wrapDiagram(diagram.Dark, "diagram-dark"))
+	_, _ = writer.WriteString(`<div class="diagram-body" data-light="` + light + `" data-dark="` + dark + `">`)
+	_, _ = writer.WriteString(`<span class="diagram-slot" role="img" aria-label="` + title + `" style="width:` + width + `px;aspect-ratio:` + width + `/` + height + `"></span>`)
+	_, _ = writer.WriteString(`<noscript><picture><source media="(prefers-color-scheme: dark)" srcset="` + dark + `">`)
+	_, _ = writer.WriteString(`<img src="` + light + `" alt="` + title + `" width="` + width + `" height="` + height + `" loading="lazy" decoding="async"></picture></noscript>`)
 	_, _ = writer.WriteString(`</div><pre class="diagram-source" hidden>`)
 	_, _ = writer.Write(util.EscapeHTML(node.source))
 	_, _ = writer.WriteString("</pre></figure>\n")
-}
-
-// diagramIDPattern finds the id Mermaid gives a drawing: every selector and marker of the SVG starts with it.
-var diagramIDPattern = regexp.MustCompile(`<svg[^>]*?\sid="([^"]+)"`)
-
-// wrapDiagram adds the scheme class the CSS switches on to the root of a drawn SVG, and makes its id unique.
-// Both drawings of a block share an id, and a <style> applies to the whole page even in a hidden SVG: without
-// this, the last drawing's colours would win in both schemes, and its markers would resolve to the first one.
-func wrapDiagram(svg, scheme string) string {
-	if match := diagramIDPattern.FindStringSubmatch(svg); match != nil {
-		svg = strings.ReplaceAll(svg, match[1], match[1]+"-"+scheme)
-	}
-	if index := strings.Index(svg, "<svg"); index >= 0 {
-		end := index + len("<svg")
-		return svg[:end] + ` class="` + scheme + `"` + svg[end:]
-	}
-	return svg
 }
 
 type diagrams struct{}
 
 // Extend registers the diagram transformer and renderer.
 func (diagrams) Extend(markdown goldmark.Markdown) {
-	markdown.Parser().AddOptions(parser.WithASTTransformers(util.Prioritized(diagramTransformer{}, 100)))
+	markdown.Parser().AddOptions(parser.WithASTTransformers(
+		util.Prioritized(diagramTransformer{}, 100), util.Prioritized(imageTransformer{}, 200)))
 	markdown.Renderer().AddOptions(renderer.WithNodeRenderers(util.Prioritized(diagramRenderer{}, 100)))
 }
 
@@ -245,7 +226,7 @@ func TableOfContents(markdownSource string) []TOCEntry {
 			case string:
 				id = typed
 			}
-			if title := headingText(heading, source); id != "" && title != "" {
+			if title := inlineText(heading, source); id != "" && title != "" {
 				entries = append(entries, TOCEntry{Level: heading.Level, ID: id, Title: title})
 			}
 		}
@@ -254,13 +235,14 @@ func TableOfContents(markdownSource string) []TOCEntry {
 	return entries
 }
 
-func headingText(heading *ast.Heading, source []byte) string {
+// inlineText is the text of an inline node and its children, such as a heading or the alternative text of an image.
+func inlineText(node ast.Node, source []byte) string {
 	var builder strings.Builder
-	_ = ast.Walk(heading, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
+	_ = ast.Walk(node, func(child ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
 			return ast.WalkContinue, nil
 		}
-		switch typed := node.(type) {
+		switch typed := child.(type) {
 		case *ast.Text:
 			builder.Write(typed.Segment.Value(source))
 		case *ast.String:

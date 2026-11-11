@@ -24,7 +24,7 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 			continue
 		}
 		view := metadataView(document.Metadata)
-		view.Excerpt = blog.Excerpt(document.Markdown, blog.ExcerptLength)
+		view.Excerpt = postDescription(document)
 		year := web.LocalYear(parseTime(metadata.PublishedAt))
 		if len(groups) == 0 || groups[len(groups)-1].Year != year {
 			groups = append(groups, web.PostYearGroup{Year: year})
@@ -32,11 +32,15 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 		groups[len(groups)-1].Posts = append(groups[len(groups)-1].Posts, view)
 	}
 	data := web.BlogPageData{
-		PageData:   app.page(request.URL.Path, "blog / sacha.house", "My blog about subjects often related to computer science."),
+		PageData:   app.page(request.URL.Path, "blog / sacha.house", web.Me.FullName+"'s blog: software, systems, the tools I build, and the occasional recipe."),
 		YearGroups: groups,
 	}
+	data.PageData.SEO.StructuredData = web.BlogStructuredData()
 	renderHTML(writer, request, web.BlogPage(data), http.StatusOK)
 }
+
+// morePosts is how many other posts a post links to at its end.
+const morePosts = 3
 
 func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 	document, err := app.blog.Load(request.PathValue("slug"), false)
@@ -44,8 +48,10 @@ func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 		app.notFound(writer, request)
 		return
 	}
-	view := metadataView(document.Metadata)
-	html, err := blog.RenderMarkdownWithDiagrams(document.Markdown, app.blog.Diagrams(document.Metadata.Slug))
+	metadata := document.Metadata
+	view := metadataView(metadata)
+	assets := app.blog.Assets(metadata.Slug)
+	html, err := blog.RenderPost(document.Markdown, assets)
 	if err != nil {
 		http.Error(writer, "failed to render blog post", http.StatusInternalServerError)
 		return
@@ -54,13 +60,50 @@ func (app *App) blogPost(writer http.ResponseWriter, request *http.Request) {
 	for _, entry := range blog.TableOfContents(document.Markdown) {
 		view.TOC = append(view.TOC, web.TOCItem{Level: entry.Level, ID: entry.ID, Title: entry.Title})
 	}
-	data := web.PostPageData{
-		PageData: app.page(request.URL.Path, document.Metadata.Title+" / sacha.house", blog.Excerpt(document.Markdown, blog.ExcerptLength)),
-		Post:     view,
+	page := app.page(request.URL.Path, metadata.Title+" / sacha.house", postDescription(document))
+	page.Language = metadata.Language
+	page.SEO.Type = "article"
+	page.SEO.PublishedTime = metadata.PublishedAt
+	page.SEO.ModifiedTime = metadata.UpdatedAt
+	if page.SEO.ModifiedTime == "" {
+		page.SEO.ModifiedTime = metadata.PublishedAt
 	}
-	data.PageData.Language = document.Metadata.Language
-	data.PageData.SEO.Type = "article"
+	if cover, found := assets.Cover(document.Markdown); found {
+		page.SEO.Image, page.SEO.ImageWidth, page.SEO.ImageHeight = web.SiteURL+cover.URL, cover.Width, cover.Height
+		page.SEO.ImageAlt = cover.Alt
+		if page.SEO.ImageAlt == "" {
+			page.SEO.ImageAlt = metadata.Title
+		}
+	}
+	page.SEO.StructuredData = web.PostStructuredData(page.SEO, metadata.Title, metadata.Language)
+	data := web.PostPageData{PageData: page, Post: view, More: app.otherPosts(metadata.Slug, morePosts)}
 	renderHTML(writer, request, web.PostPage(data), http.StatusOK)
+}
+
+// postDescription is the summary of a post: its own description, or an excerpt of its text.
+func postDescription(document blog.Document) string {
+	if document.Metadata.Description != "" {
+		return document.Metadata.Description
+	}
+	return blog.Excerpt(document.Markdown, blog.ExcerptLength)
+}
+
+// otherPosts returns the newest published posts other than slug.
+func (app *App) otherPosts(slug string, limit int) []web.PostView {
+	posts, err := app.blog.List(false)
+	if err != nil {
+		return nil
+	}
+	views := make([]web.PostView, 0, limit)
+	for _, metadata := range posts {
+		if len(views) == limit {
+			break
+		}
+		if metadata.Slug != slug {
+			views = append(views, metadataView(metadata))
+		}
+	}
+	return views
 }
 
 func metadataView(metadata blog.Metadata) web.PostView {
@@ -70,7 +113,7 @@ func metadataView(metadata blog.Metadata) web.PostView {
 		updated = created
 	}
 	return web.PostView{
-		Slug: metadata.Slug, Title: metadata.Title, Language: metadata.Language,
+		Slug: metadata.Slug, Title: metadata.Title, Description: metadata.Description, Language: metadata.Language,
 		PublishedOn: web.FormatDate(parseTime(metadata.PublishedAt)),
 		CreatedOn:   web.FormatDate(created), CreatedAtTime: web.FormatTime(created),
 		UpdatedOn: web.FormatDate(updated), UpdatedAtTime: web.FormatTime(updated),

@@ -22,6 +22,7 @@ const (
 	defaultBlogRoot     = "data/blog"
 	defaultProjectsPath = "projects_cache.json"
 	publicCache         = "public, max-age=86400"
+	immutableCache      = "public, max-age=31536000, immutable"
 	feedCache           = "public, max-age=600"
 	projectsCacheMaxAge = 24 * time.Hour
 )
@@ -202,6 +203,7 @@ func (app *App) routes() http.Handler {
 	mux.HandleFunc("GET /blog/rss.xml", app.rss)
 	mux.HandleFunc("GET /blog/atom.xml", app.atom)
 	mux.HandleFunc("GET /sitemap.xml", app.sitemap)
+	mux.HandleFunc("GET /llms.txt", app.llmsText)
 	mux.HandleFunc("GET /about", app.about)
 	mux.HandleFunc("GET /resume", app.resume)
 	mux.HandleFunc("GET /cv", app.curriculumVitae)

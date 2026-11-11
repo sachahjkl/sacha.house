@@ -38,19 +38,19 @@ The price is speed: JavaScript is interpreted, with a JIT for numeric loops only
 
 The window, its tabs and its pages are all drawn by Wren itself. These are real screenshots, all taken in one pass by a script (`wrentool shots`). They come from Wren 0.6.1; later versions changed some of what they show, the start page above all.
 
-![about:demos lists every demo and test page that ships with the browser, by theme](/media/blog/wren/assets/demos.png)
+![about:demos lists every demo and test page that ships with the browser, by theme](/media/blog/wren/assets/demos.webp)
 
-![A page of plain JavaScript, run by the engine written in Odin and compiled to Wasm (JS in the status bar)](/media/blog/wren/assets/javascript.png)
+![A page of plain JavaScript, run by the engine written in Odin and compiled to Wasm (JS in the status bar)](/media/blog/wren/assets/javascript.webp)
 
-![A page written in Wasm: the counter and the clock are an Odin module, no JavaScript at all](/media/blog/wren/assets/wasm-counter.png)
+![A page written in Wasm: the counter and the clock are an Odin module, no JavaScript at all](/media/blog/wren/assets/wasm-counter.webp)
 
-![Declarative shadow DOM, slots, :host, ::slotted(), ::part() and custom elements](/media/blog/wren/assets/shadow-dom.png)
+![Declarative shadow DOM, slots, :host, ::slotted(), ::part() and custom elements](/media/blog/wren/assets/shadow-dom.webp)
 
-![CSS Grid: areas, auto-fill and minmax, dense packing, alignment, nesting and subgrid](/media/blog/wren/assets/css-grid.png)
+![CSS Grid: areas, auto-fill and minmax, dense packing, alignment, nesting and subgrid](/media/blog/wren/assets/css-grid.webp)
 
-![The frame statistics panel (Ctrl+Shift+B): phases per frame, display pacing, compositor, Wasm and memory counters](/media/blog/wren/assets/frame-statistics.png)
+![The frame statistics panel (Ctrl+Shift+B): phases per frame, display pacing, compositor, Wasm and memory counters](/media/blog/wren/assets/frame-statistics.webp)
 
-![about:config: every setting of the browser, documented, searchable and editable](/media/blog/wren/assets/about-config.png)
+![about:config: every setting of the browser, documented, searchable and editable](/media/blog/wren/assets/about-config.webp)
 
 ## The macro view
 

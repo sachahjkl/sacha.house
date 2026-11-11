@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"sacha.house/internal/blog"
 	"sacha.house/internal/projects"
 	"sacha.house/internal/web"
 )
@@ -42,6 +41,7 @@ func (app *App) home(writer http.ResponseWriter, request *http.Request) {
 		Projects: featured[:min(len(featured), homeProjects)], ProjectCount: len(all),
 		Posts: app.latestPosts(homePosts),
 	}
+	data.PageData.SEO.StructuredData = web.HomeStructuredData()
 	renderHTML(writer, request, web.HomePage(data), http.StatusOK)
 }
 
@@ -55,7 +55,7 @@ func (app *App) latestPosts(limit int) []web.PostView {
 	for _, metadata := range posts[:min(len(posts), limit)] {
 		view := metadataView(metadata)
 		if document, err := app.blog.Load(metadata.Slug, false); err == nil {
-			view.Excerpt = blog.Excerpt(document.Markdown, blog.ExcerptLength)
+			view.Excerpt = postDescription(document)
 		}
 		views = append(views, view)
 	}
@@ -82,6 +82,7 @@ func (app *App) careerPage(writer http.ResponseWriter, request *http.Request, fu
 	}
 	page := app.page(request.URL.Path, documentName+" · "+web.Me.FullName, profile.Summary)
 	page.Language = language
+	page.SEO.StructuredData = web.ProfileStructuredData(page.SEO.URL)
 	data := web.CareerPageData{
 		PageData: page, Identity: web.Me, Age: web.Me.AgeAt(app.options.Now()), Full: full, Profile: profile,
 	}
@@ -103,9 +104,10 @@ func (app *App) legacyCurriculumVitae(writer http.ResponseWriter, request *http.
 func (app *App) about(writer http.ResponseWriter, request *http.Request) {
 	identity := web.Me
 	data := web.AboutPageData{
-		PageData: app.page(request.URL.Path, "about / sacha.house", "Who I am, where I have worked, and how to reach me."),
+		PageData: app.page(request.URL.Path, "about "+identity.FullName+" / sacha.house", identity.FullName+", software engineer in France: who I am, where I have worked, and how to reach me."),
 		Identity: identity, Age: identity.AgeAt(app.options.Now()), Career: web.Career("en"),
 	}
+	data.PageData.SEO.StructuredData = web.ProfileStructuredData(data.PageData.SEO.URL)
 	renderHTML(writer, request, web.AboutPage(data), http.StatusOK)
 }
 

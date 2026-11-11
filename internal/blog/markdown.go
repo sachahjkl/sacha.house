@@ -33,15 +33,15 @@ func NormalizeMarkdown(source string) string {
 
 // RenderMarkdown converts CommonMark Markdown to HTML. Diagrams are shown as source.
 func RenderMarkdown(source string) (string, error) {
-	return RenderMarkdownWithDiagrams(source, nil)
+	return RenderPost(source, PostAssets{})
 }
 
-// RenderMarkdownWithDiagrams converts Markdown to HTML and inlines the prerendered drawing of each Mermaid block
-// that has one in diagrams.
-func RenderMarkdownWithDiagrams(source string, diagrams Diagrams) (string, error) {
+// RenderPost converts Markdown to HTML. A Mermaid block with a prerendered drawing in assets becomes that
+// drawing, and an image of assets gets its dimensions.
+func RenderPost(source string, assets PostAssets) (string, error) {
 	var output bytes.Buffer
 	context := parser.NewContext()
-	context.Set(diagramContextKey, diagramContext{diagrams: diagrams})
+	context.Set(assetsContextKey, assets)
 	if err := markdown.Convert([]byte(NormalizeMarkdown(source)), &output, parser.WithContext(context)); err != nil {
 		return "", fmt.Errorf("render markdown: %w", err)
 	}

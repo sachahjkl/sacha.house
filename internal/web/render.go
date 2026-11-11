@@ -92,6 +92,7 @@ type BlogPostForm struct {
 	Revision    string
 	Title       string
 	Slug        string
+	Description string
 	Language    string
 	Status      string
 	PublishedAt string

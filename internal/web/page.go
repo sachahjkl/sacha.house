@@ -41,11 +41,28 @@ type SEO struct {
 	Title       string
 	Description string
 	Author      string
+	// Image is the absolute URL of the link preview picture. ImageWidth and ImageHeight are its size in pixels.
 	Image       string
+	ImageAlt    string
+	ImageWidth  int
+	ImageHeight int
 	URL         string
 	Type        string
 	NoIndex     bool
+	// PublishedTime and ModifiedTime are the RFC 3339 dates of an article.
+	PublishedTime string
+	ModifiedTime  string
+	// StructuredData is the schema.org description of the page, written as JSON-LD. Nil writes none.
+	StructuredData any
 }
+
+// Default link preview picture.
+const (
+	defaultImage       = SiteURL + "/static/og.png"
+	defaultImageAlt    = "sacha.house"
+	defaultImageWidth  = 1200
+	defaultImageHeight = 630
+)
 
 type Footer struct {
 	Year       int
@@ -101,7 +118,10 @@ func NewPageData(options PageOptions) PageData {
 		seo.Author = Me.FullName
 	}
 	if seo.Image == "" {
-		seo.Image = SiteURL + "/static/og.png"
+		seo.Image, seo.ImageAlt, seo.ImageWidth, seo.ImageHeight = defaultImage, defaultImageAlt, defaultImageWidth, defaultImageHeight
+	}
+	if seo.ImageAlt == "" {
+		seo.ImageAlt = seo.Title
 	}
 	if seo.URL == "" {
 		seo.URL = SiteURL + options.ActivePathname
@@ -220,6 +240,7 @@ func SplitProjects(projects []ProjectView) (featured, others []ProjectView) {
 type PostView struct {
 	Slug          string
 	Title         string
+	Description   string
 	Excerpt       string
 	Language      string
 	HTML          string
@@ -251,4 +272,6 @@ type BlogPageData struct {
 type PostPageData struct {
 	PageData
 	Post PostView
+	// More lists other posts, newest first, to read next.
+	More []PostView
 }

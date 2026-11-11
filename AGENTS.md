@@ -16,7 +16,9 @@
 - The projects shown first are listed in `featuredProjects` in `internal/web/page.go`.
 - The career data of `/about`, `/resume`, and `/cv` lives in `internal/web/career.go`.
 - Blog content is filesystem-backed under `data/blog/`.
-- Mermaid diagrams are prerendered, never drawn in the browser: run `just diagrams` after editing a `mermaid` block, and commit the SVGs. A test fails when a shipped post has a diagram without its drawing.
+- Mermaid diagrams are prerendered, never drawn in the browser: run `just diagrams` after editing a `mermaid` block, and commit the SVGs. A test fails when a shipped post has a diagram without its drawing. The page only reserves the room of each diagram; `static/js/post.js` inlines the SVG of the reader's scheme when the figure comes near the screen.
+- Each post has a `description` in `post.json` (160 characters at most): it feeds the meta description, link previews, feeds, JSON-LD and `/llms.txt`. Without it, an excerpt is used.
+- Post images get `loading="lazy"` and their width and height from the file. Prefer WebP; convert screenshots with `cwebp -lossless -z 9`.
 - `data/embed.go` embeds `data/blog/` in the binary. At start, `blog.MergeSeed` merges the posts of the repository into the running data directory with a three-way merge. A new post is imported. If only the repository changed a post since the last merge, the post is replaced. If the repository and the admin both changed it, the admin version stays, the repository version is written as `post.seed.json` and `content.seed.md` in the post directory, and the start logs a warning once. The merge memory is `.seed-state.json` at the root of the blog data, outside the post directories, because `Store.Save` rebuilds a post directory.
 - Encrypted Gist paste code lives in `internal/paste/` and `internal/app/paste.go`.
 
