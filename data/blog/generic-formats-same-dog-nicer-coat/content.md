@@ -4,7 +4,7 @@ This post is about the same mistake in a modern coat. YAML, JSON and XML are gen
 
 ![Two small dogs wearing knitted sweaters, standing on grass](/media/blog/generic-formats-same-dog-nicer-coat/assets/dogs-in-sweaters.jpg)
 
-*Still a dog.*
+*Still a dog.*[^photos]
 
 ## The same dog, with a nicer coat
 
@@ -51,8 +51,8 @@ The usual answer is the tooling: syntax colors, validators, formatters, support 
 
 The implementations do not agree with each other:
 
-*   In YAML 1.1, the unquoted value `no` is a boolean. The country code of Norway becomes `false`. YAML 1.2 fixed it, and libraries still differ on which version they follow.
-*   _Parsing JSON is a Minefield_ is an article with a test suite that compares JSON parsers on valid, invalid and ambiguous inputs. The parsers do not give the same answer.
+*   In YAML 1.1, the unquoted value `no` is a boolean. The country code of Norway becomes `false`.[^yaml11] YAML 1.2 fixed it, and libraries still differ on which version they follow.[^yaml12]
+*   _Parsing JSON is a Minefield_ is an article with a test suite that compares JSON parsers on valid, invalid and ambiguous inputs. The parsers do not give the same answer.[^jsonmine]
 
 A generic format promised that we would agree on one thing. We now have to agree on which parser, which version and which options. We did not remove the problem. We built a new one next to it, and it is bigger than the one we started with.
 
@@ -73,7 +73,7 @@ The generic format was supposed to save work. It gave you two passes, a dependen
 
 There is one more reason, and it is not about convenience. It is about safety.
 
-Code that does not exist has no bugs. A reader that needs twenty lines has fewer places to fail than a reader that needs a library. The library I removed from my site, `yaml.v3`, is about 11,000 lines of Go without its tests, and that includes a writer for YAML that I never used. The parser of `info.txt` is 23 lines, comments included. I can read all of it. I cannot say that of the 11,000.
+Code that does not exist has no bugs. A reader that needs twenty lines has fewer places to fail than a reader that needs a library. The library I removed from my site, `yaml.v3`, is about 11,000 lines of Go without its tests, and that includes a writer for YAML that I never used. The parser of `info.txt` is 23 lines, comments included. I can read all of it. I cannot say that of the 11,000.[^linecount]
 
 ![A large pile of books on the floor of a library](/media/blog/generic-formats-same-dog-nicer-coat/assets/stack-of-books.jpg)
 
@@ -81,9 +81,9 @@ Code that does not exist has no bugs. A reader that needs twenty lines has fewer
 
 And every feature of a format is something an attacker can use, even a feature you never needed:
 
-*   **YAML can build objects.** Before version 2.0, SnakeYAML, a widely used Java library, let a YAML document instantiate any class on the classpath. Whoever controlled the document could run code. It is CVE-2022-1471.
-*   **A format inside a format.** In 2013, Ruby on Rails accepted XML parameters. An XML parameter could declare itself as YAML, and Rails decoded it as YAML. That could expose the application to remote code execution or SQL injection. It is CVE-2013-0156.
-*   **XML can read files.** An XML document can declare an external entity. A parser that resolves it can be made to disclose local files, call internal servers, or hang. OWASP has a whole name for it, XXE, and a cheat sheet to disable the feature.
+*   **YAML can build objects.** Before version 2.0, SnakeYAML, a widely used Java library, let a YAML document instantiate any class on the classpath. Whoever controlled the document could run code. It is CVE-2022-1471.[^cve1]
+*   **A format inside a format.** In 2013, Ruby on Rails accepted XML parameters. An XML parameter could declare itself as YAML, and Rails decoded it as YAML. That could expose the application to remote code execution or SQL injection. It is CVE-2013-0156.[^cve2]
+*   **XML can read files.** An XML document can declare an external entity. A parser that resolves it can be made to disclose local files, call internal servers, or hang. OWASP has a whole name for it, XXE, and a cheat sheet to disable the feature.[^xxe]
 
 None of these is a story about a careless programmer. Each one is a feature of a generic format that the reader did not need and that someone else found a use for.
 
@@ -118,7 +118,11 @@ The Unix text stream makes the same mistake at a bigger scale, as I wrote in the
 
 ## Sources
 
-*   [CVE-2022-1471](https://nvd.nist.gov/vuln/detail/cve-2022-1471), SnakeYAML unsafe deserialization, with the [Veracode analysis](https://www.veracode.com/blog/resolving-cve-2022-1471-snakeyaml-20-release-0/).
-*   [CVE-2013-0156](https://nvd.nist.gov/vuln/detail/cve-2013-0156), Ruby on Rails, with the [Rapid7 explanation](https://www.rapid7.com/blog/post/2013/01/09/serialization-mischief-in-ruby-land-cve-2013-0156/).
-*   OWASP, [XML External Entity (XXE) Processing](https://community.owasp.org/vulnerabilities/XML_External_Entity_(XXE)_Processing) and the [XXE Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html).
-*   Photographs from Wikimedia Commons, resized: [dog sweater](https://commons.wikimedia.org/wiki/File:Dog_sweater_1.jpg) by Sciencia58 (CC0), and [books in a stack](https://commons.wikimedia.org/wiki/File:Books_in_a_stack_%28a_stack_of_books%29_-_Flickr_-_austinevan.jpg) by Evan Bench ([CC BY 2.0](https://creativecommons.org/licenses/by/2.0/)).
+[^photos]: Photographs from Wikimedia Commons, resized: [dog sweater](https://commons.wikimedia.org/wiki/File:Dog_sweater_1.jpg) by Sciencia58 (CC0), and [books in a stack](https://commons.wikimedia.org/wiki/File:Books_in_a_stack_%28a_stack_of_books%29_-_Flickr_-_austinevan.jpg) by Evan Bench ([CC BY 2.0](https://creativecommons.org/licenses/by/2.0/)).
+[^yaml11]: YAML 1.1, [Boolean Language-Independent Type](https://yaml.org/type/bool.html): the values `y`, `yes`, `n`, `no`, `on` and `off`, in three spellings each, are booleans.
+[^yaml12]: YAML 1.2.2, [section 10.3.2, Core Schema, Tag Resolution](https://yaml.org/spec/1.2.2/): only `true` and `false`, in three spellings, resolve to booleans.
+[^jsonmine]: Nicolas Seriot, _Parsing JSON is a Minefield_, and its test suite, [JSONTestSuite](https://github.com/nst/JSONTestSuite), which runs many parsers on files that must be accepted, rejected, or are left open by the standard.
+[^linecount]: Measured by me: the non-test Go files of `gopkg.in/yaml.v3` v3.0.1 total 11,285 lines. The parser of `info.txt` in `internal/projects/projects.go`, from its regular expression to the end of `parseInfo`, is 23 lines.
+[^cve1]: [CVE-2022-1471](https://nvd.nist.gov/vuln/detail/cve-2022-1471), SnakeYAML unsafe deserialization, with the [Veracode analysis](https://www.veracode.com/blog/resolving-cve-2022-1471-snakeyaml-20-release-0/).
+[^cve2]: [CVE-2013-0156](https://nvd.nist.gov/vuln/detail/cve-2013-0156), Ruby on Rails, with the [Rapid7 explanation](https://www.rapid7.com/blog/post/2013/01/09/serialization-mischief-in-ruby-land-cve-2013-0156/).
+[^xxe]: OWASP, [XML External Entity (XXE) Processing](https://community.owasp.org/vulnerabilities/XML_External_Entity_(XXE)_Processing) and the [XXE Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html).
