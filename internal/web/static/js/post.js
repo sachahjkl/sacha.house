@@ -359,11 +359,115 @@
     });
   }
 
+  /* ------------------------------------------------------------------ notes */
+
+  // A note is a number in the text and an item of the list after the post, which links back to the number. On a
+  // wide screen the notes are also set in the margin, each beside its number, and the ones near the reading
+  // position stand out. The margin copies are for the eye: screen readers and keyboards use the list.
+
+  const WIDE_SCREEN = "(min-width: 84rem)";
+  const NOTE_GAP = 12;
+
+  function setupNotes(root) {
+    const list = root.querySelector(".footnotes");
+    if (!list) return;
+    const wide = window.matchMedia(WIDE_SCREEN);
+    const pairs = [];
+    let column = null;
+
+    function collect() {
+      pairs.length = 0;
+      for (const mark of root.querySelectorAll("sup > a.footnote-ref")) {
+        const item = document.getElementById(mark.getAttribute("href").slice(1));
+        if (!item) continue;
+        const note = element("div", "sidenote");
+        note.append(element("span", "sidenote-number", mark.textContent));
+        for (const paragraph of item.querySelectorAll(":scope > p")) {
+          const copy = paragraph.cloneNode(true);
+          copy.querySelectorAll(".footnote-backref").forEach((link) => link.remove());
+          note.append(copy);
+        }
+        pairs.push({ mark, sup: mark.parentElement, note });
+      }
+    }
+
+    function highlight(pair, on) {
+      pair.note.classList.toggle("is-active", on);
+      pair.sup.classList.toggle("is-active", on);
+    }
+
+    function place() {
+      if (!column) return;
+      const origin = root.getBoundingClientRect().top + window.scrollY;
+      let floor = 0;
+      for (const pair of pairs) {
+        const top = Math.max(pair.sup.getBoundingClientRect().top + window.scrollY - origin - 2, floor);
+        pair.note.style.top = top + "px";
+        floor = top + pair.note.offsetHeight + NOTE_GAP;
+      }
+    }
+
+    function markNear() {
+      if (!column) return;
+      const from = window.innerHeight * 0.12;
+      const to = window.innerHeight * 0.7;
+      for (const pair of pairs) {
+        const top = pair.sup.getBoundingClientRect().top;
+        pair.note.classList.toggle("is-near", top >= from && top <= to);
+      }
+    }
+
+    function build() {
+      if (column) column.remove();
+      column = null;
+      if (!wide.matches) return;
+      column = element("aside", "sidenotes");
+      column.setAttribute("aria-hidden", "true");
+      for (const pair of pairs) column.append(pair.note);
+      root.append(column);
+      place();
+      markNear();
+    }
+
+    collect();
+    for (const pair of pairs) {
+      for (const node of [pair.sup, pair.note]) {
+        node.addEventListener("mouseenter", () => highlight(pair, true));
+        node.addEventListener("mouseleave", () => highlight(pair, false));
+      }
+      pair.mark.addEventListener("focus", () => highlight(pair, true));
+      pair.mark.addEventListener("blur", () => highlight(pair, false));
+      // With the note already beside the text, a click on its number shows it instead of jumping to the list.
+      pair.mark.addEventListener("click", (event) => {
+        if (!column || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        highlight(pair, true);
+        setTimeout(() => highlight(pair, false), 1600);
+      });
+    }
+
+    let frame = 0;
+    const refresh = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        place();
+        markNear();
+      });
+    };
+    wide.addEventListener("change", build);
+    window.addEventListener("scroll", () => requestAnimationFrame(markNear), { passive: true });
+    window.addEventListener("resize", refresh);
+    if (window.ResizeObserver) new ResizeObserver(refresh).observe(root);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+    build();
+  }
+
   /* ------------------------------------------------------------------ boot */
 
   function start() {
     const root = document.querySelector("article.prose") || document.body;
     makeImagesZoomable(root);
+    setupNotes(root);
     root.querySelectorAll("figure.diagram-ready").forEach(wireDiagram);
     for (const body of diagramBodies()) {
       if (nearScreen) nearScreen.observe(body);
