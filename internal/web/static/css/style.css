@@ -1729,6 +1729,10 @@ html, * {
   scrollbar-color: var(--color-textColor) var(--color-bgColor);
   scrollbar-width: auto;
 }
+::highlight(search-match) {
+  background-color: #ffe14d;
+  color: #000000;
+}
 .blog-search {
   display: flex;
   flex-wrap: wrap;

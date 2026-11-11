@@ -81,6 +81,8 @@ type PageData struct {
 	StyleVersion string
 	HotReload    bool
 	AdminScripts bool
+	// SearchScripts loads static/js/highlight.js: the highlighting of search matches.
+	SearchScripts bool
 	// PostScripts loads static/js/post.js: the image and diagram viewer and the Mermaid loader.
 	PostScripts bool
 	// HomeIsActive marks the site name in the header as the current page.
@@ -158,11 +160,12 @@ func NewPageData(options PageOptions) PageData {
 			GitRepoID:  options.GitRepoID,
 			Version:    options.Version,
 		},
-		NavItems:     NavItems(options.ActivePathname),
-		StyleVersion: styleVersion,
-		HotReload:    options.HotReload,
-		HomeIsActive: options.ActivePathname == "/",
-		AdminScripts: strings.HasPrefix(options.ActivePathname, "/admin"),
+		NavItems:      NavItems(options.ActivePathname),
+		StyleVersion:  styleVersion,
+		HotReload:     options.HotReload,
+		HomeIsActive:  options.ActivePathname == "/",
+		AdminScripts:  strings.HasPrefix(options.ActivePathname, "/admin"),
+		SearchScripts: options.ActivePathname == "/blog" || strings.HasPrefix(options.ActivePathname, "/admin"),
 		PostScripts: strings.HasPrefix(options.ActivePathname, "/blog/") ||
 			strings.HasPrefix(options.ActivePathname, "/admin/blogposts/"),
 	}

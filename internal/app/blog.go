@@ -33,6 +33,9 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 		}
 		view := metadataView(document.Metadata)
 		view.Excerpt = postDescription(document)
+		if query != "" {
+			view.Excerpt = blog.SearchSnippet(document, query, view.Excerpt)
+		}
 		year := web.LocalYear(parseTime(metadata.PublishedAt))
 		if len(groups) == 0 || groups[len(groups)-1].Year != year {
 			groups = append(groups, web.PostYearGroup{Year: year})

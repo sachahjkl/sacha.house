@@ -114,3 +114,20 @@ func TestParisDateConversions(t *testing.T) {
 		t.Fatal("ParseLocalDateTime() accepted an invalid date")
 	}
 }
+
+func TestSearchSnippetShowsTheMatchOfTheText(t *testing.T) {
+	document := Document{
+		Metadata: Metadata{Title: "Wren"},
+		Markdown: strings.Repeat("filler words here. ", 20) + "The engine runs QuickJS bytecode inside Wasm. " + strings.Repeat("more filler text. ", 20),
+	}
+	snippet := SearchSnippet(document, "quickjs", "A browser.")
+	if !strings.Contains(snippet, "QuickJS bytecode") || !strings.HasPrefix(snippet, "…") || !strings.HasSuffix(snippet, "…") || len([]rune(snippet)) > 2*searchSnippetRadius+12 {
+		t.Fatalf("snippet = %q", snippet)
+	}
+	if got := SearchSnippet(document, "wren", "A browser."); got != "A browser." {
+		t.Fatalf("a title match keeps the description: %q", got)
+	}
+	if got := SearchSnippet(document, "browser", "A browser."); got != "A browser." {
+		t.Fatalf("a description match keeps the description: %q", got)
+	}
+}

@@ -58,6 +58,14 @@ func TestAdminResolvesABlogConflict(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(post, "assets", "image.txt")); err != nil {
 		t.Fatalf("the asset was lost: %v", err)
 	}
+	download := get("/admin/blogposts/hello/download")
+	if download.Code != http.StatusOK || download.Header().Get("Content-Type") != "application/zip" ||
+		download.Header().Get("Content-Disposition") != `attachment; filename="hello.zip"` || !strings.HasPrefix(download.Body.String(), "PK") {
+		t.Fatalf("download = %d %v", download.Code, download.Header())
+	}
+	if response := get("/admin/blogposts/missing/download"); response.Code != http.StatusNotFound {
+		t.Fatalf("download of a missing post = %d", response.Code)
+	}
 	if response := get("/admin/blogposts/hello/conflict"); response.Code != http.StatusSeeOther {
 		t.Fatalf("a resolved conflict page = %d, want a redirect to the editor", response.Code)
 	}
@@ -73,7 +81,7 @@ func TestBlogSearch(t *testing.T) {
 		}
 		return response.Body.String()
 	}
-	if body := get("/blog?q=PUBLIC+welcome"); !strings.Contains(body, `href="/blog/hello"`) || !strings.Contains(body, "1 post matches") || !strings.Contains(body, `name="robots" content="noindex"`) {
+	if body := get("/blog?q=PUBLIC+welcome"); !strings.Contains(body, `data-highlight-terms="PUBLIC welcome"`) || !strings.Contains(body, "/static/js/highlight.js") || !strings.Contains(body, `href="/blog/hello"`) || !strings.Contains(body, "1 post matches") || !strings.Contains(body, `name="robots" content="noindex"`) {
 		t.Fatalf("a matching search: %s", body)
 	}
 	if body := get("/blog?q=nothing-like-this"); strings.Contains(body, `href="/blog/hello"`) || !strings.Contains(body, "No post matches") {
