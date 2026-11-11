@@ -16,6 +16,7 @@
 - The projects shown first are listed in `featuredProjects` in `internal/web/page.go`.
 - The career data of `/about`, `/resume`, and `/cv` lives in `internal/web/career.go`.
 - Blog content is filesystem-backed under `data/blog/`.
+- Notes: write `[^id]` in the text and `[^id]: the note` in a paragraph of its own, usually under a `## Sources` heading. The page lists the notes after the post, each with a link back to its number. On a screen of 84rem or more, `static/js/post.js` also sets each note in the margin beside its number, and highlights the notes near the reading position. The margin is built by the script; the list is plain HTML. Notes stay out of excerpts and searches.
 - Mermaid diagrams are prerendered, never drawn in the browser: run `just diagrams` after editing a `mermaid` block, and commit the SVGs. A test fails when a shipped post has a diagram without its drawing. The page only reserves the room of each diagram; `static/js/post.js` inlines the SVG of the reader's scheme when the figure comes near the screen.
 - Each post has a `description` in `post.json` (160 characters at most): it feeds the meta description, link previews, feeds, JSON-LD and `/llms.txt`. Without it, an excerpt is used.
 - Post images get `loading="lazy"` and their width and height from the file. Prefer WebP; convert screenshots with `cwebp -lossless -z 9`.

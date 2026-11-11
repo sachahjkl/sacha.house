@@ -732,6 +732,9 @@
   .min-w-0 {
     min-width: calc(var(--spacing) * 0);
   }
+  .grow {
+    flex-grow: 1;
+  }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
@@ -1540,6 +1543,104 @@ body {
   .ascii-logo-fire {
     background-image: none;
     filter: none;
+  }
+}
+.prose {
+  position: relative;
+}
+.prose sup:has(> a.footnote-ref) {
+  line-height: 0;
+}
+.prose a.footnote-ref, .prose a.footnote-backref {
+  color: var(--color-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+.prose a.footnote-ref {
+  margin-left: 0.1em;
+  padding: 0 0.15em;
+  font-size: 0.85em;
+}
+.prose a.footnote-ref:hover, .prose a.footnote-ref:focus-visible, .prose sup.is-active > a.footnote-ref {
+  background: var(--color-accent);
+  color: var(--color-bgColor);
+}
+.prose sup[id^="fnref:"], .prose .footnotes li {
+  scroll-margin-top: 30vh;
+}
+.prose .footnotes {
+  margin-top: 1.5rem;
+  font-size: 0.95em;
+}
+.prose .footnotes hr {
+  display: none;
+}
+.prose .footnotes ol {
+  margin: 0;
+  padding-left: 1.75rem;
+}
+.prose .footnotes li {
+  margin: 0.5rem 0;
+  padding-left: 0.25rem;
+}
+.prose .footnotes li:target {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.prose .footnotes li > p {
+  display: inline;
+  margin: 0;
+}
+.prose a.footnote-backref {
+  margin-left: 0.4em;
+}
+.prose a.footnote-backref:hover, .prose a.footnote-backref:focus-visible {
+  background: var(--color-accent);
+  color: var(--color-bgColor);
+}
+.sidenotes {
+  display: none;
+}
+@media (min-width: 84rem) {
+  .sidenotes {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: calc(100% + 1.75rem);
+    width: 15rem;
+    pointer-events: none;
+  }
+  .sidenote {
+    position: absolute;
+    left: 0;
+    right: 0;
+    padding-left: 0.6rem;
+    border-left: 2px solid var(--color-bgOffColor);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    opacity: 0.5;
+    pointer-events: auto;
+    transition: opacity 0.15s, border-color 0.15s;
+  }
+  .sidenote.is-near, .sidenote.is-active {
+    border-left-color: var(--color-accent);
+    opacity: 1;
+  }
+  .sidenote p {
+    margin: 0;
+  }
+  .sidenote a {
+    overflow-wrap: anywhere;
+  }
+  .sidenote-number {
+    margin-right: 0.35em;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+}
+@media print {
+  .sidenotes {
+    display: none;
   }
 }
 .prose :is(h2, h3, h4) {

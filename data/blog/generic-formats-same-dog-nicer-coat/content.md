@@ -112,7 +112,7 @@ There is one question that decides everything: who reads this?
 
 And a protocol is not something you declare. A protocol is a protocol because it was built to be shared: it has a specification, several independent implementations, and people who agreed on it before the first byte was sent. A file does not become one because you gave it a format.
 
-That is exactly where the generic format went wrong for me. `.project/project.yaml` was a private file. I invented the `.project` folder, and as far as I know nobody else had ever been asked to read it. Yet I had dressed it as a protocol, with the parser, the schema and the dependency that go with it. The mistake was not YAML itself. It was paying the price of sharing for a file that was never shared.
+That is exactly where the generic format went wrong for me. `.project/project.yaml` was a private file. I invented the `.project` folder, and nobody else had ever been asked to read it. Yet I had dressed it as a protocol, with the parser, the schema and the dependency that go with it. The mistake was not YAML itself. It was paying the price of sharing for a file that was never shared.
 
 The Unix text stream makes the same mistake at a bigger scale, as I wrote in the first post. It treats every conversation between two programs as if it were public, even when only two programs of mine are talking.
 

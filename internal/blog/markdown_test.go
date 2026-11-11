@@ -131,3 +131,34 @@ func TestSearchSnippetShowsTheMatchOfTheText(t *testing.T) {
 		t.Fatalf("a description match keeps the description: %q", got)
 	}
 }
+
+func TestNotesAreListedWithALinkBack(t *testing.T) {
+	html, err := RenderMarkdown("A claim.[^1] Another one.[^2]\n\n[^1]: The first source, [a link](https://example.com).\n[^2]: The second source.\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		`<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" title="Show the note" role="doc-noteref">1</a></sup>`,
+		`<sup id="fnref:2">`,
+		`<div class="footnotes" role="doc-endnotes">`,
+		`<li id="fn:1">`,
+		`<a href="https://example.com">a link</a>`,
+		`<a href="#fnref:1" class="footnote-backref" title="Back to the text" role="doc-backlink">↩</a>`,
+		`<li id="fn:2">`,
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("rendered notes lack %q:\n%s", want, html)
+		}
+	}
+}
+
+func TestNotesStayOutOfExcerptsAndSearches(t *testing.T) {
+	source := "A claim.[^1] Another one.\n\n[^1]: A source that nobody reads in an excerpt.\n"
+	plain := PlainText(source)
+	if plain != "A claim. Another one." {
+		t.Fatalf("PlainText = %q", plain)
+	}
+	if excerpt := Excerpt(source, 100); strings.Contains(excerpt, "source") {
+		t.Fatalf("Excerpt = %q", excerpt)
+	}
+}
