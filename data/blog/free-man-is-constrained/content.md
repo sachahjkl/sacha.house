@@ -23,17 +23,17 @@ Look at what these texts do. They do not give freedom first and add limits later
 
 ## Where this man comes from
 
-I think of the free man as a person who holds his own impulses. No lord holds them for him, and no crowd, and no fear of what the neighbors will say.
+The free man is a person who holds his own impulses. No lord holds them for him, and no crowd, and no fear of what the neighbors will say.
 
 Norbert Elias followed this slowly in _The Civilizing Process_ (1939). Over centuries, in the courts of Western Europe, the way people behaved around violence, the body and speech changed. Thresholds of shame and repugnance rose, until the constraint that others imposed became a constraint that each person imposed on himself.
 
 The Church had been working on the same thing since 1215. Canon 21 of the Fourth Lateran Council says that "all the faithful of both sexes shall after they have reached the age of discretion faithfully confess all their sins at least once a year to their own (parish) priest", on pain of excommunication. Every adult Christian was to examine his own conscience, every year.
 
-Anthropologists have a vocabulary for this. Ruth Benedict made popular the distinction between a "shame culture", where behavior is held by the eyes of others, and a "guilt culture", where it is held by an inner voice. I do not claim that the free man feels no shame: the inner constraint that Elias describes is made of it. I claim that the constraint moved inside.
+Anthropologists have a vocabulary for this. Ruth Benedict made popular the distinction between a "shame culture", where behavior is held by the eyes of others, and a "guilt culture", where it is held by an inner voice. The free man is not free of shame: the inner constraint that Elias describes is made of it. What changed is where the constraint sits. It moved inside.
 
 Then there is the place. Quentin Skinner showed how the Italian city republics worked out a theory of liberty as living under no one's arbitrary will, and how it reached seventeenth-century England. England gave Locke. France gave Montesquieu and Rousseau. And in 1776 and 1789, two texts built a political order on the man who rules himself. The American Declaration says that all men "are endowed by their Creator with certain unalienable Rights, that among these are Life, Liberty and the pursuit of Happiness", and that "to secure these rights, Governments are instituted among Men". The French one is article 4, above.
 
-Both rest on a bet: that a man who is given his rights will keep himself inside their limits. My thesis is that this man, as the foundation of the law, could only have appeared in one corner of Europe, made of England, France and northern Italy. Self-mastery as an ideal is much older, and it is not only Western: the Stoics have it, and so does Confucian self-cultivation. What was specific is making it the base of a political order.
+Both rest on a bet: that a man who is given his rights will keep himself inside their limits. This man, as the foundation of the law, could only have appeared in one corner of Europe, made of England, France and northern Italy. The ideal of self-mastery is older: the Stoics had it. What appeared there was a political order built on it.
 
 ## Absolute freedom is not freedom
 
@@ -66,7 +66,7 @@ Everyone agreed that these constraints were good. For a long time, many teams st
 When code was written by hand, a constraint had a cost on three sides.
 
 *   **Time.** A test suite, a build that checks types, a pipeline that validates every change: each one is work to set up before it protects anything.
-*   **Skills.** The machinery became a craft of its own. The first DevOpsDays conference was held in Ghent in 2009. In my experience, the word named a real job: somebody had to know how the pipeline worked. Jenkins appeared in 2011, Travis CI was founded the same year, and GitHub Actions launched in November 2019. Each step made it cheaper. None made it free.
+*   **Skills.** The machinery became a craft of its own. The first DevOpsDays conference was held in Ghent in 2009. The word named a real job: somebody had to know how the pipeline worked. Jenkins appeared in 2011, Travis CI was founded the same year, and GitHub Actions launched in November 2019. Each step made it cheaper. None made it free.
 *   **Friction.** All that machinery has to run, and it has to be maintained. A slow or broken pipeline slows every change. When a deadline came, the pipeline was what had to be justified, and it often lost: skip the tests, merge anyway, add it later.
 
 So constraints were won one at a time, and often given up.
@@ -99,7 +99,7 @@ I could hand a hundred repositories to an agent because of that harness. It limi
 
 A man without law is not free. He is exposed. A program without a process boundary or a type system is not free. It is fragile. An agent without a guardrail is not autonomous. It is dangerous.
 
-The free man, the free program and the free agent have the same condition: a frame that they respect, and that they hold first of all themselves. The tradition that built the free man bet that he could do it. I think the bet was right, and that we make the same bet each time we give a program, or a model, the power to act.
+The free man, the free program and the free agent have the same condition: a frame that they respect, and that they hold first of all themselves. The tradition that built the free man bet that he could do it. The bet was right, and we make the same bet each time we give a program, or a model, the power to act.
 
 The free man is constrained. That is not a bug. It is the specification.
 

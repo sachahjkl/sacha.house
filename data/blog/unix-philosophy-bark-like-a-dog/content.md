@@ -49,7 +49,7 @@ The idea of the pipe was good, and it was deliberate. Doug McIlroy wrote a memo 
 
 So the order is: a machine with 144K of memory forced a simple stream, then the stream was explained as a design, then it was taught as a principle.
 
-The constraint is gone. A machine today has gigabytes of memory, and a pipe between two programs is cheap. The habit stayed, and in my experience it became a badge: knowing `awk` and `sed` by heart is treated as a sign of intelligence. A way to survive a small machine became a way to prove you belong. This is my opinion, not a finding. But I think that is how a limit turns into a culture.
+The constraint is gone. A machine today has gigabytes of memory, and a pipe between two programs is cheap. The habit stayed, and it became a badge: knowing `awk` and `sed` by heart is treated as a sign of intelligence. A way to survive a small machine became a way to prove you belong. That is how a limit turns into a culture.
 
 ## The universal interface is a loan
 
@@ -67,7 +67,7 @@ You know the symptoms:
 
 Text is fine for people to read: a log, a message, a README. The trouble starts when text is the interface between programs. A program that reads text cannot tell the data from the commands. They travel in the same channel, and whoever writes the data can write a command.
 
-The best example is the language that was meant to be written by anyone. In 1974, Donald Chamberlin and Raymond Boyce called it SEQUEL, for Structured English Query Language. Their abstract says it is "intended as a data base sublanguage for both the professional programmer and the more infrequent data base user". Plain English words, so that you did not need to be a programmer. In my experience, that is not what happened. Today SQL is written by programmers, and the text it is made of is assembled by programs, from strings.
+The best example is the language that was meant to be written by anyone. In 1974, Donald Chamberlin and Raymond Boyce called it SEQUEL, for Structured English Query Language. Their abstract says it is "intended as a data base sublanguage for both the professional programmer and the more infrequent data base user". Plain English words, so that you did not need to be a programmer. That is not what happened. Today SQL is written by programmers, and the text it is made of is assembled by programs, from strings.
 
 That is where the trouble comes from. OWASP defines a SQL injection like this: "untrusted data (usually strings) becomes part of a query's SQL syntax, modifying the logic of the SQL request". Its first example is a query built by gluing a request parameter into a string. The user types SQL, and the database runs it.
 
