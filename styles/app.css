@@ -718,6 +718,68 @@ body {
   font-size: 0.875rem;
 }
 
+/* Blogpost conflicts: the site and repository versions side by side */
+.conflict-badge {
+  color: var(--color-accent);
+}
+
+.conflict-fields {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.conflict-fields th,
+.conflict-fields td {
+  border: 1px solid color-mix(in srgb, var(--color-textColor) 30%, transparent);
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.conflict-fields tbody th {
+  width: 9rem;
+}
+
+.conflict-fields tr.conflict-differs td {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.diff {
+  border: 2px solid var(--color-textColor);
+  max-height: 70vh;
+  overflow: auto;
+  font-size: 0.8rem;
+}
+
+.diff-line {
+  padding-inline: 0.5rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.diff-sign {
+  display: inline-block;
+  width: 1.5ch;
+  user-select: none;
+}
+
+.diff-add {
+  background: color-mix(in srgb, #39ff14 18%, transparent);
+}
+
+.diff-remove {
+  background: color-mix(in srgb, #ff3b30 18%, transparent);
+}
+
+.diff-skip {
+  padding: 0.2rem 0.5rem;
+  opacity: 0.6;
+  font-style: italic;
+}
+
 /* Lists of things to manage. The li stays a block, for the .hidden of the filter. */
 .rows li {
   border-bottom: 1px solid color-mix(in srgb, var(--color-textColor) 20%, transparent);
@@ -1057,4 +1119,23 @@ html,
 * {
   scrollbar-color: var(--color-textColor) var(--color-bgColor);
   scrollbar-width: auto;
+}
+
+/* Search of the blog index */
+.blog-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.blog-search label {
+  flex-basis: 100%;
+  font-size: 0.85rem;
+}
+
+.blog-search .input {
+  flex: 1;
+  min-width: min(100%, 14rem);
 }

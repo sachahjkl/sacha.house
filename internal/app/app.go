@@ -102,7 +102,7 @@ func NewWithOptions(config Config, options Options) (*App, error) {
 			slog.Info("blog posts updated from the repository", "posts", merged.Updated)
 		}
 		if len(merged.Conflicts) > 0 {
-			slog.Warn("blog posts changed in the repository and in the admin: the admin version stays, merge post.seed.json and content.seed.md by hand", "posts", merged.Conflicts)
+			slog.Warn("blog posts changed in the repository and in the admin: the admin version stays until a resolution in /admin/blogposts", "posts", merged.Conflicts)
 		}
 	}
 
@@ -230,6 +230,9 @@ func (app *App) routes() http.Handler {
 	mux.Handle("POST /admin/blogposts/new", app.requireAdmin(http.HandlerFunc(app.adminCreateBlogPost)))
 	mux.Handle("GET /admin/blogposts/{slug}", app.requireAdmin(http.HandlerFunc(app.adminEditBlogPost)))
 	mux.Handle("POST /admin/blogposts/{slug}/save", app.requireAdmin(http.HandlerFunc(app.adminSaveBlogPost)))
+	mux.Handle("GET /admin/blogposts/{slug}/conflict", app.requireAdmin(http.HandlerFunc(app.adminBlogConflict)))
+	mux.Handle("POST /admin/blogposts/{slug}/conflict/take-repository", app.requireAdmin(http.HandlerFunc(app.adminTakeRepositoryVersion)))
+	mux.Handle("POST /admin/blogposts/{slug}/conflict/keep-site", app.requireAdmin(http.HandlerFunc(app.adminKeepSiteVersion)))
 	mux.Handle("POST /admin/blogposts/upload-image", app.requireAdminAPI(http.HandlerFunc(app.adminUploadBlogImage)))
 	mux.Handle("POST /admin/refresh-projects", app.requireAdmin(http.HandlerFunc(app.adminRefreshProjects)))
 	mux.Handle("GET /admin/pastes", app.requireAdmin(http.HandlerFunc(app.adminPastes)))

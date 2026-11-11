@@ -1,6 +1,7 @@
 package web
 
 import (
+	"strconv"
 	"strings"
 	"time"
 )
@@ -267,6 +268,8 @@ type PostYearGroup struct {
 type BlogPageData struct {
 	PageData
 	YearGroups []PostYearGroup
+	// Query is the search of /blog?q=; empty lists every post.
+	Query string
 }
 
 type PostPageData struct {
@@ -274,4 +277,19 @@ type PostPageData struct {
 	Post PostView
 	// More lists other posts, newest first, to read next.
 	More []PostView
+}
+
+// searchSummary tells how many posts a blog search found.
+func searchSummary(groups []PostYearGroup, query string) string {
+	count := 0
+	for _, group := range groups {
+		count += len(group.Posts)
+	}
+	switch count {
+	case 0:
+		return "No post matches “" + query + "”."
+	case 1:
+		return "1 post matches “" + query + "”."
+	}
+	return strconv.Itoa(count) + " posts match “" + query + "”."
 }

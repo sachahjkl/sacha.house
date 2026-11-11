@@ -19,6 +19,7 @@ func (app *App) renderAdminPage(writer http.ResponseWriter, request *http.Reques
 	data := web.AdminPageData{
 		PageData:  app.page(request.URL.Path, "admin / sacha.house", "Administration panel."),
 		IPAddress: app.requestIP(request), Error: message, PasteEnabled: app.pastes != nil,
+		BlogConflicts: app.blogConflictCount(),
 	}
 	renderHTML(writer, request, web.AdminPage(data), status)
 }

@@ -1,18 +1,20 @@
 package web
 
-// Icon renders a Noto emoji SVG embedded in static/icons/noto, sized to the surrounding text.
+// Icon renders a Noto emoji SVG embedded in static/icons/noto, sized to the surrounding text. The icons are
+// decoration next to a label: aria-hidden keeps screen readers from reading them, and the alt text names the
+// emoji for the tools that require one on every image.
 templ Icon(name string) {
-	<img src={ iconURL(name) } alt="" width="20" height="20" aria-hidden="true" class="not-prose mr-[0.3em] inline-block h-[1.1em] w-[1.1em] align-[-0.2em]"/>
+	<img src={ iconURL(name) } alt={ iconLabel(name) } width="20" height="20" aria-hidden="true" class="not-prose mr-[0.3em] inline-block h-[1.1em] w-[1.1em] align-[-0.2em]"/>
 }
 
 // IconEnd is Icon placed after a label.
 templ IconEnd(name string) {
-	<img src={ iconURL(name) } alt="" width="20" height="20" aria-hidden="true" class="not-prose ml-[0.3em] inline-block h-[1.1em] w-[1.1em] align-[-0.2em]"/>
+	<img src={ iconURL(name) } alt={ iconLabel(name) } width="20" height="20" aria-hidden="true" class="not-prose ml-[0.3em] inline-block h-[1.1em] w-[1.1em] align-[-0.2em]"/>
 }
 
 // BigIcon renders a large animated Noto SVG.
 templ BigIcon(name string) {
-	<img src={ iconURL(name) } alt="" width="144" height="144" aria-hidden="true" class="not-prose inline-block h-36 w-36 animate-bounce drop-shadow-md"/>
+	<img src={ iconURL(name) } alt={ iconLabel(name) } width="144" height="144" aria-hidden="true" class="not-prose inline-block h-36 w-36 animate-bounce drop-shadow-md"/>
 }
 
 // ArrowLeft is the Lucide arrow-left icon, drawn in the current text colour.

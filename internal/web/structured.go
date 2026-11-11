@@ -40,6 +40,11 @@ func website() object {
 		"description": Me.FullName + ", software engineer. Projects, writing, and how to reach me.",
 		"author":      object{"@id": personID},
 		"publisher":   object{"@id": personID},
+		"potentialAction": object{
+			"@type":       "SearchAction",
+			"target":      object{"@type": "EntryPoint", "urlTemplate": SiteURL + "/blog?q={search_term_string}"},
+			"query-input": "required name=search_term_string",
+		},
 	}
 }
 

@@ -20,7 +20,7 @@ func (app *App) adminBlogPosts(writer http.ResponseWriter, request *http.Request
 	for index, post := range posts {
 		views[index] = web.AdminBlogPostView{
 			Slug: post.Slug, Title: post.Title, Status: post.Status,
-			UpdatedAt: post.UpdatedAt, PublishedAt: post.PublishedAt,
+			UpdatedAt: post.UpdatedAt, PublishedAt: post.PublishedAt, Conflict: app.blog.HasConflict(post.Slug),
 		}
 	}
 	data := web.AdminBlogPostsPageData{
