@@ -26,6 +26,8 @@ type AdminPageData struct {
 	IPAddress    string
 	Error        string
 	PasteEnabled bool
+	// BlogConflicts counts the posts that wait for a conflict resolution.
+	BlogConflicts int
 }
 
 type AdminPasteListItem struct {
@@ -78,6 +80,27 @@ type AdminBlogPostView struct {
 	Status      string
 	UpdatedAt   string
 	PublishedAt string
+	// Conflict is set when the repository and the admin both changed the post.
+	Conflict bool
+}
+
+// ConflictField compares one metadata field of the site and repository versions of a post.
+type ConflictField struct {
+	Name       string
+	Site       string
+	Repository string
+}
+
+// Differs reports whether the two versions disagree on the field.
+func (field ConflictField) Differs() bool { return field.Site != field.Repository }
+
+type AdminBlogConflictPageData struct {
+	PageData
+	Slug    string
+	Title   string
+	Error   string
+	Fields  []ConflictField
+	Content []DiffHunk
 }
 
 type AdminBlogPostsPageData struct {

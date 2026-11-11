@@ -8,6 +8,7 @@ Thumbs.db
 config.json
 projects_cache.json
 webauthn_credentials.json
+paste-secrets.json
 
 # Dependencies and tool state
 node_modules/

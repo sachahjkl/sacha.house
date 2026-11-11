@@ -161,7 +161,7 @@ func postHash(read func(name string) ([]byte, error)) (string, error) {
 }
 
 func writeSeedConflict(seed fs.FS, slug, destination string) error {
-	for source, target := range map[string]string{"post.json": "post.seed.json", "content.md": "content.seed.md"} {
+	for source, target := range map[string]string{"post.json": seedMetadataName, "content.md": seedContentName} {
 		content, err := fs.ReadFile(seed, path.Join(slug, source))
 		if err != nil {
 			return err

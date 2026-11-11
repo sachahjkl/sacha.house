@@ -184,3 +184,16 @@ func FormatLocalDateTime(value string) (string, error) {
 	}
 	return parsed.In(location).Format("2006-01-02T15:04"), nil
 }
+
+// Matches reports whether every word of query appears in the title, the description or the text of a post,
+// ignoring case.
+func Matches(document Document, query string) bool {
+	haystack := strings.ToLower(document.Metadata.Title + "\n" + document.Metadata.Description + "\n" + PlainText(document.Markdown))
+	words := strings.Fields(strings.ToLower(query))
+	for _, word := range words {
+		if !strings.Contains(haystack, word) {
+			return false
+		}
+	}
+	return len(words) > 0
+}

@@ -1,5 +1,7 @@
 package web
 
+import "fmt"
+
 // AdminBack is the link back to the parent admin page.
 templ AdminBack(href string, label string) {
 	<p class="back-link">
@@ -76,6 +78,9 @@ templ AdminContent(data AdminPageData) {
 			<section class="pane">
 				<h2 class="pane-title">blog</h2>
 				<p>Write, edit, and publish posts.</p>
+				if data.BlogConflicts > 0 {
+					<p class="status status-error">{ fmt.Sprint(data.BlogConflicts) } blogposts changed both in the repository and here: resolve them in the list.</p>
+				}
 				<p class="actions"><a class="btn" href="/admin/blogposts">Manage blogposts</a><a class="btn" href="/admin/blogposts/new">New blogpost</a></p>
 			</section>
 			<section class="pane">
@@ -148,8 +153,14 @@ templ AdminBlogPostsContent(data AdminBlogPostsPageData) {
 								if post.PublishedAt != "" {
 									· published { post.PublishedAt }
 								}
+								if post.Conflict {
+									· <strong class="conflict-badge">conflict</strong>
+								}
 							</p>
 						</div>
+						if post.Conflict {
+							<a class="btn btn-primary" href={ templ.SafeURL("/admin/blogposts/" + post.Slug + "/conflict") }>Resolve</a>
+						}
 						<a class="btn" href={ templ.SafeURL("/blog/" + post.Slug) }>View</a>
 					</div>
 				</li>
@@ -405,5 +416,62 @@ templ AdminPasteEditorContent(data AdminPasteEditorPageData) {
 				</form>
 			</section>
 		}
+	</article>
+}
+
+templ AdminBlogConflictPage(data AdminBlogConflictPageData) {
+	@Document(data.PageData, AdminBlogConflictContent(data))
+}
+
+// AdminBlogConflictContent compares the site and repository versions of a post and offers the resolutions.
+templ AdminBlogConflictContent(data AdminBlogConflictPageData) {
+	<article>
+		@AdminBack("/admin/blogposts", "blogposts")
+		<h1 class="h1">conflict: { data.Title }</h1>
+		@AdminMessages(data.Error, "")
+		<p class="mb-4">This post changed in the repository and in this admin since the last merge. The site shows the admin version until you choose.</p>
+		<section class="mb-6">
+			<h2 class="pane-title">metadata</h2>
+			<table class="conflict-fields">
+				<thead><tr><th scope="col">field</th><th scope="col">site</th><th scope="col">repository</th></tr></thead>
+				<tbody>
+					for _, field := range data.Fields {
+						<tr class={ templ.KV("conflict-differs", field.Differs()) }>
+							<th scope="row">{ field.Name }</th>
+							<td>{ field.Site }</td>
+							<td>{ field.Repository }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</section>
+		<section class="mb-6">
+			<h2 class="pane-title">text</h2>
+			if len(data.Content) == 0 {
+				<p class="meta">The text is the same in both versions.</p>
+			} else {
+				<p class="meta mb-2"><span class="diff-remove">− site only</span> · <span class="diff-add">+ repository only</span></p>
+				<div class="diff">
+					for _, hunk := range data.Content {
+						if hunk.Skipped > 0 {
+							<div class="diff-skip">{ fmt.Sprintf("… %d unchanged lines", hunk.Skipped) }</div>
+						}
+						for _, line := range hunk.Lines {
+							<div class={ "diff-line", "diff-" + line.Kind }><span class="diff-sign" aria-hidden="true">{ diffSign(line.Kind) }</span>{ line.Text }</div>
+						}
+					}
+				</div>
+			}
+		</section>
+		<div class="actions">
+			<form method="POST" action={ templ.SafeURL("/admin/blogposts/" + data.Slug + "/conflict/take-repository") }>
+				<button type="submit" class="btn btn-primary">Take the repository version</button>
+			</form>
+			<form method="POST" action={ templ.SafeURL("/admin/blogposts/" + data.Slug + "/conflict/keep-site") }>
+				<button type="submit" class="btn">Keep the site version</button>
+			</form>
+			<a class="btn" href={ templ.SafeURL("/admin/blogposts/" + data.Slug) }>Edit the site version</a>
+		</div>
+		<p class="meta mt-4">Taking the repository version keeps the uploaded images. Keeping the site version stops this report until the repository changes again; copy the site version into the repository to end the conflicts for good.</p>
 	</article>
 }

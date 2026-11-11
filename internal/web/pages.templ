@@ -184,7 +184,7 @@ templ ProjectsContent(data ProjectsPageData) {
 
 templ ProjectAvatar(project ProjectView) {
 	if project.HasAvatar {
-		<img class="project-avatar" loading="lazy" src={ templ.SafeURL(project.AvatarURL) } width="48" height="48" alt=""/>
+		<img class="project-avatar" loading="lazy" src={ templ.SafeURL(project.AvatarURL) } width="48" height="48" alt={ "Logo of " + project.Name }/>
 	} else {
 		<span class="project-avatar project-letter" style={ "background-color: " + project.HSLColor + ";" } aria-hidden="true">{ project.FirstLetter }</span>
 	}
@@ -235,7 +235,16 @@ templ BlogContent(data BlogPageData) {
 	<article class="reading">
 		<h1 class="h1">blog</h1>
 		<p class="lead">Notes on what I build, and the occasional recipe. Follow along with <a href="/blog/rss.xml">rss</a> or <a href="/blog/atom.xml">atom</a>.</p>
-		if len(data.YearGroups) == 0 {
+		<form class="blog-search" role="search" method="GET" action="/blog">
+			<label for="blog-search-query">Search the posts</label>
+			<input class="input" id="blog-search-query" type="search" name="q" value={ data.Query } maxlength="200" placeholder="webassembly, unix, recette…"/>
+			<button type="submit" class="btn">Search</button>
+		</form>
+		if data.Query != "" {
+			<p class="meta mt-4">
+				{ searchSummary(data.YearGroups, data.Query) } · <a href="/blog">all articles</a>
+			</p>
+		} else if len(data.YearGroups) == 0 {
 			<p>No articles yet.</p>
 		}
 		for _, group := range data.YearGroups {

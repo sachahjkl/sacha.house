@@ -37,7 +37,7 @@
       secretspec = nixpkgs-secretspec.legacyPackages.${system}.secretspec;
       lib = pkgs.lib;
       pname = "sacha.house";
-      vendorHash = "sha256-q8hoC4+O9lmD22g6xVQY9bf8firGc8U0mG4cuCDvnuU=";
+      vendorHash = "sha256-ruV0CnPHDxuAQaXB4MDPTg9BL0ayu4hQZsn/n/3ZM2E=";
       versionPrefix = lib.strings.trim (builtins.readFile ./VERSION);
       gitCommitHash =
         if self ? shortRev

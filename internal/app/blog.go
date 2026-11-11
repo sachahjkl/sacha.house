@@ -5,6 +5,7 @@ import (
 	"mime"
 	"net/http"
 	"path"
+	"strings"
 	"time"
 
 	"sacha.house/internal/blog"
@@ -17,10 +18,17 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "failed to load blog", http.StatusInternalServerError)
 		return
 	}
+	query := strings.TrimSpace(request.URL.Query().Get("q"))
+	if len(query) > maxSearchLength {
+		query = query[:maxSearchLength]
+	}
 	groups := make([]web.PostYearGroup, 0)
 	for _, metadata := range posts {
 		document, err := app.blog.Load(metadata.Slug, false)
 		if err != nil {
+			continue
+		}
+		if query != "" && !blog.Matches(document, query) {
 			continue
 		}
 		view := metadataView(document.Metadata)
@@ -33,11 +41,20 @@ func (app *App) blogIndex(writer http.ResponseWriter, request *http.Request) {
 	}
 	data := web.BlogPageData{
 		PageData:   app.page(request.URL.Path, "blog / sacha.house", web.Me.FullName+"'s blog: software, systems, the tools I build, and the occasional recipe."),
-		YearGroups: groups,
+		YearGroups: groups, Query: query,
 	}
-	data.PageData.SEO.StructuredData = web.BlogStructuredData()
+	if query == "" {
+		data.PageData.SEO.StructuredData = web.BlogStructuredData()
+	} else {
+		// A search result page is not a page of its own for search engines.
+		data.PageData.Title = "search: " + query + " / blog / sacha.house"
+		data.PageData.SEO.NoIndex = true
+	}
 	renderHTML(writer, request, web.BlogPage(data), http.StatusOK)
 }
+
+// maxSearchLength bounds the query of /blog?q=, in bytes.
+const maxSearchLength = 200
 
 // morePosts is how many other posts a post links to at its end.
 const morePosts = 3
