@@ -2,6 +2,7 @@
   "id": "wren",
   "slug": "wren",
   "title": "Wren: a browser where WebAssembly runs everything",
+  "description": "Wren is a web browser written in Odin where WebAssembly is the only execution engine, JavaScript included. Architecture, sandbox, tests and limits.",
   "status": "published",
   "publishedAt": "2026-11-02T09:00:00Z",
   "updatedAt": "2026-11-02T09:00:00Z",

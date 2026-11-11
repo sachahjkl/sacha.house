@@ -2,6 +2,7 @@
   "id": "rust-rewrite-xmaybex",
   "slug": "rust-rewrite-xmaybex",
   "title": "Design draft for chat.sacha.house",
+  "description": "Design notes for chat.sacha.house: the Rust libraries considered for a small, self-contained chat server.",
   "status": "published",
   "publishedAt": "2025-11-21T13:54:45.889979+00:00",
   "updatedAt": "2025-11-23T10:41:54.57497+00:00",

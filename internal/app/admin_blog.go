@@ -64,12 +64,12 @@ func (app *App) saveBlogPost(writer http.ResponseWriter, request *http.Request, 
 		return
 	}
 	form := blogPostFormFromRequest(request, oldSlug == "")
-	if len(form.Title) > 200 || len(form.Slug) > 200 || len(form.Markdown) > 1<<20 {
+	if len(form.Title) > 200 || len(form.Slug) > 200 || len(form.Description) > 300 || len(form.Markdown) > 1<<20 {
 		app.renderBlogEditor(writer, request, form, "The blogpost fields exceed the allowed size.", http.StatusUnprocessableEntity)
 		return
 	}
 	slug, err := app.blog.Save(blog.SaveInput{
-		Title: form.Title, Slug: form.Slug, Language: form.Language, Status: form.Status,
+		Title: form.Title, Slug: form.Slug, Description: form.Description, Language: form.Language, Status: form.Status,
 		PublishedAt: form.PublishedAt, Markdown: form.Markdown, Revision: form.Revision,
 	}, oldSlug)
 	if err != nil {
@@ -86,7 +86,7 @@ func blogPostFormFromRequest(request *http.Request, isNew bool) web.BlogPostForm
 	}
 	return web.BlogPostForm{
 		IsNew: isNew, FormAction: action, CurrentSlug: request.PathValue("slug"), Revision: request.PostForm.Get("revision"),
-		Title: request.PostForm.Get("title"), Slug: request.PostForm.Get("slug"),
+		Title: request.PostForm.Get("title"), Slug: request.PostForm.Get("slug"), Description: request.PostForm.Get("description"),
 		Language: request.PostForm.Get("language"), Status: request.PostForm.Get("status"), PublishedAt: request.PostForm.Get("publishedAt"),
 		Markdown: request.PostForm.Get("markdown"),
 	}
@@ -99,7 +99,7 @@ func blogPostForm(document blog.Document) (web.BlogPostForm, error) {
 	}
 	return web.BlogPostForm{
 		FormAction: "/admin/blogposts/" + document.Metadata.Slug + "/save", CurrentSlug: document.Metadata.Slug, Revision: document.Metadata.UpdatedAt,
-		Title: document.Metadata.Title, Slug: document.Metadata.Slug, Language: document.Metadata.Language, Status: document.Metadata.Status,
+		Title: document.Metadata.Title, Slug: document.Metadata.Slug, Description: document.Metadata.Description, Language: document.Metadata.Language, Status: document.Metadata.Status,
 		PublishedAt: publishedAt, Markdown: document.Markdown,
 		PublicURL: "/blog/" + document.Metadata.Slug,
 		CreatedAt: document.Metadata.CreatedAt, UpdatedAt: document.Metadata.UpdatedAt,

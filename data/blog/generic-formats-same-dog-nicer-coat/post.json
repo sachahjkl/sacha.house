@@ -2,6 +2,7 @@
   "id": "generic-formats-same-dog-nicer-coat",
   "slug": "generic-formats-same-dog-nicer-coat",
   "title": "The same dog with a nicer coat: why I left YAML for a key=value file",
+  "description": "Why I replaced a five-field YAML file with key=value lines: what generic formats like YAML, JSON and XML cost in code, bugs and attack surface.",
   "status": "published",
   "publishedAt": "2026-11-10T19:58:10Z",
   "updatedAt": "2026-11-10T19:58:10Z",

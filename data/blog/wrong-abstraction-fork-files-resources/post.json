@@ -2,6 +2,7 @@
   "id": "wrong-abstraction-fork-files-resources",
   "slug": "wrong-abstraction-fork-files-resources",
   "title": "A wrong abstraction is worse than none: fork, files and the myth of the resource",
+  "description": "fork, \"everything is a file\" and the idea of a resource: how a cheap mechanism becomes a universal abstraction, and what it costs.",
   "status": "published",
   "publishedAt": "2026-11-10T19:57:10Z",
   "updatedAt": "2026-11-10T19:57:10Z",

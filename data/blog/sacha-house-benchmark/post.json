@@ -2,6 +2,7 @@
   "id": "sacha-house-benchmark",
   "slug": "sacha-house-benchmark",
   "title": "HTTP Benchmark of sacha.house",
+  "description": "An HTTP load test of sacha.house with oha: about 10,600 requests per second on the projects page, with the latency histogram.",
   "status": "published",
   "publishedAt": "2025-11-21T13:39:54.957804+00:00",
   "updatedAt": "2025-11-23T10:41:10.515281+00:00",

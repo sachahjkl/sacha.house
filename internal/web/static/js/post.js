@@ -1,8 +1,9 @@
 // Blog posts: a viewer (pan, zoom, pinch, full screen) for diagrams and images, and the buttons of a diagram.
 //
-// The diagrams are drawn at build time (tools/diagrams.ts): the server inlines two SVGs per figure, one for each
-// colour scheme, and the stylesheet shows the one of the reader's scheme. Nothing is drawn here, and no library
-// is loaded. Without JavaScript the diagrams still show; only the buttons need it.
+// The diagrams are drawn at build time (tools/diagrams.ts) into two SVG files per figure, one for each colour
+// scheme. The page only reserves their room: this script inlines the SVG of the reader's scheme when its figure
+// comes near the screen, and swaps it when the scheme changes. The SVG is inlined, not shown as an image, because
+// it uses the page's font. Without JavaScript the page shows the drawings as images.
 (function () {
   "use strict";
 
@@ -240,12 +241,67 @@
 
   /* ---------------------------------------------------------------- diagrams */
 
-  // The figure holds the light and the dark drawing; the one the stylesheet shows is the one with a box.
-  function visibleSvg(figure) {
-    for (const svg of figure.querySelectorAll(".diagram-body svg")) {
-      if (svg.getClientRects().length) return svg;
+  const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+  // drawDiagram inlines the drawing of the current scheme into the body of a figure, once per scheme.
+  async function drawDiagram(body) {
+    const scheme = darkScheme.matches ? "dark" : "light";
+    if (body.dataset.drawn === scheme) return;
+    if (body.drawing && body.drawing.scheme === scheme) return body.drawing.done;
+    const done = (async () => {
+      const response = await fetch(body.dataset[scheme]);
+      if (!response.ok) throw new Error(response.status + " " + response.url);
+      const parsed = new DOMParser().parseFromString(await response.text(), "image/svg+xml");
+      const svg = parsed.documentElement;
+      if (svg.localName !== "svg") throw new Error("not an SVG: " + response.url);
+      if ((darkScheme.matches ? "dark" : "light") !== scheme) return;
+      const current = body.querySelector(":scope > svg, :scope > .diagram-slot");
+      const drawing = document.importNode(svg, true);
+      if (current) current.replaceWith(drawing);
+      else body.prepend(drawing);
+      body.dataset.drawn = scheme;
+    })();
+    body.drawing = { scheme, done };
+    try {
+      await done;
+    } catch (error) {
+      console.error("diagram:", error);
+    } finally {
+      if (body.drawing && body.drawing.done === done) body.drawing = null;
     }
-    return figure.querySelector(".diagram-body svg");
+  }
+
+  const nearScreen = "IntersectionObserver" in window
+    ? new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        nearScreen.unobserve(entry.target);
+        entry.target.dataset.near = "true";
+        drawDiagram(entry.target);
+      }
+    }, { rootMargin: "800px 0px" })
+    : null;
+
+  function diagramBodies() {
+    return document.querySelectorAll(".diagram-body[data-light]");
+  }
+
+  darkScheme.addEventListener("change", () => {
+    for (const body of diagramBodies()) {
+      if (body.dataset.near) drawDiagram(body);
+    }
+  });
+
+  // Printing shows every diagram, even those the reader never scrolled to.
+  window.addEventListener("beforeprint", () => {
+    for (const body of diagramBodies()) drawDiagram(body);
+  });
+
+  async function figureSvg(figure) {
+    const body = figure.querySelector(".diagram-body");
+    if (!body) return null;
+    await drawDiagram(body);
+    return body.querySelector(":scope > svg");
   }
 
   function figureSource(figure) {
@@ -253,8 +309,8 @@
     return pre ? pre.textContent : "";
   }
 
-  function openDiagram(figure) {
-    const svg = visibleSvg(figure);
+  async function openDiagram(figure) {
+    const svg = await figureSvg(figure);
     if (!svg) return;
     const copy = svg.cloneNode(true);
     const [width, height] = svgSize(svg);
@@ -265,11 +321,10 @@
     openViewer(copy, width, height, figure.dataset.title || "Diagram", figure.querySelector(".diagram-body"));
   }
 
-  function downloadDiagram(figure) {
-    const svg = visibleSvg(figure);
+  async function downloadDiagram(figure) {
+    const svg = await figureSvg(figure);
     if (!svg) return;
     const clone = svg.cloneNode(true);
-    clone.removeAttribute("class");
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: "image/svg+xml" }));
     const link = element("a");
@@ -310,6 +365,13 @@
     const root = document.querySelector("article.prose") || document.body;
     makeImagesZoomable(root);
     root.querySelectorAll("figure.diagram-ready").forEach(wireDiagram);
+    for (const body of diagramBodies()) {
+      if (nearScreen) nearScreen.observe(body);
+      else {
+        body.dataset.near = "true";
+        drawDiagram(body);
+      }
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);

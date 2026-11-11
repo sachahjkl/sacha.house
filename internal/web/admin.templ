@@ -179,6 +179,7 @@ templ AdminBlogPostEditorContent(data AdminBlogPostEditorPageData) {
 			<div class="form-grid">
 				<label class="field"><span>Title</span><input class="input" id="blog-title" type="text" name="title" value={ data.Form.Title } required/></label>
 				<label class="field"><span>Slug</span><input class="input" id="blog-slug" type="text" name="slug" value={ data.Form.Slug } required/></label>
+				<label class="field"><span>Description</span><input class="input" id="blog-description" type="text" name="description" value={ data.Form.Description } maxlength="300" placeholder="One sentence for search results and link previews"/></label>
 				<label class="field">
 					<span>Status</span>
 					<select class="input" name="status">

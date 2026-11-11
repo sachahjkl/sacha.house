@@ -39,9 +39,12 @@ var (
 )
 
 type Metadata struct {
-	ID          string `json:"id"`
-	Slug        string `json:"slug"`
-	Title       string `json:"title"`
+	ID    string `json:"id"`
+	Slug  string `json:"slug"`
+	Title string `json:"title"`
+	// Description is the one-sentence summary of search results and link previews. An empty description falls
+	// back to an excerpt of the post.
+	Description string `json:"description,omitempty"`
 	Language    string `json:"language"`
 	Status      string `json:"status"`
 	PublishedAt string `json:"publishedAt"`
@@ -58,6 +61,7 @@ type Document struct {
 type SaveInput struct {
 	Title       string
 	Slug        string
+	Description string
 	Language    string
 	Status      string
 	PublishedAt string
@@ -269,7 +273,8 @@ func (store *Store) Save(input SaveInput, oldSlug string) (string, error) {
 	}
 
 	metadata := Metadata{
-		ID: existing.Metadata.ID, Slug: newSlug, Title: title, Language: language, Status: status,
+		ID: existing.Metadata.ID, Slug: newSlug, Title: title, Description: strings.TrimSpace(input.Description),
+		Language: language, Status: status,
 		PublishedAt: published, UpdatedAt: now, CreatedAt: createdAt, Author: store.defaultAuthor,
 	}
 	if metadata.ID == "" {
@@ -579,14 +584,16 @@ func (store *Store) loadMetadata(slug string) (Metadata, error) {
 	return metadata, nil
 }
 
-// Diagrams returns the prerendered diagrams of a post, or nil when it has none.
-func (store *Store) Diagrams(slug string) Diagrams {
+// Assets locates the assets of a post and its prerendered diagrams, for RenderPost.
+func (store *Store) Assets(slug string) PostAssets {
 	if !validSlug(slug) {
-		return nil
+		return PostAssets{}
 	}
 	store.mu.RLock()
 	defer store.mu.RUnlock()
-	return LoadDiagrams(store.postDirectory(slug))
+	assets := PostAssets{Directory: filepath.Join(store.postDirectory(slug), "assets"), URL: MediaURLPrefix + "/" + slug + "/assets"}
+	assets.Diagrams = LoadDiagrams(assets.Directory, assets.URL)
+	return assets
 }
 
 func (store *Store) postDirectory(slug string) string { return filepath.Join(store.root, slug) }

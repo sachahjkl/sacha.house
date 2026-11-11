@@ -18,7 +18,7 @@ func TestMarkdown(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(html, "<h1 id=\"heading\">Heading</h1>") || !strings.Contains(html, "<img src=\"/image.png\" alt=\"secret alt\">") {
+	if !strings.Contains(html, "<h1 id=\"heading\">Heading</h1>") || !strings.Contains(html, "<img src=\"/image.png\" alt=\"secret alt\" loading=\"lazy\" decoding=\"async\">") {
 		t.Fatalf("RenderMarkdown() = %q", html)
 	}
 }

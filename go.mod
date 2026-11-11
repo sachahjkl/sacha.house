@@ -1,6 +1,6 @@
 module sacha.house
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/a-h/templ v0.3.1020
@@ -34,10 +34,11 @@ require (
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
+	golang.org/x/image v0.48.0 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/tools v0.35.0 // indirect
 )
 

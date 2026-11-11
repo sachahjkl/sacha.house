@@ -26,9 +26,13 @@ var textRootAssets = map[string]struct{}{
 func (app *App) staticHandler() http.Handler {
 	server := http.StripPrefix("/static/", http.FileServerFS(app.static))
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		if app.options.Development {
+		switch {
+		case app.options.Development:
 			writer.Header().Set("Cache-Control", "no-store")
-		} else {
+		case request.URL.Query().Get("v") != "":
+			// The pages add ?v=<commit> to the stylesheet and the scripts: a new build is a new URL.
+			writer.Header().Set("Cache-Control", immutableCache)
+		default:
 			writer.Header().Set("Cache-Control", publicCache)
 		}
 		server.ServeHTTP(writer, request)

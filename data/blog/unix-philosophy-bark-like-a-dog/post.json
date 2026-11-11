@@ -2,6 +2,7 @@
   "id": "unix-philosophy-bark-like-a-dog",
   "slug": "unix-philosophy-bark-like-a-dog",
   "title": "The Unix Philosophy: Making a duck, a mouse and an elephant bark like a dog",
+  "description": "Where the Unix text stream comes from, and why one untyped interface for every program makes a duck, a mouse and an elephant bark like a dog.",
   "status": "published",
   "publishedAt": "2026-11-10T19:25:30Z",
   "updatedAt": "2026-11-10T19:25:30Z",
