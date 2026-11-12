@@ -1,3 +1,7 @@
+![A blurred orange road sign reading ROAD WORK AHEAD, seen through a car windshield, with palm trees behind it](/media/blog/beware-big-ideas-ahead/assets/road-work-ahead.jpg)
+
+*Big ideas ahead? Uh, yeah, I sure hope they work.*[^vine]
+
 Every few years, a good idea gets loose.
 
 It is a real idea. It solved a real problem, for real people, in a real place. Then it grows. Within a couple of years it is no longer a tool, it is a worldview. It explains everything and it must be applied everywhere, and the developers who hold it start to build programs for the idea, not for the problem.
@@ -72,3 +76,4 @@ Beware.
 [^prime]: Marcin Kolny, [Scaling up the Prime Video audio/video monitoring service and reducing costs by 90%](https://www.primevideotech.com/video-streaming/scaling-up-the-prime-video-audio-video-monitoring-service-and-reducing-costs-by-90), Prime Video Tech, 2023, as quoted in the [report of DevClass](https://www.devclass.com/ci-cd/2023/05/05/reduce-costs-by-90-by-moving-from-microservices-to-monolith-amazon-internal-case-study-raises-eyebrows/1621790).
 [^dhh]: David Heinemeier Hansson, [Even Amazon can't make sense of serverless or microservices](https://world.hey.com/dhh/even-amazon-can-t-make-sense-of-serverless-or-microservices-59625580), 2023, as quoted in the same DevClass report.
 [^thomas]: Dave Thomas, [Agile is Dead (Long Live Agility)](https://pragdave.me/thoughts/active/2014-03-04-time-to-kill-agile.html), 2014.
+[^vine]: Screenshot of a Vine by Drew Gooden, supplied by the author. The caption turns his answer to the sign, "Uh, yeah, I sure hope it does", into the question of this post.
