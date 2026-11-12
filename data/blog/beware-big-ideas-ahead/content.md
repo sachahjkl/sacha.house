@@ -52,16 +52,6 @@ Fielding's hypertext constraint is a serious answer to how an interface can last
 
 The idea is not the problem. The capture is. A good idea has a home: the context it was made in. The cycle takes it out of its home and applies it to the street. The signs of it are always the same. People defend the idea instead of describing the program. The costs are named by the critics, not by the believers. And the idea comes with a vocabulary that makes the question "what does this cost here?" feel rude.
 
-## The current one
-
-The idea of the moment is AI, and it is the biggest one so far. It is also a real one. I use it every day.
-
-It has already gone through the first four steps. There is a principle: the agent writes the code. There is an identity. And there are people for whom a program that an agent wrote is good because an agent wrote it, and who have stopped looking at what it does.
-
-The numbers are not an argument against the idea. They are a description of what it does to what it meets. The DORA report of 2025 says that AI's primary role in software development "is that of an amplifier. It magnifies the strengths of high-performing organizations and the dysfunctions of struggling ones."[^dora] An amplifier does not choose. If the program was bad, it makes it bad faster. If the team measured nothing, it now measures nothing at ten times the volume.
-
-That is the case for the constraints of [the last article](/blog/free-man-is-constrained). A big idea without a harness runs away with its believers.
-
 ## How to tell
 
 There is one test that I use. I take the idea, and I ask someone who believes in it to name what it costs in this program. Not in general, in this program.
@@ -82,4 +72,3 @@ Beware.
 [^prime]: Marcin Kolny, [Scaling up the Prime Video audio/video monitoring service and reducing costs by 90%](https://www.primevideotech.com/video-streaming/scaling-up-the-prime-video-audio-video-monitoring-service-and-reducing-costs-by-90), Prime Video Tech, 2023, as quoted in the [report of DevClass](https://www.devclass.com/ci-cd/2023/05/05/reduce-costs-by-90-by-moving-from-microservices-to-monolith-amazon-internal-case-study-raises-eyebrows/1621790).
 [^dhh]: David Heinemeier Hansson, [Even Amazon can't make sense of serverless or microservices](https://world.hey.com/dhh/even-amazon-can-t-make-sense-of-serverless-or-microservices-59625580), 2023, as quoted in the same DevClass report.
 [^thomas]: Dave Thomas, [Agile is Dead (Long Live Agility)](https://pragdave.me/thoughts/active/2014-03-04-time-to-kill-agile.html), 2014.
-[^dora]: DORA, [State of AI-assisted Software Development 2025](https://dora.dev/research/2025/dora-report/).
