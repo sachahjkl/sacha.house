@@ -2,6 +2,10 @@ An abstraction is a loan.
 
 It gives you something now: you stop thinking about the machine and start thinking about the problem. The price comes later, with interest, in cycles, in memory and in the hours you spend finding out what the layer was doing for you. The better the abstraction hides the price, the more you will borrow.
 
+![Five painted matryoshka dolls of different sizes standing in a row, with two tiny ones in front](/media/blog/abstraction-is-a-loan/assets/matryoshka.jpg)
+
+*Each layer hides the next one. The price is in the smallest doll.*[^photos]
+
 ## The layer that leaks
 
 Joel Spolsky named the problem in 2002: "All non-trivial abstractions, to some degree, are leaky. Abstractions fail. Sometimes a little, sometimes a lot."[^spolsky]
@@ -32,6 +36,10 @@ The danger grows with the width. A wide abstraction covers many things, so it ca
 
 The other way to build is to compose.
 
+![Loose LEGO bricks of several colors and sizes lying on a table, with a coin for scale](/media/blog/abstraction-is-a-loan/assets/bricks.jpg)
+
+*Nothing underneath. Every piece shows what it is and how it connects.*
+
 Composition is putting structures next to each other and inside each other, with nothing underneath that holds them together. An array of records. A record that holds another record. A pipe that connects a program that reads to a program that writes. You can see the whole thing, because it is only the parts and the way they touch.
 
 The pipe is the oldest example. The 1974 Unix paper describes a "filter", a program that copies its input to its output with some processing, and a line of them chained with `|`.[^unix] Each filter is small. The structure of the whole is the order in which they are written. There is no framework above them that knows what they mean.
@@ -60,3 +68,4 @@ The first rule keeps Dijkstra's tool. The second keeps the loan from growing. Th
 [^proverbs]: Rob Pike, [Go Proverbs](https://go-proverbs.github.io/).
 [^metz]: Sandi Metz, [The Wrong Abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction), 2016.
 [^unix]: Dennis M. Ritchie and Ken Thompson, [The UNIX Time-Sharing System](https://people.eecs.berkeley.edu/~brewer/cs262/unix.pdf), 1974, section 6.2.
+[^photos]: Photographs from Wikimedia Commons, resized: [matryoshka dolls](https://commons.wikimedia.org/wiki/File:Matryoshka_from_Hungary.jpg) by Wilfredor (CC0), and [LEGO bricks](https://commons.wikimedia.org/wiki/File:LEGO-01.jpg) by Priwo (public domain).
