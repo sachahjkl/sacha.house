@@ -91,10 +91,10 @@ type CareerPageData struct {
 }
 
 func Career(language string) CareerProfile {
-	if language == "en" {
-		return careerEN()
+	if language == "fr" {
+		return careerFR()
 	}
-	return careerFR()
+	return careerEN()
 }
 
 func careerPath(full bool, language string) string {
@@ -102,8 +102,8 @@ func careerPath(full bool, language string) string {
 	if full {
 		path = "/cv"
 	}
-	if language == "en" {
-		return path + "?lang=en"
+	if language == "fr" {
+		return path + "?lang=fr"
 	}
 	return path
 }

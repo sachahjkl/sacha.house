@@ -73,9 +73,9 @@ func (app *App) notFound(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (app *App) careerPage(writer http.ResponseWriter, request *http.Request, full bool) {
-	language := "fr"
-	if request.URL.Query().Get("lang") == "en" {
-		language = "en"
+	language := "en"
+	if request.URL.Query().Get("lang") == "fr" {
+		language = "fr"
 	}
 	profile := web.Career(language)
 	documentName := profile.ResumeLabel

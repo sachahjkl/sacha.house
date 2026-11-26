@@ -416,7 +416,7 @@ func AboutContent(data AboutPageData) templ.Component {
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</ol><p class=\"actions\"><a class=\"btn\" href=\"/resume?lang=en\">one-page résumé</a> <a class=\"btn\" href=\"/cv?lang=en\">full cv</a></p></section><section id=\"education\" class=\"mb-10\"><h2 class=\"h2\">education</h2><ol class=\"timeline\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</ol><p class=\"actions\"><a class=\"btn\" href=\"/resume\">one-page résumé</a> <a class=\"btn\" href=\"/cv\">full cv</a></p></section><section id=\"education\" class=\"mb-10\"><h2 class=\"h2\">education</h2><ol class=\"timeline\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
