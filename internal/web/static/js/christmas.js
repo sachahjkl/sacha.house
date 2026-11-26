@@ -115,12 +115,6 @@
   let toggle = null;
   let resizeTimer = 0;
 
-  function footerHeight() {
-    const footer = document.querySelector("footer");
-    // Only a footer pinned to the viewport takes room from the ground; one at the end of the page does not.
-    return footer && getComputedStyle(footer).position === "fixed" ? footer.offsetHeight : 0;
-  }
-
   const BULB_COLORS = ["#ff2b2b", "#39ff14", "#ffd24a", "#00b7ff", "#ff2bd6", "#ff8a00"];
   const ORNAMENTS = ["bell", "glowing-star", "candy", "cookie", "wrapped-gift"];
 
@@ -202,7 +196,6 @@
       lights.append(bulb);
     });
     ground.append(lights);
-    document.body.append(ground);
     buildGround();
 
     const chip = el("div", "xmas-chip");
@@ -212,14 +205,22 @@
     toggle = el("button", "", { type: "button" });
     toggle.addEventListener("click", () => setEnabled(!enabled));
     chip.append(chipText, toggle);
-    document.body.append(chip);
+
+    // Sticky floors in the flow just above the footer: they ride the bottom of the viewport, then rest on the footer
+    // once it scrolls in, so the snow lies on the footer instead of covering it, without a scroll handler.
+    const groundFloor = el("div", "xmas-floor ground");
+    const chipFloor = el("div", "xmas-floor chip");
+    groundFloor.append(ground);
+    chipFloor.append(chip);
+    const footer = document.querySelector("body > footer");
+    if (footer) footer.before(groundFloor, chipFloor);
+    else document.body.append(groundFloor, chipFloor);
 
     layout();
     setEnabled(enabled, true);
   }
 
   function layout() {
-    document.documentElement.style.setProperty("--xmas-footer", `${footerHeight()}px`);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     for (const canvas of [backCanvas, frontCanvas]) {
       canvas.width = Math.round(innerWidth * dpr);

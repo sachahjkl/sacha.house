@@ -137,12 +137,27 @@ html.xmas ::selection {
 
 /* ------------------------------------------------------------------ ground */
 
-.xmas-ground {
-  position: fixed;
-  right: 0;
-  bottom: var(--xmas-footer, 0px);
-  left: 0;
+/* Height 0 so the floors take no room; sticky so they stop on the footer (see build() in christmas.js) */
+.xmas-floor {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
+  height: 0;
+}
+
+.xmas-floor.ground {
   z-index: 4;
+}
+
+.xmas-floor.chip {
+  z-index: 70;
+}
+
+.xmas-ground {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
   height: 64px;
   pointer-events: none;
 }
@@ -246,10 +261,9 @@ html.xmas ::selection {
 /* -------------------------------------------------------------------- chip */
 
 .xmas-chip {
-  position: fixed;
+  position: absolute;
   right: 10px;
-  bottom: calc(var(--xmas-footer, 0px) + 68px);
-  z-index: 70;
+  bottom: 68px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -293,7 +307,7 @@ html.xmas-off .xmas-gift {
 }
 
 html.xmas-off .xmas-chip {
-  bottom: calc(var(--xmas-footer, 0px) + 8px);
+  bottom: 8px;
 }
 
 /* ------------------------------------------------------------------- santa */
@@ -456,7 +470,7 @@ html.xmas .avatar picture::after {
   }
 
   .xmas-chip {
-    bottom: calc(var(--xmas-footer, 0px) + 66px);
+    bottom: 66px;
     font-size: 0.72rem;
   }
 
