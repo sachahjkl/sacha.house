@@ -407,15 +407,14 @@
       }
     }
 
-    function markNear() {
-      if (!column) return;
-      const from = window.innerHeight * 0.12;
-      const to = window.innerHeight * 0.7;
-      for (const pair of pairs) {
-        const top = pair.sup.getBoundingClientRect().top;
-        pair.note.classList.toggle("is-near", top >= from && top <= to);
-      }
-    }
+    // A note is near while its number is between 12 % and 70 % of the screen's height. An observer tells, so the
+    // scroll measures nothing.
+    const bySup = new Map();
+    const near = "IntersectionObserver" in window
+      ? new IntersectionObserver((entries) => {
+        for (const entry of entries) bySup.get(entry.target).note.classList.toggle("is-near", entry.isIntersecting);
+      }, { rootMargin: "-12% 0px -30% 0px" })
+      : null;
 
     function build() {
       if (column) column.remove();
@@ -426,10 +425,13 @@
       for (const pair of pairs) column.append(pair.note);
       root.append(column);
       place();
-      markNear();
     }
 
     collect();
+    for (const pair of pairs) {
+      bySup.set(pair.sup, pair);
+      if (near) near.observe(pair.sup);
+    }
     for (const pair of pairs) {
       for (const node of [pair.sup, pair.note]) {
         node.addEventListener("mouseenter", () => highlight(pair, true));
@@ -449,13 +451,9 @@
     let frame = 0;
     const refresh = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        place();
-        markNear();
-      });
+      frame = requestAnimationFrame(place);
     };
     wide.addEventListener("change", build);
-    window.addEventListener("scroll", () => requestAnimationFrame(markNear), { passive: true });
     window.addEventListener("resize", refresh);
     if (window.ResizeObserver) new ResizeObserver(refresh).observe(root);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);

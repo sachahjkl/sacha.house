@@ -13,3 +13,5 @@ The site is one Go binary. templ renders the pages, Datastar adds progressive na
   `?lang=fr` gives the French version. The data of both versions lives in `internal/web/career.go`.
 
 ## File Index
+
+- [features/christmas.md](features/christmas.md): the Christmas decoration and the rules that keep its cost low.

@@ -37,18 +37,23 @@ html.xmas ::selection {
   fill: #2b3a2b;
 }
 
+/* The glow filters are painted once in each rhythm's layer; only the layer's opacity twinkles (the compositor's job). */
 .xmas-bulb {
   fill: currentColor;
   filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 12px currentColor);
+}
+
+.xmas-lights {
+  will-change: opacity;
   animation: xmas-twinkle-a 2.4s ease-in-out infinite;
 }
 
-.xmas-bulb.b1 {
+.xmas-lights.b1 {
   animation-name: xmas-twinkle-b;
   animation-duration: 3.1s;
 }
 
-.xmas-bulb.b2 {
+.xmas-lights.b2 {
   animation-name: xmas-twinkle-c;
   animation-duration: 1.9s;
 }
@@ -69,13 +74,26 @@ html.xmas ::selection {
   40%, 60% { opacity: 0.25; }
 }
 
+/* The wrapper swings; the shadow is on the image inside, so it is painted once and not filtered each frame. */
 .xmas-ornament {
   position: absolute;
   width: 22px;
   height: 22px;
   transform-origin: 50% 0;
   animation: xmas-swing 3.6s ease-in-out infinite;
+}
+
+.xmas-ornament img {
+  display: block;
+  width: 100%;
+  height: 100%;
   filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.45));
+}
+
+/* Off the screen, the garland stops: nothing seen, nothing to animate */
+.xmas-garland.xmas-still .xmas-lights,
+.xmas-garland.xmas-still .xmas-ornament {
+  animation-play-state: paused;
 }
 
 .xmas-ornament:nth-of-type(2n) {
@@ -95,20 +113,14 @@ html.xmas ::selection {
 
 /* -------------------------------------------------------------------- snow */
 
+/* One canvas above the text for every depth of snow (see internal/md/features/christmas.md) */
 .xmas-snow {
   position: fixed;
   inset: 0;
+  z-index: 60;
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-.xmas-snow.back {
-  z-index: -1;
-}
-
-.xmas-snow.front {
-  z-index: 60;
 }
 
 .xmas-frost {
@@ -238,6 +250,24 @@ html.xmas ::selection {
   height: 60px;
 }
 
+/* As for the garland: one layer per rhythm, whose opacity twinkles */
+.xmas-tree-lights > div {
+  position: absolute;
+  inset: 0;
+  will-change: opacity;
+  animation: xmas-twinkle-a 1.7s ease-in-out infinite;
+}
+
+.xmas-tree-lights > .b1 {
+  animation-name: xmas-twinkle-b;
+  animation-duration: 2.3s;
+}
+
+.xmas-tree-lights > .b2 {
+  animation-name: xmas-twinkle-c;
+  animation-duration: 1.3s;
+}
+
 .xmas-tree-lights i {
   position: absolute;
   width: 5px;
@@ -245,17 +275,6 @@ html.xmas ::selection {
   border-radius: 50%;
   background: currentColor;
   box-shadow: 0 0 6px 2px currentColor;
-  animation: xmas-twinkle-a 1.7s ease-in-out infinite;
-}
-
-.xmas-tree-lights i:nth-child(2n) {
-  animation-name: xmas-twinkle-b;
-  animation-duration: 2.3s;
-}
-
-.xmas-tree-lights i:nth-child(3n) {
-  animation-name: xmas-twinkle-c;
-  animation-duration: 1.3s;
 }
 
 /* -------------------------------------------------------------------- chip */
@@ -336,6 +355,11 @@ html.xmas-off .xmas-chip {
   flex-direction: row-reverse;
   align-items: flex-end;
   animation: xmas-bob 2.4s ease-in-out infinite;
+}
+
+/* The shadow is on parts that do not move inside the bobbing layer, so it is painted once */
+.xmas-santa .deer img,
+.xmas-santa .sleigh {
   filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.5));
 }
 
@@ -355,6 +379,7 @@ html.xmas-off .xmas-chip {
 }
 
 .xmas-santa .deer {
+  display: block;
   margin-left: -10px;
 }
 
@@ -483,9 +508,9 @@ html.xmas .avatar picture::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .xmas-bulb,
+  .xmas-lights,
   .xmas-ornament,
-  .xmas-tree-lights i {
+  .xmas-tree-lights > div {
     animation: none;
   }
 }

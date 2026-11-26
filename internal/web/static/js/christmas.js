@@ -109,8 +109,7 @@
   let stopSanta = null;
   let garland = null;
   let ground = null;
-  let backCanvas = null;
-  let frontCanvas = null;
+  let canvas = null;
   let chipText = null;
   let toggle = null;
   let resizeTimer = 0;
@@ -130,9 +129,11 @@
       path += ` Q${((index + 0.5) * swagWidth).toFixed(1)} ${top + 2 * sag} ${((index + 1) * swagWidth).toFixed(1)} ${top}`;
     }
     const count = Math.floor(width / (width < 600 ? 34 : 44));
-    let bulbs = "";
+    // The bulbs of one rhythm share an SVG layer whose opacity twinkles: the glow filters are painted once.
+    const rhythms = ["", "", ""];
+    let sockets = "";
     let strings = "";
-    garland.querySelectorAll(".xmas-ornament").forEach((node) => node.remove());
+    garland.querySelectorAll(".xmas-ornament, svg").forEach((node) => node.remove());
     for (let index = 0; index < count; index++) {
       const x = (index + 0.5) * (width / count);
       const t = (x % swagWidth) / swagWidth;
@@ -140,18 +141,20 @@
       const color = BULB_COLORS[index % BULB_COLORS.length];
       if (index % 5 === 2) {
         strings += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 8).toFixed(1)}" stroke="#7b8a7b" stroke-width="1"/>`;
-        const ornament = icon(ORNAMENTS[(index / 5 | 0) % ORNAMENTS.length], "xmas-ornament");
+        // The wrapper swings and the image inside keeps its drop shadow, so the shadow is not filtered again each frame.
+        const ornament = el("span", "xmas-ornament");
+        ornament.append(icon(ORNAMENTS[(index / 5 | 0) % ORNAMENTS.length]));
         ornament.style.left = `${(x - 11).toFixed(1)}px`;
         ornament.style.top = `${(y + 8).toFixed(1)}px`;
         garland.append(ornament);
       } else {
-        bulbs += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><rect class="xmas-socket" x="-2.2" y="0" width="4.4" height="6" rx="1"/>` +
-          `<ellipse class="xmas-bulb b${index % 3}" cx="0" cy="11.5" rx="4.2" ry="6" style="color:${color}"/></g>`;
+        sockets += `<rect class="xmas-socket" x="${(x - 2.2).toFixed(1)}" y="${y.toFixed(1)}" width="4.4" height="6" rx="1"/>`;
+        rhythms[index % 3] += `<ellipse class="xmas-bulb" cx="${x.toFixed(1)}" cy="${(y + 11.5).toFixed(1)}" rx="4.2" ry="6" style="color:${color}"/>`;
       }
     }
-    const svg = `<svg class="xmas-wire" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/>${strings}${bulbs}</svg>`;
-    const previous = garland.querySelector("svg.xmas-wire");
-    if (previous) previous.remove();
+    const open = (className) => `<svg class="${className}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">`;
+    const svg = `${open("xmas-wire")}<path d="${path}"/>${strings}${sockets}</svg>` +
+      rhythms.map((bulbs, rhythm) => `${open(`xmas-wire xmas-lights b${rhythm}`)}${bulbs}</svg>`).join("");
     garland.insertAdjacentHTML("afterbegin", svg);
   }
 
@@ -175,11 +178,13 @@
     garland = el("div", "xmas-garland", { "aria-hidden": "true" });
     document.body.prepend(garland);
     buildGarland();
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([entry]) => garland.classList.toggle("xmas-still", !entry.isIntersecting)).observe(garland);
+    }
 
-    backCanvas = el("canvas", "xmas-snow back", { "aria-hidden": "true" });
-    frontCanvas = el("canvas", "xmas-snow front", { "aria-hidden": "true" });
+    canvas = el("canvas", "xmas-snow", { "aria-hidden": "true" });
     const frost = el("div", "xmas-frost", { "aria-hidden": "true" });
-    document.body.append(backCanvas, frontCanvas, frost);
+    document.body.append(canvas, frost);
 
     ground = el("div", "xmas-ground", { "aria-hidden": "true" });
     const bank = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -187,13 +192,15 @@
     bank.setAttribute("preserveAspectRatio", "none");
     ground.append(bank, icon("christmas-tree", "xmas-scene tree"), icon("wrapped-gift", "xmas-scene gift-a"),
       icon("wrapped-gift", "xmas-scene gift-b"), icon("snowman-without-snow", "xmas-scene snowman"), icon("cookie", "xmas-scene cookie"));
+    // One layer per rhythm, as for the garland: the opacity of the layer twinkles, the glows are painted once.
     const lights = el("div", "xmas-tree-lights");
+    const rhythms = [0, 1, 2].map((rhythm) => lights.appendChild(el("div", `b${rhythm}`)));
     [[48, 28], [30, 44], [66, 48], [40, 62], [58, 66], [50, 80], [34, 82], [68, 82]].forEach(([x, y], index) => {
       const bulb = el("i");
       bulb.style.left = `${x}%`;
       bulb.style.top = `${y}%`;
       bulb.style.color = BULB_COLORS[index % BULB_COLORS.length];
-      lights.append(bulb);
+      rhythms[(index + 1) % 3 === 0 ? 2 : (index + 1) % 2 === 0 ? 1 : 0].append(bulb);
     });
     ground.append(lights);
     buildGround();
@@ -220,13 +227,11 @@
     setEnabled(enabled, true);
   }
 
+  // One device pixel per CSS pixel even on a DPR 2 screen: the flakes are soft dots, and four times the pixels
+  // to clear and composite each frame showed no difference.
   function layout() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    for (const canvas of [backCanvas, frontCanvas]) {
-      canvas.width = Math.round(innerWidth * dpr);
-      canvas.height = Math.round(innerHeight * dpr);
-      canvas.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
     engine.resize(innerWidth, innerHeight);
   }
 
@@ -249,8 +254,18 @@
 
   /* ----------------------------------------------------------- snow engine */
 
+  // The cost rules of this engine are in internal/md/features/christmas.md.
   const engine = (function () {
+    const LAYERS = [
+      { r: [0.8, 1.7], vy: [14, 26], alpha: [0.3, 0.5], wind: 0.3, amp: [4, 9] },
+      { r: [1.6, 3.0], vy: [26, 46], alpha: [0.5, 0.75], wind: 0.6, amp: [6, 14] },
+      { r: [3.6, 6.4], vy: [52, 92], alpha: [0.7, 0.95], wind: 1.1, amp: [10, 22] },
+    ];
+    const GOLDEN = 0.6180339887;
+    const SPRITE_STEP = 0.5;
+    const MIN_SHARE = 0.4;
     const flakes = [];
+    const gusts = [];
     const sparks = [];
     const rockets = [];
     const pointer = { x: -1000, y: -1000 };
@@ -258,58 +273,76 @@
     let height = innerHeight;
     let frame = 0;
     let last = 0;
+    let lastDraw = 0;
     let wind = 0;
     let windTarget = 0;
     let blizzardUntil = 0;
     let nextFirework = 0;
     let sprites = null;
+    let active = 0;
+    let halfRate = false;
+    let checked = 0;
+    let slow = 0;
+    let pausedUntil = 0;
+    let scrollY0 = scrollY;
+    let scrollAt = 0;
 
+    function sprite(size, paint) {
+      const node = document.createElement("canvas");
+      node.width = node.height = Math.max(1, Math.ceil(size));
+      paint(node.getContext("2d"), node.width / 2);
+      return node;
+    }
+
+    // One dot sprite per radius step, drawn at its final size, so a frame copies the dots without scaling them.
     function makeSprites() {
       const flake = darkQuery.matches ? "255,255,255" : "100,150,210";
-      const dot = document.createElement("canvas");
-      dot.width = dot.height = 48;
-      const dotContext = dot.getContext("2d");
-      const gradient = dotContext.createRadialGradient(24, 24, 0, 24, 24, 24);
-      gradient.addColorStop(0, `rgba(${flake},1)`);
-      gradient.addColorStop(0.45, `rgba(${flake},0.7)`);
-      gradient.addColorStop(1, `rgba(${flake},0)`);
-      dotContext.fillStyle = gradient;
-      dotContext.fillRect(0, 0, 48, 48);
-
-      const crystal = document.createElement("canvas");
-      crystal.width = crystal.height = 96;
-      const context = crystal.getContext("2d");
-      context.translate(48, 48);
-      context.strokeStyle = `rgba(${flake},0.95)`;
-      context.lineCap = "round";
-      context.lineWidth = 3.2;
-      for (let arm = 0; arm < 6; arm++) {
-        context.save();
-        context.rotate((arm * Math.PI) / 3);
-        context.beginPath();
-        context.moveTo(0, 0);
-        context.lineTo(0, -40);
-        for (const [at, length] of [[-14, 12], [-26, 9]]) {
-          context.moveTo(0, at);
-          context.lineTo(length * 0.8, at - length);
-          context.moveTo(0, at);
-          context.lineTo(-length * 0.8, at - length);
-        }
-        context.stroke();
-        context.restore();
+      const dots = [];
+      for (let step = 0; step * SPRITE_STEP <= 6.5; step++) {
+        const r = Math.max(0.5, step * SPRITE_STEP);
+        dots.push(sprite(r * 3, (context, half) => {
+          const gradient = context.createRadialGradient(half, half, 0, half, half, r * 1.5);
+          gradient.addColorStop(0, `rgba(${flake},1)`);
+          gradient.addColorStop(0.45, `rgba(${flake},0.7)`);
+          gradient.addColorStop(1, `rgba(${flake},0)`);
+          context.fillStyle = gradient;
+          context.fillRect(0, 0, half * 2, half * 2);
+        }));
       }
-      return { dot, crystal };
+      // A crystal is drawn large once, then scaled down per radius step with the best filter: drawn small directly,
+      // or scaled with the per-frame filter, its thin arms break into dots.
+      const master = sprite(96, (context, half) => {
+        context.translate(half, half);
+        context.strokeStyle = `rgba(${flake},0.95)`;
+        context.lineCap = "round";
+        context.lineWidth = 3.2;
+        for (let arm = 0; arm < 6; arm++) {
+          context.save();
+          context.rotate((arm * Math.PI) / 3);
+          context.beginPath();
+          context.moveTo(0, 0);
+          context.lineTo(0, -40);
+          for (const [at, length] of [[-14, 12], [-26, 9]]) {
+            context.moveTo(0, at);
+            context.lineTo(length * 0.8, at - length);
+            context.moveTo(0, at);
+            context.lineTo(-length * 0.8, at - length);
+          }
+          context.stroke();
+          context.restore();
+        }
+      });
+      const crystals = dots.map((dot, step) => sprite(Math.max(0.5, step * SPRITE_STEP) * 2.8, (context, half) => {
+        context.imageSmoothingQuality = "high";
+        context.drawImage(master, 0, 0, half * 2, half * 2);
+      }));
+      return { dots, crystals };
     }
 
     function spawn(layer, anywhere, temporary) {
-      const spec = [
-        { r: [0.8, 1.7], vy: [14, 26], alpha: [0.3, 0.5], wind: 0.3, amp: [4, 9] },
-        { r: [1.6, 3.0], vy: [26, 46], alpha: [0.5, 0.75], wind: 0.6, amp: [6, 14] },
-        { r: [3.6, 6.4], vy: [52, 92], alpha: [0.7, 0.95], wind: 1.1, amp: [10, 22] },
-      ][layer];
+      const spec = LAYERS[layer];
       const flake = {
         layer,
-        temporary: !!temporary,
         x: random(-20, width + 20),
         y: anywhere ? random(-10, height) : random(-40, -8),
         r: random(spec.r[0], spec.r[1]),
@@ -323,18 +356,22 @@
         spin: random(-1.2, 1.2),
         crystal: layer === 2 && Math.random() < 0.45,
       };
-      flakes.push(flake);
+      flake.sprite = Math.round(flake.r / SPRITE_STEP);
+      (temporary ? gusts : flakes).push(flake);
       return flake;
     }
 
+    // The depths are interleaved, so any first part of the list, which the frame guard keeps, has every depth in
+    // the same proportions: 38 % far, 42 % middle, 20 % near.
     function populate() {
       flakes.length = 0;
       const area = width * height;
       const total = clamp(Math.round(area / (width < 700 ? 12000 : 8500)), 60, 280);
       for (let index = 0; index < total; index++) {
-        const roll = index / total;
+        const roll = (index * GOLDEN) % 1;
         spawn(roll < 0.38 ? 0 : roll < 0.8 ? 1 : 2, true, false);
       }
+      active = total;
     }
 
     function resize(w, h) {
@@ -380,6 +417,23 @@
       for (let index = 0; index < 220; index++) spawn(index % 3, false, true).y = random(-height * 0.6, 0);
     }
 
+    function move(flake, dt, storm) {
+      flake.phase += flake.sway * dt;
+      flake.angle += flake.spin * dt;
+      flake.y += flake.vy * dt * (storm ? 1.4 : 1);
+      flake.x += (wind * 60 * flake.windK + Math.sin(flake.phase) * flake.amp) * dt;
+      if (flake.layer === 2) {
+        const dx = flake.x - pointer.x;
+        const dy = flake.y - pointer.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance < 90 && distance > 0.1) {
+          flake.x += (dx / distance) * (90 - distance) * dt * 5;
+          flake.y += (dy / distance) * (90 - distance) * dt * 5;
+        }
+      }
+      return flake.y > height + 12 || flake.x < -60 || flake.x > width + 60;
+    }
+
     function update(dt, now) {
       const storm = now < blizzardUntil;
       const pointerWind = clamp((pointer.x / width - 0.5) * 2, -1, 1);
@@ -387,31 +441,17 @@
       if (!storm) windTarget = pointer.x < 0 ? gust : pointerWind * 0.8 + gust;
       wind += (windTarget - wind) * Math.min(1, dt * 1.6);
 
-      for (let index = flakes.length - 1; index >= 0; index--) {
+      for (let index = 0; index < active; index++) {
         const flake = flakes[index];
-        flake.phase += flake.sway * dt;
-        flake.angle += flake.spin * dt;
-        flake.y += flake.vy * dt * (storm ? 1.4 : 1);
-        flake.x += (wind * 60 * flake.windK + Math.sin(flake.phase) * flake.amp) * dt;
-        if (flake.layer === 2) {
-          const dx = flake.x - pointer.x;
-          const dy = flake.y - pointer.y;
-          const distance = Math.hypot(dx, dy);
-          if (distance < 90 && distance > 0.1) {
-            flake.x += (dx / distance) * (90 - distance) * dt * 5;
-            flake.y += (dy / distance) * (90 - distance) * dt * 5;
-          }
+        if (move(flake, dt, storm)) {
+          flake.y = random(-30, -6);
+          flake.x = random(-20, width + 20);
+          if (wind > 0.8) flake.x -= wind * 80;
+          if (wind < -0.8) flake.x += -wind * 80;
         }
-        if (flake.y > height + 12 || flake.x < -60 || flake.x > width + 60) {
-          if (flake.temporary) {
-            flakes.splice(index, 1);
-          } else {
-            flake.y = random(-30, -6);
-            flake.x = random(-20, width + 20);
-            if (wind > 0.8) flake.x -= wind * 80;
-            if (wind < -0.8) flake.x += -wind * 80;
-          }
-        }
+      }
+      for (let index = gusts.length - 1; index >= 0; index--) {
+        if (move(gusts[index], dt, storm)) gusts.splice(index, 1);
       }
 
       for (let index = sparks.length - 1; index >= 0; index--) {
@@ -459,41 +499,73 @@
       context.fill();
     }
 
+    function drawFlake(context, flake) {
+      context.globalAlpha = flake.alpha;
+      if (flake.crystal) {
+        const cos = Math.cos(flake.angle);
+        const sin = Math.sin(flake.angle);
+        context.setTransform(cos, sin, -sin, cos, flake.x, flake.y);
+        const image = sprites.crystals[flake.sprite];
+        context.drawImage(image, -image.width / 2, -image.height / 2);
+        context.setTransform(1, 0, 0, 1, 0, 0);
+      } else {
+        const image = sprites.dots[flake.sprite];
+        context.drawImage(image, flake.x - image.width / 2, flake.y - image.height / 2);
+      }
+    }
+
+    // The far and middle flakes first, then the near ones over them.
     function draw() {
-      const back = backCanvas.getContext("2d");
-      const front = frontCanvas.getContext("2d");
-      back.clearRect(0, 0, width, height);
-      front.clearRect(0, 0, width, height);
-      for (const flake of flakes) {
-        const context = flake.layer === 2 ? front : back;
-        context.globalAlpha = flake.alpha;
-        if (flake.crystal) {
-          context.save();
-          context.translate(flake.x, flake.y);
-          context.rotate(flake.angle);
-          context.drawImage(sprites.crystal, -flake.r * 1.4, -flake.r * 1.4, flake.r * 2.8, flake.r * 2.8);
-          context.restore();
-        } else {
-          context.drawImage(sprites.dot, flake.x - flake.r * 1.5, flake.y - flake.r * 1.5, flake.r * 3, flake.r * 3);
+      const context = canvas.getContext("2d");
+      context.clearRect(0, 0, width, height);
+      for (const near of [false, true]) {
+        for (let index = 0; index < active; index++) {
+          if ((flakes[index].layer === 2) === near) drawFlake(context, flakes[index]);
         }
+        for (const flake of gusts) if ((flake.layer === 2) === near) drawFlake(context, flake);
       }
-      front.globalAlpha = 1;
-      front.globalCompositeOperation = "lighter";
+      context.globalAlpha = 1;
+      context.globalCompositeOperation = "lighter";
       for (const spark of sparks) {
-        front.globalAlpha = clamp(spark.life / spark.max, 0, 1);
-        front.fillStyle = spark.color;
-        if (spark.size > 2.6) drawStar(front, spark.x, spark.y, spark.size * 0.7);
-        else front.fillRect(spark.x - spark.size / 2, spark.y - spark.size / 2, spark.size, spark.size);
+        context.globalAlpha = clamp(spark.life / spark.max, 0, 1);
+        context.fillStyle = spark.color;
+        if (spark.size > 2.6) drawStar(context, spark.x, spark.y, spark.size * 0.7);
+        else context.fillRect(spark.x - spark.size / 2, spark.y - spark.size / 2, spark.size, spark.size);
       }
-      front.globalCompositeOperation = "source-over";
-      front.globalAlpha = 1;
-      back.globalAlpha = 1;
+      context.globalCompositeOperation = "source-over";
+      context.globalAlpha = 1;
+    }
+
+    // The frame budget guard: every 30 display frames, if more than 8 came late, draw fewer flakes, then draw one
+    // frame in two. If none came late, come back one step.
+    function guard(interval) {
+      if (interval > 25) slow++;
+      if (++checked < 30) return;
+      const total = flakes.length;
+      if (slow > 8) {
+        if (active > Math.ceil(total * MIN_SHARE)) active = Math.max(Math.ceil(total * MIN_SHARE), Math.round(active * 0.8));
+        else halfRate = true;
+      } else if (slow === 0) {
+        if (halfRate) halfRate = false;
+        else active = Math.min(total, active + Math.ceil(total * 0.1));
+      }
+      checked = 0;
+      slow = 0;
     }
 
     function tick(now) {
       frame = requestAnimationFrame(tick);
-      const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+      const interval = now - last;
       last = now;
+      if (now < pausedUntil) {
+        lastDraw = now;
+        return;
+      }
+      guard(interval);
+      // At most one snow frame per 60 Hz frame on a faster screen, and one in two when the guard asks for it.
+      if (now - lastDraw < (halfRate ? 28 : 12)) return;
+      const dt = Math.min(0.05, (now - lastDraw) / 1000 || 0.016);
+      lastDraw = now;
       update(dt, now);
       draw();
     }
@@ -502,7 +574,7 @@
       if (frame || reduced || document.hidden) return;
       sprites = sprites || makeSprites();
       if (!flakes.length) populate();
-      last = performance.now();
+      last = lastDraw = performance.now();
       frame = requestAnimationFrame(tick);
     }
 
@@ -511,10 +583,8 @@
       frame = 0;
       sparks.length = 0;
       rockets.length = 0;
-      if (backCanvas) {
-        backCanvas.getContext("2d").clearRect(0, 0, width, height);
-        frontCanvas.getContext("2d").clearRect(0, 0, width, height);
-      }
+      gusts.length = 0;
+      if (canvas) canvas.getContext("2d").clearRect(0, 0, width, height);
     }
 
     darkQuery.addEventListener("change", () => {
@@ -531,6 +601,15 @@
     window.addEventListener("pointermove", (event) => {
       pointer.x = event.clientX;
       pointer.y = event.clientY;
+    }, { passive: true });
+    // A scroll faster than one screen per second freezes the snow until it slows down: the main thread is the
+    // scroll's, and frozen flakes are not seen behind a page in motion.
+    window.addEventListener("scroll", () => {
+      const now = performance.now();
+      const speed = Math.abs(scrollY - scrollY0) / Math.max(1, now - scrollAt);
+      scrollY0 = scrollY;
+      scrollAt = now;
+      if (speed > height / 1000) pausedUntil = now + 150;
     }, { passive: true });
 
     return { start, stop, resize, sparkle, launchRocket, blizzard, addSpark };
@@ -557,9 +636,16 @@
     const santa = el("div", `xmas-santa${leftward ? " leftward" : ""}`, { "aria-hidden": "true" });
     const duration = clamp(innerWidth / 70, 12, 24);
     santa.style.setProperty("--xmas-fly", `${duration.toFixed(1)}s`);
-    santa.style.top = `${random(8, 26).toFixed(1)}vh`;
+    const top = (innerHeight * random(8, 26)) / 100;
+    santa.style.top = `${top.toFixed(1)}px`;
     const inner = el("div", "xmas-santa-inner");
-    inner.append(icon("deer", "deer"), icon("deer", "deer"), icon("deer", "deer"));
+    // Each deer is a wrapper that gallops around an image that keeps its shadow, so the shadow is painted once.
+    const deer = () => {
+      const node = el("span", "deer");
+      node.append(icon("deer"));
+      return node;
+    };
+    inner.append(deer(), deer(), deer());
     const sleigh = el("div", "sleigh");
     sleigh.append(icon("sled", "sled"), icon("santa-claus", "claus"));
     sleigh.firstChild.style.width = "76px";
@@ -568,11 +654,17 @@
     santa.append(inner);
     document.body.append(santa);
 
+    // The trail follows the flight animation's clock, not the layout: one size read now, none per spark.
+    const size = { width: santa.offsetWidth, height: santa.offsetHeight };
+    const flight = santa.getAnimations()[0];
+    const from = leftward ? innerWidth + 40 : -420;
+    const to = leftward ? -420 : innerWidth + 40;
     const trail = setInterval(() => {
-      const box = santa.getBoundingClientRect();
-      const x = leftward ? box.right - 14 : box.left + 14;
+      const progress = flight ? clamp(Number(flight.currentTime) / (duration * 1000), 0, 1) : 0;
+      const left = from + (to - from) * progress;
+      const x = leftward ? left + size.width - 14 : left + 14;
       for (let index = 0; index < 3; index++) {
-        engine.addSpark(x + random(-6, 6), box.top + box.height * random(0.4, 0.9), (leftward ? 1 : -1) * random(10, 50), random(-20, 30), pick(["#ffd24a", "#ffffff", "#ff4d4d", "#39ff14"]), random(1.4, 3.6), random(0.7, 1.5), 40);
+        engine.addSpark(x + random(-6, 6), top + size.height * random(0.4, 0.9), (leftward ? 1 : -1) * random(10, 50), random(-20, 30), pick(["#ffd24a", "#ffffff", "#ff4d4d", "#39ff14"]), random(1.4, 3.6), random(0.7, 1.5), 40);
       }
     }, 60);
 
