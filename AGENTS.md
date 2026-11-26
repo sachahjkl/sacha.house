@@ -23,6 +23,25 @@
 - `data/embed.go` embeds `data/blog/` in the binary. At start, `blog.MergeSeed` merges the posts of the repository into the running data directory with a three-way merge. A new post is imported. If only the repository changed a post since the last merge, the post is replaced. If the repository and the admin both changed it, the admin version stays, the repository version is written as `post.seed.json` and `content.seed.md` in the post directory, and the start logs a warning once. The admin lists these conflicts in `/admin/blogposts` and resolves them at `/admin/blogposts/{slug}/conflict`: it shows the diff, then takes the repository version (`Store.TakeRepositoryVersion`, which records the result as merged) or keeps the site version (`Store.KeepSiteVersion`, which only removes the `.seed` files). The merge memory is `.seed-state.json` at the root of the blog data, outside the post directories, because `Store.Save` rebuilds a post directory.
 - Encrypted Gist paste code lives in `internal/paste/` and `internal/app/paste.go`.
 
+## Changelog
+
+- `CHANGELOG.md` follows Keep a Changelog and semantic versioning. Do not edit it by hand.
+- A change that a visitor or the site owner can see is one fragment in `changelog.d/`, in the same commit as the change.
+  `changelog.d/README.md` gives the format.
+
+## Roadmap
+
+- `ROADMAP.md` holds the planned work: `# Roadmap`, then `## Now`, `## Next` and `## Later`, each a list; an optional
+  `## Maybe` comes last. No front matter, no dates.
+- An entry starts with a bold summary, then one or two sentences on what it gives the user.
+- When a work is done, remove its entry in the same commit as its changelog fragment.
+
+## Intent
+
+- The site follows <https://srcmd.org>. The project has no `src` folder, so the intent lives in `internal/md`.
+  Read `internal/md/README.md` first.
+- Change the intent first, then the code and the tests, in the same commit.
+
 ## Common Commands
 
 - `just dev`: watch source files, rebuild, and run the server with `-dev`.
