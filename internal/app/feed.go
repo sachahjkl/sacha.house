@@ -93,8 +93,8 @@ func (app *App) llmsText(writer http.ResponseWriter, _ *http.Request) {
 		{"/", "Home", "Who " + web.Me.FullName + " is, featured projects, and the latest posts."},
 		{"/about", "About", "Biography, career, education, and contact details."},
 		{"/projects", "Projects", "Every public project, with the featured ones first."},
-		{"/resume", "Résumé", "One-page résumé, in French; add ?lang=en for English."},
-		{"/cv", "Curriculum vitae", "Full curriculum vitae, in French; add ?lang=en for English."},
+		{"/resume", "Résumé", "One-page résumé, in English; add ?lang=fr for French."},
+		{"/cv", "Curriculum vitae", "Full curriculum vitae, in English; add ?lang=fr for French."},
 		{"/blog", "Blog", "Every post, newest first. Feeds: /blog/rss.xml and /blog/atom.xml."},
 	} {
 		output.WriteString("- [" + page.title + "](" + web.SiteURL + page.path + "): " + page.description + "\n")
