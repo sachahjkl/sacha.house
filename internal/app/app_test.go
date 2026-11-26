@@ -267,6 +267,7 @@ func TestPublicRoutes(t *testing.T) {
 		{path: "/cv?lang=fr", status: 200, contentType: "text/html", contains: "Catalogue de projets"},
 		{path: "/resume", status: 200, contentType: "text/html", contains: "opencode native"},
 		{path: "/resume", status: 200, contentType: "text/html", contains: "gui_toolkit"},
+		{path: "/cv", status: 200, contentType: "text/html", contains: "own kernel (modulus)"},
 		{path: "/cv", status: 200, contentType: "text/html", contains: "href=\"/cv?lang=fr\""},
 		{path: "/projects", status: 200, contentType: "text/html", contains: "GitHub"},
 		{path: "/teapot", status: 200, contentType: "text/html", contains: "nice cup"},
